@@ -1,0 +1,115 @@
+.mitsiFilter
+{ 
+    border: 1;
+    padding: 0;
+}
+
+.sqlinput {
+	font-family: monospace;
+}
+
+.separator {
+	background-color:lightgrey;
+}
+.hseparator {
+	height:3px;
+}
+.vseparator {
+	width:3px;
+}
+
+.datasource {
+	background-color:lightblue;
+	border-top:1px;
+	border-left:0px;
+	border-right:0px;
+	border-bottom:0px;
+	border-style: solid;
+	margin-top:5px;
+	border-top-right-radius:10px;
+}
+
+.datasourceName {
+    font-size: 100%;
+	font-weight: bold;
+}
+
+.datasourceTags {
+	font-size: 80%;
+	font-style: italic;
+}
+
+.popupMenu {
+	background-color:lightgrey;
+}
+
+#sqlinput {
+	font-family: monospace;
+}
+
+.datasourceTable {
+	padding-left:10px;
+	font-family: Arial;
+	color:red;
+}
+
+.datasourceColumns {
+}
+
+.datasourceColumn {
+	padding-left:20px;
+	font-family: Arial;
+	font-size:80%;
+	color:lightred;
+}
+
+.detailWindow {
+	background-color:#4aa5e6;
+	border-radius:8px;
+}
+
+.detailHeader {
+	background-color:blue;
+	margin-top:15px;
+	border-top-left-radius:8px;
+	border-top-right-radius:8px;
+}
+
+.detailContent {
+	background-color:lightblue;
+	border-bottom-left-radius:8px;
+	border-bottom-right-radius:8px;
+}
+
+.detailIcon {
+	margin-top:15px;
+}
+
+.datasourceFilterTable td {
+	padding:0px;
+}
+
+.schemaSelect {
+	background-color : lightblue;
+	font-weight:bold;
+}
+
+.headerTitle {
+	font-size: 140%;
+	font-style: italic;
+}
+
+.detailsAccordionTitle {
+	background-color:lightblue;
+	border-top:1px;
+	border-left:0px;
+	border-right:0px;
+	border-bottom:0px;
+	border-style: solid;
+	margin-top:5px;
+	border-top-right-radius:10px;
+}
+
+.detailsBody {
+	background-color:white;
+}

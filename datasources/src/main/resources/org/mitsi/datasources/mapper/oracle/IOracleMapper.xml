@@ -1,0 +1,220 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mitsi.datasources.mapper.oracle.IOracleMapper">
+
+
+<select id="testOK" resultType="String">
+	SELECT TO_CHAR(SYSDATE, 'YYYYMMDD hh24:mi:ss')
+	FROM DUAL
+</select>
+
+<update id="changeSchema">
+	ALTER SESSION SET CURRENT_SCHEMA = ${schema}
+</update>
+
+<resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
+	<result property="name" column="schema_name"/>
+	<result property="current" column="is_current"/>
+    <result property="jsonDetails" column="json_details"/>
+</resultMap>
+
+<select id="getAllSchemas" resultMap="SchemaResultMap">
+	SELECT username schema_name,
+	DECODE(username, sys_context( 'userenv', 'current_schema' ), '1', '0') is_current
+	FROM ALL_USERS 
+</select>
+
+<resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
+  <constructor>
+    <idArg column="id_type" javaType="String"/>
+    <idArg column="id_schema" javaType="String"/>
+    <idArg column="id_name" javaType="String"/>
+  </constructor>
+  <result property="jsonDetails" column="json_details"/>
+  <collection property="columns" ofType="org.mitsi.datasources.Column">
+      <result property="name" column="column_name"/>
+  </collection>
+</resultMap>
+
+<select id="getTablesAndViews" resultMap="DatabaseObjectResultMap">
+	
+	SELECT 
+		all_objects.owner 		id_schema, 
+		all_objects.object_name id_name, 
+		decode(all_objects.object_type, 
+			'TABLE', 'table', 
+			'VIEW', 'view', 
+			'MATERIALIZED VIEW', 'matview', 
+			null 
+		) id_type,
+    all_tab_columns.column_name column_name
+	FROM all_objects
+	     LEFT JOIN all_tab_columns ON all_objects.owner=all_tab_columns.owner AND all_objects.object_name=all_tab_columns.table_name 
+	WHERE all_objects.object_type IN ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
+	AND all_objects.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_objects.owner NOT LIKE 'APEX_%'
+	AND NOT (all_objects.object_type='TABLE' and 
+          exists (SELECT 1 FROM all_objects ao WHERE ao.owner=all_objects.owner AND ao.object_name=all_objects.object_name AND ao.object_type='MATERIALIZED VIEW'))
+	ORDER BY all_objects.owner, all_objects.object_name, all_objects.object_type, all_tab_columns.column_id
+	
+</select>
+
+
+<!--  todo : encoder le json autrement ? -->
+<select id="getTablesDetails" resultMap="DatabaseObjectResultMap">
+	SELECT 
+		all_tables.owner 		id_schema, 
+		all_tables.table_name   id_name, 
+		decode((SELECT 1 FROM all_objects ao WHERE ao.owner=all_tables.owner AND ao.object_name=all_tables.table_name AND ao.object_type='MATERIALIZED VIEW'),
+			1    ,  'matview',
+			'table'
+		) id_type,
+		-- null column_name,
+		'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'", '||
+		  '"partitioned":"'   ||partitioned  ||'", '||
+		  '"temporary":"'     ||temporary    ||'", '||
+		  '"secondary":"'     ||secondary    ||'", '||
+		  '"nested":"'        ||nested       ||'", '||
+		  '"row_movement":"'  ||row_movement ||'" } ' json_details
+	FROM all_tables
+	WHERE all_tables.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_tables.owner NOT LIKE 'APEX_%'
+	ORDER BY all_tables.owner, all_tables.table_name
+</select>
+
+<select id="getViewsDetails" resultMap="DatabaseObjectResultMap">
+	SELECT 
+		all_views.owner 		id_schema, 
+		all_views.view_name   id_name, 
+		'view' id_type,
+		'{ "view_type":"'       ||view_type||'", '||
+		  '"superview_name":"'   ||superview_name  ||'", '||
+		  '"editioning_view":"'  ||editioning_view    ||'", '||
+		  '"read_only":"'        ||read_only    ||'" } ' json_details
+	FROM all_views
+	WHERE all_views.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_views.owner NOT LIKE 'APEX_%'
+	ORDER BY all_views.owner, all_views.view_name
+</select>
+
+<select id="getMatViewsDetails" resultMap="DatabaseObjectResultMap">
+	SELECT 
+		all_mviews.owner 		id_schema, 
+		all_mviews.mview_name   id_name, 
+		'matview' id_type,
+		'{ "container_name":"'            ||container_name||'", '||
+		  '"updatable":"'                 ||updatable  ||'", '||
+		  '"refresh_mode":"'              ||refresh_mode    ||'", '||
+		  '"fast_refreshable":"'          ||fast_refreshable    ||'", '||
+		  '"last_refresh_type":"'         ||last_refresh_type    ||'", '||
+		  '"last_refresh_date":"'         ||last_refresh_date    ||'", '||
+		  '"staleness":"'                 ||staleness    ||'", '||
+		  '"compile_state":"'             ||compile_state    ||'", '||
+		  '"stale_since":"'               ||stale_since    ||'" } ' json_details
+	FROM all_mviews
+	WHERE all_mviews.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_mviews.owner NOT LIKE 'APEX_%'
+	ORDER BY all_mviews.owner, all_mviews.mview_name
+</select>
+
+<select id="getSchemasDetails" resultMap="SchemaResultMap">
+	SELECT username schema_name,
+		DECODE(username, sys_context( 'userenv', 'current_schema' ), '1', '0') is_current,
+		'{ "user_id":"'            ||user_id||'", '||
+		  '"created":"'            ||created||'" } ' json_details
+	FROM ALL_USERS 
+</select>
+
+<select id="getTablespaceDetails" resultType="org.mitsi.datasources.Tablespace">
+	SELECT 
+		tablespace_name name,
+		file_name 		file_name,
+		bytes           size_bytes,
+		maxbytes		max_size_bytes,
+		blocks			blocks,
+		maxblocks		max_blocks,
+		'{ "file_id":"'            ||file_id||'", '||
+		  '"status":"'             ||status||'", '||
+		  '"autoextensible":"'     ||autoextensible||'", '||
+		  '"increment_by":"'       ||increment_by||'", '||
+		  '"user_bytes":"'         ||user_bytes||'", '||
+		  '"user_blocks":"'        ||user_blocks||'", '||
+		  '"online_status":"'      ||online_status||'" } ' json_details
+	FROM dba_data_files 
+	ORDER BY 1, 2
+
+</select>
+
+<select id="getTableColumnsDetails" resultType="org.mitsi.datasources.Column">
+	select 
+	column_name name,
+	decode(data_type, 'NUMBER', 'integer', 'VARCHAR2', 'string', data_type) type,
+	data_length,
+	nullable,
+			'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'" } ' json_details
+	from all_tab_columns where owner=#{owner} and table_name=#{name} order by column_id
+</select>
+
+
+<select id="getTableIndexesDetails" resultType="org.mitsi.datasources.Index">
+	select  
+	  all_indexes.owner owner,
+	  all_indexes.index_name name,
+	  all_indexes.index_type type,
+	  all_indexes.uniqueness uniqueness,
+	  ( select LISTAGG(all_ind_columns.column_name, ',') WITHIN GROUP (ORDER BY column_position)
+	    from all_ind_columns where all_indexes.index_name=all_ind_columns.index_name and all_indexes.owner=all_ind_columns.index_owner
+	  )columns,
+			'{ "last_analyzed":"'||to_char(all_indexes.last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'", '||
+			  '"tablespace_name":"'    ||all_indexes.tablespace_name||'", '||
+			  '"logging":"'            ||all_indexes.logging||'", '||
+			  '"partitioned":"'        ||all_indexes.partitioned||'", '||
+			  '"temporary":"'          ||all_indexes.temporary||'", '||
+			  '"generated":"'          ||all_indexes.generated||'", '||
+			  '"secondary":"'          ||all_indexes.secondary||'", '||
+			  '"dropped":"'            ||all_indexes.dropped||'", '||
+			  '"visibility":"'         ||all_indexes.visibility||'" } ' json_details
+	
+	from all_indexes 
+	where all_indexes.table_name=#{tableName} and all_indexes.table_owner=#{tableOwner}
+</select>
+
+<select id="getTableConstraintsDetails" resultType="org.mitsi.datasources.Constraint">
+	select 
+	  constraint_name name,
+	  constraint_type type,
+	  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+	    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.constraint_name and all_cons_columns.owner=all_constraints.owner
+	  ) columns,
+	  r_owner fk_constraint_owner,
+	  r_constraint_name fk_constraint_name,
+	  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+	    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.r_constraint_name and all_cons_columns.owner=all_constraints.r_owner
+	  ) fk_columns,
+			'{ "delete_rule":"'    ||delete_rule||'", '||
+			  '"status":"'         ||status||'", '||
+			  '"index_owner":"'    ||index_owner||'", '||
+			  '"index_name":"'     ||index_name||'", '||
+			  '"invalid":"'        ||invalid||'" } ' json_details
+	from all_constraints 
+	where owner=#{tableOwner} and table_name=#{tableName}
+</select>
+
+<select id="getTablePartitionDetails" resultType="org.mitsi.datasources.Partition">
+	select 
+	partition_name name,
+	tablespace_name tablespace_name,
+	high_value high_value,
+	high_value_length high_value_length,
+	interval interval,
+			'{ "subpartition_count":"'    ||subpartition_count||'", '||
+			  '"partition_position":"'            ||partition_position||'", '||
+			  '"max_size":"'        ||max_size||'" } ' json_details
+	from all_tab_partitions
+	where table_owner=#{tableOwner} and table_name=#{tableName}
+</select>
+
+
+
+</mapper>

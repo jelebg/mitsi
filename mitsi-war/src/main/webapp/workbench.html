@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+<TITLE>Mitsi Workbench</TITLE>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+<link rel="stylesheet" media="screen" href="handsontable-0.12.6/handsontable.full.css">
+<link rel="stylesheet" media="screen"  href="css/mitsi.css">
+<script src="handsontable-0.12.6/handsontable.mitsi.js"></script>
+<script src="js/mitsi.common.js"></script>
+<script src="js/mitsi.window.js"></script>
+<script src="js/mitsi.widget.js"></script>
+<script src="js/mitsi.ftext.js"></script>
+<script src="js/workbench.context.js"></script>
+<script src="js/workbench.event.js"></script>
+<script src="js/mitsi.table.js"></script>
+<script src="js/workbench.js"></script>
+
+<script>
+var data = [
+			/*[ '', 'Coucou', 'Mazda', 'Mercedes', 'Mini', 'Mitsubishi' ],
+			[ '2009', 0, 2941, 4303, 354, 5814 ],
+			[ '2010', 3, 2905, 2867, 412, 5284 ],
+			[ '2011', 4, 2517, 4822, 552, 6127 ],
+			[ '2012', 2, 2422, 5399, 776, 4151 ] */ ];
+
+			
+
+
+
+/*function initSqlResult() {
+	var hot = new Handsontable(gid("sqlresulttable"), {
+		data : data,
+		minSpareRows : 0,
+		colHeaders : true,
+		contextMenu : true,
+		afterChange : function() {
+			console.log(JSON.stringify(data));
+		},
+		manualColumnResize : true,
+		manualColumnMove : true,
+		colHeaders : [ 'première', 'deuxième', 'troisième', 'quatrième',
+				'cinquième', 'sixième' ]
+
+	});
+}*/
+
+window.onresize = function(event) {
+	adjustPanelSize();
+}
+
+document.onclick = function(event) {
+	// TODO : à enrichir au fur et a mesure des besoins de popups
+	
+	datasourcePopupMenu.hide();
+	detailScreen.hide();
+}
+
+
+/*function windAllDatasources() {
+	var divs = document.getElementsByClassName(datasourceUnrolledPrefix);
+	if(divs) {
+		for(var i=0; i!=divs.length; i++) {
+			var d = divs[i];
+			if(d.style.display != "none") {
+				d.style.display = "none";
+			}
+		}
+	}
+}
+
+function unrollDatasource(element, event, datasource) {
+	// on est obligés de tester ça avant de d'enrouler tous les accordéons
+	var div = gid(datasourceUnrolledPrefix+datasource);
+	var unroll = (div.style.display == "none");
+
+	windAllDatasources();
+	
+	if(unroll) {
+		div.style.display = "inline";
+	}
+}*/
+
+/*function showDatasourceMenu(element, event, datasource) {
+	var oldMenu = gid("datasourceMenu");
+	//var parent = gid("datasourcePanel");
+	var parent = gid("around");
+	if(oldMenu) {
+		var parent = oldMenu.parentElement;
+		parent.removeChild(oldMenu);
+	}
+
+
+	var elementXY = getAbsoluteXY(element);
+	//var dataSourcePanelXY = getAbsoluteXY(parent);
+	
+	var divMenu = document.createElement("DIV");
+	divMenu.id = "datasourceMenu";
+	divMenu.className = "datasourceMenu";
+	divMenu.style.position = "absolute";
+	divMenu.style.top = (elementXY.y/*-dataSourcePanelXY.y* /+element.offsetHeight)+"px";
+	divMenu.style.left = (elementXY.x/*-dataSourcePanelXY.x* /)+"px";
+	divMenu.style.width = "200px";
+	divMenu.style.zIndex = "200";
+
+	var line1 = document.createElement("DIV");
+	var line2 = document.createElement("DIV");
+	var line3 = document.createElement("DIV");
+	line1.textContent = "menu";
+	line2.textContent = "de";
+	line3.textContent = datasource;
+	line1.style.width = "100%";
+	line2.style.width = "100%";
+	line3.style.width = "100%";
+	divMenu.appendChild(line1);
+	divMenu.appendChild(line2);
+	divMenu.appendChild(line3);
+	
+	parent.appendChild(divMenu);
+}*/
+
+
+
+</script>
+
+</head>
+<body id="mybody" onload="bodyOnLoad();" style="overflow:hidden;">
+
+<img src="img/logo.png" style="height:26px;vertical-align:bottom;"/>
+<input type="button" value="import datasources"/>
+<input type="button" value="export datasources"/>
+
+<div id="around" style="background-color:lightgrey">
+
+<div id="datasourcePanel" style="position: absolute;width:400px;overflow-y:scroll;overflow-x:hidden;">
+<div id="datasourceFilterDiv"></div>
+<!-- div style="position:absolute;right:2px">
+	<a href=""><img src="img/toggle_redcross.png" onclick="gid('datasourceFilter').value='';return false;"/></a>
+</div >
+<input id="datasourceFilter" type="text" value="filter here" style="width:99%;padding:0;border-width:1;"/ -->
+
+</div>
+<div id="vseparator" class="separator vseparator" style="position:absolute;left:5px;">
+</div>
+<div id="rightPanel" style="width:100%;height:100%;float:right;position:absolute;right:0;">
+  <input type="button" value="run" onclick="runSQL();"/>
+  <input type="button" value="explain" disabled="true"/>
+  <input type="button" value="trace" disabled="true"/>
+  <input type="button" value="import sql file" disabled="true"/>
+  <input type="button" value="export sql file" disabled="true"/>
+  <button id="btnHighlight" title="toggle highlight on/off" disabled="true"></button>
+  <div>
+    <select id="runSQLDatasourceSelect" style="width:400px;">
+    	<option value="">select datasource to run SQL here</option>
+    </select>
+  </div>
+
+  <div id="sqlinput" style="width:100%;height:200px;overflow-x:auto;overflow-y:auto;padding:0px;" contenteditable="true" spellcheck="false" onkeyup="sqlInputOnKey(event);">
+    sql
+  </div>
+  <div id="hseparator" class="separator hseparator" style="position:absolute;width:100%;height:3px">
+  </div>
+  <!-- div id="sqlresult" style="position:absolute;width:100px;height:100px;overflow-y:auto;overflow-x:auto;"-->
+  <div id="sqlresult" style="position:absolute;width:100px;height:100px;">
+  <button>refresh</button>
+  <button>filter</button>
+    <div id="sqlresulttable" style="width:100%;height:100%;overflow-y:auto;overflow-x:auto;">
+    <!--div id="sqlresulttable" -->
+	<!-- TODO : scrollbar horizontal ne fonctionne pas, vertical ne fonctionne que sur firefox -->
+	</div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
