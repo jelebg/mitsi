@@ -5,7 +5,7 @@ function adjustPanelSize() {
 	var rightPanel = gid("rightPanel");
 	var vSeparator = gid("vseparator");
 	var hSeparator = gid("hseparator");
-	var sqlInput = gid("sqlinput");
+	var sqlInput = gid("sqlinputGlobal");
 	var sqlResult = gid("sqlresult");
 	var sqlResultTable = gid("sqlresulttable");
 	
@@ -642,6 +642,7 @@ var hightlightToggle = null;
 var datasourcePopupMenu = null;
 var detailScreen = null;
 var datasourceFilter = null;
+var ftextSqlInput = null;
 function bodyOnLoad() {
 	datasourceFilter = new DynamicFilter(gid("datasourceFilterDiv"),
 			"",
@@ -674,11 +675,13 @@ function bodyOnLoad() {
 		15
 	);
 		
+	ftextSqlInput = new FText(gid("sqlinput"), gid("sqlLineNumber"));
+
 	//highlight();
 	adjustPanelSize();
 	
 	vSeparatorFor(gid("vseparator"), [gid("datasourcePanel")], [gid("rightPanel"), gid("sqlresulttable")]);
-	hSeparatorFor(gid("hseparator"), [gid("sqlinput")], [gid("sqlresult"), gid("sqlresulttable")]);
+	hSeparatorFor(gid("hseparator"), [gid("sqlinputGlobal")], [gid("sqlresult"), gid("sqlresulttable")]);
 	
 	//highlightTimeout();
 	
@@ -719,6 +722,12 @@ function bodyOnLoad() {
 
 
 function sqlInputOnKey(event) {
+	//console.log(event.keyCode);
+	if(event.keyCode == 13 || event.keyCode == 8 || event.keyCode == 46 ||
+		event.ctrlKey&&(event.key=="v" ||event.key=="x")) {
+		ftextSqlInput.updateLineNumbers();
+	}
+
 	if(event.keyCode == 120) { // F9 key
 		if(event.ctrlKey) { // ctrl-F9
 			console.log("XPLAN for : '"+getSqlInputOne()+"'");

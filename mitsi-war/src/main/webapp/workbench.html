@@ -17,12 +17,12 @@
 <script src="js/workbench.js"></script>
 
 <script>
-var data = [
-			/*[ '', 'Coucou', 'Mazda', 'Mercedes', 'Mini', 'Mitsubishi' ],
+/*var data = [
+			[ '', 'Coucou', 'Mazda', 'Mercedes', 'Mini', 'Mitsubishi' ],
 			[ '2009', 0, 2941, 4303, 354, 5814 ],
 			[ '2010', 3, 2905, 2867, 412, 5284 ],
 			[ '2011', 4, 2517, 4822, 552, 6127 ],
-			[ '2012', 2, 2422, 5399, 776, 4151 ] */ ];
+			[ '2012', 2, 2422, 5399, 776, 4151 ]  ];*/
 
 			
 
@@ -155,8 +155,29 @@ function unrollDatasource(element, event, datasource) {
     </select>
   </div>
 
-  <div id="sqlinput" style="width:100%;height:200px;overflow-x:auto;overflow-y:auto;padding:0px;" contenteditable="true" spellcheck="false" onkeyup="sqlInputOnKey(event);">
-    sql
+  <div id="sqlinputGlobal" style="width:100%;height:200px;overflow-y:auto;">
+	  <table style="width:100%;"><tr>
+		  <td id="sqlLineNumber" style="font-family: monospace;vertical-align:top;background-color:lightgrey;">
+			  001<br/>
+		  </td>
+		  <td style="width:100%;vertical-align:top;" >
+			<div id="sqlinput" style="width:100%;padding:0px;" contenteditable="true" spellcheck="false" onkeyup="sqlInputOnKey(event);">
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql<br/>
+			sql
+			</div>
+		  </td>
+	  </tr></table>
   </div>
   <div id="hseparator" class="separator hseparator" style="position:absolute;width:100%;height:3px">
   </div>

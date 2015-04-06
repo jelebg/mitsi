@@ -89,3 +89,51 @@ function getSqlInputOne() {
 	}
 	return sqlInput.substring(beginIndex, endIndex);;
 }
+
+
+function getFTextNbLigneRecurse(div) {
+	var nbLines = 0;
+	
+	for(var i=0; i!=div.childNodes.length; i++) {
+		var c = div.childNodes[i];
+		if(c.nodeName=="BR") {
+			nbLines++;
+		}
+		else {
+			nbLines = nbLines + getFTextNbLigneRecurse(c);
+		}
+	}
+	return nbLines;
+}
+
+function FText(divText, divNbLines) {
+	this.getNbLines = function() {
+		return getFTextNbLigneRecurse(this.divText);
+	}
+	this.initLineNumbers = function() {
+		if(!divNbLines) {
+			return;
+		}
+		
+		divNbLines.innerHTML = "";
+		for(var i=0; i!=this.nbLines+1; i++) {
+			divNbLines.appendChild(document.createTextNode(""+(i+1)));
+			if(i!=this.nbLines) {
+				divNbLines.appendChild(document.createElement("BR"));
+			}
+		}
+	}
+	this.updateLineNumbers = function() {
+		var oldNbLines = this.nbLines;
+		this.nbLines = this.getNbLines();
+		this.initLineNumbers();
+	
+	}
+	
+	this.divText = divText;
+	this.divNbLines = divNbLines;
+	this.nbLines = this.getNbLines()+1;
+	this.initLineNumbers();
+	
+	
+}
