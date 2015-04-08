@@ -17,7 +17,7 @@ import org.mitsi.datasources.Tablespace;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.Connection;
+import org.mitsi.mitsiwar.connections.MultiConnection;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -107,14 +107,14 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		return links;
 	}
 	
-	private void getDatasource(GetDetailsResponse response, Connection connection, String datasourceName) {
+	private void getDatasource(GetDetailsResponse response, MultiConnection connection, String datasourceName) {
 		response.accordions = new ArrayList<GetDetailsResponse.Accordion>();
 		
 		GetDetailsResponse.Accordion tables = response.new Accordion();
 		response.accordions.add(tables);
 		tables.title = "Tables";
 		try {
-			List<DatabaseObject> objectList = connection.getMapper().getTablesDetails();
+			List<DatabaseObject> objectList = connection.getConnectionForMitsi().getTablesDetails();
 			tables.data = new ArrayList<String[]>();
 			tables.columns = new ArrayList<String>();
 			fromObjectList(objectList,  tables.data, tables.columns);
@@ -128,7 +128,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(views);
 		views.title = "Views";
 		try {
-			List<DatabaseObject> objectList = connection.getMapper().getViewsDetails();
+			List<DatabaseObject> objectList = connection.getConnectionForMitsi().getViewsDetails();
 			views.data = new ArrayList<String[]>();
 			views.columns = new ArrayList<String>();
 			fromObjectList(objectList,  views.data, views.columns);
@@ -142,7 +142,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(matviews);
 		matviews.title = "Materialized Views";
 		try {
-			List<DatabaseObject> objectList = connection.getMapper().getMatViewsDetails();
+			List<DatabaseObject> objectList = connection.getConnectionForMitsi().getMatViewsDetails();
 			matviews.data = new ArrayList<String[]>();
 			matviews.columns = new ArrayList<String>();
 			fromObjectList(objectList,  matviews.data, matviews.columns);
@@ -156,7 +156,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(schemas);
 		schemas.title = "Users / schemas";
 		try {
-			List<Schema> schemaList = connection.getMapper().getSchemasDetails();
+			List<Schema> schemaList = connection.getConnectionForMitsi().getSchemasDetails();
 			schemas.data = new ArrayList<String[]>();
 			schemas.columns = new ArrayList<String>();
 			fromSchemaList(schemaList,  schemas.data, schemas.columns);
@@ -169,7 +169,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(tablespaces);
 		tablespaces.title = "Tablespaces";
 		try {
-			List<Tablespace> tablespaceList = connection.getMapper().getTablespaceDetails();
+			List<Tablespace> tablespaceList = connection.getConnectionForMitsi().getTablespaceDetails();
 			tablespaces.data = new ArrayList<String[]>();
 			tablespaces.columns = new ArrayList<String>();
 			fromTablespaceList(tablespaceList,  tablespaces.data, tablespaces.columns);
@@ -267,7 +267,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		}
 	}
 
-	private void getTable(GetDetailsResponse response, Connection connection,
+	private void getTable(GetDetailsResponse response, MultiConnection connection,
 			String datasourceName, String owner, String tableName) {
 		response.accordions = new ArrayList<GetDetailsResponse.Accordion>();
 		
@@ -278,7 +278,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(columns);
 		columns.title = "Columns";
 		try {
-			List<Column> columnList = connection.getMapper().getTableColumnsDetails(owner, tableName);
+			List<Column> columnList = connection.getConnectionForMitsi().getTableColumnsDetails(owner, tableName);
 			columns.data = new ArrayList<String[]>();
 			columns.columns = new ArrayList<String>();
 			fromColumnsList(columnList,  columns.data, columns.columns);
@@ -292,7 +292,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(indexes);
 		indexes.title = "Indexes";
 		try {
-			List<Index> indexList = connection.getMapper().getTableIndexesDetails(owner, tableName);
+			List<Index> indexList = connection.getConnectionForMitsi().getTableIndexesDetails(owner, tableName);
 			indexes.data = new ArrayList<String[]>();
 			indexes.columns = new ArrayList<String>();
 			fromIndexList(indexList,  indexes.data, indexes.columns);
@@ -306,7 +306,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(constraints);
 		constraints.title = "Constraints";
 		try {
-			List<Constraint> constraintList = connection.getMapper().getTableConstraintsDetails(owner, tableName);
+			List<Constraint> constraintList = connection.getConnectionForMitsi().getTableConstraintsDetails(owner, tableName);
 			constraints.data = new ArrayList<String[]>();
 			constraints.columns = new ArrayList<String>();
 			fromConstraintList(constraintList,  constraints.data, constraints.columns);
@@ -320,7 +320,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		response.accordions.add(partitions);
 		partitions.title = "Partitions";
 		try {
-			List<Partition> partitionList = connection.getMapper().getTablePartitionDetails(owner, tableName);
+			List<Partition> partitionList = connection.getConnectionForMitsi().getTablePartitionDetails(owner, tableName);
 			partitions.data = new ArrayList<String[]>();
 			partitions.columns = new ArrayList<String>();
 			fromPartitionList(partitionList,  partitions.data, partitions.columns);
@@ -344,7 +344,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			return response;
 		}
 
-		Connection connection = connectedClient.getConnection(request.datasourceName);
+		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
 		if(request.objectName == null || request.objectType == null || request.owner == null) {
 			getDatasource(response, connection, request.datasourceName);
 		}

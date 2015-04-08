@@ -42,7 +42,7 @@ public class PublicDatasourcesTest {
 		
 		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
 			connection.connect();
-			connection.getMapper().testOK();
+			connection.testOK();
 		}
 	}
 
@@ -53,7 +53,7 @@ public class PublicDatasourcesTest {
 		
 		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
 			connection.connect();
-			List<DatabaseObject> ldo = connection.getMapper().getTablesAndViews();
+			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
 			
@@ -67,7 +67,7 @@ public class PublicDatasourcesTest {
 		
 		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
 			connection.connect();
-			connection.getMapper().changeSchema("XE2");
+			connection.changeSchema("XE2");
 			List<Column> columns = connection.rawSelectBegin("select count(*) cnt from mytable_xe2");
 			assertTrue(columns.size()==1);
 			assertTrue("CNT".equals(columns.get(0).name));
@@ -101,7 +101,7 @@ public class PublicDatasourcesTest {
 		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
 			
 			connection.connect();
-			List<Schema> schemas = connection.getMapper().getAllSchemas();
+			List<Schema> schemas = connection.getAllSchemas();
 			assertTrue(schemas.size() > 0);
 			
 		}
@@ -114,23 +114,23 @@ public class PublicDatasourcesTest {
 		
 		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
 			connection.connect();
-			List<DatabaseObject> ldo = connection.getMapper().getTablesDetails();
+			List<DatabaseObject> ldo = connection.getTablesDetails();
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
 			
-			ldo = connection.getMapper().getViewsDetails();
+			ldo = connection.getViewsDetails();
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
 			
-			ldo = connection.getMapper().getMatViewsDetails();
+			ldo = connection.getMatViewsDetails();
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
 			
-			List<Schema> ls = connection.getMapper().getSchemasDetails();
+			List<Schema> ls = connection.getSchemasDetails();
 			assertTrue(ls != null);
 			assertTrue(ls==null || ls.size() > 0);
 			
-			List<Tablespace> lt = connection.getMapper().getTablespaceDetails();
+			List<Tablespace> lt = connection.getTablespaceDetails();
 			assertTrue(lt != null);
 			assertTrue(lt==null || lt.size() > 0);
 		}

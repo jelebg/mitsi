@@ -10,7 +10,7 @@ public interface IMitsiMapper {
 	String testOK();
 	void changeSchema(@Param("schema") String schema);
 	List<Schema> getAllSchemas();
-	List<DatabaseObject> getTablesAndViews();
+	List<DatabaseObject> getTablesAndViews(@Param("owner") String owner);
 
 	// for datasource details
 	List<DatabaseObject> getTablesDetails();

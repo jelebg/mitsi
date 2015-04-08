@@ -42,6 +42,9 @@ public class TypeHelper {
 
 
 	public static String fromJdbcToString(int jdbcType, ResultSet rs, int column) throws SQLException {
+		if(rs.getObject(column) == null) {
+			return null;
+		}
 		switch(jdbcType) {
 		case Types.TIMESTAMP :
 		//case Types.TIMESTAMP_WITH_TIMEZONE :
@@ -50,6 +53,9 @@ public class TypeHelper {
 			// I know there is hundreeds of other 'better' ways to do that but I didn't want another lib like JODA just for that
 			// TODO : maybe the perfs are just awfull here ...
 			Date d = rs.getDate(column);
+			if(d == null) {
+				return null;
+			}
 			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			c.setTime(d);
 			return String.format("%04d-%02d-%02dT%02d:%02d:%02d.%03d",

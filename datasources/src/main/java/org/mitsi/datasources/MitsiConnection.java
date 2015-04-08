@@ -29,14 +29,14 @@ import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.datasources.mapper.oracle.IOracleMapper;
 
-public class MitsiConnection implements Closeable {
+public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
 
 	MitsiDatasource datasource;
 	//Connection connection = null;
 	DataSource jdbcDataSource = null;
 	SqlSessionFactory sqlSessionFactory = null;
-	SqlSession sqlSession = null;
+	SqlSession sqlSession = null; // TODO : gérer la thread-safeitude de la sqlSession un peu mieux qu'avec des synchronized (faire des MitsiSession, et prévoir le cas de les mettre de coté pour pour pouvoir garder des resultsets ouverts (resultset ouvert)
 	IMitsiMapper mapper = null;
 	PreparedStatement currentStatement = null; // TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
 	ResultSet currentResultSet = null;// TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
@@ -61,12 +61,19 @@ public class MitsiConnection implements Closeable {
 		jdbcDataSource = new UnpooledDataSource(datasource.getDriver(), 
 				datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
 		//connection = jdbcDataSource.getConnection();
-
+		
 		TransactionFactory transactionFactory = new JdbcTransactionFactory();
 		/* TODO : vérifier à quoi sert le nom de l'environment */
 		Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);
 		Configuration configuration = new Configuration(environment);
 		configuration.setCacheEnabled(false);
+		
+		
+		java.util.Properties props = new java.util.Properties();
+		props.put("v$session.program", "MITSI");
+		configuration.setVariables(props);
+
+		//configuration.setMultipleResultSetsEnabled(multipleResultSetsEnabled); TODO : voir si ça sert a quelque chose
 		//configuration.addMappers("mapper.oracle");
 		// TODO : a rajouter
 		// configuration.addMapper(BlogMapper.class);
@@ -98,21 +105,21 @@ public class MitsiConnection implements Closeable {
 		mapper = null;
 	}
 	
-	public IMitsiMapper getMapper() {
-		return mapper;
-	}
+	//public IMitsiMapper getMapper() {
+	//	return mapper;
+	//}
 
-	public void rollback() {
+	public synchronized void rollback() {
 		sqlSession.rollback();
 		
 	}
-	public void commit() {
+	public synchronized void commit() {
 		sqlSession.commit();
 		
 	}
 	
 	
-	public List<Column> rawSelectBegin(String sql) throws SQLException, MitsiDatasourceException { // TODO : parameters
+	public synchronized List<Column> rawSelectBegin(String sql) throws SQLException, MitsiDatasourceException { // TODO : parameters
 		if(currentResultSet != null) {
 			rawSelectEndQuietly();
 		}
@@ -140,7 +147,7 @@ public class MitsiConnection implements Closeable {
 		return columns;
 	}
 	
-	public List<String[]> rawSelectFetch(int nbRowToFetch) throws SQLException, MitsiDatasourceException { 
+	public synchronized List<String[]> rawSelectFetch(int nbRowToFetch) throws SQLException, MitsiDatasourceException { 
 		// TODO : renvoyer autre chose que des strings pour gérer les blogs, long, etc.
 		if(currentStatement == null) {
 			throw new MitsiDatasourceException("no current statement for connection");
@@ -158,7 +165,7 @@ public class MitsiConnection implements Closeable {
 		return results;
 	}
 	
-	public void rawSelectEnd() throws SQLException, MitsiDatasourceException {
+	public synchronized void rawSelectEnd() throws SQLException, MitsiDatasourceException {
 		if(currentStatement == null) {
 			throw new MitsiDatasourceException("no current statement for connection");
 		}
@@ -171,7 +178,7 @@ public class MitsiConnection implements Closeable {
 		currentResultSetJdbTypes = null;
 	}
 	
-	public void rawSelectEndQuietly()   {
+	public synchronized void rawSelectEndQuietly()   {
 		
 			if(currentResultSet != null) {
 				try {
@@ -190,6 +197,75 @@ public class MitsiConnection implements Closeable {
 			//currentResultSetNbColumns = 0;
 			currentResultSetJdbTypes = null;
 
+	}
+
+	
+	@Override
+	public synchronized String testOK() {
+		return mapper.testOK();
+	}
+
+	@Override
+	public synchronized void changeSchema(String schema) {
+		mapper.changeSchema(schema);
+	}
+
+	@Override
+	public synchronized List<Schema> getAllSchemas() {
+		return mapper.getAllSchemas();
+	}
+
+	@Override
+	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+		return mapper.getTablesAndViews(owner);
+	}
+
+	@Override
+	public synchronized List<DatabaseObject> getTablesDetails() {
+		return mapper.getTablesDetails();
+	}
+
+	@Override
+	public synchronized List<DatabaseObject> getViewsDetails() {
+		return mapper.getViewsDetails();
+	}
+
+	@Override
+	public synchronized List<DatabaseObject> getMatViewsDetails() {
+		return mapper.getMatViewsDetails();
+	}
+
+	@Override
+	public synchronized List<Schema> getSchemasDetails() {
+		return mapper.getSchemasDetails();
+	}
+
+	@Override
+	public synchronized List<Tablespace> getTablespaceDetails() {
+		return mapper.getTablespaceDetails();
+	}
+
+	@Override
+	public synchronized List<Column> getTableColumnsDetails(String owner, String name) {
+		return mapper.getTableColumnsDetails(owner, name);
+	}
+
+	@Override
+	public synchronized List<Index> getTableIndexesDetails(String tableOwner,
+			String tableName) {
+		return mapper.getTableIndexesDetails(tableOwner, tableName);
+	}
+
+	@Override
+	public synchronized List<Partition> getTablePartitionDetails(String tableOwner,
+			String tableName) {
+		return mapper.getTablePartitionDetails(tableOwner, tableName);
+	}
+
+	@Override
+	public synchronized List<Constraint> getTableConstraintsDetails(String tableOwner,
+			String tableName) {
+		return mapper.getTableConstraintsDetails(tableOwner, tableName);
 	}
 	
 	/*public void testOK() {

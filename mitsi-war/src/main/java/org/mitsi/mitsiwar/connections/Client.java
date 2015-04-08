@@ -15,7 +15,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class Client {
 	private String userName; // null for anonymous
-	private Map<String, Connection> publicConnections = new TreeMap<>();
+	private Map<String, MultiConnection> publicConnections = new TreeMap<>();
 	//private List<Connection> userConnections; // TODO : pour plus tard
 	private boolean disconnected = false;
 	
@@ -34,14 +34,14 @@ public class Client {
 	
 	public void disconnect() {
 		disconnected = true;
-		for(Connection connection : publicConnections.values()) {
-			connection.disconnect();
+		for(MultiConnection connection : publicConnections.values()) {
+			connection.disconnectAll();
 		}
 	}
 
 	public void connectDatasource(String datasourceName)
 			throws AlreadyConnectedException, ClassNotFoundException, SQLException {
-		Connection connection = publicConnections.get(datasourceName);
+		MultiConnection connection = publicConnections.get(datasourceName);
 		if(connection != null) {
 			if(!connection.isConnected()) {
 				publicConnections.remove(datasourceName);
@@ -52,16 +52,16 @@ public class Client {
 		}
 		
 		MitsiDatasource mitsiDatasource = publicDatasources.getDatasource(datasourceName);
-		publicConnections.put(datasourceName, new Connection(mitsiDatasource));
+		publicConnections.put(datasourceName, new MultiConnection(mitsiDatasource));
 	}
 
 	public void disconnectDatasource(String datasourceName) throws NotConnectedException {
-		Connection connection = publicConnections.get(datasourceName);
+		MultiConnection connection = publicConnections.get(datasourceName);
 		if(connection == null || !connection.isConnected()) {
 			throw new NotConnectedException();
 		}
 		
-		connection.disconnect();
+		connection.disconnectAll();
 		publicConnections.remove(datasourceName);
 		
 	}
@@ -70,14 +70,14 @@ public class Client {
 		return publicConnections.containsKey(datasourceName);
 	}
 	
-	public Connection getConnection(String datasourceName) throws ClassNotFoundException, SQLException {
-		Connection connection = publicConnections.get(datasourceName);
+	public MultiConnection getConnection(String datasourceName) throws ClassNotFoundException, SQLException {
+		MultiConnection connection = publicConnections.get(datasourceName);
 		if(connection != null) {
 			return connection;
 		}
 		
 		MitsiDatasource mitsiDatasource = publicDatasources.getDatasource(datasourceName);
-		connection = new Connection(mitsiDatasource);
+		connection = new MultiConnection(mitsiDatasource);
 		publicConnections.put(datasourceName, connection);
 		return connection;
 	}

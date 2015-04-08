@@ -5,7 +5,7 @@ import java.util.Map;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.Connection;
+import org.mitsi.mitsiwar.connections.MultiConnection;
 import org.mitsi.mitsiwar.exception.AlreadyConnectedException;
 import org.mitsi.mitsiwar.exception.NotConnectedException;
 import org.mitsi.users.PublicDatasources;
@@ -33,7 +33,7 @@ public class RawSQLBeginServlet extends GsonServlet<RawSQLBegin, RawSQLBeginResp
 		
 		RawSQLBeginResponse response = new RawSQLBeginResponse();
 		
-		Connection connection = client.getConnection(request.datasourceName);
+		MultiConnection connection = client.getConnection(request.datasourceName);
 		response.columns = connection.rawSelectBegin(request.sql);
 		if(request.nbRowToFetch > 0) {
 			response.results = connection.rawSelectFetch(request.nbRowToFetch);

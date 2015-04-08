@@ -6,7 +6,7 @@ import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.Connection;
+import org.mitsi.mitsiwar.connections.MultiConnection;
 import org.mitsi.mitsiwar.exception.NotConnectedException;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema,
 			throw new NotConnectedException();
 		}
 		
-		Connection connection = connectedClient.getConnection(request.datasource);
-		connection.getMapper().changeSchema(request.schema);
+		MultiConnection connection = connectedClient.getConnection(request.datasource);
+		connection.getConnectionForMitsi().changeSchema(request.schema);
 		
 		return new ChangeCurrentSchemaResponse();
 	}

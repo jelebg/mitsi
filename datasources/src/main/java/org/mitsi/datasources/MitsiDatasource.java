@@ -14,9 +14,11 @@ public class MitsiDatasource {
 	private String password;
 	private String connectSchema;
 	private List<String> tags;
+	private long maxConnectionPerUser;
 	
 	public MitsiDatasource(String name, String description, String provider,
-			String driver, String jdbcUrl, String user, String password, List<String> tags) {
+			String driver, String jdbcUrl, String user, String password, List<String> tags,
+			long maxConnectionPerUser) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -25,6 +27,7 @@ public class MitsiDatasource {
 		this.user = user;
 		this.password = password;
 		this.tags = tags;
+		this.maxConnectionPerUser = maxConnectionPerUser;
 	}
 
 	public String getName() {
@@ -99,14 +102,24 @@ public class MitsiDatasource {
 		this.tags = tags;
 	}
 
+	public long getMaxConnectionPerUser() {
+		return maxConnectionPerUser;
+	}
+
+	public void setMaxConnectionPerUser(int maxConnectionPerUser) {
+		this.maxConnectionPerUser = maxConnectionPerUser;
+	}
+
 	@Override
 	public String toString() {
 		return "MitsiDatasource [name=" + name + ", description=" + description
 				+ ", provider=" + provider + ", driver=" + driver
 				+ ", jdbcUrl=" + jdbcUrl + ", user=" + user + ", password="
 				+ password + ", connectSchema=" + connectSchema + ", tags="
-				+ tags + "]";
+				+ tags + ", maxConnectionPerUser=" + maxConnectionPerUser + "]";
 	}
+
+
 
 	
 

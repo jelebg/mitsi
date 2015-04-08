@@ -5,7 +5,7 @@ import java.util.Map;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.Connection;
+import org.mitsi.mitsiwar.connections.MultiConnection;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,18 +28,18 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 	@Override
 	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
 		
-		Connection connection = connectedClient.getConnection(request.datasourceName);
+		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
 		
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
 //		connection.clearCache();
-		try {
-			response.databaseObjects = connection.getMapper().getTablesAndViews();
-			response.schemas = connection.getMapper().getAllSchemas();
-		}
-		finally {
-			connection.rollback();
-		}
+		//try {
+			response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(null);
+			response.schemas = connection.getConnectionForMitsi().getAllSchemas();
+		//}
+		//finally {
+		//	connection.rollback();
+		//}
 
 		return response;
 	}
