@@ -8,7 +8,8 @@
 		"user" : "test",
 		"password" : "test",
 		"connect.schema" : "TEST",
-		"max.connections.per.user" : 2
+		"max.connections.per.user" : 2,
+		"use.schema.cache" : true
 	  },
 	  "LOCALHOST-XE2": {
 		"description" : "another test datasource", 
@@ -17,7 +18,8 @@
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
-		"max.connections.per.user" : 2
+		"max.connections.per.user" : 2,
+		"use.schema.cache" : true
 	  },
 	  "LOCALHOST-XE2-ON-TEST": {
 		"description" : "another test datasource", 
@@ -27,7 +29,8 @@
 		"user" : "xe2",
 		"password" : "xe2",
 		"connect.schema" : "TEST",
-		"max.connections.per.user" : 2
+		"max.connections.per.user" : 2,
+		"use.schema.cache" : true
 	  }
   } 
 }

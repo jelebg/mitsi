@@ -20,6 +20,7 @@ import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.connections.MultiConnection;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -106,6 +107,20 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		}
 		return links;
 	}
+
+	private String[] getConstraintLinks(List<Constraint> constraintList, String datasourceName) {
+		String[] links = new String[constraintList.size()];
+		int i =0;
+		for(Constraint constraint : constraintList) {
+			if(!"R".equals(constraint.type)) {
+				continue;
+			}
+			links[i] = 	getDetailUrl(datasourceName, "table", constraint.fkTable, constraint.fkConstraintOwner);
+			i++;
+		}
+		return links;
+	}
+
 	
 	private void getDatasource(GetDetailsResponse response, MultiConnection connection, String datasourceName) {
 		response.accordions = new ArrayList<GetDetailsResponse.Accordion>();
@@ -251,6 +266,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		columns.add("columns");
 		columns.add("FK constraint owner");
 		columns.add("FK constraint name");
+		columns.add("FK table");
 		columns.add("FK columns");
 		columns.add("jsonDetails");
 		
@@ -261,8 +277,29 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			row[2] =  constraint.columns;
 			row[3] =  constraint.fkConstraintOwner;
 			row[4] =  constraint.fkConstraintName;
+			row[5] =  constraint.fkTable;
+			row[6] =  constraint.fkColumns;
+			row[7] =  constraint.jsonDetails;
+			data.add(row);
+		}
+	}
+	
+	private void fromFktoList(List<Constraint> constraintList, List<String[]> data, List<String> columns) {
+		columns.add("name");
+		columns.add("columns");
+		columns.add("FK constraint owner");
+		columns.add("FK constraint name");
+		columns.add("FK table");
+		columns.add("FK columns");
+		
+		for(Constraint constraint : constraintList) {
+			String[] row = new String[columns.size()];
+			row[0] =  constraint.name;
+			row[1] =  constraint.columns;
+			row[2] =  constraint.fkConstraintOwner;
+			row[3] =  constraint.fkConstraintName;
+			row[4] =  constraint.fkTable;
 			row[5] =  constraint.fkColumns;
-			row[6] =  constraint.jsonDetails;
 			data.add(row);
 		}
 	}
@@ -310,10 +347,29 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			constraints.data = new ArrayList<String[]>();
 			constraints.columns = new ArrayList<String>();
 			fromConstraintList(constraintList,  constraints.data, constraints.columns);
+			constraints.links = getConstraintLinks(constraintList, datasourceName);
+
 		}
 		catch(Exception e) {
 			constraints.message = e.getMessage();
 		}
+		
+		// FKs to this table
+		GetDetailsResponse.Accordion fkto = response.new Accordion();
+		response.accordions.add(fkto);
+		fkto.title = "FK to this table";
+		try {
+			List<Constraint> fktoList = connection.getConnectionForMitsi().getTablesWithConstraintsTo(owner, tableName);
+			fkto.data = new ArrayList<String[]>();
+			fkto.columns = new ArrayList<String>();
+			fromFktoList(fktoList,  fkto.data, fkto.columns);
+			fkto.links = getConstraintLinks(fktoList, datasourceName);
+
+		}
+		catch(Exception e) {
+			constraints.message = e.getMessage();
+		}
+
 		
 		// partitions
 		GetDetailsResponse.Accordion partitions = response.new Accordion();
@@ -345,7 +401,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		}
 
 		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
-		if(request.objectName == null || request.objectType == null || request.owner == null) {
+		if(StringUtils.isEmpty(request.objectName) || StringUtils.isEmpty(request.objectType) || StringUtils.isEmpty(request.owner)) {
 			getDatasource(response, connection, request.datasourceName);
 		}
 		else {

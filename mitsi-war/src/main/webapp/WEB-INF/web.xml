@@ -143,4 +143,24 @@
     <servlet-name>ChangeCurrentSchemaServlet</servlet-name>
     <url-pattern>/ChangeCurrentSchemaServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LinksJspServlet</display-name>
+    <servlet-name>LinksJspServlet</servlet-name>
+    <servlet-class>org.mitsi.mitsiwar.links.LinksJspServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LinksJspServlet</servlet-name>
+    <url-pattern>/links</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetAllRelationsServlet</display-name>
+    <servlet-name>GetAllRelationsServlet</servlet-name>
+    <servlet-class>org.mitsi.mitsiwar.links.GetAllRelationsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetAllRelationsServlet</servlet-name>
+    <url-pattern>/GetAllRelationsServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

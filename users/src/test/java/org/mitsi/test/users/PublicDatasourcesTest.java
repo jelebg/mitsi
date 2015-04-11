@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import org.json.simple.parser.ParseException;
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.MitsiConnection;
+import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
@@ -56,6 +58,11 @@ public class PublicDatasourcesTest {
 			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
+			
+			List<Date> ld = connection.getLastSchemaUpdateTime("TEST");
+			assertTrue(ld != null);
+			assertTrue(ld==null || ld.size() == 1);
+
 			
 		}
 	}
@@ -134,6 +141,16 @@ public class PublicDatasourcesTest {
 			assertTrue(lt != null);
 			assertTrue(lt==null || lt.size() > 0);
 		}
+	}
+	
+	@Test
+	public void getAllRelations() throws IOException, ParseException, ClassNotFoundException, SQLException {
+		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
+			connection.connect();
+			List<Relation> lr = connection.getAllRelations();
+			assertTrue(lr != null);
+			assertTrue(lr==null || lr.size() > 0);
+		}		
 	}
 
 }

@@ -340,12 +340,12 @@ function displayDatabaseObjects(datasourceName) {
 			20,
 			7,
 			[{ title:"unroll", imgsrc:"img/unroll.png" 		},
-			 { title:"search", imgsrc:"img/search.png" 		},
+			 { title:"links", imgsrc:"img/graph.png" 		},
 			 { title:"menu", imgsrc:"img/menu.png"     		}, 
 			 { title:"details", imgsrc:"img/details.png"    },
 			 { title:"table datas", imgsrc:"img/table.png"  } 
 			]);
-		smallMenu.getDiv(1).onclick = function() { alert("search"); return false; };
+		smallMenu.getDiv(1).onclick = createOnClickShowTableLinks("links.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(1), datasourceName, table.id.schema, table.id.type, table.id.name);
 		smallMenu.getDiv(2).onclick = function() { alert("menu"); return false; };
 		smallMenu.getDiv(3).onclick = createOnClickShowTableDetail("details.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(3), datasourceName, table.id.schema, table.id.type, table.id.name);
 		smallMenu.getDiv(4).onclick = createOnClickShowTable("data.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(3), datasourceName, table.id.schema, table.id.name);
@@ -474,11 +474,32 @@ function createOnClickShowTableDetail(detailScreenId, div, datasource, owner, ob
 		return false; 
 	}
 }
+function createOnClickShowTableLinks(detailScreenId, div, datasource, owner, objectType, objectName) {
+	return function(event) {
+		try {
+			detailScreen.show(detailScreenId,
+						"links?datasource="+datasource+"&type="+objectType+"&owner="+owner+"&name="+objectName,
+						div); 
+		}
+		catch (e) {
+			console.log(e);
+		}
+		event.stopPropagation();
+		return false; 
+	}
+}
 
 function refreshDatasource(datasource) {
+	var datasourceContext = CONTEXT.getDatasource(datasource);
+	var select = datasourceContext.schemaList;
+	if(select.selectedIndex >= 0) {
+		var schema = select.options[select.selectedIndex].value;
+	}
+	
 	callGsonServlet("GetDatabaseObjectsServlet", 
 			{
-				"datasourceName" : datasource
+				"datasourceName" : datasource,
+				"schema" : schema
 			},
 			function(response) { 
 				console.log(response);
@@ -803,6 +824,8 @@ function runSQLFetchMore() {
 }
 
 function changeCurrentSchema(datasourceName) {
+	// TODO :est-ce vraiment nécessaire pour la connexion spécifique MITSI ? appeler directement  EVENT_DatasourceSchemaChange ?
+	
 	var datasourceContext = CONTEXT.getDatasource(datasourceName);
 	var select = datasourceContext.schemaList;
 	var schema = select.options[select.selectedIndex].value;

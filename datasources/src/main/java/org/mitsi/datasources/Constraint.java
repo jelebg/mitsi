@@ -6,6 +6,7 @@ public class Constraint {
 	public String columns;
 	public String fkConstraintOwner;
 	public String fkConstraintName;
+	public String fkTable;
 	public String fkColumns;
 	public String jsonDetails;
 }

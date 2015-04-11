@@ -2,7 +2,10 @@ package org.mitsi.mitsiwar.datasources;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
+import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.connections.MultiConnection;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, GetDatabaseObjectsResponse> {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger(GetDatabaseObjectsServlet.class);
 
 	@Autowired
 	private PublicDatasources publicDatasources;
@@ -34,8 +38,19 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 
 //		connection.clearCache();
 		//try {
-			response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(null);
-			response.schemas = connection.getConnectionForMitsi().getAllSchemas();
+		
+		response.schemas = connection.getConnectionForMitsi().getAllSchemas();
+		String schema = request.schema;
+		if(schema == null) {
+			for(Schema s : response.schemas) {
+				if(s.current) {
+					schema = s.name;
+					break;
+				}
+			}
+		}
+		response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(schema);
+		
 		//}
 		//finally {
 		//	connection.rollback();

@@ -10,6 +10,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -69,9 +71,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		configuration.setCacheEnabled(false);
 		
 		
-		java.util.Properties props = new java.util.Properties();
-		props.put("v$session.program", "MITSI");
-		configuration.setVariables(props);
+		//java.util.Properties props = new java.util.Properties();
+		//props.put("v$session.program", "MITSI");
+		//configuration.setVariables(props);
 
 		//configuration.setMultipleResultSetsEnabled(multipleResultSetsEnabled); TODO : voir si ça sert a quelque chose
 		//configuration.addMappers("mapper.oracle");
@@ -217,6 +219,32 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+		if(datasource.isUseSchemaCache()) {
+			log.info("use of cache for owner "+owner);
+
+			Date begining = new Date();
+			MitsiDatasource.Cache cache = datasource.getCache(owner);
+			if(cache == null) {
+				log.info("cache init for owner "+owner+" date="+begining);
+				cache = datasource.new Cache();
+				cache.databaseObjects = mapper.getTablesAndViews(owner);
+				cache.lastCacheUpdate = begining;
+				datasource.setCache(owner, cache);
+			}
+			else {
+				Date lastSchemaUpdate =  mapper.getLastSchemaUpdateTime(owner).get(0);
+				if(lastSchemaUpdate.after(cache.lastCacheUpdate)) {
+					log.info("cache update for owner "+owner+" date="+begining);
+					cache.databaseObjects = mapper.getTablesAndViews(owner);
+					cache.lastCacheUpdate = begining;
+				}
+				else {
+					log.info("cache hit for owner "+owner);
+				}
+			}
+			return cache.databaseObjects;
+		}
+		log.info("cache not used for owner "+owner);
 		return mapper.getTablesAndViews(owner);
 	}
 
@@ -266,6 +294,33 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public synchronized List<Constraint> getTableConstraintsDetails(String tableOwner,
 			String tableName) {
 		return mapper.getTableConstraintsDetails(tableOwner, tableName);
+	}
+
+	@Override
+	public List<Date> getLastSchemaUpdateTime(String owner) {
+		return mapper.getLastSchemaUpdateTime(owner);
+	}
+
+	@Override
+	public List<Constraint> getTablesWithConstraintsTo(String tableOwner,
+			String tableName) {
+		return mapper.getTablesWithConstraintsTo(tableOwner, tableName);
+	}
+
+	@Override
+	public List<Relation> getAllRelations() {
+		List<Relation> relations = mapper.getAllRelations();
+		
+		for(Relation relation : relations) {
+			if(relation.keyColumnsStr != null) {
+				relation.keyColumns = Arrays.asList(relation.keyColumnsStr.split(","));
+			}
+			if(relation.rKeyColumnsStr != null) {
+				relation.rKeyColumns = Arrays.asList(relation.rKeyColumnsStr.split(","));
+			}
+		}
+		
+		return relations;
 	}
 	
 	/*public void testOK() {

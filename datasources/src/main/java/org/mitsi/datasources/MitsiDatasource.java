@@ -1,6 +1,9 @@
 package org.mitsi.datasources;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MitsiDatasource {
 	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
@@ -15,10 +18,17 @@ public class MitsiDatasource {
 	private String connectSchema;
 	private List<String> tags;
 	private long maxConnectionPerUser;
+	private boolean useSchemaCache;
+	private Map<String, Cache> schemasCache;
+	
+	public class Cache 	{
+		List<DatabaseObject> databaseObjects;
+		Date lastCacheUpdate;
+	}
 	
 	public MitsiDatasource(String name, String description, String provider,
 			String driver, String jdbcUrl, String user, String password, List<String> tags,
-			long maxConnectionPerUser) {
+			long maxConnectionPerUser, boolean useSchemaCache) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -28,7 +38,18 @@ public class MitsiDatasource {
 		this.password = password;
 		this.tags = tags;
 		this.maxConnectionPerUser = maxConnectionPerUser;
+		this.useSchemaCache = useSchemaCache;
+		
+		this.schemasCache = new HashMap<String, Cache>();
 	}
+
+	public Cache getCache(String schema) {
+		return schemasCache.get(schema);
+	}
+	public void setCache(String schema, Cache cache) {
+		schemasCache.put(schema, cache);
+	}
+
 
 	public String getName() {
 		return name;
@@ -106,9 +127,19 @@ public class MitsiDatasource {
 		return maxConnectionPerUser;
 	}
 
-	public void setMaxConnectionPerUser(int maxConnectionPerUser) {
+	public void setMaxConnectionPerUser(long maxConnectionPerUser) {
 		this.maxConnectionPerUser = maxConnectionPerUser;
 	}
+	
+	public boolean isUseSchemaCache() {
+		return useSchemaCache;
+	}
+
+	public void setUseSchemaCache(boolean useSchemaCache) {
+		this.useSchemaCache = useSchemaCache;
+	}
+
+
 
 	@Override
 	public String toString() {
@@ -116,8 +147,11 @@ public class MitsiDatasource {
 				+ ", provider=" + provider + ", driver=" + driver
 				+ ", jdbcUrl=" + jdbcUrl + ", user=" + user + ", password="
 				+ password + ", connectSchema=" + connectSchema + ", tags="
-				+ tags + ", maxConnectionPerUser=" + maxConnectionPerUser + "]";
+				+ tags + ", maxConnectionPerUser=" + maxConnectionPerUser
+				+ ", useSchemaCache=" + useSchemaCache + "]";
 	}
+
+
 
 
 

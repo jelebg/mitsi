@@ -7,7 +7,11 @@
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"connect.schema" : "TEST"
+		"connect.schema" : "TEST",
+		"connect.schema" : "TEST",
+		"tags" : [ "tag4", "tag5", "tag3" ],
+		"max.connections.per.user" : 2,
+		"use.schema.cache" : true
 	  },
 	  "LOCALHOST-XE2": {
 		"description" : "another test datasource", 
@@ -15,7 +19,11 @@
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
-		"password" : "xe2"
+		"password" : "xe2",
+		"connect.schema" : "XE2",
+		"tags" : [ "tag4", "tag5", "tag3" ],
+		"max.connections.per.user" : 2,
+		"use.schema.cache" : true
 	  }
   } 
 }

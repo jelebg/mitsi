@@ -32,6 +32,7 @@ public class PublicDatasources extends PooledResource {
 	public static final String FIELD_PASSWORD = "password";
 	public static final String FIELD_CONNECT_SCHEMA = "connect.schema";
 	public static final String FIELD_MAX_CONECTIONS_PER_USER = "max.connections.per.user";
+	public static final String FIELD_USE_SCHEMA_CACHE = "use.schema.cache";
 	public static final String FIELD_TAGS = "tags";
 
 	//@Autowired
@@ -84,6 +85,7 @@ public class PublicDatasources extends PooledResource {
 				}
 				
 				Long maxConnectionsPerUser = (Long) v.get(FIELD_MAX_CONECTIONS_PER_USER);
+				Boolean useSchemaCache = (Boolean) v.get(FIELD_USE_SCHEMA_CACHE);
 				MitsiDatasource datasource = new MitsiDatasource(
 							(String) k,
 							(String) v.get(FIELD_DESCRIPTION),
@@ -93,7 +95,8 @@ public class PublicDatasources extends PooledResource {
 							(String) v.get(FIELD_USER),
 							(String) v.get(FIELD_PASSWORD),
 							tags,
-							(maxConnectionsPerUser==null ? 2L : maxConnectionsPerUser)
+							(maxConnectionsPerUser==null ? 2L : maxConnectionsPerUser),
+							(useSchemaCache==null ? true : useSchemaCache)
 						);
 				datasource.setConnectSchema((String) v.get(FIELD_CONNECT_SCHEMA));
 				datasources.put((String) k, datasource);
