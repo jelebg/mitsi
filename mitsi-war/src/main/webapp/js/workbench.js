@@ -340,7 +340,7 @@ function displayDatabaseObjects(datasourceName) {
 			20,
 			7,
 			[{ title:"unroll", imgsrc:"img/unroll.png" 		},
-			 { title:"links", imgsrc:"img/graph.png" 		},
+			 { title:"links", imgsrc:"img/proxgraph.png" 		},
 			 { title:"menu", imgsrc:"img/menu.png"     		}, 
 			 { title:"details", imgsrc:"img/details.png"    },
 			 { title:"table datas", imgsrc:"img/table.png"  } 
