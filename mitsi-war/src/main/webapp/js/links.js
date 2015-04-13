@@ -77,77 +77,69 @@ function draw() {
 	
 	var name = currentVertexName;
 	var currentVertexIndex = graph.getIndex(currentVertexName);
-	var toexplore = [ currentVertexIndex ];
-	var explored = [];
-	var before = [];
-	var after = [];
 	
-	for(var i=0; i!=depth; i++) {
-		var newBefore = [];
-		var newAfter = [];
-		var toexplorenext = [];
-
-		for(var j=0; j!=toexplore.length; j++) {
-			var exploreIndex = toexplore[j];
-			explored.push(exploreIndex);
-			var links = graph.getLinks(exploreIndex);
-			var reverseLinks = graph.getReverseLinks(exploreIndex);
-			
-			for(var k=0; k!=links.length; k++) {
-				var index = links[k].target;
-
-				if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
-					newAfter.push(index);
-					toexplorenext.push(index);
-				}
-			}
-			
-			for(var k=0; k!=reverseLinks.length; k++) {
-				var index = reverseLinks[k].target;
-				
-				if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
-					newBefore.push(index);
-					toexplorenext.push(index);
-				}
-			}
-		}
-		
-		before[i] = newBefore;
-		after[i] = newAfter;
-		toexplore = toexplorenext;
-		
-	}
+	var proximityGraph = graph.getProximityGraph(currentVertexIndex, depth);
 	
-	var x0 = 20;
+
+	
+	/*var x0 = 20;
 	var y0 = 20;
 	var dx = 300;
 	var dy = 100;
+	*/
+	
+	
+	var radiu = [];
+	
+	// compute radius considering the max number of linked tables for each level, before or after 
+	var maxmax = 0;
+	for(var i=0; i!=depth; i++) {
+		var r = 160*i;
+		var max = (proximityGraph.before[i].length>proximityGraph.after[i] ? proximityGraph.before[i].length : proximityGraph.before[i].length);
+		if(max > maxmax) {
+			maxmax = max;
+		}
+		if(maxmax > 4) {
+			r = (i+1) * maxmax * 40;
+		}
+		radiu[i] = r;
+	}
+	var x0 = radiu[depth-1];
+	var y0 = radiu[depth-1];
 	
 	// append tables
-	appendTable(content, x0+dx*depth, y0+80, name);
+	appendTable(content, x0+40, y0+20, name);
 	for(var i=0; i!=depth; i++) {
-		for(var j=0; j!=before[i].length; j++) {
-			var index = before[i][j];
+		for(var j=0; j!=proximityGraph.before[i].length; j++) {
+			var index = proximityGraph.before[i][j];
 			var vertexName = graph.getVertexName(index);
-			appendTable(content, x0+dx*(depth-i-1), y0+dy*j, vertexName);
+			//appendTable(content, x0+dx*(depth-i-1), y0+dy*j, vertexName);
+			appendTable(content, 
+					x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3)), 
+					y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3)), 
+					vertexName);
 		}
-		for(var j=0; j!=after[i].length; j++) {
-			var index = after[i][j];
+		for(var j=0; j!=proximityGraph.after[i].length; j++) {
+			var index = proximityGraph.after[i][j];
 			var vertexName = graph.getVertexName(index);
-			appendTable(content, x0+dx*(i+depth+1), y0+dy*j, vertexName);
+			//appendTable(content, x0+dx*(i+depth+1), y0+dy*j, vertexName);
+			appendTable(content, 
+					x0+80+radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.after[i].length+3)), 
+					y0+40-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.after[i].length+3)), 
+					vertexName);
 		}
 	}
 	
 	// append links between tables
 	appendLinks(graph.getVertex(currentVertexIndex));
 	for(var i=0; i!=depth; i++) {
-		for(var j=0; j!=before[i].length; j++) {
-			var index = before[i][j];
+		for(var j=0; j!=proximityGraph.before[i].length; j++) {
+			var index = proximityGraph.before[i][j];
 			var vertex = graph.getVertex(index);
 			appendLinks(vertex);
 		}
-		for(var j=0; j!=after[i].length; j++) {
-			var index = after[i][j];
+		for(var j=0; j!=proximityGraph.after[i].length; j++) {
+			var index = proximityGraph.after[i][j];
 			var vertex = graph.getVertex(index);
 			appendLinks(vertex);
 		}
@@ -189,26 +181,28 @@ function bodyOnLoad() {
 
 }
 
-function appendTableIcon(div, vertexName, imgsrc, title, fonclick ) {
+function appendTableIcon(div, vertexName, imgsrc, title, fonclick, url ) {
 	var img = document.createElement("IMG");
 	var a = document.createElement("A");
 	img.src = imgsrc
+	img.style.height = "16px";
 	a.title = title;
-	a.href = "";
-	a.onclick = function(event) {
-		try {
-			fonclick(event, vertexName);
+	a.href = url;
+	if(fonclick) {
+		a.onclick = function(event) {
+			try {
+				fonclick(event, vertexName);
+			}
+			catch (e) {
+				console.log(e);
+			}
+			return false;
+			
 		}
-		catch (e) {
-			console.log(e);
-		}
-		return false;
-		
 	}
 	a.appendChild(img);
 	div.appendChild(a);
 }
-
 function appendTable(div, left, top, name) {
 	var d = document.createElement("DIV");
 	d.id = divPrefix+name;
@@ -237,9 +231,10 @@ function appendTable(div, left, top, name) {
 	
 	var td21 = document.createElement("TD");
 	tr2.appendChild(td21);
-	appendTableIcon(td21, name, "img/proxgraph.png", "show links from this table", function(event, vertexName) { gotoVertex(vertexName); } );
-	appendTableIcon(td21, name, "img/table.png", "show table content", function(event, vertexName) { alert("2:"+vertexName); } );
-	appendTableIcon(td21, name, "img/details.png", "show table details", function(event, vertexName) { alert("3:"+vertexName); } );
+	appendTableIcon(td21, name, "img/proxgraph.png", "show links from this table", function(event, vertexName) { gotoVertex(vertexName); } , "" );
+	appendTableIcon(td21, name, "img/plus.png", "add linked table", function(event, vertexName) { addLinkedTable(vertexName); } , "" );
+	appendTableIcon(td21, name, "img/table.png", "show table content", null, getTableUrl(name) );
+	appendTableIcon(td21, name, "img/details.png", "show table details", null, getDetailsUrl(name) );
 	
 
 	a.onclick = function(event) {
@@ -262,6 +257,16 @@ function appendTable(div, left, top, name) {
 	d.style.top = top+"px";
 	
 	div.appendChild(d);
+}
+
+function getTableUrl(vertexName) {
+	var splt = vertexName.split(".");
+	return "table?datasource="+datasourceName+"&owner="+splt[0]+"&name="+splt[1];
+}
+
+function getDetailsUrl(vertexName) {
+	var splt = vertexName.split(".");
+	return "details?datasource="+datasourceName+"&type=table&owner="+splt[0]+"&name="+splt[1];
 }
 
 function appendLinks(vertex) {

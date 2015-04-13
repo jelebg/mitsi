@@ -86,4 +86,52 @@ function MitsiGraph(relations) {
 		return this.vertexes[index];
 	}
 	
+	this.getProximityGraph = function(index, depth) {
+		var toexplore = [ index ];
+		var explored = [];
+		var before = [];
+		var after = [];
+		
+		for(var i=0; i!=depth; i++) {
+			var newBefore = [];
+			var newAfter = [];
+			var toexplorenext = [];
+
+			for(var j=0; j!=toexplore.length; j++) {
+				var exploreIndex = toexplore[j];
+				explored.push(exploreIndex);
+				var links = graph.getLinks(exploreIndex);
+				var reverseLinks = graph.getReverseLinks(exploreIndex);
+				
+				for(var k=0; k!=links.length; k++) {
+					var index = links[k].target;
+
+					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
+						newAfter.push(index);
+						toexplorenext.push(index);
+					}
+				}
+				
+				for(var k=0; k!=reverseLinks.length; k++) {
+					var index = reverseLinks[k].target;
+					
+					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
+						newBefore.push(index);
+						toexplorenext.push(index);
+					}
+				}
+			}
+			
+			before[i] = newBefore;
+			after[i] = newAfter;
+			toexplore = toexplorenext;
+			
+		}
+		
+		return {
+			"before" : before,
+			"after"  : after
+		};
+	}
+	
 }
