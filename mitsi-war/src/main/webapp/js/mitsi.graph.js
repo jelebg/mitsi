@@ -134,4 +134,47 @@ function MitsiGraph(relations) {
 		};
 	}
 	
+	this.computeDijkstra = function(startIndex) {
+		var t = [];
+		var visited = []
+		var unvisited = [startIndex]
+		
+		t[startIndex] = { d:0, p:-1 };
+		
+		do {
+			var current = unvisited.pop();
+			visited[current] = true;
+			
+			var v = this.vertexes[current];
+			for(var i=0; i!=v.links.length; i++) {
+				var l = v.links[i];
+				if(visited[l.target]) {
+					continue;
+				}
+				
+				if(!t[l.target] || t[l.target].d > t[current].d+1) {
+					t[l.target] = { d:t[current].d+1, p:current };
+				}
+				unvisited.push(l.target);
+			}
+			
+		} while(unvisited.length > 0);
+		
+		return t;
+	}
+	
+	this.getPath = function(dijkstraTable, endIndex) {
+		// TODO : trouver pourquoi dans le path on a parfois des entiers, parfois des string
+		var path = [];
+		
+		var current = endIndex;
+		path.push(current);
+		while(dijkstraTable[current] && dijkstraTable[current].p != -1) {
+			current = dijkstraTable[current].p;
+			path.push(current);
+		}
+			
+		return path.reverse();
+	}
+	
 }

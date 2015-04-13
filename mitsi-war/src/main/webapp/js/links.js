@@ -2,6 +2,8 @@ var jsplumb = null;
 var divPrefix = "mitsiObject_";
 var relations = null;
 var graph = null;
+var dijkstraTable = null;
+var currentVertexName = null
 //var reverseGraph = null;
 
 /*var json = {
@@ -71,7 +73,10 @@ function draw() {
 	jsPlumb.setContainer(content);
 	jsplumb = jsPlumb.getInstance();
 	jsplumb.empty("linksContent");
-
+	jsPlumb.importDefaults({
+		  Endpoints : [ [ "Dot", { radius:5 } ], [ "Dot", { radius:5 } ] ]
+	});
+	
 	content.ondrop = function(event) { dragend(event); };
 	content.ondragover = function(event) { allowDrop(event); };
 	
@@ -94,13 +99,13 @@ function draw() {
 	// compute radius considering the max number of linked tables for each level, before or after 
 	var maxmax = 0;
 	for(var i=0; i!=depth; i++) {
-		var r = 160*i;
+		var r = 200*(i+1);
 		var max = (proximityGraph.before[i].length>proximityGraph.after[i] ? proximityGraph.before[i].length : proximityGraph.before[i].length);
 		if(max > maxmax) {
 			maxmax = max;
 		}
 		if(maxmax > 4) {
-			r = (i+1) * maxmax * 40;
+			r = (i+1) * maxmax * 50;
 		}
 		radiu[i] = r;
 	}
@@ -345,10 +350,22 @@ function fk(from, to, columnsFrom, columnsTo) {
 	jsplumb.connect({
 		source:divPrefix+from,
 		target:divPrefix+to
-		,anchor:[ "Right", "Left" ]
+	    ,paintStyle:{ 
+	    	strokeStyle:"lightgrey", 
+	    	lineWidth:1
+	    }
+    	,hoverPaintStyle:{ 
+    		strokeStyle:"black", 
+    	    lineWidth:3
+    	}
+    	,endpointStyle:{ 
+    		fillStyle:"lightgrey", 
+    		outlineWidth:1 
+    	}
+    	,anchor:[ "Right", "Left" ]
 		,overlays:[ "Arrow", 
-			[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"lightgrey", borderWidth:"1"}} ], 
-			[ "Label", { label:columnsTo, location:0.8} ]
+			[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
+			//,[ "Label", { label:columnsTo, location:0.8} ]
 		  ]
 	});
 
@@ -377,4 +394,35 @@ function dragend(event) {
 	//c.style.left = ev.clientX+"px";
 	c.style.left = (c.offsetLeft+ev.clientX-startX)+"px";
 	c.style.top = (c.offsetTop+ev.clientY-startY)+"px";
+}
+
+function prepareDisjkstra() {
+	var startIndex = graph.getIndex(currentVertexName);
+	dijkstraTable = graph.computeDijkstra(startIndex);
+	
+	var select = gid("shortestPathToSelect");
+	select.innerHTML = "";
+	select.appendChild(document.createElement("OPTION"));
+	for(var i=0; i!=dijkstraTable.length; i++) {
+		
+		if(dijkstraTable[i] && dijkstraTable[i].p!=-1) {
+			var o = document.createElement("OPTION");
+			o.value = i;
+			o.text = graph.getVertexName(i);
+			select.appendChild(o);
+		}
+		
+	}
+}
+
+function highlightShortestPath() {
+	var select = gid("shortestPathToSelect");
+	var endIndex = select.options[select.selectedIndex].value
+	
+	var path = graph.getPath(dijkstraTable, endIndex);
+	var str = "";
+	for(var i=0; i!=path.length; i++) {
+		str = str + graph.getVertexName(path[i]) + "\n";
+	}
+	alert(str);
 }

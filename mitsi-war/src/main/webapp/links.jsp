@@ -40,6 +40,10 @@ var owner = "${owner}";
   <option value="3">3</option>
   <option value="4">4</option>
 </select> 
+<button onclick="prepareDisjkstra();">Dijkstra !</button>
+<select id="shortestPathToSelect" onchange="highlightShortestPath();">
+	<option>please Dijkstra first</option>
+</select>
 <div id="linksContent" style="position:absolute;width:800px;height:800px;"></div>
 
 </body>
