@@ -235,6 +235,7 @@ function appendTable(div, left, top, name) {
 	appendTableIcon(td21, name, "img/plus.png", "add linked table", function(event, vertexName) { addLinkedTable(vertexName); } , "" );
 	appendTableIcon(td21, name, "img/table.png", "show table content", null, getTableUrl(name) );
 	appendTableIcon(td21, name, "img/details.png", "show table details", null, getDetailsUrl(name) );
+	appendTableIcon(td21, name, "img/greycross.png", "hide table", function(event, vertexName) { hideTable(vertexName); } , "" );
 	
 
 	a.onclick = function(event) {
@@ -267,6 +268,45 @@ function getTableUrl(vertexName) {
 function getDetailsUrl(vertexName) {
 	var splt = vertexName.split(".");
 	return "details?datasource="+datasourceName+"&type=table&owner="+splt[0]+"&name="+splt[1];
+}
+
+function hideTable(vertexName) {
+	var div = gid(divPrefix+vertexName);
+	var parent = div.parentElement;
+	
+	jsplumb.remove(divPrefix+vertexName);
+	//parend.removeChild(div);
+}
+
+function addLinkedTable(vertexName) {
+	var missingFrom = [];
+	var missingTo = [];
+	var links = graph.getLinksByName(vertexName);
+	var reverseLinks = graph.getReverseLinksByName(vertexName);
+	
+	//TODO : popup
+	
+	for(var i=0; i!=links.length; i++) {
+		var l = links[i];
+		if(gid(divPrefix+graph.getVertexName(l.target)) == null) {
+			missingTo.push(l.target);
+		}
+	}
+	for(var i=0; i!=reverseLinks.length; i++) {
+		var l = reverseLinks[i];
+		if(gid(divPrefix+graph.getVertexName(l.target)) == null) {
+			missingFrom.push(l.target);
+		}
+	}
+	
+	var str = "";
+	for(var i=0; i!=missingTo.length; i++) {
+		str = str + "->" + graph.getVertexName(missingTo[i]) + "\n";
+	}
+	for(var i=0; i!=missingFrom.length; i++) {
+		str = str + "<-" + graph.getVertexName(missingFrom[i]) + "\n";
+	}
+	alert("missing:\n"+str);
 }
 
 function appendLinks(vertex) {
