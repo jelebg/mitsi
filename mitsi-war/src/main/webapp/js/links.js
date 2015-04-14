@@ -100,7 +100,7 @@ function draw() {
 	var maxmax = 0;
 	for(var i=0; i!=depth; i++) {
 		var r = 200*(i+1);
-		var max = (proximityGraph.before[i].length>proximityGraph.after[i] ? proximityGraph.before[i].length : proximityGraph.before[i].length);
+		var max = Math.max(proximityGraph.before[i].length , proximityGraph.after[i].length);
 		if(max > maxmax) {
 			maxmax = max;
 		}
@@ -347,7 +347,7 @@ function appendLinks(vertex) {
 }
 
 function fk(from, to, columnsFrom, columnsTo) {
-	jsplumb.connect({
+	var connection = jsplumb.connect({
 		source:divPrefix+from,
 		target:divPrefix+to
 	    ,paintStyle:{ 
@@ -365,9 +365,42 @@ function fk(from, to, columnsFrom, columnsTo) {
     	,anchor:[ "Right", "Left" ]
 		,overlays:[ "Arrow", 
 			[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
-			//,[ "Label", { label:columnsTo, location:0.8} ]
+			,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
 		  ]
 	});
+	displayAllLabelsOnConnection(connection, false);
+
+	connection.bind("mouseover", function(conn) {
+	    //console.log("you overed ", conn);
+		displayAllLabelsOnConnection(conn, true);
+	});
+	connection.bind("mouseout", function(conn) {
+	    //console.log("you outed ", conn);
+		//conn.setLabel("");
+		displayAllLabelsOnConnection(conn, false);
+	});
+}
+
+function displayAllLabelsOnConnection(connection, display) {
+	if(!connection.getOverlays) {
+		return;
+	}
+	var overlays = connection.getOverlays();
+	if(!overlays) {
+		return;
+	}
+	for(var overlayId in overlays) {
+		var overlay = overlays[overlayId];
+		if(overlay.label) {
+			//console.log("label:"+overlay.label);
+			if(display) {
+				connection.showOverlay(overlayId) ;
+			}
+			else {
+				connection.hideOverlay(overlayId) ;
+			}
+		}
+	}
 
 }
 
