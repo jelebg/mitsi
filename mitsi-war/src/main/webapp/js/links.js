@@ -534,9 +534,19 @@ function highlightShortestPath() {
 	
 	var select = gid("shortestPathToSelect");
 	var endIndex = select.options[select.selectedIndex].value;
+	var text = select.options[select.selectedIndex].text;
+	var reverse = false;
+	if(text && text.substr(0, 1)=="<") {
+		reverse = true;
+	}
 	
-	var path = graph.getPath(dijkstraTable, endIndex);
-	currentPaths = [ path ];
+	var path = graph.getPath(reverse ? dijkstraReverseTable : dijkstraTable, endIndex);
+	if(reverse) {
+		currentPaths = [ path.reverse() ];
+	}
+	else {
+		currentPaths = [ path ];
+	}
 	highlightCurrentPath();
 }
 
