@@ -1,4 +1,4 @@
- { 
+{ 
   "datasources" : {
 	  "LOCALHOST-TEST" :  {
 		"description" : "the test datasource for anything",
