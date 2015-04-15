@@ -1,6 +1,6 @@
 function MitsiGraph(relations) {
 	this.nameTable = {};	
-	this.vertexes = [];
+	this.vertexes = []; // BTW, should be vertices not vertexes
 	
 	this.createVertexIfNecessary = function(name) {
 		var pos = this.nameTable[name];
@@ -178,4 +178,75 @@ function MitsiGraph(relations) {
 		return path.reverse();
 	}
 	
+	this.computeEppstein = function(startIndex, endIndex, reverse) {
+		var t = [];
+		
+		var tDijkstra = this.computeDijkstra(endIndex, !reverse);
+		for(var i=0; i!=this.vertexes.length; i++) {
+			
+			var nt = {
+				// d : tDijkstra[i].d, should be useless
+				ls : []
+			}
+			
+			var links = reverse ? this.vertexes[i].reverseLinks : this.vertexes[i].links;
+			for(var l=0; l!=links.length; l++) {
+				var target = tDijkstra[links[l].target];
+				if(!target || target.d < 0) { // TODO target.d should not be <0
+					// unreachable vertex
+					continue;
+				}
+
+				nt.ls[l] = {
+					t  : links[l].target,
+					dt : 1 + target.d - tDijkstra[i].d
+				};
+			}
+				
+			if(nt.ls.length > 0) {
+				t[i] = nt;
+			}
+		}
+		
+		
+		
+		
+		return t;
+	}
+	
+	this.getAllEqualsShortestPathBFS = function(tEppstein, path, endIndex) {
+		var index = path[path.length-1];
+		
+		if(index == endIndex) {
+			return [ path ];
+		}
+
+		var retPaths = [];
+		for(var i=0; i!=tEppstein[index].ls.length; i++) {
+			var l = tEppstein[index].ls[i];
+			if(l.dt > 0) {
+				continue;
+			}
+			
+			var tPath = [];
+			for(var j=0; j!=path.length; j++) {
+				tPath[j] = path[j];
+			}
+			tPath[j] = l.t;
+			
+			var nextPaths = this.getAllEqualsShortestPathBFS(tEppstein, tPath, endIndex);
+
+			for(var j=0; j!=nextPaths.length; j++) {
+				retPaths.push(nextPaths[j]);
+			}
+		}
+		
+		return retPaths;
+	}
+	
+	this.getAllEqualsShortestPath = function(tEppstein, startIndex, endIndex) {
+		var path = [ startIndex ];
+		var paths = this.getAllEqualsShortestPathBFS(tEppstein, path, endIndex);
+		return paths;
+	}
 }

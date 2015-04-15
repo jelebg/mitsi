@@ -105,14 +105,11 @@ function draw() {
 	// compute radius considering the max number of linked tables for each level, before or after 
 	var maxmax = 0;
 	for(var i=0; i!=depth; i++) {
-		var r = 200*(i+1);
 		var max = Math.max(proximityGraph.before[i].length , proximityGraph.after[i].length);
 		if(max > maxmax) {
 			maxmax = max;
 		}
-		if(maxmax > 4) {
-			r = (i+1) * maxmax * 50;
-		}
+		var r = (i+1)*Math.max(250, maxmax * 50);
 		radiu[i] = r;
 	}
 	var x0 = radiu[depth-1];
@@ -180,7 +177,7 @@ function draw() {
 	*/
 	
 	jsplumb.draggable(document.querySelectorAll(".linksTable"));
-	highlightCurrentPath();
+	highlightCurrentPaths();
 }
 
 function bodyOnLoad() {
@@ -367,7 +364,7 @@ function addLinkedTableOne(select, x, y) {
 	appendTable(gid("linksContent"), x, y, vertexName);
 	appendLinks(graph.getVertex(graph.getIndex(vertexName)));
 	jsplumb.draggable(document.querySelectorAll(".linksTable"));
-	highlightCurrentPath();
+	highlightCurrentPaths();
 
 }
 
@@ -419,7 +416,7 @@ function fk(from, to, columnsFrom, columnsTo) {
 		target:divPrefix+to
 	    ,paintStyle:{ 
 	    	strokeStyle:"lightgrey", 
-	    	lineWidth:1
+	    	lineWidth:2
 	    }
     	,hoverPaintStyle:{ 
     		strokeStyle:"black", 
@@ -547,10 +544,22 @@ function highlightShortestPath() {
 	else {
 		currentPaths = [ path ];
 	}
-	highlightCurrentPath();
+	highlightCurrentPaths();
 }
 
-function highlightCurrentPath() {
+function highlightKShortestPaths() {
+	var select = gid("shortestPathToSelect");
+	var endIndex = select.options[select.selectedIndex].value;
+	var startIndex = graph.getIndex(currentVertexName);
+
+	var tEppstein = graph.computeEppstein(startIndex, endIndex, false);
+	currentPaths = graph.getAllEqualsShortestPath(tEppstein, startIndex, endIndex);
+	
+	highlightCurrentPaths();
+
+}
+
+function highlightCurrentPaths() {
 	unhighlightPaths();
 	var infoMessage = gid("infoMessage");
 	infoMessage.innerHTML = "";
@@ -601,7 +610,7 @@ function unhighlightLinksForDivId(id) {
 		var connection = connectionList[key];
 		connection.setPaintStyle ({ 
 	    	strokeStyle:"lightgrey", 
-	    	lineWidth:1
+	    	lineWidth:2
 	    })
 	}
 }
