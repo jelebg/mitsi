@@ -134,7 +134,7 @@ function MitsiGraph(relations) {
 		};
 	}
 	
-	this.computeDijkstra = function(startIndex) {
+	this.computeDijkstra = function(startIndex, reverse) {
 		var t = [];
 		var visited = []
 		var unvisited = [startIndex]
@@ -146,8 +146,9 @@ function MitsiGraph(relations) {
 			visited[current] = true;
 			
 			var v = this.vertexes[current];
-			for(var i=0; i!=v.links.length; i++) {
-				var l = v.links[i];
+			var ls = reverse ? v.reverseLinks : v.links;
+			for(var i=0; i!=ls.length; i++) {
+				var l = ls[i];
 				if(visited[l.target]) {
 					continue;
 				}

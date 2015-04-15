@@ -3,7 +3,11 @@ var divPrefix = "mitsiObject_";
 var relations = null;
 var graph = null;
 var dijkstraTable = null;
-var currentVertexName = null
+var dijkstraReverseTable = null;
+var currentVertexName = null;
+
+var currentPaths = [];
+
 //var reverseGraph = null;
 
 /*var json = {
@@ -54,11 +58,13 @@ function showMessage(message) {
 function gotoNodeByObjectName(objectOwner, objectName) {
 	currentVertexName = objectOwner+"."+objectName;
 	draw();
+	prepareDisjkstra();
 }
 
 function gotoVertex(name) {
 	currentVertexName = name;
 	draw();
+	prepareDisjkstra();
 }
 
 function draw() {
@@ -173,7 +179,8 @@ function draw() {
 	}
 	*/
 	
-	jsplumb.draggable(document.querySelectorAll(".linksTable")/*, { grid: [20, 20] }*/);
+	jsplumb.draggable(document.querySelectorAll(".linksTable"));
+	highlightCurrentPath();
 }
 
 function bodyOnLoad() {
@@ -237,7 +244,7 @@ function appendTable(div, left, top, name) {
 	var td21 = document.createElement("TD");
 	tr2.appendChild(td21);
 	appendTableIcon(td21, name, "img/proxgraph.png", "show links from this table", function(event, vertexName) { gotoVertex(vertexName); } , "" );
-	appendTableIcon(td21, name, "img/plus.png", "add linked table", function(event, vertexName) { addLinkedTable(vertexName); } , "" );
+	appendTableIcon(td21, name, "img/plus.png", "add linked table", function(event, vertexName) { addLinkedTable(div, td21, vertexName); } , "" );
 	appendTableIcon(td21, name, "img/table.png", "show table content", null, getTableUrl(name) );
 	appendTableIcon(td21, name, "img/details.png", "show table details", null, getDetailsUrl(name) );
 	appendTableIcon(td21, name, "img/greycross.png", "hide table", function(event, vertexName) { hideTable(vertexName); } , "" );
@@ -283,13 +290,11 @@ function hideTable(vertexName) {
 	//parend.removeChild(div);
 }
 
-function addLinkedTable(vertexName) {
+function addLinkedTable(divParent, divOffset, vertexName) {
 	var missingFrom = [];
 	var missingTo = [];
 	var links = graph.getLinksByName(vertexName);
 	var reverseLinks = graph.getReverseLinksByName(vertexName);
-	
-	//TODO : popup
 	
 	for(var i=0; i!=links.length; i++) {
 		var l = links[i];
@@ -304,14 +309,73 @@ function addLinkedTable(vertexName) {
 		}
 	}
 	
-	var str = "";
+	var select = document.createElement("SELECT");
+	select.size = missingTo.length+missingFrom.length;
+	//var str = "";
 	for(var i=0; i!=missingTo.length; i++) {
-		str = str + "->" + graph.getVertexName(missingTo[i]) + "\n";
+		//str = str + "->" + graph.getVertexName(missingTo[i]) + "\n";
+		var o = document.createElement("OPTION");
+		o.text = "->" + graph.getVertexName(missingTo[i]);
+		o.value = graph.getVertexName(missingTo[i]);
+		select.appendChild(o);
 	}
 	for(var i=0; i!=missingFrom.length; i++) {
-		str = str + "<-" + graph.getVertexName(missingFrom[i]) + "\n";
+		//str = str + "<-" + graph.getVertexName(missingFrom[i]) + "\n";
+		var o = document.createElement("OPTION");
+		o.text = "->" + graph.getVertexName(missingFrom[i]);
+		o.value = graph.getVertexName(missingFrom[i]);
+		select.appendChild(o);
 	}
-	alert("missing:\n"+str);
+	
+	var xy = getAbsoluteXY(divOffset);
+	var xyParent = getAbsoluteXY(divParent);
+	
+	//alert("missing:\n"+str);
+	var newdiv = document.createElement("DIV");
+	newdiv.id = "popup";
+	newdiv.style.position = "absolute";
+	newdiv.style.top = (xy.y-xyParent.y+20)+"px";
+	newdiv.style.left = (xy.x-xyParent.x)+"px";
+	//newdiv.textContent = str;
+	
+	if(missingFrom.length==0 && missingTo.length==0) {
+		newdiv.textContent = "no missing link";
+	}
+	else {
+		select.onclick = select.onchange = function(event) { addLinkedTableOne(select, (xy.x-xyParent.x+50), (xy.y-xyParent.y+50)); };
+		newdiv.appendChild(select);
+	}
+	newdiv.appendChild(document.createElement("BR"));
+	var button = document.createElement("INPUT");
+	button.type = "button";
+	button.value = "close";
+	button.style.width = "100%";
+	button.onclick = function(event) { closePopup(); };
+	newdiv.appendChild(button);
+	divParent.appendChild(newdiv);
+	
+	
+	//alert(str);
+}
+
+function addLinkedTableOne(select, x, y) {
+	closePopup();
+	var vertexName = select.options[select.selectedIndex].value;
+	if(gid(divPrefix+vertexName)) {
+		return;
+	}
+	appendTable(gid("linksContent"), x, y, vertexName);
+	appendLinks(graph.getVertex(graph.getIndex(vertexName)));
+	jsplumb.draggable(document.querySelectorAll(".linksTable"));
+	highlightCurrentPath();
+
+}
+
+function closePopup() {
+	var popup = gid("popup");
+	if(popup) {
+		popup.offsetParent.removeChild(popup);
+	}
 }
 
 function appendLinks(vertex) {
@@ -335,6 +399,9 @@ function appendLinks(vertex) {
 		
 		if(gid(divPrefix+targetVertexName)==null) {
 			missingLinks.push(targetVertexName);
+		}
+		else {
+			fk(targetVertexName, vertex.name, l.properties.keyColumns, l.properties.rKeyColumns);
 		}
 	}
 	
@@ -431,31 +498,133 @@ function dragend(event) {
 
 function prepareDisjkstra() {
 	var startIndex = graph.getIndex(currentVertexName);
-	dijkstraTable = graph.computeDijkstra(startIndex);
+	dijkstraTable = graph.computeDijkstra(startIndex, false);
+	dijkstraReverseTable = graph.computeDijkstra(startIndex, true);
 	
 	var select = gid("shortestPathToSelect");
 	select.innerHTML = "";
-	select.appendChild(document.createElement("OPTION"));
+	//select.appendChild(document.createElement("OPTION"));
+	var mysort = [];
+	
 	for(var i=0; i!=dijkstraTable.length; i++) {
 		
 		if(dijkstraTable[i] && dijkstraTable[i].p!=-1) {
-			var o = document.createElement("OPTION");
-			o.value = i;
-			o.text = graph.getVertexName(i);
-			select.appendChild(o);
+			mysort["-> " + graph.getVertexName(i)] = i;
 		}
+	}
+	
+	for(var i=0; i!=dijkstraReverseTable.length; i++) {
 		
+		if(dijkstraReverseTable[i] && dijkstraReverseTable[i].p!=-1) {
+			mysort["<- " + graph.getVertexName(i)] = i;
+		}
+	}
+	
+	mysort.sort();
+	
+	for(k in mysort) {
+		var o = document.createElement("OPTION");
+		o.value = mysort[k];
+		o.text = k;
+		select.appendChild(o);
 	}
 }
 
 function highlightShortestPath() {
+	
 	var select = gid("shortestPathToSelect");
-	var endIndex = select.options[select.selectedIndex].value
+	var endIndex = select.options[select.selectedIndex].value;
 	
 	var path = graph.getPath(dijkstraTable, endIndex);
-	var str = "";
-	for(var i=0; i!=path.length; i++) {
-		str = str + graph.getVertexName(path[i]) + "\n";
+	currentPaths = [ path ];
+	highlightCurrentPath();
+}
+
+function highlightCurrentPath() {
+	unhighlightPaths();
+	var infoMessage = gid("infoMessage");
+	infoMessage.innerHTML = "";
+	if(currentPaths.length > 0) {
+		infoMessage.appendChild(document.createTextNode("current paths highlighted : "));
 	}
-	alert(str);
+	else {
+		infoMessage.appendChild(document.createTextNode("no path highlighted"));
+	}
+	infoMessage.appendChild(document.createElement("BR"));
+
+	for(var i=0; i!=currentPaths.length; i++) {
+		var str = "";
+		var path = currentPaths[i];
+		var prev = null;
+		for(var j=0; j!=path.length; j++) {
+			
+			highlightTable(graph.getVertexName(path[j]));
+			if(j != 0) {
+				str = str + " -> ";
+			}
+			str = str + graph.getVertexName(path[j]);
+			if(prev != null) {
+				highlightLink(graph.getVertexName(prev), graph.getVertexName(path[j]))
+			}
+			prev = path[j];
+		}
+		infoMessage.appendChild(document.createTextNode(str));
+		infoMessage.appendChild(document.createElement("BR"));
+	}
+	
+}
+
+function highlightTable(vertexName) {
+	var div = gid(divPrefix+vertexName);
+	if(div) {
+		div.className = "linksTableHighlight";
+	}
+}
+
+function unhighlightLinksForDivId(id) {
+	var connectionList = jsplumb.getConnections({ source:id });
+	if(!connectionList) {
+		return;
+	}
+	
+	for(key in connectionList) {
+		var connection = connectionList[key];
+		connection.setPaintStyle ({ 
+	    	strokeStyle:"lightgrey", 
+	    	lineWidth:1
+	    })
+	}
+}
+
+function highlightLink(v1, v2) {
+	var connectionList = jsplumb.getConnections({ source:divPrefix+v1, target:divPrefix+v2 });
+	if(!connectionList) {
+		return;
+	}
+	
+	for(key in connectionList) {
+		var connection = connectionList[key];
+		connection.setPaintStyle ({ 
+	    	strokeStyle:"orange", 
+	    	lineWidth:3
+	    })
+	}
+}
+
+function clearPaths() {
+	gid("infoMessage").innerHTML = "no path highlighted";
+	currentPaths = [];
+	unhighlightPaths();
+}
+
+function unhighlightPaths() {
+	//currentPaths = [];
+	var elts = document.getElementsByClassName("linksTableHighlight");
+	var nb = elts.length;
+	
+	for(var i=0; i!=nb; i++) {
+		unhighlightLinksForDivId(elts[0].id);
+		elts[0].className = "linksTable";
+	}
+	
 }

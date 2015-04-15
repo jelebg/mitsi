@@ -34,16 +34,20 @@ var owner = "${owner}";
 
 
 <div id="linksHeader" class="headerTitle"></div>
- <select id="depthSelect" onchange="draw();">
+ <select id="depthSelect" onchange="draw();" disabled="true">
   <option value="1" selected>1</option>
   <option value="2">2</option>
   <option value="3">3</option>
   <option value="4">4</option>
 </select> 
-<button onclick="prepareDisjkstra();">Dijkstra !</button>
-<select id="shortestPathToSelect" onchange="highlightShortestPath();">
-	<option>please Dijkstra first</option>
+<!--  button onclick="prepareDisjkstra();">Dijkstra !</button -->
+<select id="shortestPathToSelect" >
+	<!-- option>please Dijkstra first</option -->
 </select>
+<button onclick="highlightShortestPath();">highlight shortest path</button>
+<button onclick="showShortestPath();">display shortest path</button>
+<button onclick="clearPaths();">clear</button>
+<div id="infoMessage" ></div>
 <div id="linksContent" style="position:absolute;width:800px;height:800px;"></div>
 
 </body>
