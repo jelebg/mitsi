@@ -253,6 +253,7 @@ function MitsiGraph(relations) {
 	}
 	
 	this.getKShortestPathBFSTreePush = function(tree, sidetrackpath, stDistance) {
+		var removeone = false;
 		var current = tree;
 		for(var i=0; i!=sidetrackpath.length; i++) {
 			var st = sidetrackpath[i];
@@ -266,17 +267,53 @@ function MitsiGraph(relations) {
 				arr : sidetrackpath,
 				dt : stDistance,
 				childs : {} ,
-				sortedChilds : null
+				sortedChilds : [],
+				prev : current
 			}
 			current.childs[st] = c;
+			current.sortedChilds.push(st);
+			// so horrible, a tree would have been far better
+			// should be OK for k < 10
+			current.sortedChilds.sort(function(a, b) {
+				if(a.dt > b.dt) {
+					return 1;
+				}
+				if(a.dt < b.dt) {
+					return -1;
+				}
+				return 0;
+			});
 			
 			if(i != sidetrackpath.length-1) {
 				console.log("ERROR !!! when build Eppstein side tracks tree");
 			}
+
+			if(tree.nbChilds < tree.maxChilds) {
+				tree.nbChilds ++;
+			}
+			else {
+				removeone = true;
+			}
 		}
+
+		if(removeone) {
+			var current = tree;
+			var removeNode = null;
+			for(var i=0; i!=sidetrackpath.length; i++) {
+				var st = sidetrackpath[i];
+				var ist = current.sortedChilds.indexOf(st);
+				if(ist < current.sortedChilds.length) {
+					removeNode = current;
+				}
+			}
+			
+			var toremove = removeNode.sortedChilds.pop();
+			delete removeNode.childs[toremove];
+		}
+
 	}
 	
-	this.getKShortestPathOrderTreeByDistance = function(tree) {
+	/*this.getKShortestPathOrderTreeByDistance = function(tree) {
 		// TODO would be so much faster and easy to program with a true stack 
 		var newchilds = [];
 		for(var k in tree.childs) {
@@ -296,7 +333,7 @@ function MitsiGraph(relations) {
 			return 0;
 		});
 		tree.sortedChilds = newchilds;
-	}
+	}*/
 	
 	this.getKShortestPathBFS = function(tEppstein, tree, visited, tovisit) {
 		var newtovisit = [];
@@ -386,8 +423,8 @@ function MitsiGraph(relations) {
 	}
 	
 	this.getKShortestPathFromTree = function(tEppstein, tree, k, startIndex, endIndex) {
-		// TODO optimize by removing nodes during insertion in tree when more than k nodes
-		this.getKShortestSliceTree(tree, k);
+		// TODO optimize by removing nodes during insertion in tree when more than k nodes ?
+		//this.getKShortestSliceTree(tree, k);
 		
 		var path = [startIndex];
 		var paths = [];
@@ -414,13 +451,15 @@ function MitsiGraph(relations) {
 			arr : [],
 			dt : 0,
 			childs : {},
-			sortedChilds : null
+			sortedChilds : [],
+			maxChilds : k-1,
+			nbChilds : 0
 		}
 		while(tovisit.length > 0) {
 			tovisit = this.getKShortestPathBFS(tEppstein, tree, visited, tovisit);
 		}
 		
-		this.getKShortestPathOrderTreeByDistance(tree);
+		//this.getKShortestPathOrderTreeByDistance(tree);
 		
 		//compute final paths
 		return this.getKShortestPathFromTree(tEppstein, tree, k, startIndex, endIndex);
