@@ -45,8 +45,10 @@ var owner = "${owner}";
 	<!-- option>please Dijkstra first</option -->
 </select>
 <button onclick="highlightShortestPath();">highlight shortest path</button>
-<button onclick="showShortestPath();">display shortest path</button>
-<button onclick="highlightKShortestPaths();">K-shortest</button>
+<button onclick="highlightAllShortestPaths();">all equal-distance shortests</button>
+<input id="kShortest" type="text" value="3" style="width:20px;"/>
+<button onclick="highlightKShortestPaths();">-shortests</button>
+<button onclick="highlightAllPaths();">All paths</button>
 <button onclick="clearPaths();">clear</button>
 <div id="infoMessage" ></div>
 <div id="linksContent" style="position:absolute;width:800px;height:800px;"></div>

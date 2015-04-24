@@ -296,31 +296,41 @@ function addLinkedTable(divParent, divOffset, vertexName) {
 	for(var i=0; i!=links.length; i++) {
 		var l = links[i];
 		if(gid(divPrefix+graph.getVertexName(l.target)) == null) {
-			missingTo.push(l.target);
+			missingTo.push(graph.getVertexName(l.target));
 		}
 	}
 	for(var i=0; i!=reverseLinks.length; i++) {
 		var l = reverseLinks[i];
 		if(gid(divPrefix+graph.getVertexName(l.target)) == null) {
-			missingFrom.push(l.target);
+			missingFrom.push(graph.getVertexName(l.target));
 		}
 	}
+	
+	missingTo.sort();
+	missingFrom.sort();
 	
 	var select = document.createElement("SELECT");
 	select.size = missingTo.length+missingFrom.length;
 	//var str = "";
+	var prev = null;
 	for(var i=0; i!=missingTo.length; i++) {
 		//str = str + "->" + graph.getVertexName(missingTo[i]) + "\n";
+		if(prev != null && prev==missingTo[i]) {
+			continue;
+		}
 		var o = document.createElement("OPTION");
-		o.text = "->" + graph.getVertexName(missingTo[i]);
-		o.value = graph.getVertexName(missingTo[i]);
+		o.text = "->" + missingTo[i];
+		o.value = missingTo[i];
 		select.appendChild(o);
 	}
 	for(var i=0; i!=missingFrom.length; i++) {
 		//str = str + "<-" + graph.getVertexName(missingFrom[i]) + "\n";
+		if(prev != null && prev==missingFrom[i]) {
+			continue;
+		}
 		var o = document.createElement("OPTION");
-		o.text = "->" + graph.getVertexName(missingFrom[i]);
-		o.value = graph.getVertexName(missingFrom[i]);
+		o.text = "->" + missingFrom[i];
+		o.value = missingFrom[i];
 		select.appendChild(o);
 	}
 	
@@ -547,16 +557,62 @@ function highlightShortestPath() {
 	highlightCurrentPaths();
 }
 
-function highlightKShortestPaths() {
+function highlightAllShortestPaths() {
 	var select = gid("shortestPathToSelect");
 	var endIndex = select.options[select.selectedIndex].value;
 	var startIndex = graph.getIndex(currentVertexName);
+	var text = select.options[select.selectedIndex].text;
+	if(text && text.substr(0, 1)=="<") {
+		var tmp = endIndex;
+		endIndex = startIndex;
+		startIndex = tmp;
+	}
 
 	var tEppstein = graph.computeEppstein(startIndex, endIndex, false);
 	currentPaths = graph.getAllEqualsShortestPath(tEppstein, startIndex, endIndex);
 	
 	highlightCurrentPaths();
 
+}
+
+function highlightKShortestPaths() {
+	var select = gid("shortestPathToSelect");
+	var endIndex = select.options[select.selectedIndex].value;
+	var startIndex = graph.getIndex(currentVertexName);
+	var k = gid("kShortest").value;
+	var text = select.options[select.selectedIndex].text;
+	if(text && text.substr(0, 1)=="<") {
+		var tmp = endIndex;
+		endIndex = startIndex;
+		startIndex = tmp;
+	}
+	
+	var tEppstein = graph.computeEppstein(startIndex, endIndex, false);
+	currentPaths  = graph.getKShortestPath(tEppstein, startIndex, endIndex, parseInt(k));
+	
+	highlightCurrentPaths();
+
+}
+
+function highlightAllPaths() {
+	var select = gid("shortestPathToSelect");
+	var endIndex = select.options[select.selectedIndex].value;
+	var startIndex = graph.getIndex(currentVertexName);
+	var text = select.options[select.selectedIndex].text;
+	var reverse = false;
+	if(text && text.substr(0, 1)=="<") {
+		reverse = true;
+	}
+
+	currentPaths = graph.getAllPaths(startIndex, endIndex, reverse);
+	if(reverse) {
+		for(var i=0; i!=currentPaths.length; i++) {
+			currentPaths[i] = [ currentPaths[i].reverse() ];
+		}
+	}
+	
+	highlightCurrentPaths();
+	
 }
 
 function highlightCurrentPaths() {
@@ -572,22 +628,24 @@ function highlightCurrentPaths() {
 	infoMessage.appendChild(document.createElement("BR"));
 
 	for(var i=0; i!=currentPaths.length; i++) {
-		var str = "";
 		var path = currentPaths[i];
+		//var str = "";
 		var prev = null;
 		for(var j=0; j!=path.length; j++) {
 			
 			highlightTable(graph.getVertexName(path[j]));
-			if(j != 0) {
-				str = str + " -> ";
-			}
-			str = str + graph.getVertexName(path[j]);
+			//if(j != 0) {
+			//	str = str + " -> ";
+			//}
+			//str = str + graph.getVertexName(path[j]);
 			if(prev != null) {
 				highlightLink(graph.getVertexName(prev), graph.getVertexName(path[j]))
 			}
 			prev = path[j];
 		}
-		infoMessage.appendChild(document.createTextNode(str));
+		//infoMessage.appendChild(document.createTextNode(str));*/
+		
+		infoMessage.appendChild(buildPathArrow(path, 30));
 		infoMessage.appendChild(document.createElement("BR"));
 	}
 	
@@ -646,4 +704,67 @@ function unhighlightPaths() {
 		elts[0].className = "linksTable";
 	}
 	
+}
+
+
+function buildPathArrowTdText(t, height) {
+	var d = document.createElement("DIV");
+	d.style.height = height+"px";
+    d.style.backgroundColor = "lightgreen";
+	d.appendChild(t);
+	
+	var td = document.createElement("TD");
+	td.appendChild(d);
+	td.style.padding = "0";
+	return td;
+}
+
+function buildPathArrowTdSvg(display1, display2, height) {
+	var space = 7;
+
+	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");;
+	svg.setAttribute("width", (height/2+space)+"px");
+	svg.setAttribute("height", height+"px");
+	
+	if(display1) {
+		var p1 = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+		p1.style.fill = "lightgreen";
+		p1.setAttribute("points", "0,0 "+(height/2)+","+(height/2)+" 0,"+height);
+		svg.appendChild(p1);
+	}
+
+	if(display2) {
+		var p2 = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+		p2.style.fill = "lightgreen";
+		p2.setAttribute("points", space+",0 "+(height/2+space)+","+(height/2)+" "+space+","+height+" "+(height/2+space)+","+height+" "+(height/2+space)+",0");
+		svg.appendChild(p2);
+	}
+	
+	var td = document.createElement("TD");
+	td.style.padding = "0";
+	td.appendChild(svg);
+	return td;
+}
+
+
+function buildPathArrow(path, height) {
+
+	var t = document.createElement("TABLE");
+	t.cellSpacing = "0";
+	var tr = document.createElement("TR");
+	tr.style.verticalAlign = "top";
+	t.appendChild(tr);
+	
+	
+	for(var i=0; i!=path.length; i++) {
+		var vertexName = graph.getVertexName(path[i]);
+		var d = document.createTextNode(vertexName);
+		
+		tr.appendChild(buildPathArrowTdSvg(i!=0, true, height));
+		tr.appendChild(buildPathArrowTdText(d, height ));
+	}	
+	tr.appendChild(buildPathArrowTdSvg(true, false, height));
+	
+
+	return t;
 }
