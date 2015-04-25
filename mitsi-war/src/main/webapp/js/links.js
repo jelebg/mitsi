@@ -646,7 +646,7 @@ function highlightCurrentPaths() {
 		//infoMessage.appendChild(document.createTextNode(str));*/
 		
 		infoMessage.appendChild(buildPathArrow(path, 30));
-		infoMessage.appendChild(document.createElement("BR"));
+		//infoMessage.appendChild(document.createElement("BR"));
 	}
 	
 }
@@ -751,6 +751,7 @@ function buildPathArrow(path, height) {
 
 	var t = document.createElement("TABLE");
 	t.cellSpacing = "0";
+	t.style.margin = "2px";
 	var tr = document.createElement("TR");
 	tr.style.verticalAlign = "top";
 	t.appendChild(tr);

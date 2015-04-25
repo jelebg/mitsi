@@ -15,6 +15,22 @@ function MitsiGraph(relations) {
 		}
 	}
 	
+	// order relations by tableOwner/tableName/keyColumnsStr/rTableOwner/rTableName/rKeyColumnsStr
+	relations.sort(function(a, b) {
+		var lc = a.tableOwner.localeCompare(b.tableOwner);
+		if(lc != 0) return lc;
+		lc = a.tableName.localeCompare(b.tableName);
+		if(lc != 0) return lc;
+		lc = a.keyColumnsStr.localeCompare(b.keyColumnsStr);
+		if(lc != 0) return lc;
+		lc = a.rTableOwner.localeCompare(b.rTableOwner);
+		if(lc != 0) return lc;
+		lc = a.rTableName.localeCompare(b.rTableName);
+		if(lc != 0) return lc;
+		lc = a.rKeyColumnsStr.localeCompare(b.rKeyColumnsStr);
+		return lc;
+	});
+	
 	// d'abord on crée une entrée pour chaque sommet
 	for(var i=0; i!=relations.length; i++) {
 		var relation = relations[i];
@@ -511,6 +527,19 @@ function MitsiGraph(relations) {
 		var path = [ startIndex ];
 		var paths = this.getAllPathsDFS(endIndex, path, reverse) ;
 		return paths;
+	}
+	
+	this.getMaxConnectedNode = function() {
+		var max = -1;
+		var mvi = -1;
+		for(var i=0; i!=this.vertexes.length; i++) {
+			var v = this.vertexes[i];
+			if(v.reverseLinks.length > max) {
+				mvi = i;
+				max = v.reverseLinks.length;
+			}
+		}
+		return mvi;
 	}
 }
 
