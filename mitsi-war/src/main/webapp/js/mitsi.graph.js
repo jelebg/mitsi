@@ -252,17 +252,40 @@ function MitsiGraph(relations) {
 		return paths;
 	}
 	
+	this.getKShortestPathBFSTreeSort = function(a, b) {
+		if(a.dt > b.dt) {
+			return 1;
+		}
+		if(a.dt < b.dt) {
+			return -1;
+		}
+		return 0;
+	}
+	
 	this.getKShortestPathBFSTreePush = function(tree, sidetrackpath, stDistance) {
 		var removeone = false;
 		var current = tree;
+		var topmost = true;
 		for(var i=0; i!=sidetrackpath.length; i++) {
 			var st = sidetrackpath[i];
 			var c = current.childs[st];
 			if(c) {
+				if(current.sortedChilds.length>0 &&
+						current.sortedChilds[current.sortedChilds.length-1] != st) {
+					topmost = false;
+				} 
 				current = c;
 				continue;
 			}
 			
+			// if alredy max node in tree and this node is greater, must not add it 
+			if( tree.nbChilds == tree.maxChilds &&
+				topmost && 
+				(current.sortedChilds.length==0 || 
+					current.sortedChilds[current.sortedChilds.length-1].dt < stDistance)) {
+				break;
+			}
+				
 			c = {
 				arr : sidetrackpath,
 				dt : stDistance,
@@ -272,19 +295,11 @@ function MitsiGraph(relations) {
 			}
 			current.childs[st] = c;
 			current.sortedChilds.push(st);
-			// so horrible, a tree would have been far better
-			// should be OK for k < 10
-			current.sortedChilds.sort(function(a, b) {
-				if(a.dt > b.dt) {
-					return 1;
-				}
-				if(a.dt < b.dt) {
-					return -1;
-				}
-				return 0;
-			});
+			// TODO : so horrible, a tree would have been far better should be OK for k < 10
+			current.sortedChilds.sort(this.getKShortestPathBFSTreeSort);
 			
 			if(i != sidetrackpath.length-1) {
+				// normally, nodes should be added only at the tip of the tree
 				console.log("ERROR !!! when build Eppstein side tracks tree");
 			}
 
@@ -298,17 +313,12 @@ function MitsiGraph(relations) {
 
 		if(removeone) {
 			var current = tree;
-			var removeNode = null;
-			for(var i=0; i!=sidetrackpath.length; i++) {
-				var st = sidetrackpath[i];
-				var ist = current.sortedChilds.indexOf(st);
-				if(ist < current.sortedChilds.length) {
-					removeNode = current;
-				}
+			while(current.sortedChilds.length > 0) {
+				current = current.sortedChilds[current.sortedChilds.length-1];
 			}
 			
-			var toremove = removeNode.sortedChilds.pop();
-			delete removeNode.childs[toremove];
+			var toremove = current.sortedChilds.pop();
+			delete current.childs[toremove];
 		}
 
 	}
