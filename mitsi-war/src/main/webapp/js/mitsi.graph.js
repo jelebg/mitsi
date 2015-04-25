@@ -116,8 +116,8 @@ function MitsiGraph(relations) {
 			for(var j=0; j!=toexplore.length; j++) {
 				var exploreIndex = toexplore[j];
 				explored.push(exploreIndex);
-				var links = graph.getLinks(exploreIndex);
-				var reverseLinks = graph.getReverseLinks(exploreIndex);
+				var links = this.getLinks(exploreIndex);
+				var reverseLinks = this.getReverseLinks(exploreIndex);
 				
 				for(var k=0; k!=links.length; k++) {
 					var index = links[k].target;

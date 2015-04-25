@@ -645,7 +645,7 @@ function highlightCurrentPaths() {
 		}
 		//infoMessage.appendChild(document.createTextNode(str));*/
 		
-		infoMessage.appendChild(buildPathArrow(path, 30));
+		infoMessage.appendChild(buildPathArrow(path, 20));
 		//infoMessage.appendChild(document.createElement("BR"));
 	}
 	

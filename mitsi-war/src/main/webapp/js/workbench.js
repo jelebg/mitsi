@@ -83,6 +83,7 @@ function displayDatasource(datasourceName) {
 		[{ title:"unroll", imgsrc:"img/unroll.png" },
 		 //{ title:"search", imgsrc:"img/search.png" },
 		 { title:"menu", imgsrc:"img/menu.png"     },
+		 { title:"SQL", imgsrc:"img/sql.png" 	},
 		 { title:"details", imgsrc:"img/details.png"     },
 		 { title:"refresh", imgsrc:"img/refresh.png"     },
 		 { title:"connect", imgsrc:"img/connected-false.png", toggleimg:"img/connected-true.png", toggled:datasourceContext.connected }
@@ -102,13 +103,14 @@ function displayDatasource(datasourceName) {
 		event.stopPropagation();
 		//return false; 
 	});
-	datasourceContext.smallMenu.setOnClick(2, 
+	datasourceContext.smallMenu.setOnClick(2, function(event) { showSQLPanel(name); } );
+	datasourceContext.smallMenu.setOnClick(3, 
 			createOnClickShowDatasourceDetail("details.datasource."+name, 
 					datasourceContext.smallMenu.getDiv(3), 
 												name));
-	datasourceContext.smallMenu.setOnClick(3, 
-			createOnClickRefreshDatasource(name));
 	datasourceContext.smallMenu.setOnClick(4, 
+			createOnClickRefreshDatasource(name));
+	datasourceContext.smallMenu.setOnClick(5, 
 			createOnClickConnectDatasource(name));
 
 
@@ -340,12 +342,13 @@ function displayDatabaseObjects(datasourceName) {
 			20,
 			7,
 			[{ title:"unroll", imgsrc:"img/unroll.png" 		},
-			 { title:"links", imgsrc:"img/proxgraph.png" 		},
+			 { title:"links", imgsrc:"img/proxgraph.png" 	},
 			 { title:"menu", imgsrc:"img/menu.png"     		}, 
 			 { title:"details", imgsrc:"img/details.png"    },
 			 { title:"table datas", imgsrc:"img/table.png"  } 
 			]);
-		smallMenu.getDiv(1).onclick = createOnClickShowTableLinks("links.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(1), datasourceName, table.id.schema, table.id.type, table.id.name);
+		//smallMenu.getDiv(1).onclick = createOnClickShowTableLinksInPopup("links.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(1), datasourceName, table.id.schema, table.id.type, table.id.name);
+		smallMenu.getDiv(1).onclick = createOnClickShowTableLinks(datasourceName, table.id.schema, table.id.type, table.id.name);
 		smallMenu.getDiv(2).onclick = function() { alert("menu"); return false; };
 		smallMenu.getDiv(3).onclick = createOnClickShowTableDetail("details.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(3), datasourceName, table.id.schema, table.id.type, table.id.name);
 		smallMenu.getDiv(4).onclick = createOnClickShowTable("data.table."+datasourceName+"."+table.id.name, smallMenu.getDiv(3), datasourceName, table.id.schema, table.id.name);
@@ -474,7 +477,21 @@ function createOnClickShowTableDetail(detailScreenId, div, datasource, owner, ob
 		return false; 
 	}
 }
-function createOnClickShowTableLinks(detailScreenId, div, datasource, owner, objectType, objectName) {
+
+function createOnClickShowTableLinks(datasource, owner, objectType, objectName) {
+	return function(event) {
+		try {
+			linksGraph.setCurrent(datasource, owner, objectName);
+		}
+		catch (e) {
+			console.log(e);
+		}
+		event.stopPropagation();
+		return false; 
+	}
+}
+
+function createOnClickShowTableLinksInPopup(detailScreenId, div, datasource, owner, objectType, objectName) {
 	return function(event) {
 		try {
 			detailScreen.show(detailScreenId,
@@ -664,6 +681,8 @@ var datasourcePopupMenu = null;
 var detailScreen = null;
 var datasourceFilter = null;
 var ftextSqlInput = null;
+var linksConfiguration = null;
+var linksGraph = null;
 function bodyOnLoad() {
 	datasourceFilter = new DynamicFilter(gid("datasourceFilterDiv"),
 			"",
@@ -698,6 +717,10 @@ function bodyOnLoad() {
 		
 	ftextSqlInput = new FText(gid("sqlinput"), gid("sqlLineNumber"));
 
+	linksConfiguration = new MitsiLinksConfiguration(gid("linksPathConfiguration"));
+	linksGraph = new MitsiLinksGraph(gid("linksGraph"));
+	linksGraph.setPathsDiv(gid("linksPaths"));
+	
 	//highlight();
 	adjustPanelSize();
 	
@@ -850,4 +873,32 @@ function changeCurrentSchema(datasourceName) {
 
 	
 	
+}
+
+function showSQLPanel(datasourceName) {
+	var rightPanelLinks = gid("rightPanelLinksGlobal");
+	var rightPanelSql = gid("rightPanelSql");
+	var runSQLDatasourceSelect = gid("runSQLDatasourceSelect");
+	var os = runSQLDatasourceSelect.options;
+	for(var i=0; i!=os.length; i++) {
+		if(os[i].value == datasourceName) {
+			runSQLDatasourceSelect.selectedIndex = i;
+			break;
+		}
+	}
+	
+	
+	rightPanelLinks.style.display = "none";
+	rightPanelSql.style.display = "block";
+	adjustPanelSize();
+
+}
+function showLinksPanel(datasourceName, objectOwner, objectName) {
+	var rightPanelLinks = gid("rightPanelLinksGlobal");
+	var rightPanelSql = gid("rightPanelSql");
+	
+	rightPanelLinks.style.display = "block";
+	rightPanelSql.style.display = "none";
+	
+
 }
