@@ -539,6 +539,7 @@ function prepareDisjkstra() {
 
 function highlightShortestPath() {
 	
+	var startIndex = graph.getIndex(currentVertexName);
 	var select = gid("shortestPathToSelect");
 	var endIndex = select.options[select.selectedIndex].value;
 	var text = select.options[select.selectedIndex].text;
@@ -547,12 +548,17 @@ function highlightShortestPath() {
 		reverse = true;
 	}
 	
-	var path = graph.getPath(reverse ? dijkstraReverseTable : dijkstraTable, endIndex);
-	if(reverse) {
-		currentPaths = [ path.reverse() ];
+	var path = graph.getShortestPath(reverse ? dijkstraReverseTable : dijkstraTable, startIndex, endIndex);
+	if(path == null) {
+		currentPaths = [];
 	}
 	else {
-		currentPaths = [ path ];
+		if(reverse) {
+			currentPaths = [ path.reverse() ];
+		}
+		else {
+			currentPaths = [ path ];
+		}
 	}
 	highlightCurrentPaths();
 }

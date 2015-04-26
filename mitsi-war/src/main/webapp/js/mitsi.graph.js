@@ -182,7 +182,7 @@ function MitsiGraph(relations) {
 		return t;
 	}
 	
-	this.getPath = function(dijkstraTable, endIndex) {
+	this.getShortestPath = function(dijkstraTable, startIndex, endIndex) {
 		// TODO : trouver pourquoi dans le path on a parfois des entiers, parfois des string
 		var path = [];
 		
@@ -193,6 +193,9 @@ function MitsiGraph(relations) {
 			path.push(current);
 		}
 			
+		if(current != startIndex) {
+			return null;
+		}
 		return path.reverse();
 	}
 	

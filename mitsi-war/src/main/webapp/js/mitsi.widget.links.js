@@ -466,7 +466,7 @@ function MitsiLinksGraph(div) {
 		button.type = "button";
 		button.value = "close";
 		button.style.width = "100%";
-		button.onclick = function(event) { closePopup(); };
+		button.onclick = function(event) { othis.closePopup(); };
 		newdiv.appendChild(button);
 		divParent.appendChild(newdiv);
 		
@@ -475,14 +475,19 @@ function MitsiLinksGraph(div) {
 	this.addLinkedTableOne = function(select, x, y) {
 		this.closePopup();
 		var vertexName = select.options[select.selectedIndex].value;
+		this.showTable(vertexName, x, y);
+		this.linksPaths.highlightCurrentPaths();
+	}
+	
+	this.showTable = function(vertexName, x, y) {
 		if(gid(this.divPrefix+vertexName)) {
 			return;
 		}
 		this.appendTable(x, y, vertexName);
 		this.appendLinks(this.graph.getVertex(this.graph.getIndex(vertexName)));
 		this.jsplumb.draggable(document.querySelectorAll(".linksTable"));
-		this.linksPaths.highlightCurrentPaths();
 	}
+	
 	this.closePopup = function() {
 		var popup = gid("popup");
 		if(popup) {
@@ -659,7 +664,8 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		switch(method) {
 		case shortesPathMethod.shortestWithDijkstra :
 			var dijkstraTable = graph.computeDijkstra(start, false);
-			return [ graph.getPath(dijkstraTable, finish) ];
+			var p = graph.getShortestPath(dijkstraTable, start, finish);
+			return p==null ? [] : [p];
 			
 		case shortesPathMethod.allShortestWithEppstein :
 			var tEppstein = graph.computeEppstein(start, finish, false);
@@ -717,9 +723,13 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		}
 		else {
 			this.divInfoMessage.appendChild(document.createTextNode("no path highlighted"));
+			return;
 		}
 		this.divInfoMessage.appendChild(document.createElement("BR"));
 
+		var t = document.createElement("TABLE");
+		t.cellSpacing = "0";
+		this.divInfoMessage.appendChild(t);
 		for(var i=0; i!=currentPaths.length; i++) {
 			var path = currentPaths[i];
 			//var str = "";
@@ -738,9 +748,45 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 			}
 			//infoMessage.appendChild(document.createTextNode(str));*/
 			
-			this.divInfoMessage.appendChild(this.buildPathArrow(path, 20));
+			var tr = document.createElement("TR");
+			var td = document.createElement("TD");
+			//var d = document.createElement("DIV");
+			//d.style.verticalAlign = "top";
+			var aRemovePath = document.createElement("A");
+			aRemovePath.title = "remove this path";
+			aRemovePath.href = "";
+			aRemovePath.style.verticalAlign = "top";
+			aRemovePath.onclick = function(event) {
+				var iPathToRemove = this.parentNode.parentNode.rowIndex;
+				othis.paths.splice(iPathToRemove, 1);
+				othis.draw();
+				return false;
+			}
+			var imgRemovePath = document.createElement("IMG");
+			imgRemovePath.src = "img/greycross.png";
+			aRemovePath.appendChild(imgRemovePath);
+			td.appendChild(aRemovePath);
+			td.appendChild(this.buildPathArrow(path, 20));
+			//td.appendChild(d);
+			tr.appendChild(td);
+			t.appendChild(tr);
 			//infoMessage.appendChild(document.createElement("BR"));
 		}
+		
+		var aClearAll = document.createElement("A");
+		aClearAll.href = "";
+		aClearAll.appendChild(document.createTextNode("clear all paths"));
+		aClearAll.onclick = function(event) {
+			try {
+				othis.paths = [];
+				othis.draw();
+			}
+			catch (e) {
+				console.log(e);
+			}
+			return false;
+		}
+		this.divInfoMessage.appendChild(aClearAll);
 		
 	}
 
@@ -802,6 +848,7 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		var td = document.createElement("TD");
 		td.appendChild(d);
 		td.style.padding = "0";
+		td.style.margin = "0";
 		return td;
 	}
 
@@ -828,16 +875,51 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		
 		var td = document.createElement("TD");
 		td.style.padding = "0";
+		td.style.margin = "0";
 		td.appendChild(svg);
 		return td;
 	}
 
+	this.buildPathArrowLabel = function(vertexName) {
+		var d = document.createElement("DIV");
+		var a = document.createElement("A");
+		a.href = "";
+		a.onclick = function(event) {
+			try {
+				//alert("plus "+vertexName);
+				othis.linksGraph.showTable(vertexName, 100, 100);
+				othis.draw();
+			} catch (e) { console.log(e); }
+			return false;
+		}
+		var img = document.createElement("IMG");
+		img.src = "img/plus.png";
+		img.style.height = "16px";
+		img.style.verticalAlign = "middle";
+		a.appendChild(img);
+		d.appendChild(a);
+		
+		var a2=document.createElement("A");
+		a2.href = "";
+		a2.onclick = function(event) {
+			try {
+				othis.linksGraph.gotoVertex(vertexName);
+				othis.draw();
+			} catch (e) { console.log(e); }
+			return false;
+		}
+		a2.appendChild(document.createTextNode(vertexName));
+		d.appendChild(a2);
+		return d;
+	}
 
 	this.buildPathArrow = function (path, height) {
 
 		var t = document.createElement("TABLE");
 		t.cellSpacing = "0";
-		t.style.margin = "2px";
+		//t.style.margin = "2px";
+		t.style.display = "inline-table";
+		t.style.display = "inline-table";
 		var tr = document.createElement("TR");
 		tr.style.verticalAlign = "top";
 		t.appendChild(tr);
@@ -845,7 +927,8 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		
 		for(var i=0; i!=path.length; i++) {
 			var vertexName = this.linksGraph.graph.getVertexName(path[i]);
-			var d = document.createTextNode(vertexName);
+			var d = this.buildPathArrowLabel(vertexName);
+			//var d = document.createTextNode(vertexName);
 			
 			tr.appendChild(this.buildPathArrowTdSvg(i!=0, true, height));
 			tr.appendChild(this.buildPathArrowTdText(d, height ));
