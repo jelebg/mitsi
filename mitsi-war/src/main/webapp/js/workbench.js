@@ -420,7 +420,6 @@ function createOnFilterDatasource(datasourceName) {
 					}
 					else {
 						for(var j=0; j!=obj.columns.length; j++) {
-							console.log("col:"+obj.columns[j].name);
 							if(obj.columns[j].name.match(regex)) {
 								display = true;
 								break;
@@ -719,7 +718,7 @@ function bodyOnLoad() {
 
 	linksConfiguration = new MitsiLinksConfiguration(gid("linksPathConfiguration"));
 	linksGraph = new MitsiLinksGraph(gid("linksGraph"));
-	linksGraph.setPathsDiv(gid("linksPaths"));
+	linksGraph.setPathsDiv(gid("linksPaths"), linksConfiguration);
 	
 	//highlight();
 	adjustPanelSize();

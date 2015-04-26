@@ -240,8 +240,12 @@ function MitsiGraph(relations) {
 		}
 
 		var retPaths = [];
-		for(var i=0; i!=tEppstein[index].ls.length; i++) {
-			var l = tEppstein[index].ls[i];
+		var tEppsteinIndex = tEppstein[index];
+		if(!tEppsteinIndex) {
+			return retPaths;
+		}
+		for(var i=0; i!=tEppsteinIndex.ls.length; i++) {
+			var l = tEppsteinIndex.ls[i];
 			if(!l || l.dt > 0) {
 				continue;
 			}
@@ -423,8 +427,12 @@ function MitsiGraph(relations) {
 		}
 
 		var retPaths = [];
-		for(var i=0; i!=tEppstein[index].ls.length; i++) {
-			var l = tEppstein[index].ls[i];
+		var tEppsteinIndex = tEppstein[index];
+		if(!tEppsteinIndex) {
+			return retPaths;
+		}
+		for(var i=0; i!=tEppsteinIndex.ls.length; i++) {
+			var l = tEppsteinIndex.ls[i];
 			if(!l) {
 				continue;
 			}
