@@ -127,3 +127,26 @@
 	border-radius:4px;
 	padding:4px;
 }
+
+.dynamicFilterCheckbox:checked {
+	display:none;
+}
+
+.dynamicFilterCheckbox:not(checked) {
+	display:none;
+}
+
+.dynamicFilterCheckbox:not(:checked) + label {
+	color:grey;
+	font-weight: normal;
+}
+.dynamicFilterCheckbox:checked + label {
+	color:black;
+	font-weight: normal;
+}
+.dynamicFilterPopup {
+	background-color : white;
+	border-radius : 5px;
+	border : 3px solid lightgrey;
+	padding : 5px;
+}

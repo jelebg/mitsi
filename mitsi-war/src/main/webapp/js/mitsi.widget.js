@@ -426,7 +426,7 @@ function newFunctionGotoUrl(url) {
 
 // filtre dynamique pour filtrer pendant la frappe
 var dynamicFilterMinIntervalMilliSec = 500; // 0.5 sec
-function DynamicFilter(div, style, emptyMessage, onchange) {
+function DynamicFilter(div, style, emptyMessage, onchange, categories) {
 	this.div = div;
 	this.div2 = document.createElement("DIV");
 	//this.div2.style.position = "absolute";
@@ -435,6 +435,7 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 	//this.lastOnChangeCallDate = null;
 	this.lastOnChangeSetTimeoutHandle = null;
 	this.lastOnChangeValue = null;
+	this.categories = categories;
 	
 	//var div2 = document.createElement("DIV");
 	//div2.style.display = "inline-block";
@@ -466,6 +467,108 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 	div3.appendChild(a);
 	this.div2.appendChild(div3);
 	
+	if(this.categories) {
+		var a4 = celt("A", {
+			childs : [
+			     celt("IMG", {
+			    	 att:{
+			    		 src:"img/menu.png"
+			    	 }
+			     })
+			]
+		});
+
+		var div4 = celt("DIV", {
+			styles : {
+				position:"absolute",
+				right : "16px",
+				marginTop : "2px"
+			},
+			childs : [ a4 ]
+		});
+		
+		a4.onclick = function() {
+			if(gid("dynamicFilterPopup")) {
+				dynamicFilterHidePopup();
+				return;
+			}
+			
+	
+			var listchilds = [];
+			for(var cat in othis.categories) {
+				var cb = celt("INPUT", {att:{ 
+			    	id:"dynamicFilterPopup_"+cat, 
+			    	type:"checkbox", 
+			    	class:"dynamicFilterCheckbox", 
+			    	onclick:"dynamicFilterOnClick(event);"
+			    }});
+				cb.checked = othis.categories[cat].value;
+				
+				listchilds.push(celt("DIV", {
+					childs : [
+					    celt("IMG", {att:{ src:"img/cb-"+othis.categories[cat].value+".png", id:"dynamicFilterCbImg_"+cat }, styles:{height:"14px", marginRight:"3px"}}),
+					    cb,
+					    celt("LABEL", {
+					    	att:{ 
+					    		"for":"dynamicFilterPopup_"+cat
+					    	}, 
+					    	childs:[ctn(othis.categories[cat].label)]
+					    }),
+					    celt("BR")
+					]
+				}));
+			}
+			
+			var okButton = celt("IMG", {
+		    	att:{ 
+		    		src:"img/ok.png"
+		    	}, 
+		    	styles:{height:"15px", paddingRight:"8px"}
+		    });
+			okButton.onclick = function() {
+				for(var cat in othis.categories) {
+					var catCb = gid("dynamicFilterPopup_"+cat);
+					othis.categories[cat].value = catCb.checked;
+					//alert(cat+"="+othis.categories[cat].value);
+				}
+				othis.onchange(othis.getValue(), othis.categories);
+				dynamicFilterHidePopup();
+				return false;
+			}
+			
+			listchilds.push(celt("DIV", {
+				childs : [
+				    okButton,
+				    celt("IMG", {
+				    	att:{ 
+				    		src:"img/cancel.png",
+				    		onclick:"dynamicFilterHidePopup();return false;"
+				    	}, 
+				    	styles:{height:"15px"}})
+				]
+			}));
+			
+			var dd4 = celt("DIV", {
+				att : {
+					id  : "dynamicFilterPopup",
+					class:"dynamicFilterPopup"
+				},
+				styles : {
+					position:"absolute",
+					top : (div4.offsetTop+div4.offsetHeight)+"px",
+					//right : (othis.div2.offsetWidth-div4.offsetLeft/*+div4.offsetWidth*/)+"px"
+					right : "10px",
+					zIndex : 100
+				},
+				childs : listchilds
+			});
+			othis.div2.appendChild(dd4);
+			return false;
+		};
+			
+		this.div2.appendChild(div4);
+	}
+	
 	this.input.onfocus = function(event) {
 		if(event.target.value == emptyMessage) {
 			event.target.value = "";
@@ -491,7 +594,7 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 			var ovalue = othis.getValue();
 			if(ovalue != othis.lastOnChangeValue) {
 				if(othis.onchange != null) {
-					othis.onchange(ovalue);
+					othis.onchange(ovalue, othis.categories);
 				}
 			}
 			
@@ -506,7 +609,7 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 					var ovalue = othis.getValue();
 					if(ovalue != othis.lastOnChangeValue) {
 						if(othis.onchange != null) {
-							othis.onchange(ovalue);
+							othis.onchange(ovalue, othis.categories);
 						}
 						othis.lastOnChangeSetTimeoutHandle = null;
 						othis.lastOnChangeValue = ovalue;
@@ -523,7 +626,7 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 		this.input.value = emptyMessage;
 		this.input.style.color = "grey";
 		if(this.onchange) {
-			this.onchange(null);
+			this.onchange(null, null);
 		}
 	} 
 	
@@ -535,5 +638,18 @@ function DynamicFilter(div, style, emptyMessage, onchange) {
 			return this.input.value.trim();
 		}
 
+	}
+}
+
+function dynamicFilterOnClick(event) {
+	var id = "dynamicFilterCbImg_"+event.target.id.replace("dynamicFilterPopup_", "");
+//	alert(id);
+	gid(id).src = "img/cb-"+event.target.checked+".png";
+}
+
+function dynamicFilterHidePopup() {
+	var d = gid("dynamicFilterPopup");
+	if(d) {
+		d.parentElement.removeChild(d);
 	}
 }

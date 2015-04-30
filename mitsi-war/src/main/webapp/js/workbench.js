@@ -176,7 +176,12 @@ function displayDatasource(datasourceName) {
 	/*divUnrolledButtons*/td2.appendChild(divUnrolledButton2);
 	/*divUnrolledButtons*/td3.appendChild(divUnrolledButton3);
 	datasourceContext.filter = new DynamicFilter(/*ivUnrolledButtons*/ td4, "", "filter tables/cols here ...", 
-			createOnFilterDatasource(name));
+			createOnFilterDatasource(name), 
+			{ "table"      : {label:"table names", value:true},
+			  "column"     : {label:"column names", value:true},
+			  "index"      : {label:"index names", value:true},
+			  "constraint" : {label:"constraint names", value:true}
+			});
 	datasourceContext.divUnrolled.appendChild(divUnrolledButtons);
 	
 	

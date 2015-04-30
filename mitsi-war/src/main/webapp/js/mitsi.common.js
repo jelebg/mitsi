@@ -3,6 +3,42 @@ function gid(id) {
 	return document.getElementById(id);
 }
 
+// creer un élément rapido
+function celt(nodeName, properties) {
+	var n = document.createElement(nodeName);
+	if(!properties) {
+		return n;
+	}
+	var attributes = properties.att;
+	var styles = properties.styles;
+	var childs = properties.childs;
+	
+	if(attributes) {
+		for(var a in attributes) {
+			n.setAttribute(a, attributes[a]);
+		}
+	}
+	
+	if(styles) {
+		for(var s in styles) {
+			n.style[s] = styles[s];
+		}
+	}
+	
+	if(childs) {
+		for(var i=0; i!=childs.length; i++) {
+			n.appendChild(childs[i]);
+		}
+	}
+	
+	return n;
+}
+
+// creer un node texte rapido
+function ctn(text) {
+	return document.createTextNode(text);
+}
+
 // appeller une GsonServlet
 function callGsonServlet(gsonServlet, request, onresponse, onerror) {
 	var json = JSON.stringify(request);
