@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class DatabaseObject {
-	public class Id {
+	public static class Id {
 		private String type;
 		private String schema;
 		private String name;
@@ -25,6 +25,41 @@ public class DatabaseObject {
 		public String getName() {
 			return name;
 		}
+		@Override
+		public int hashCode() {
+			// TODO : check if can be necessary to check type also
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result
+					+ ((schema == null) ? 0 : schema.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			// TODO : check if can be necessary to check type also
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Id other = (Id) obj;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (schema == null) {
+				if (other.schema != null)
+					return false;
+			} else if (!schema.equals(other.schema))
+				return false;
+			return true;
+		}
+		
+		
+		
 	}
 	public class Partition {
 		public String name;
@@ -35,6 +70,8 @@ public class DatabaseObject {
 	private String descriSption;
 	private String jsonDetails;
 	private List<Column> columns = new ArrayList<>();
+	private List<Index> indexes = new ArrayList<>();
+	private List<Constraint> constraints = new ArrayList<>();
 	
 	public String getJsonDetails() {
 		return jsonDetails;
@@ -108,7 +145,21 @@ public class DatabaseObject {
 		this.descriSption = descriSption;
 	}
 
+	public List<Index> getIndexes() {
+		return indexes;
+	}
 
+	public void setIndexes(List<Index> indexes) {
+		this.indexes = indexes;
+	}
+
+	public List<Constraint> getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
+	}
 	
 	
 

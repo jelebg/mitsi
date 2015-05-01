@@ -389,7 +389,7 @@ function displayDatabaseObjects(datasourceName) {
 // niveau de la fonction, c'est horrible mais c'est comme ça
 
 function createOnFilterDatasource(datasourceName) {
-	return function() {
+	return function(newvalue, categories) {
 		try {
 			var datasourceContext = CONTEXT.getDatasource(datasourceName);
 			if(!datasourceContext.objects) {
@@ -398,7 +398,8 @@ function createOnFilterDatasource(datasourceName) {
 			var filterTable = datasourceContext.toggleTable.value;
 			var filterView = datasourceContext.toggleView.value;
 			var filterMatView = datasourceContext.toggleMatView.value;
-			var filterText = datasourceContext.filter.getValue();
+			//var filterText = datasourceContext.filter.getValue();
+			var filterText = newvalue;
 			//alert(filterText);
 			var regex = null;
 			if(filterText != null) {
@@ -420,14 +421,17 @@ function createOnFilterDatasource(datasourceName) {
 						(filterMatView && type=="matview") ) {
 					if(regex==null) {
 						display = true;
-					} else if(obj.id.name.match(regex)) {
+					} else if(categories.table.value &&
+							obj.id.name.match(regex)) {
 						display = true;
 					}
 					else {
-						for(var j=0; j!=obj.columns.length; j++) {
-							if(obj.columns[j].name.match(regex)) {
-								display = true;
-								break;
+						if(categories.column.value) {
+							for(var j=0; j!=obj.columns.length; j++) {
+								if(obj.columns[j].name.match(regex)) {
+									display = true;
+									break;
+								}
 							}
 						}
 					}

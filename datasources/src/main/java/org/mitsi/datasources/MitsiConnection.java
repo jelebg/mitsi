@@ -322,6 +322,16 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		
 		return relations;
 	}
+
+	@Override
+	public List<Index> getSchemaIndexes(String schema) {
+		return mapper.getSchemaIndexes(schema);
+	}
+
+	@Override
+	public List<Constraint> getSchemaConstraints(String schema) {
+		return mapper.getSchemaConstraints(schema);
+	}
 	
 	/*public void testOK() {
 		//boolean ret = false;

@@ -1,8 +1,13 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.mitsi.datasources.Constraint;
+import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.Schema;
@@ -51,6 +56,35 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 		}
 		response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(schema);
 		
+		
+		List<Index> indexes = connection.getConnectionForMitsi().getSchemaIndexes(null);
+		List<Constraint> constraints = connection.getConnectionForMitsi().getSchemaConstraints(null);
+		
+		Map<DatabaseObject.Id, DatabaseObject> doMap = new HashMap<>();
+		for(DatabaseObject dobj : response.databaseObjects) {
+			doMap.put(dobj.getId(), dobj);
+		}
+		
+		for(Index i : indexes) {
+			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, i.owner, i.tableName));
+			if(dobj == null) {
+				log.warn("cannot find table "+i.owner+"."+i.tableName+" for index "+i.owner+"."+i.name);
+			}
+			else {
+				dobj.getIndexes().add(i);
+			}
+		}
+		
+		for(Constraint c : constraints) {
+			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, c.owner, c.tableName));
+			if(dobj == null) {
+				log.warn("cannot find table "+c.owner+"."+c.tableName+" for index "+c.owner+"."+c.name);
+			}
+			else {
+				dobj.getConstraints().add(c);
+			}
+			
+		}
 		//}
 		//finally {
 		//	connection.rollback();

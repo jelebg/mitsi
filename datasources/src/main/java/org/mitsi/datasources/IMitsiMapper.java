@@ -13,6 +13,8 @@ public interface IMitsiMapper {
 	List<Schema> getAllSchemas();
 	List<DatabaseObject> getTablesAndViews(@Param("owner") String owner);
 	List<Date> getLastSchemaUpdateTime(@Param("owner") String owner);
+	List<Index> getSchemaIndexes(@Param("owner") String owner);
+	List<Constraint> getSchemaConstraints(@Param("owner") String owner);
 
 	// for datasource details
 	List<DatabaseObject> getTablesDetails();

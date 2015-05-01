@@ -11,7 +11,9 @@ import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.datasources.Column;
+import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
@@ -63,6 +65,34 @@ public class PublicDatasourcesTest {
 			assertTrue(ld != null);
 			assertTrue(ld==null || ld.size() == 1);
 
+			
+		}
+	}
+	
+	@Test
+	public void getIndexes() throws IOException, ParseException, ClassNotFoundException, SQLException {
+
+		assertEquals(publicDatasources.getDatasource("LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
+		
+		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
+			connection.connect();
+			List<Index> li = connection.getSchemaIndexes(null);
+			assertTrue(li != null);
+			assertTrue(li==null || li.size() > 0);
+			
+		}
+	}
+	
+	@Test
+	public void getConstraints() throws IOException, ParseException, ClassNotFoundException, SQLException {
+
+		assertEquals(publicDatasources.getDatasource("LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
+		
+		try(MitsiConnection connection = new MitsiConnection(publicDatasources.getDatasource("LOCALHOST-TEST"))) {
+			connection.connect();
+			List<Constraint> lc = connection.getSchemaConstraints(null);
+			assertTrue(lc != null);
+			assertTrue(lc==null || lc.size() > 0);
 			
 		}
 	}
