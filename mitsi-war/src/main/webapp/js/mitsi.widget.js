@@ -487,7 +487,9 @@ function DynamicFilter(div, style, emptyMessage, onchange, categories) {
 			childs : [ a4 ]
 		});
 		
-		a4.onclick = function() {
+		a4.onclick = function(event) {
+			event.stopPropagation();
+
 			if(gid("dynamicFilterPopup")) {
 				dynamicFilterHidePopup();
 				return;
@@ -500,17 +502,39 @@ function DynamicFilter(div, style, emptyMessage, onchange, categories) {
 			    	id:"dynamicFilterPopup_"+cat, 
 			    	type:"checkbox", 
 			    	class:"dynamicFilterCheckbox", 
-			    	onclick:"dynamicFilterOnClick(event);"
 			    }});
 				cb.checked = othis.categories[cat].value;
+				cb.onclick = function(event) {
+					dynamicFilterOnClick(event);
+					event.stopPropagation();
+				};
+				
+				var cbimg = celt("IMG", {
+			    	att:{ 
+			    		src:"img/cb-"+othis.categories[cat].value+".png", 
+			    		id:"dynamicFilterCbImg_"+cat 
+			    	}, 
+			    	styles:{
+			    		height:"14px", 
+			    		marginRight:"3px"
+			    	}
+			    });
+				cbimg.onclick = function(event) {
+					event.stopPropagation();
+					var mycbid = "dynamicFilterPopup_"+this.id.replace("dynamicFilterCbImg_", "");
+					var mycb = gid(mycbid);
+					mycb.checked = !(mycb.checked);					
+					this.src = "img/cb-"+mycb.checked+".png";;
+				};
 				
 				listchilds.push(celt("DIV", {
 					childs : [
-					    celt("IMG", {att:{ src:"img/cb-"+othis.categories[cat].value+".png", id:"dynamicFilterCbImg_"+cat }, styles:{height:"14px", marginRight:"3px"}}),
+					    cbimg,
 					    cb,
 					    celt("LABEL", {
 					    	att:{ 
-					    		"for":"dynamicFilterPopup_"+cat
+					    		"for":"dynamicFilterPopup_"+cat,
+					    		onclick:"event.stopPropagation();"
 					    	}, 
 					    	childs:[ctn(othis.categories[cat].label)]
 					    }),
@@ -525,14 +549,15 @@ function DynamicFilter(div, style, emptyMessage, onchange, categories) {
 		    	}, 
 		    	styles:{height:"15px", paddingRight:"8px"}
 		    });
-			okButton.onclick = function() {
+			okButton.onclick = function(event) {
+				//event.stopPropagation();
 				for(var cat in othis.categories) {
 					var catCb = gid("dynamicFilterPopup_"+cat);
 					othis.categories[cat].value = catCb.checked;
 					//alert(cat+"="+othis.categories[cat].value);
 				}
 				othis.onchange(othis.getValue(), othis.categories);
-				dynamicFilterHidePopup();
+				//dynamicFilterHidePopup();
 				return false;
 			}
 			
@@ -542,7 +567,8 @@ function DynamicFilter(div, style, emptyMessage, onchange, categories) {
 				    celt("IMG", {
 				    	att:{ 
 				    		src:"img/cancel.png",
-				    		onclick:"dynamicFilterHidePopup();return false;"
+				    		//onclick:"dynamicFilterHidePopup();return false;"
+				    		onclick:"return false;"
 				    	}, 
 				    	styles:{height:"15px"}})
 				]
