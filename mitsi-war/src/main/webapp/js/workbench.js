@@ -165,16 +165,7 @@ function displayDatasource(datasourceName) {
 	//divUnrolledButton2.style.verticalAlign = "middle"; 
 	//divUnrolledButton3.style.verticalAlign = "middle"; 
 
-	divUnrolledButton1.title = "display/hide tables";
-	datasourceContext.toggleTable = new MitsiToggle(true, "img/table.png", "16px", divUnrolledButton1, createOnFilterDatasource(name) );
-	divUnrolledButton2.title = "display/hide views";
-	datasourceContext.toggleView = new MitsiToggle(true, "img/view.png", "16px", divUnrolledButton2, createOnFilterDatasource(name) );
-	divUnrolledButton3.title = "display/hide materialized views";
-	datasourceContext.toggleMatView = new MitsiToggle(true, "img/matview.png", "16px", divUnrolledButton3, createOnFilterDatasource(name)  );
 
-	/*divUnrolledButtons*/td1.appendChild(divUnrolledButton1);
-	/*divUnrolledButtons*/td2.appendChild(divUnrolledButton2);
-	/*divUnrolledButtons*/td3.appendChild(divUnrolledButton3);
 	datasourceContext.filter = new DynamicFilter(/*ivUnrolledButtons*/ td4, "", "filter tables/cols here ...", 
 			createOnFilterDatasource(name), 
 			{ "table"      : {label:"table names", value:true},
@@ -182,6 +173,16 @@ function displayDatasource(datasourceName) {
 			  "index"      : {label:"index names", value:true},
 			  "constraint" : {label:"constraint names", value:true}
 			});
+	
+	divUnrolledButton1.title = "display/hide tables";
+	datasourceContext.toggleTable = new MitsiToggle(true, "img/table.png", "16px", divUnrolledButton1, createOnFilterDatasource(name, datasourceContext.filter) );
+	divUnrolledButton2.title = "display/hide views";
+	datasourceContext.toggleView = new MitsiToggle(true, "img/view.png", "16px", divUnrolledButton2, createOnFilterDatasource(name, datasourceContext.filter) );
+	divUnrolledButton3.title = "display/hide materialized views";
+	datasourceContext.toggleMatView = new MitsiToggle(true, "img/matview.png", "16px", divUnrolledButton3, createOnFilterDatasource(name, datasourceContext.filter)  );
+	/*divUnrolledButtons*/td1.appendChild(divUnrolledButton1);
+	/*divUnrolledButtons*/td2.appendChild(divUnrolledButton2);
+	/*divUnrolledButtons*/td3.appendChild(divUnrolledButton3);
 	datasourceContext.divUnrolled.appendChild(divUnrolledButtons);
 	
 	
@@ -388,9 +389,14 @@ function displayDatabaseObjects(datasourceName) {
 // workaround à cause de la portée des variables qui est au
 // niveau de la fonction, c'est horrible mais c'est comme ça
 
-function createOnFilterDatasource(datasourceName) {
+function createOnFilterDatasource(datasourceName, filter) {
 	return function(newvalue, categories) {
 		try {
+			if(filter) {
+				categories = filter.categories;
+				newvalue = filter.getValue();
+			}
+			
 			var datasourceContext = CONTEXT.getDatasource(datasourceName);
 			if(!datasourceContext.objects) {
 				return;
