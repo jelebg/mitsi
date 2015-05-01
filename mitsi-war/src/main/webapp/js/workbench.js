@@ -440,6 +440,24 @@ function createOnFilterDatasource(datasourceName, filter) {
 								}
 							}
 						}
+						
+						if(!display && categories.index.value) {
+							for(var j=0; j!=obj.indexes.length; j++) {
+								if(obj.indexes[j].name.match(regex)) {
+									display = true;
+									break;
+								}
+							}
+						}
+						
+						if(!display && categories.constraint.value) {
+							for(var j=0; j!=obj.constraints.length; j++) {
+								if(obj.constraints[j].name.match(regex)) {
+									display = true;
+									break;
+								}
+							}
+						}
 					}
 					
 				}
