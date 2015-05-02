@@ -387,6 +387,7 @@ function MitsiGraph(relations) {
 			// this.getKShortestPathOrderTreeByDistance(tree);
 			
 			// add new vertices to visit if current not already visited
+			// (protection against cycles)
 			//if(visited.indexOf(visiting.i) >= 0) {
 			//	continue;
 			//}
@@ -396,6 +397,11 @@ function MitsiGraph(relations) {
 				var ls = tEppsteinEntry.ls; 
 				for(var j=0; j!=ls.length; j++) {
 					if(ls[j]) {
+						// protection against cycles
+						// TODO : check if it works
+						if(visited.indexOf(ls[j].t) >= 0) {
+							continue;
+						}
 						newtovisit.push( { i:ls[j].t , prevpath:sidetrackpath , dt:(/*visiting.dt+*/ls[j].dt) } );
 					}
 				}
