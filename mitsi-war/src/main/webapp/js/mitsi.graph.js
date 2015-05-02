@@ -46,30 +46,59 @@ function MitsiGraph(relations) {
 		
 		var pos  = this.nameTable[relation.tableOwner+"."+relation.tableName];
 		var rpos = this.nameTable[relation.rTableOwner+"."+relation.rTableName];
-		
-		var newLink = {
-			"target"     : rpos,
-			"targetName" : relation.rTableOwner+"."+relation.rTableName,
-			"properties" : {
-				"keyColumns"  : relation.keyColumns.join(","),
-				"rKeyColumns" : relation.rKeyColumns.join(",")
-			}
-		};
-		
 		var v = this.vertexes[pos];
-		v.links.push(newLink);
-		
-		var newReverseLink = {
-			"target"     : pos,
-			"targetName" : relation.tableOwner+"."+relation.tableName,
-			"properties" : {
-				"keyColumns"  : relation.keyColumns.join(","),
-				"rKeyColumns" : relation.rKeyColumns.join(",")
-			}
-		};
-
 		var rv = this.vertexes[rpos];
-		rv.reverseLinks.push(newReverseLink);
+		var linkAlreadyExists = false;
+		for(var j=0; j!=v.links.length; j++) {
+			var l = v.links[j];
+			if(l.target == rpos) {
+				linkAlreadyExists = true;
+				break;
+			}
+		}
+		
+		if(linkAlreadyExists) {
+			// if a link already exists in the same direction between the 2 tables, 
+			// do not create a new link but put new properties in existing link and reverse link
+			l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+			l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+			
+			for(var j=0; j!=rv.reverseLinks.length; j++) {
+				var l = rv.reverseLinks[j];
+				if(l.target == rpos) {
+					break;
+				}
+			}
+			
+			l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+			l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+			
+		}
+		else {
+			// if no link exists in the same direction between the 2 tables, create a new link 
+			var newLink = {
+				"target"     : rpos,
+				"targetName" : relation.rTableOwner+"."+relation.rTableName,
+				"properties" : {
+					"keyColumns"  : relation.keyColumns.join(","),
+					"rKeyColumns" : relation.rKeyColumns.join(",")
+				}
+			};
+			
+			v.links.push(newLink);
+			
+			var newReverseLink = {
+				"target"     : pos,
+				"targetName" : relation.tableOwner+"."+relation.tableName,
+				"properties" : {
+					"keyColumns"  : relation.keyColumns.join(","),
+					"rKeyColumns" : relation.rKeyColumns.join(",")
+				}
+			};
+			
+			rv.reverseLinks.push(newReverseLink);
+		}
+		
 
 	}
 	
