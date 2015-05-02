@@ -339,27 +339,92 @@ function MitsiLinksGraph(div) {
 	}
 	
 	this.fk = function(from, to, columnsFrom, columnsTo) {
-		var connection = this.jsplumb.connect({
-			source:this.divPrefix+from,
-			target:this.divPrefix+to
-		    ,paintStyle:{ 
-		    	strokeStyle:"lightgrey", 
-		    	lineWidth:2
-		    }
-	    	,hoverPaintStyle:{ 
-	    		strokeStyle:"black", 
-	    	    lineWidth:3
-	    	}
-	    	,endpointStyle:{ 
-	    		fillStyle:"lightgrey", 
-	    		outlineWidth:1 
-	    	}
-	    	,anchor:[ "Right", "Left" ]
-			,overlays:[ "Arrow", 
-				[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
-				,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
-			  ]
-		});
+		var autoCycle = (from==to);
+		//if(autoCycle) {
+		//	console.log("from:"+from+" = to:"+to);
+		//}
+		
+		if(autoCycle) {
+			try {
+				this.jsplumb.addEndpoint(this.divPrefix+from, 
+						{
+				            endpoint: "Dot",
+				            paintStyle:{ 
+						    	strokeStyle:"lightgrey", 
+						    	lineWidth:2,
+						    	radius:5
+						    },
+				            isSource: true
+				        }, 
+						{ anchor: "RightMiddle", uuid: this.divPrefix+from+"FromUUID" }
+					);
+				this.jsplumb.addEndpoint(this.divPrefix+to, 
+						{
+				            endpoint: "Dot",
+				            paintStyle:{ 
+						    	strokeStyle:"lightgrey", 
+						    	lineWidth:2,
+						    	radius:5
+						    },
+				            isTarget: true
+				        }, 
+						{ anchor: "TopCenter", uuid: this.divPrefix+to+"ToUUID" }
+					);
+		
+				
+				var connection = this.jsplumb.connect({
+					uuids : [ this.divPrefix+to+"ToUUID", this.divPrefix+from+"FromUUID" ]
+					/*source:this.divPrefix+from,
+					target:this.divPrefix+to
+				    */,paintStyle:{ 
+				    	strokeStyle:"lightgrey", 
+				    	lineWidth:2
+				    }
+			    	,hoverPaintStyle:{ 
+			    		strokeStyle:"black", 
+			    	    lineWidth:3
+			    	}
+			    	,endpointStyle:{ 
+			    		fillStyle:"lightgrey", 
+			    		outlineWidth:1 
+			    	}
+			    	/*,anchor: [ "RightMiddle", "TopCenter" ]*/
+			    	//,connector: [ "Flowchart", { cornerRadius:70 } ]
+			    	,connector: [ "StateMachine" ]
+					,overlays:[ "Arrow", 
+						[ "Label", { label:columnsFrom, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
+						,[ "Label", { label:columnsTo, location:0.7, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
+					  ]
+				});
+			}
+			catch(e) {
+				console.log(e);
+				throw e;
+			}
+		}
+		else {
+			var connection = this.jsplumb.connect({
+				source:this.divPrefix+from,
+				target:this.divPrefix+to
+			    ,paintStyle:{ 
+			    	strokeStyle:"lightgrey", 
+			    	lineWidth:2
+			    }
+		    	,hoverPaintStyle:{ 
+		    		strokeStyle:"black", 
+		    	    lineWidth:3
+		    	}
+		    	,endpointStyle:{ 
+		    		fillStyle:"lightgrey", 
+		    		outlineWidth:1 
+		    	}
+		    	,anchor: [ "Right", "Left" ]
+				,overlays:[ "Arrow", 
+					[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
+					,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
+				  ]
+			});
+		}
 		this.displayAllLabelsOnConnection(connection, false);
 
 		connection.bind("mouseover", function(conn) {

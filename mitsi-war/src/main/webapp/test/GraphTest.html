@@ -13,7 +13,7 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T2",
 	relations :[
-	   {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]}
+	   {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 	],
 	expectedResult : [
 	  ["TEST.T1", "TEST.T2"]
@@ -23,8 +23,8 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T3",
 	relations :[
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":["ID"]},
-   	   {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":["ID"]}
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""},
+   	   {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""}
 	],
 	expectedResult : [
        ["TEST.T1", "TEST.T2", "TEST.T3"]
@@ -34,10 +34,10 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T5",
 	relations :[
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":["ID"]},
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":["ID"]},
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":["ID"]},
-       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":["ID"]}
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""},
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""},
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""},
+       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":["ID"], "rKeyColumnsStr":""}
 	],
 	expectedResult : [
 	  ["TEST.T1", "TEST.T3", "TEST.T5"]
@@ -47,10 +47,10 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T4",
 	relations :[
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]}
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 	],
 	expectedPathCount : 2
   },
@@ -58,11 +58,11 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T5",
 	relations :[
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[]}
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 	],
 	expectedPathCount : 2
   },
@@ -70,11 +70,11 @@ var testSet = [
 	start : "TEST.T1",
 	finish : "TEST.T5",
 	relations :[
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[]}
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 	],
 	expectedPathCount : 2
   },
@@ -82,12 +82,12 @@ var testSet = [
 		start : "TEST.T1",
 		finish : "TEST.T6",
 		relations :[
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T5","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[]}
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T5","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 		],
 		expectedPathCount : 2
 	},
@@ -95,8 +95,8 @@ var testSet = [
 		start : "TEST.T1",
 		finish : "TEST.T3",
 		relations :[
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]}
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 		],
 		expectedPathCount : 0
 	},
@@ -104,8 +104,8 @@ var testSet = [
 		start : "TEST.T1",
 		finish : "TEST.T2",
 		relations :[
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T1","rTableOwner":"TEST","rKeyColumns":[]}
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T1","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 		],
 		expectedPathCount : 1,
 		expectedResult : [
@@ -116,10 +116,10 @@ var testSet = [
 		start : "TEST.T1",
 		finish : "TEST.T4",
 		relations :[
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]}
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 		],
 		expectedPathCount : 1,
 		expectedResult : [
@@ -130,21 +130,46 @@ var testSet = [
 		start : "TEST.T1",
 		finish : "TEST.T8",
 		relations :[
-	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T6","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T7","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T7","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T5","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T1","rTableOwner":"TEST","rKeyColumns":[]},
-	       {"tableName":"T7","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T8","rTableOwner":"TEST","rKeyColumns":[]}
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T3","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T6","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T6","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T7","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T7","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T5","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T5","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T4","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T4","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T1","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T7","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T8","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
 		],
 		expectedPathCount : 1,
 		expectedResult : [
        	  ["TEST.T1", "TEST.T2", "TEST.T3", "TEST.T6", "TEST.T7", "TEST.T8"]
        	]
 	},
-// TODO : auto-cycles, multiple links between same table etc., big graphs (very connected an not)
+	{ name : "multi_link_1",
+		start : "TEST.T1",
+		finish : "TEST.T2",
+		relations :[
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
+		],
+		expectedPathCount : 1,
+		expectedResult : [
+       	  ["TEST.T1", "TEST.T2"]
+       	]
+	},
+	{ name : "auto_cycle_1",
+		start : "TEST.T1",
+		finish : "TEST.T3",
+		relations :[
+	       {"tableName":"T1","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T2","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""},
+	       {"tableName":"T2","tableOwner":"TEST","keyColumns":[],"keyColumnsStr":"","rTableName":"T3","rTableOwner":"TEST","rKeyColumns":[], "rKeyColumnsStr":""}
+		],
+		expectedPathCount : 1,
+		expectedResult : [
+       	  ["TEST.T1", "TEST.T2", "TEST.T3"]
+       	]
+	},
+// TODO : big graphs (very connected an not)
  ];
 
 function compareArray(t1, t2) {
