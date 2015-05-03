@@ -679,3 +679,138 @@ function dynamicFilterHidePopup() {
 		d.parentElement.removeChild(d);
 	}
 }
+
+//// suggestion box
+
+function SuggestionBox(div, listName, emptyMessage) {
+	var othis = this;
+	this.div = div;
+	this.onchange = null;
+	this.clearEntries = function() {
+		while(this.datalist.firstChild) {
+			this.datalist.removeChild(this.datalist.firstChild);
+		}
+	}
+	
+	this.populateEntries = function(entries) {
+		var arr = entries.slice(0);
+		arr.sort(function (a, b) {
+		    return a.toLowerCase().localeCompare(b.toLowerCase());
+		});
+		
+		for(var i=0; i!=arr.length; i++) {
+			var text = arr[i];
+			this.datalist.appendChild(celt("OPTION", {
+				att: {
+					value : text,
+					textContent : text
+				}
+			}));
+		}
+		
+	}
+	
+	this.setEntries = function(entries) {
+		this.clearEntries();
+		this.populateEntries(entries);
+	}
+
+	this.box = celt("INPUT", {
+		att : {
+			type:"text",
+			list:listName,
+			value: emptyMessage
+		},
+		styles : {
+			color : "grey"
+		}
+	});
+	
+	this.box.onchange = function(event) {
+		if(othis.onchange) {
+			othis.onchange(event);
+		}
+	};
+	
+	this.datalist = gid(listName); 
+	if(!this.datalist) {
+		this.datalist = celt("DATALIST", {
+			att : { id:listName }
+		});
+		this.div.appendChild(this.datalist);
+	}
+	this.div.appendChild(this.box);
+	
+	this.box.onfocus = function(event) {
+		if(event.target.value == emptyMessage) {
+			event.target.value = "";
+			event.target.style.color = "black";
+		}
+	}
+	this.box.onblur = function(event) {
+		if(event.target.value == "") {
+			event.target.value = emptyMessage;
+			event.target.style.color = "grey";
+		}
+	}
+	
+	this.getValue = function() {
+		if(this.box.value == emptyMessage) {
+			return "";
+		}
+		return this.box.value;
+	}
+
+	this.setValue = function(val) {
+		if(val == null || val == "") {
+			this.box.value = emptyMessage;
+		}
+		else {
+			this.box.value = val;
+		}
+	}
+
+	/*var othis = this;
+	this.filterOnChange = function(newValue) {
+		console.log(newValue);
+		if(!gid("suggestionBoxPopup")) {
+			othis.divEntries = null;
+			othis.divEntriesTable = null;
+		}
+		
+		if(!othis.divEntries) {
+			othis.divEntriesTable = celt("TABLE");
+			othis.divEntries = celt("DIV", {
+				att: { id:"suggestionBoxPopup" },
+				childs : [ othis.divEntriesTable ]
+			});
+			othis.div.appendChild(othis.divEntries);
+		}
+		
+		for(var i=0; i!=othis.entries.length; i++) {
+			var text = othis.entries[i];
+			othis.divEntriesTable.appendChild(
+				celt("TR", { childs : [
+				    celt("TD", {att:{textContent:text}})
+				]})
+			);
+		}
+	}
+
+	this.div = div;
+	this.entries = entries;
+	this.dynamicFilter = new DynamicFilter(this.div, null, "select start table here", this.filterOnChange, null);
+	this.divEntries = null;
+	this.divEntriesTable = null;
+	*/
+	
+	
+}
+
+/*function suggestionBoxHidePopup() {
+	var d = gid("suggestionBoxPopup");
+	if(d) {
+		d.parentElement.removeChild(d);
+	}
+}*/
+

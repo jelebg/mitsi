@@ -138,6 +138,9 @@ function MitsiLinksGraph(div) {
 					othis.graph = null;
 				}
 				othis.draw();
+				if(othis.linksPaths) {
+					othis.linksPaths.update();
+				}
 			}, 
 			function(code, text) { 
 				console.log("error code="+code+" text="+text); 
@@ -632,8 +635,8 @@ function dragend(event) {
 ////widget to select start, finish and display paths
 
 function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
-	this.messageNoStartSelected = "[no start selected]";
-	this.messageNoFinishSelected = "[no finish selected]";
+	//this.messageNoStartSelected = "[no start selected]";
+	//this.messageNoFinishSelected = "[no finish selected]";
 	this.div = div;
 	this.linksGraph = linksGraph;
 	this.linksConfiguration = linksConfiguration;
@@ -642,23 +645,77 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	this.paths = [];
 	
 	this.divInfoMessage = null
-	this.divStart = null;
-	this.divFinish = null;
 	this.selectDirection = null;
 	
 	var t = document.createElement("TABLE");
-	var tr = document.createElement("TR");
-	var td1 = document.createElement("TD");
-	var td2 = document.createElement("TD");
-	var td3 = document.createElement("TD");
-	tr.appendChild(td1);
-	tr.appendChild(td2);
-	tr.appendChild(td3);
-	t.appendChild(tr);
+	var td = [];
+	td[0] = celt("TD");
+	td[1] = celt("TD");
+	td[2] = celt("TD");
+	td[3] = celt("TD");
+	td[4] = celt("TD");
+	t.appendChild(celt("TR", { childs : td } ));
 	this.div.appendChild(t);
 	
-	td1.textContent = this.messageNoStartSelected;
-	td3.textContent = this.messageNoFinishSelected;
+	this.startSuggestBox = new SuggestionBox(td[0], "tableNames", "select start here...");
+	this.finishSuggestBox = new SuggestionBox(td[2], "tableNames", "select finish here...");
+	var aOK = celt("A", {
+		att: {
+			href : ""
+		},
+		childs : [
+		    celt("IMG", {
+		    	att : {
+		    		src : "img/ok.png"
+		    	}
+		    })
+		]
+	});
+	aOK.onclick = function(event) {
+		try {
+			othis.redrawFromInputBoxes();
+		}
+		catch(e) {
+			console.log(e);
+		}
+			
+		return false;
+	}
+	var aCancel = celt("A", {
+		att: {
+			href : ""
+		},
+		childs : [
+		    celt("IMG", {
+		    	att : {
+		    		src : "img/cancel.png"
+		    	}
+		    })
+		]
+	});
+	aCancel.onclick = function(event) {
+		try {
+			othis.paths = [];
+			othis.draw();
+		}
+		catch(e) {
+			console.log(e);
+		}
+		return false;
+	}
+	td[3].appendChild(aOK);
+	td[4].appendChild(aCancel);
+	
+	this.startSuggestBox.onchange = function(event) {
+		othis.redrawFromInputBoxes();
+	};
+	this.finishSuggestBox.onchange = function(event) {
+		othis.redrawFromInputBoxes();
+	};
+
+	//td1.textContent = this.messageNoStartSelected;
+	//td3.textContent = this.messageNoFinishSelected;
+
 	var s = document.createElement("SELECT");
 	var o1 = document.createElement("OPTION");
 	o1.text = "<->";
@@ -672,29 +729,58 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	s.appendChild(o1);
 	s.appendChild(o2);
 	s.appendChild(o3);
-	td2.appendChild(s);
+	td[1].appendChild(s);
+	
+	//this.divSuggestionBox = document.createElement("DIV");
+	//this.div.appendChild(this.divSuggestionBox);
 	
 	this.divInfoMessage = document.createElement("DIV");
 	this.div.appendChild(this.divInfoMessage);
 
-	this.divStart = td1;
-	this.divFinish = td3;
+	//this.divStart = td1;
+	//this.divFinish = td3;
 	this.selectDirection = s;
 	var othis = this;
-	
-	this.selectDirection.onchange = function(event) {
+
+	this.redrawFromInputBoxes = function() {
+		var startStr = othis.startSuggestBox.getValue();
+		var finishStr = othis.finishSuggestBox.getValue();
+		if(startStr==null || finishStr==null || startStr=="" || finishStr=="") {
+			return ;
+		}	
+		
+		othis.start = othis.linksGraph.graph.getIndex(startStr);
+		othis.finish = othis.linksGraph.graph.getIndex(finishStr);
+		if(!othis.start || !othis.finish) {
+			return ;
+		}
+		
+		othis.redraw();
+	}
+
+	this.redraw = function() {
 		othis.paths = [];
 		othis.draw();
 		othis.computePaths();
 		othis.draw();
 	}
 	
+	this.selectDirection.onchange = function(event) {
+		othis.redraw();
+	}
+	
 	this.linksConfiguration.setOnChange(function() {
-		othis.paths = [];
-		othis.draw();
-		othis.computePaths();
-		othis.draw();
+		othis.redraw();
 	});
+	
+	this.update = function() {
+		var tableNames = [];
+		for(var i=0; i!=this.linksGraph.graph.vertexes.length; i++) {
+			var v = this.linksGraph.graph.vertexes[i];
+			tableNames.push(v.name);
+		}
+		this.startSuggestBox.setEntries(tableNames);
+	}
 
 	this.reset = function() {
 		this.start = null;
@@ -704,20 +790,12 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	
 	this.setStart = function(vertexIndex) {
 		this.start = vertexIndex;
-
-		this.paths = [];
-		this.draw();
-		this.computePaths();
-		this.draw();
+		this.redraw();
 	}
 	
 	this.setFinish = function(vertexIndex) {
 		this.finish = vertexIndex;
-		
-		this.paths = [];
-		this.draw();
-		this.computePaths();
-		this.draw();
+		this.redraw();
 	}
 	
 	this.computePathsSub = function(graph, start, finish) {
@@ -773,8 +851,10 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	}
 	
 	this.draw = function() {
-		this.divStart.textContent = this.start==null ? this.messageNoStartSelected : this.linksGraph.graph.getVertexName(this.start);
-		this.divFinish.textContent = this.finish==null ? this.messageNoFinishSelected : this.linksGraph.graph.getVertexName(this.finish);
+		//this.divStart.textContent = this.start==null ? this.messageNoStartSelected : this.linksGraph.graph.getVertexName(this.start);
+		//this.divFinish.textContent = this.finish==null ? this.messageNoFinishSelected : this.linksGraph.graph.getVertexName(this.finish);
+		this.startSuggestBox.setValue(this.start==null ? "" : this.linksGraph.graph.getVertexName(this.start))
+		this.finishSuggestBox.setValue(this.finish==null ? "" : this.linksGraph.graph.getVertexName(this.finish))
 		this.highlightCurrentPaths();
 	}
 
@@ -838,7 +918,7 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 			//infoMessage.appendChild(document.createElement("BR"));
 		}
 		
-		var aClearAll = document.createElement("A");
+		/*var aClearAll = document.createElement("A");
 		aClearAll.href = "";
 		aClearAll.appendChild(document.createTextNode("clear all paths"));
 		aClearAll.onclick = function(event) {
@@ -852,7 +932,7 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 			return false;
 		}
 		this.divInfoMessage.appendChild(aClearAll);
-		
+		*/
 	}
 
 	this.highlightTable = function (vertexName) {
