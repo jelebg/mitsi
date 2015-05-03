@@ -275,9 +275,10 @@ function MitsiLinksGraph(div) {
 		
 		var td21 = document.createElement("TD");
 		tr2.appendChild(td21);
-		this.appendTableIcon(td21, name, "img/proxgraph.png", "show links from this table", function(event, vertexName) { othis.gotoVertex(vertexName); } , "" );
-		this.appendTableIcon(td21, name, "img/pathfrom.png", "find path from this table", function(event, vertexName) { othis.setPathFrom(vertexName); } , "" );
-		this.appendTableIcon(td21, name, "img/pathto.png", "find path to this table", function(event, vertexName) { othis.setPathTo(vertexName); } , "" );
+		//this.appendTableIcon(td21, name, "img/proxgraph.png", "show links from this table", function(event, vertexName) { othis.gotoVertex(vertexName); } , "" );
+		//this.appendTableIcon(td21, name, "img/pathfrom.png", "find path from this table", function(event, vertexName) { othis.setPathFrom(vertexName); } , "" );
+		//this.appendTableIcon(td21, name, "img/pathto.png", "find path to this table", function(event, vertexName) { othis.setPathTo(vertexName); } , "" );
+		this.appendTableIcon(td21, name, "img/flag.png", "find path to this table", function(event, vertexName) { othis.setPathTo(vertexName); } , "" );
 		this.appendTableIcon(td21, name, "img/plus.png", "add linked table", function(event, vertexName) { othis.addLinkedTable(div, td21, vertexName); } , "" );
 		this.appendTableIcon(td21, name, "img/table.png", "show table content", null, othis.getTableUrl(name) );
 		this.appendTableIcon(td21, name, "img/details.png", "show table details", null, othis.getDetailsUrl(name) );
@@ -605,7 +606,7 @@ function MitsiLinksGraph(div) {
 		}
 		
 		var i = this.graph.getIndex(vertexName);
-		this.linksPaths.setFinish(i);
+		this.linksPaths.setStartOrFinish(i);
 	}
 }
 
@@ -654,6 +655,7 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	td[2] = celt("TD");
 	td[3] = celt("TD");
 	td[4] = celt("TD");
+	td[5] = celt("TD");
 	t.appendChild(celt("TR", { childs : td } ));
 	this.div.appendChild(t);
 	
@@ -703,8 +705,34 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		}
 		return false;
 	}
+	var aInverse = celt("A", {
+		att: {
+			href : ""
+		},
+		childs : [
+		    celt("IMG", {
+		    	att : {
+		    		src : "img/inverse.png"
+		    	}
+		    })
+		]
+	});
+	aInverse.onclick = function(event) {
+		try {
+			othis.paths = [];
+			var tmp = othis.startSuggestBox.getValue();
+			othis.startSuggestBox.setValue(othis.finishSuggestBox.getValue());
+			othis.finishSuggestBox.setValue(tmp);
+			othis.redrawFromInputBoxes();
+		}
+		catch(e) {
+			console.log(e);
+		}
+		return false;
+	}
 	td[3].appendChild(aOK);
 	td[4].appendChild(aCancel);
+	td[5].appendChild(aInverse);
 	
 	this.startSuggestBox.onchange = function(event) {
 		othis.redrawFromInputBoxes();
@@ -795,6 +823,16 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	
 	this.setFinish = function(vertexIndex) {
 		this.finish = vertexIndex;
+		this.redraw();
+	}
+	
+	this.setStartOrFinish = function(vertexIndex) {
+		if(this.start == null) {
+			this.start = vertexIndex;
+		}
+		else {
+			this.finish = vertexIndex;
+		}
 		this.redraw();
 	}
 	
