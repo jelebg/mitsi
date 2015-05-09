@@ -685,8 +685,8 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	t.appendChild(celt("TR", { childs : td } ));
 	this.div.appendChild(t);
 	
-	this.startSuggestBox = new SuggestionBox(td[0], "tableNames", "select start here...");
-	this.finishSuggestBox = new SuggestionBox(td[2], "tableNames", "select finish here...");
+	this.startSuggestBox = new SuggestionBox(td[0], "tableNames", "select start here...", {width:"300px"});
+	this.finishSuggestBox = new SuggestionBox(td[2], "tableNames", "select finish here...", {width:"300px"});
 	var aOK = celt("A", {
 		att: {
 			href : ""

@@ -561,8 +561,13 @@ function refreshDatasource(datasource) {
 			function(response) { 
 				console.log(response);
 				CONTEXT.setDatasourceObjects(datasource, response.databaseObjects);
-				CONTEXT.getDatasource(datasource).schemas = response.schemas;
+				var datasourceContext = CONTEXT.getDatasource(datasource);
+				datasourceContext.schemas = response.schemas;
 				displayDatabaseObjects(datasource);
+				if(datasourceContext.accordion.isUnrolled()) {
+					EVENT_CurrentDatasourceChange(datasourceContext);
+				}
+
 			}, 
 			function(code, text) { 
 				console.log("error code="+code+" text="+text); 

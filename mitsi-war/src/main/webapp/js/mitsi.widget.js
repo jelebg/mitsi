@@ -78,6 +78,7 @@ function MitsiAccordion(
 			) {
 // nothing stored in object, for now
 	this.group = group;
+	this.div = div;
 
 	div.className += " "+group;
 			
@@ -88,11 +89,11 @@ function MitsiAccordion(
 		div.style.display = "none";
 	}
 
-	var obj = this;
+	var othis = this;
 	unrollButton.onclick = function(event) {
 		var unroll = (div.style.display == "none");
 		if(neverMoreThanOneUnrolled === true)  {
-			obj.windAll();
+			othis.windAll();
 		}
 		if(unroll) {
 			div.style.display = "block";
@@ -100,15 +101,18 @@ function MitsiAccordion(
 				onUnroll();
 			}
 		} else 	if(neverMoreThanOneUnrolled !== true) {
-			div.style.display = "none";
+			othis.div.style.display = "none";
 		}
-
 		
 		return false;
 	};
 	
 	this.windAll = function() {
 		mitsiAccordionWindAll(this.group);
+	}
+	
+	this.isUnrolled = function() {
+		return !(othis.div.style.display == "none");
 	}
 
 }
@@ -686,7 +690,7 @@ function dynamicFilterHidePopup() {
 
 //// suggestion box
 
-function SuggestionBox(div, listName, emptyMessage) {
+function SuggestionBox(div, listName, emptyMessage, boxStyles) {
 	var othis = this;
 	this.div = div;
 	this.onchange = null;
@@ -725,10 +729,9 @@ function SuggestionBox(div, listName, emptyMessage) {
 			list:listName,
 			value: emptyMessage
 		},
-		styles : {
-			color : "grey"
-		}
+		styles : boxStyles
 	});
+	this.box.style.color = "grey";
 	
 	this.box.onchange = function(event) {
 		if(othis.onchange) {
