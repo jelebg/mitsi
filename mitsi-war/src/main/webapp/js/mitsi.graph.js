@@ -15,93 +15,184 @@ function MitsiGraph(relations) {
 		}
 	}
 	
-	// order relations by tableOwner/tableName/keyColumnsStr/rTableOwner/rTableName/rKeyColumnsStr
-	relations.sort(function(a, b) {
-		var lc = a.tableOwner.localeCompare(b.tableOwner);
-		if(lc != 0) return lc;
-		lc = a.tableName.localeCompare(b.tableName);
-		if(lc != 0) return lc;
-		lc = a.keyColumnsStr.localeCompare(b.keyColumnsStr);
-		if(lc != 0) return lc;
-		lc = a.rTableOwner.localeCompare(b.rTableOwner);
-		if(lc != 0) return lc;
-		lc = a.rTableName.localeCompare(b.rTableName);
-		if(lc != 0) return lc;
-		lc = a.rKeyColumnsStr.localeCompare(b.rKeyColumnsStr);
-		return lc;
-	});
-	
-	// d'abord on crée une entrée pour chaque sommet
-	for(var i=0; i!=relations.length; i++) {
-		var relation = relations[i];
-		
-		this.createVertexIfNecessary(relation.tableOwner+"."+relation.tableName);
-		this.createVertexIfNecessary(relation.rTableOwner+"."+relation.rTableName);
-	
-	}
-	
-	// ensuite on popule les relations de chaque sommet
-	for(var i=0; i!=relations.length; i++) {
-		var relation = relations[i];
-		
-		var pos  = this.nameTable[relation.tableOwner+"."+relation.tableName];
-		var rpos = this.nameTable[relation.rTableOwner+"."+relation.rTableName];
-		var v = this.vertexes[pos];
-		var rv = this.vertexes[rpos];
-		var linkAlreadyExists = false;
-		for(var j=0; j!=v.links.length; j++) {
-			var l = v.links[j];
-			if(l.target == rpos) {
-				linkAlreadyExists = true;
-				break;
+	this.initWithDatabaseObjects = function(databaseObjects) {
+		// create vertices
+		for(var i=0; i!=databaseObjects.length; i++) {
+			var dobj = databaseObjects[i];
+			
+			if(dobj.id.type != "table" && dobj.id.type != "matview") {
+				continue;
 			}
+			
+			this.createVertexIfNecessary(dobj.id.schema+"."+dobj.id.name);
+
 		}
 		
-		if(linkAlreadyExists) {
-			// if a link already exists in the same direction between the 2 tables, 
-			// do not create a new link but put new properties in existing link and reverse link
-			l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
-			l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+		// create links
+		for(var i=0; i!=databaseObjects.length; i++) {
+			var dobj = databaseObjects[i];
 			
-			for(var j=0; j!=rv.reverseLinks.length; j++) {
-				var l = rv.reverseLinks[j];
+			if(dobj.id.type != "table" && dobj.id.type != "matview") {
+				continue;
+			}
+			
+			var pos = this.nameTable[dobj.id.schema+"."+dobj.id.name];
+			var v = this.vertexes[pos];
+			for(var k=0; k!=dobj.constraints.length; k++) {
+				var constraint = dobj.constraints[k];
+				
+				if(constraint.type != 'R') {
+					continue;
+				}
+				
+				var rpos = this.nameTable[constraint.fkConstraintOwner+"."+constraint.fkTable];
+				var rv = this.vertexes[rpos];
+				var linkAlreadyExists = false;
+				for(var j=0; j!=v.links.length; j++) {
+					var l = v.links[j];
+					if(l.target == rpos) {
+						linkAlreadyExists = true;
+						break;
+					}
+				}
+				
+				if(linkAlreadyExists) {
+					// if a link already exists in the same direction between the 2 tables, 
+					// do not create a new link but put new properties in existing link and reverse link
+					l.properties.keyColumns  +=  "\n"+constraint.columns;
+					l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
+					
+					for(var j=0; j!=rv.reverseLinks.length; j++) {
+						var l = rv.reverseLinks[j];
+						if(l.target == rpos) {
+							break;
+						}
+					}
+					
+					l.properties.keyColumns  +=  "\n"+constraint.columns;
+					l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
+					
+				}
+				else {
+					// if no link exists in the same direction between the 2 tables, create a new link 
+					var newLink = {
+						"target"     : rpos,
+						"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
+						"properties" : {
+							"keyColumns"  : constraint.columns,
+							"rKeyColumns" : constraint.fkColumns
+						}
+					};
+					
+					v.links.push(newLink);
+					
+					var newReverseLink = {
+						"target"     : pos,
+						"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
+						"properties" : {
+							"keyColumns"  : constraint.columns,
+							"rKeyColumns" : constraint.fkColumns
+						}
+					};
+					
+					rv.reverseLinks.push(newReverseLink);
+				}
+			}
+			
+		}
+	}
+	
+	this.initWithRelations = function(relations) {
+		// order relations by tableOwner/tableName/keyColumnsStr/rTableOwner/rTableName/rKeyColumnsStr
+		relations.sort(function(a, b) {
+			var lc = a.tableOwner.localeCompare(b.tableOwner);
+			if(lc != 0) return lc;
+			lc = a.tableName.localeCompare(b.tableName);
+			if(lc != 0) return lc;
+			lc = a.keyColumnsStr.localeCompare(b.keyColumnsStr);
+			if(lc != 0) return lc;
+			lc = a.rTableOwner.localeCompare(b.rTableOwner);
+			if(lc != 0) return lc;
+			lc = a.rTableName.localeCompare(b.rTableName);
+			if(lc != 0) return lc;
+			lc = a.rKeyColumnsStr.localeCompare(b.rKeyColumnsStr);
+			return lc;
+		});
+		
+		// d'abord on crée une entrée pour chaque sommet
+		for(var i=0; i!=relations.length; i++) {
+			var relation = relations[i];
+			
+			this.createVertexIfNecessary(relation.tableOwner+"."+relation.tableName);
+			this.createVertexIfNecessary(relation.rTableOwner+"."+relation.rTableName);
+		
+		}
+		
+		// ensuite on popule les relations de chaque sommet
+		for(var i=0; i!=relations.length; i++) {
+			var relation = relations[i];
+			
+			var pos  = this.nameTable[relation.tableOwner+"."+relation.tableName];
+			var rpos = this.nameTable[relation.rTableOwner+"."+relation.rTableName];
+			var v = this.vertexes[pos];
+			var rv = this.vertexes[rpos];
+			var linkAlreadyExists = false;
+			for(var j=0; j!=v.links.length; j++) {
+				var l = v.links[j];
 				if(l.target == rpos) {
+					linkAlreadyExists = true;
 					break;
 				}
 			}
 			
-			l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
-			l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
-			
-		}
-		else {
-			// if no link exists in the same direction between the 2 tables, create a new link 
-			var newLink = {
-				"target"     : rpos,
-				"targetName" : relation.rTableOwner+"."+relation.rTableName,
-				"properties" : {
-					"keyColumns"  : relation.keyColumns.join(","),
-					"rKeyColumns" : relation.rKeyColumns.join(",")
+			if(linkAlreadyExists) {
+				// if a link already exists in the same direction between the 2 tables, 
+				// do not create a new link but put new properties in existing link and reverse link
+				l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+				
+				for(var j=0; j!=rv.reverseLinks.length; j++) {
+					var l = rv.reverseLinks[j];
+					if(l.target == rpos) {
+						break;
+					}
 				}
-			};
+				
+				l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+				
+			}
+			else {
+				// if no link exists in the same direction between the 2 tables, create a new link 
+				var newLink = {
+					"target"     : rpos,
+					"targetName" : relation.rTableOwner+"."+relation.rTableName,
+					"properties" : {
+						"keyColumns"  : relation.keyColumns.join(","),
+						"rKeyColumns" : relation.rKeyColumns.join(",")
+					}
+				};
+				
+				v.links.push(newLink);
+				
+				var newReverseLink = {
+					"target"     : pos,
+					"targetName" : relation.tableOwner+"."+relation.tableName,
+					"properties" : {
+						"keyColumns"  : relation.keyColumns.join(","),
+						"rKeyColumns" : relation.rKeyColumns.join(",")
+					}
+				};
+				
+				rv.reverseLinks.push(newReverseLink);
+			}
 			
-			v.links.push(newLink);
-			
-			var newReverseLink = {
-				"target"     : pos,
-				"targetName" : relation.tableOwner+"."+relation.tableName,
-				"properties" : {
-					"keyColumns"  : relation.keyColumns.join(","),
-					"rKeyColumns" : relation.rKeyColumns.join(",")
-				}
-			};
-			
-			rv.reverseLinks.push(newReverseLink);
-		}
-		
 
+		}
+				
 	}
 	
+
 	this.getLinksByName = function(tableOwner, tableName) {
 		var pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
 		return this.vertexes[pos].links;

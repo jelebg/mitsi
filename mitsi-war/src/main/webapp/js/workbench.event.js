@@ -19,3 +19,7 @@ function EVENT_DatasourceSchemaChange(datasource) {
 function EVENT_datasourceDisconnection(datasource) {
 	// nothing yet
 }
+
+function EVENT_CurrentDatasourceChange(datasource) {
+	linksGraph.setCurrentDatasource(datasource.name, datasource.objects);
+}

@@ -73,7 +73,8 @@ function MitsiAccordion(
 				group,        // string identifying all of the accordions linked
 				unrollButton, // the button to unroll the accordion
 				initUnrolled,  // true if the accordion is displayed on initialisation
-				neverMoreThanOneUnrolled
+				neverMoreThanOneUnrolled,
+				onUnroll
 			) {
 // nothing stored in object, for now
 	this.group = group;
@@ -95,6 +96,9 @@ function MitsiAccordion(
 		}
 		if(unroll) {
 			div.style.display = "block";
+			if(onUnroll) {
+				onUnroll();
+			}
 		} else 	if(neverMoreThanOneUnrolled !== true) {
 			div.style.display = "none";
 		}

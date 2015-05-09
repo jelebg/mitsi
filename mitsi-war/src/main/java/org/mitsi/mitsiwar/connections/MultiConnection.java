@@ -75,7 +75,7 @@ public class MultiConnection {
 	}*/
 	
 	// TODO : design a revoir, là ça sert juste à le synchroniser avec la SqlSession
-	public IMitsiMapper getConnectionForMitsi() {
+	public MitsiConnection getConnectionForMitsi() {
 		return mitsiConnections.get(0);
 	}
 	private MitsiConnection getConnectionForRawSql() {

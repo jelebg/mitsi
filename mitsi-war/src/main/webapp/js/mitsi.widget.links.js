@@ -97,8 +97,29 @@ function MitsiLinksGraph(div) {
 	
 	var othis = this;
 	
-	this.setCurrent = function(datasourceName, owner, objectName) {
+	this.setCurrentDatasource = function(datasourceName, databaseObjects) {
+		// TODO : voir si on pourrait ne calculer le graph qu'au dernier moment
+		this.graph = new MitsiGraph();
+		this.graph.initWithDatabaseObjects(databaseObjects);
+		
+		var objectList = [];
+		for(var i=0; i!=databaseObjects.length; i++) {
+			var dobj = databaseObjects[i];
 			
+			if(dobj.id.type != "table" && dobj.id.type != "matview") {
+				continue;
+			}
+			
+			var objectName= dobj.id.schema+"."+dobj.id.name;
+			objectList.push(objectName);
+		}
+		//objectList.sort();
+		
+		this.linksPaths.updateSuggestions(objectList);
+	}
+	
+	this.setCurrent = function(datasourceName, databaseObjects, owner, objectName) {
+	
 		var reload = false;
 		if(this.currentDatasourceName == null || 
 			this.currentDatasourceName!=datasourceName ||
@@ -110,19 +131,22 @@ function MitsiLinksGraph(div) {
 		this.currentVertexName = owner+"."+objectName;
 		if(reload) {
 			// reload graph, change object later
-			this.load();
+			//this.load();
+			this.setCurrentDatasource(datasourceName, databaseObjects);
+
 		}
-		else {
+		//else {
 			// we already have the graph, change the object now
 			this.draw();
 			if(this.linksPaths) {
 				this.linksPaths.highlightCurrentPaths();
 			}
-		}
+		//}
 		
 	}
 	
-	this.load = function() {
+	// TODO : à obsoletiser
+	/*this.load = function() {
 		callGsonServlet("GetAllRelationsServlet", 
 			{
 				"datasourceName" : this.currentDatasourceName
@@ -132,7 +156,8 @@ function MitsiLinksGraph(div) {
 				othis.message = response.message;
 				othis.relations = response.relations;
 				if(othis.relations) {
-					othis.graph = new MitsiGraph(othis.relations);
+					othis.graph = new MitsiGraph();
+					othis.graph.initWithRelations(othis.relations);
 				}
 				else {
 					othis.graph = null;
@@ -148,7 +173,7 @@ function MitsiLinksGraph(div) {
 			}
 		);
 		
-	}
+	}*/
 	
 	this.draw = function() {
 		this.div.innerHTML = "";
@@ -468,6 +493,7 @@ function MitsiLinksGraph(div) {
 	this.gotoVertex = function(name) {
 		this.currentVertexName = name;
 		this.draw();
+		this.linksPaths.highlightCurrentPaths();
 	}
 	
 	this.addLinkedTable = function(divParent, divOffset, vertexName) {
@@ -697,6 +723,8 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	});
 	aCancel.onclick = function(event) {
 		try {
+			othis.start = null;
+			othis.finish = null;
 			othis.paths = [];
 			othis.draw();
 		}
@@ -801,14 +829,17 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		othis.redraw();
 	});
 	
-	this.update = function() {
+	this.updateSuggestions = function(entries) {
+		this.startSuggestBox.setEntries(entries);
+	}
+	/*this.update = function() {
 		var tableNames = [];
 		for(var i=0; i!=this.linksGraph.graph.vertexes.length; i++) {
 			var v = this.linksGraph.graph.vertexes[i];
 			tableNames.push(v.name);
 		}
 		this.startSuggestBox.setEntries(tableNames);
-	}
+	}*/
 
 	this.reset = function() {
 		this.start = null;
@@ -996,6 +1027,10 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 	}
 
 	this.highlightLink = function (v1, v2) {
+		if(!this.linksGraph.jsplumb) {
+			return;
+		}
+		
 		var connectionList = this.linksGraph.jsplumb.getConnections({ source:this.linksGraph.divPrefix+v1, target:this.linksGraph.divPrefix+v2 });
 		if(!connectionList) {
 			return;

@@ -12,7 +12,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -216,6 +218,37 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public synchronized List<Schema> getAllSchemas() {
 		return mapper.getAllSchemas();
 	}
+	
+	private void getTablesAndViewsSubObjects(List<DatabaseObject> databaseObjects) {
+		List<Index> indexes = mapper.getSchemaIndexes(null);
+		List<Constraint> constraints = mapper.getSchemaConstraints(null);
+
+		Map<DatabaseObject.Id, DatabaseObject> doMap = new HashMap<>();
+		for(DatabaseObject dobj : databaseObjects) {
+			doMap.put(dobj.getId(), dobj);
+		}
+		
+		for(Index i : indexes) {
+			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, i.owner, i.tableName));
+			if(dobj == null) {
+				log.warn("cannot find table "+i.owner+"."+i.tableName+" for index "+i.owner+"."+i.name);
+			}
+			else {
+				dobj.getIndexes().add(i);
+			}
+		}
+		
+		for(Constraint c : constraints) {
+			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, c.owner, c.tableName));
+			if(dobj == null) {
+				log.warn("cannot find table "+c.owner+"."+c.tableName+" for index "+c.owner+"."+c.name);
+			}
+			else {
+				dobj.getConstraints().add(c);
+			}
+			
+		}
+	}
 
 	@Override
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
@@ -228,6 +261,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				log.info("cache init for owner "+owner+" date="+begining);
 				cache = datasource.new Cache();
 				cache.databaseObjects = mapper.getTablesAndViews(owner);
+				getTablesAndViewsSubObjects(cache.databaseObjects);
 				cache.lastCacheUpdate = begining;
 				datasource.setCache(owner, cache);
 			}
@@ -236,6 +270,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				if(lastSchemaUpdate.after(cache.lastCacheUpdate)) {
 					log.info("cache update for owner "+owner+" date="+begining);
 					cache.databaseObjects = mapper.getTablesAndViews(owner);
+					getTablesAndViewsSubObjects(cache.databaseObjects);
 					cache.lastCacheUpdate = begining;
 				}
 				else {

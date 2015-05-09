@@ -190,7 +190,13 @@ function displayDatasource(datasourceName) {
 				datasourceUnrolledPrefix,
 				datasourceContext.smallMenu.getDiv(0),
 				false,
-				true);
+				true, 
+				function() {
+					var ds = CONTEXT.getDatasource(datasourceName);
+					if(ds.connected) {
+						EVENT_CurrentDatasourceChange(ds);
+					}
+				});
 	
 	datasourceContext.divAllTables = document.createElement("DIV");
 	//datasourceContext.divAllTables.id=datasourceObjectsPrefix+name;
@@ -510,10 +516,12 @@ function createOnClickShowTableDetail(detailScreenId, div, datasource, owner, ob
 	}
 }
 
-function createOnClickShowTableLinks(datasource, owner, objectType, objectName) {
+function createOnClickShowTableLinks(datasourceName, owner, objectType, objectName) {
 	return function(event) {
 		try {
-			linksGraph.setCurrent(datasource, owner, objectName);
+			//var datasource = CONTEXT.getDatasource(datasourceName);
+			var objects = datasource.objects;
+			linksGraph.setCurrent(datasourceName, objects, owner, objectName);
 		}
 		catch (e) {
 			console.log(e);
@@ -555,7 +563,6 @@ function refreshDatasource(datasource) {
 				CONTEXT.setDatasourceObjects(datasource, response.databaseObjects);
 				CONTEXT.getDatasource(datasource).schemas = response.schemas;
 				displayDatabaseObjects(datasource);
-				
 			}, 
 			function(code, text) { 
 				console.log("error code="+code+" text="+text); 
