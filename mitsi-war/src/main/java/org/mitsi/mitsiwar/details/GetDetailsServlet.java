@@ -223,7 +223,17 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			data.add(row);
 		}
 	}
-
+	
+	private void fromPartitioningKeyList(List<Column> columnList, List<String[]> data, List<String> columns) {
+		columns.add("name");
+		
+		for(Column dbColumn : columnList) {
+			String[] row = new String[columns.size()];
+			row[0] =  dbColumn.name;
+			data.add(row);
+		}
+	}
+	
 	private void fromIndexList(List<Index> indexList, List<String[]> data, List<String> columns) {
 		columns.add("owner");
 		columns.add("name");
@@ -374,7 +384,20 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			constraints.message = e.getMessage();
 		}
 
-		
+		// partitioning keys
+		GetDetailsResponse.Accordion partitioningKeys = response.new Accordion();
+		response.accordions.add(partitioningKeys);
+		partitioningKeys.title = "Partitioning keys";
+		try {
+			List<Column> partitioningKeysList = connection.getConnectionForMitsi().getTablePartitioninKeysDetails(owner, tableName);
+			partitioningKeys.data = new ArrayList<String[]>();
+			partitioningKeys.columns = new ArrayList<String>();
+			fromPartitioningKeyList(partitioningKeysList,  partitioningKeys.data, partitioningKeys.columns);
+		}
+		catch(Exception e) {
+			columns.message = e.getMessage();
+		}
+
 		// partitions
 		GetDetailsResponse.Accordion partitions = response.new Accordion();
 		response.accordions.add(partitions);

@@ -23,6 +23,7 @@ public interface IMitsiMapper {
 	List<Schema> getSchemasDetails();
 	List<Tablespace> getTablespaceDetails();
 	List<Column> getTableColumnsDetails(@Param("owner") String owner, @Param("name") String name);
+	List<Column> getTablePartitioninKeysDetails(@Param("owner") String owner, @Param("name") String name);
 	List<Index> getTableIndexesDetails(@Param("tableOwner") String tableOwner, @Param("tableName") String tableName);
 	List<Partition> getTablePartitionDetails(@Param("tableOwner") String tableOwner, @Param("tableName") String tableName);
 	List<Constraint> getTableConstraintsDetails(@Param("tableOwner") String tableOwner, @Param("tableName") String tableName);

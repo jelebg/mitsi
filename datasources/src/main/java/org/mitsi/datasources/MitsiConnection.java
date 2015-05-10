@@ -326,6 +326,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	public synchronized List<Column> getTablePartitioninKeysDetails(String owner, String name) {
+		return mapper.getTablePartitioninKeysDetails(owner, name);
+	}
+	
+	@Override
 	public synchronized List<Index> getTableIndexesDetails(String tableOwner,
 			String tableName) {
 		return mapper.getTableIndexesDetails(tableOwner, tableName);
