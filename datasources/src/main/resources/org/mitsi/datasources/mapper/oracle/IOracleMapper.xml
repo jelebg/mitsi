@@ -164,8 +164,12 @@
 <select id="getTableColumnsDetails" resultType="org.mitsi.datasources.Column">
 	select 
 	column_name name,
-	decode(data_type, 'NUMBER', 'integer', 'VARCHAR2', 'string', data_type) type,
-	data_length,
+	data_type type,
+	<!-- decode(data_type, 'NUMBER', 'integer', 'VARCHAR2', 'string', data_type) type, -->
+	data_length length,
+	data_precision precision,
+	data_scale scale,
+	data_default defaultValue,
 	nullable,
 			'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'" } ' json_details
 	from all_tab_columns where owner=#{owner} and table_name=#{name} order by column_id

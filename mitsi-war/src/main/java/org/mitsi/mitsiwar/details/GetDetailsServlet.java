@@ -205,6 +205,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		columns.add("type");
 		columns.add("length");
 		columns.add("precision");
+		columns.add("scale");
+		columns.add("defaultValue");
 		columns.add("nullable");
 		columns.add("jsonDetails");
 		
@@ -214,8 +216,10 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			row[1] =  dbColumn.type;
 			row[2] =  Long.toString(dbColumn.length);
 			row[3] =  dbColumn.precision;
-			row[4] =  dbColumn.nullable;
-			row[5] =  dbColumn.jsonDetails;
+			row[4] =  dbColumn.scale;
+			row[5] =  dbColumn.defaultValue;
+			row[6] =  dbColumn.nullable;
+			row[7] =  dbColumn.jsonDetails;
 			data.add(row);
 		}
 	}
