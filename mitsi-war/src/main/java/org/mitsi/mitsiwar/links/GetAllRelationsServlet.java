@@ -43,7 +43,7 @@ public class GetAllRelationsServlet extends GsonServlet<GetAllRelations, GetAllR
 
  
 	@Override
-	public GetAllRelationsResponse proceed(GetAllRelations request, Client connectedClient) throws Exception {
+	public GetAllRelationsResponse proceed(GetAllRelations request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		GetAllRelationsResponse response = new GetAllRelationsResponse();
@@ -54,6 +54,7 @@ public class GetAllRelationsServlet extends GsonServlet<GetAllRelations, GetAllR
 		}
 
 		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
+		usingConnections.add(connection.getConnectionForMitsi());
 		response.relations = connection.getConnectionForMitsi().getAllRelations();
 		
 		

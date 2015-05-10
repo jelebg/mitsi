@@ -1,7 +1,9 @@
 package org.mitsi.mitsiwar.connections;
 
+import java.util.List;
 import java.util.Map;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.exception.AlreadyConnectedException;
@@ -26,7 +28,7 @@ public class DisconnectServlet extends GsonServlet<Disconnect, DisconnectRespons
 
  
 	@Override
-	public DisconnectResponse proceed(Disconnect request, Client client) throws Exception {
+	public DisconnectResponse proceed(Disconnect request, Client client, List<MitsiConnection> usingConnections) throws Exception {
 		
 		
 		DisconnectResponse response = new DisconnectResponse();

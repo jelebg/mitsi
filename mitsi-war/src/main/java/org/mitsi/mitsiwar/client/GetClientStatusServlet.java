@@ -1,7 +1,9 @@
 package org.mitsi.mitsiwar.client;
 
+import java.util.List;
 import java.util.Map;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
@@ -27,7 +29,7 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 
  
 	@Override
-	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient) throws Exception {
+	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		

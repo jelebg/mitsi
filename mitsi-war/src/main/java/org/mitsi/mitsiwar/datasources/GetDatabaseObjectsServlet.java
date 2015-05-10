@@ -35,16 +35,17 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 
  
 	@Override
-	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
+	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
+		usingConnections.add(connection.getConnectionForMitsi());
 		
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
-		// TODO problèmes dans la gestion du cache à revoir complètement
+		// TODO problèmes dans la gestion du cache MyBatis à revoir complètement
 		//connection.getConnectionForMitsi().clearCache();
 		//try {
-		
+
 		response.schemas = connection.getConnectionForMitsi().getAllSchemas();
 		String schema = request.schema;
 		if(schema == null) {
@@ -55,7 +56,9 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 				}
 			}
 		}
-		response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(schema);
+		boolean disableCaching = (request.disableCaching!=null && request.disableCaching==true);
+		
+		response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(schema, disableCaching);
 		
 		
 		

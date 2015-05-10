@@ -1,5 +1,8 @@
 package org.mitsi.mitsiwar;
 
+import java.util.List;
+
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,7 @@ public class TestGsonServlet extends GsonServlet<TestGsonRequest, TestGsonRespon
 
  
 	@Override
-	public TestGsonResponse proceed(TestGsonRequest request, Client connectedClient) throws Exception {
+	public TestGsonResponse proceed(TestGsonRequest request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		System.out.println("sql='"+request.sql+"'");
 		System.out.println("message='"+request.message+"'");
 		

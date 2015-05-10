@@ -1,7 +1,9 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.List;
 import java.util.Map;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
@@ -29,7 +31,7 @@ public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema,
 
  
 	@Override
-	public ChangeCurrentSchemaResponse proceed(ChangeCurrentSchema request, Client connectedClient) throws Exception {
+	public ChangeCurrentSchemaResponse proceed(ChangeCurrentSchema request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		

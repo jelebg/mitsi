@@ -1,7 +1,9 @@
 package org.mitsi.mitsiwar.rawsql;
 
+import java.util.List;
 import java.util.Map;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
@@ -28,12 +30,13 @@ public class RawSQLFetchServlet extends GsonServlet<RawSQLFetch, RawSQLFetchResp
 
  
 	@Override
-	public RawSQLFetchResponse proceed(RawSQLFetch request, Client client) throws Exception {
+	public RawSQLFetchResponse proceed(RawSQLFetch request, Client client, List<MitsiConnection> usingConnections) throws Exception {
 		
 		
 		RawSQLFetchResponse response = new RawSQLFetchResponse();
 		
 		MultiConnection connection = client.getConnection(request.datasourceName);
+		usingConnections.add(connection.getConnectionForRawSql());
 		response.results = connection.rawSelectFetch(request.nbRowToFetch);
 		
 		//try {

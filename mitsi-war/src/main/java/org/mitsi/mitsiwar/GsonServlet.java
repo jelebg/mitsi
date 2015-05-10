@@ -3,12 +3,15 @@ package org.mitsi.mitsiwar;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -27,7 +30,7 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		this.requestClass = requestClass;
 	}
 	
-	public abstract Response proceed(Request request, Client client) throws Exception;
+	public abstract Response proceed(Request request, Client client, List<MitsiConnection> usingConnections) throws Exception;
 	
 	@Override
 	public void init() throws ServletException {
@@ -44,12 +47,14 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 			request.getSession().setAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE, connectedClient);
 		}
 		
+		List<MitsiConnection> usingConnections = new ArrayList<>();
+		
 		response.setContentType("application/json; charset=UTF-8");
 		Gson gson = new Gson();
 		try {
 			
 			Request gsonRequest = gson.fromJson(in, requestClass);
-			Response gsonResponse = proceed(gsonRequest, connectedClient);
+			Response gsonResponse = proceed(gsonRequest, connectedClient, usingConnections);
 			gson.toJson(gsonResponse, out);
 			
 		} 
@@ -61,8 +66,13 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		} 
 		catch(Exception e){
 			throw new ServletException("Unexpected Exception", e);
-		} 
-	
+		}
+		finally {
+			for(MitsiConnection mitsiConnection : usingConnections) {
+				mitsiConnection.rollback();
+			}
+		}
+		
 	
 	}
 	

@@ -78,7 +78,7 @@ public class MultiConnection {
 	public MitsiConnection getConnectionForMitsi() {
 		return mitsiConnections.get(0);
 	}
-	private MitsiConnection getConnectionForRawSql() {
+	public MitsiConnection getConnectionForRawSql() {
 		// TODO : gérer plus de deux connections
 		if(maxConnections > 1) {
 			return mitsiConnections.get(1);

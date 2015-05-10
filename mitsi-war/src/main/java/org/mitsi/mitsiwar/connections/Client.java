@@ -86,4 +86,5 @@ public class Client {
 	public int getConnectionCount() {
 		return publicConnections.size();
 	}
+	
 }

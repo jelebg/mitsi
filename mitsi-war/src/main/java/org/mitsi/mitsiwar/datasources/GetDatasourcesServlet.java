@@ -1,7 +1,9 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.List;
 import java.util.Map;
 
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
@@ -27,7 +29,7 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 
  
 	@Override
-	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws Exception {
+	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		

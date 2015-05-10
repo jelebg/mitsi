@@ -72,7 +72,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		Configuration configuration = new Configuration(environment);
 		configuration.setCacheEnabled(false);
 		
-		
 		//java.util.Properties props = new java.util.Properties();
 		//props.put("v$session.program", "MITSI");
 		//configuration.setVariables(props);
@@ -80,7 +79,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		//configuration.setMultipleResultSetsEnabled(multipleResultSetsEnabled); TODO : voir si ça sert a quelque chose
 		//configuration.addMappers("mapper.oracle");
 		// TODO : a rajouter
-		// configuration.addMapper(BlogMapper.class);
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 		sqlSessionFactory.getConfiguration().addMapper(IOracleMapper.class);
 		sqlSession = sqlSessionFactory.openSession();
@@ -250,13 +248,19 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 	}
 
-	@Override
-	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+	// pas d'override ici pour cause de gestion de cache explicite (disableCaching)
+	public synchronized List<DatabaseObject> getTablesAndViews(String owner, boolean disableCaching) {
 		if(datasource.isUseSchemaCache()) {
 			log.info("use of cache for owner "+owner);
-
 			Date begining = new Date();
-			MitsiDatasource.Cache cache = datasource.getCache(owner);
+
+			MitsiDatasource.Cache cache = null;
+			if(disableCaching) {
+				log.info("cache refresh for owner "+owner);
+			}
+			else {
+				cache = datasource.getCache(owner);
+			}
 			if(cache == null) {
 				log.info("cache init for owner "+owner+" date="+begining);
 				cache = datasource.new Cache();
@@ -279,8 +283,16 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 			return cache.databaseObjects;
 		}
+		
 		log.info("cache not used for owner "+owner);
-		return mapper.getTablesAndViews(owner);
+		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
+		getTablesAndViewsSubObjects(databaseObjects);
+		return databaseObjects;
+	}
+	
+	@Override
+	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+		return getTablesAndViews(owner, false);
 	}
 
 	@Override

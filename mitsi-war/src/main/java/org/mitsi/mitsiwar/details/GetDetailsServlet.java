@@ -390,7 +390,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 	
  
 	@Override
-	public GetDetailsResponse proceed(GetDetails request, Client connectedClient) throws Exception {
+	public GetDetailsResponse proceed(GetDetails request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		GetDetailsResponse response = new GetDetailsResponse();
@@ -401,6 +401,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		}
 
 		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
+		usingConnections.add(connection.getConnectionForMitsi());
 		if(StringUtils.isEmpty(request.objectName) || StringUtils.isEmpty(request.objectType) || StringUtils.isEmpty(request.owner)) {
 			getDatasource(response, connection, request.datasourceName);
 		}

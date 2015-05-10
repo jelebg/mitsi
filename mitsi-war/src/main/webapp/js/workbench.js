@@ -556,7 +556,8 @@ function refreshDatasource(datasource) {
 	callGsonServlet("GetDatabaseObjectsServlet", 
 			{
 				"datasourceName" : datasource,
-				"schema" : schema
+				"schema" : schema,
+				"disableCaching" : true
 			},
 			function(response) { 
 				console.log(response);
