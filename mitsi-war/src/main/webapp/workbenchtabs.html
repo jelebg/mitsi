@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<title>Mitsi</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/png" href="img/favicon.png" />
+
+<link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<!--  link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap-theme.min.css"/ -->
+<link rel="stylesheet" href="ui-layout-0.0.0/ui-layout.css"/>
+
+<script src="angularjs-1.4.3/angular.js"></script>
+<!-- script src="angularjs-1.4.3/angular-route.js"></script -->
+<script src="ui-bootstrap-0.13.3/ui-bootstrap-tpls-0.13.3.js"></script>
+<script src="ui-layout-master/ui-layout.js"></script>
+
+<!-- script src="mitsiApp.js"></script>
+<script src="workbenchtabsCtrl.js"></script>
+<script src="mitsiAppRoute.js"></script -->
+
+
+</head>
+
+<!-- body data-ng-app="mitsiApp" data-ng-controller="workbenchtabsCtrl" -->
+<body data-ng-app="mitsiApp"  >
+			<!-- a href="" class="btn btn-default" ui-sref="workbench.graph">click here</a>
+			<a href="" class="btn btn-info" data-ng-click="$window.alert('bou')">click here too</a>
+			<button data-ng-click="$window.alert('bou');">coucou</button>
+			<button data-ng-click="tutu = 'blabla';">coucou</button>
+			<button data-ng-click="coucou()">coucou</button>
+			<button onclick="montutu();">coucou</button -->
+			>{{ tutu }}< 
+        	<tabset >
+			  <tab  ui-sref="workbench.details" >
+			  	<tab-heading>
+			      <span>details</span> <!-- i class="glyphicon glyphicon-remove" ng-click=""></i--> <!-- the tab close button -->
+			    </tab-heading>
+			  </tab>
+			  <tab ui-sref="workbench.graph" >
+			  	<tab-heading>
+			      <span>graph</span> <!-- i class="glyphicon glyphicon-remove" ng-click=""></i--> <!-- the tab close button -->
+			    </tab-heading>
+			  </tab>
+			  <tab ui-sref="workbench.sql" >
+			  	<tab-heading>
+			      <span>sql</span> <!-- i class="glyphicon glyphicon-remove" ng-click=""></i--> <!-- the tab close button -->
+			    </tab-heading>
+			  </tab>
+			  <tab ui-sref="workbench.data" >
+			  	<tab-heading>
+			      <span>data</span> <!-- i class="glyphicon glyphicon-remove" ng-click=""></i--> <!-- the tab close button -->
+			    </tab-heading>
+			  </tab>
+			</tabset>
+			
+			<div ui-view></div>
+			
+</body>
+</html>

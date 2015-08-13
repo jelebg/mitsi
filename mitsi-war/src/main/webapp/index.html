@@ -1,68 +1,85 @@
 <!DOCTYPE html>
-<html style="height: 100%">
+<html lang="en" >
 <head>
-<TITLE>Mitsi test</TITLE>
+<title>Mitsi</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/png" href="img/favicon.png" />
 
+<link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<!--  link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap-theme.min.css"/ -->
+<link rel="stylesheet" href="ui-layout-0.0.0/ui-layout.css"/>
+
+<script src="angularjs-1.4.3/angular.js"></script>
+<!-- script src="angularjs-1.4.3/angular-route.js"></script -->
+<script src="ui-router-0.2.15/angular-ui-router.js"></script>
+<script src="ui-bootstrap-0.13.3/ui-bootstrap-tpls-0.13.3.js"></script>
+<script src="ui-layout-master/ui-layout.js"></script>
+
+<script src="mitsiApp.js"></script>
+<script src="workbenchtabsCtrl.js"></script>
+<script src="wdetailsCtrl.js"></script>
+<script src="wdataCtrl.js"></script>
+<script src="wgraphCtrl.js"></script>
+<script src="wsqlCtrl.js"></script>
+<script src="sourcesCtrl.js"></script>
+<script src="mitsiAppRoute.js"></script>
+
+<style>
+
+
+
+
+</style>
 
 <script>
-
-function run() {
-	var message = {
-		"sql" : "select tutu titi", //gid("sql").textContent
-		"message" : "ceci est mon message"
-	};
-	var json = JSON.stringify(message);
-
-	// exceptionnellement on travaille en synchrone
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "TestGsonServlet", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4) {
-			if (xhr.status != 200) {
-				alert(xhr.status + " : " + xhr.statusText);
-			} else {
-				console.log(xhr.responseText);
-				
-				//var response = JSON.parse(xhr.responseText);
-				//document.getElementById("descriptionTextArea").value = reponse["description"];
-				
-				//data = response.data;
-				//hot.render();
-				
-				/*hot.destroy();
-				hot = new Handsontable(gid("example"), {
-					data : response.data,
-					minSpareRows : 1,
-					colHeaders : true,
-					contextMenu : true,
-					//afterChange : function() {
-					//	console.log(JSON.stringify(response.data));
-					//},
-					manualColumnResize : true,
-					manualColumnMove : true,
-					colHeaders : response.header
-
-				});*/
-
-
-			}
-		}
-	}
-
-	xhr.send(json);
+function montutu() {
+	alert('bou');
 }
-
 </script>
 
 </head>
-<body>
 
+<body data-ng-app="mitsiApp">
+      	<img src="img/logo-transparent.png" style="height:26px;vertical-align:bottom;"/>
+		<a href="" class="btn btn-default">import datasources</a>
+		<a href="" class="btn btn-default">export datasources</a>
 
-<button onclick="run();">click me !</button>
+   <div ui-layout style="top:40px">
+      <!-- header  >
+      	<img src="img/logo-transparent.png" style="height:26px;vertical-align:bottom;"/>
+		<a href="" class="btn btn-default">import datasources</a>
+		<a href="" class="btn btn-default">export datasources</a>
+	      
+      </header -->
+      <ui-layout options="{ flow : 'column' }">
+        <sidebar ui-layout-container size="200px" >
+        coucou
+        	<ng-include src="'sources.html'" ></ng-include>
+        </sidebar>
+        
+        <div ui-layout-container >
+         <div ui-view></div>
+        </div>
+        <!-- div >
+        	<div ui-layout-container>coucou</div>
+        	<div ui-layout-container>coucou2</div>
+        </div -->
+        
+        
+        <!-- ui-layout ui-layout-container options="{ flow : 'row' }" >
+  	      <div ui-layout-container  >
+  	      	center-back
+  	      </div>
+  	      <div ui-layout-container >
+  	      	center-back-2
+  	      </div>
+  	    </ui-layout -->
+      </ui-layout>
+      <!-- footer >south-back</footer -->
+    </div>
 
+	
 
-</body>
+    </body>
 </html>
