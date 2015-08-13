@@ -23,11 +23,16 @@
 <script src="wgraphCtrl.js"></script>
 <script src="wsqlCtrl.js"></script>
 <script src="sourcesCtrl.js"></script>
-<script src="mitsiAppRoute.js"></script>
+<script src="services/userService.js"></script>
 
 <style>
 
-
+.ui-splitbar {
+	border: 1px solid lightgrey;
+}
+.ui-splitbar a {
+	font-size : 70%;
+}
 
 
 </style>
@@ -54,7 +59,6 @@ function montutu() {
       </header -->
       <ui-layout options="{ flow : 'column' }">
         <sidebar ui-layout-container size="200px" >
-        coucou
         	<ng-include src="'sources.html'" ></ng-include>
         </sidebar>
         

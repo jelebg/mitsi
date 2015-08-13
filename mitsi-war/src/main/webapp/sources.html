@@ -21,14 +21,15 @@
 
 <body data-ng-app="mitsiApp">
 <div  ng-controller="sourcesCtrl">
+<!--a href="" class="btn btn-info" ng-click="init()">init</a><br -->
 >{{ tutu }}<  <br/>
 
 	<ul>
-		<li ng-repeat="s in messources">
-			{{ s }}
+		<li ng-repeat="s in datasources" title="{{s.description}}">
+			{{ s.name }}
 		</li>
 	</ul>
-
+	end
 </div>
 </body>
 </html>
