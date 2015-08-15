@@ -51,8 +51,18 @@
             <span class="sourceTags">{{ s.tags.join(", ") }}</span>
           </accordion-heading>
 	      This content is brought to you by myself
+	      	<div class="form-group has-feedback">
+				<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
+				<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
+			</div>
+			      
 	      	<accordion close-others="false">
-				<accordion-group ng-repeat="o in s.objects" is-open="o.accordionOpened" is-disabled="false" title="{{o.description}}">
+				<accordion-group 
+					ng-repeat="o in s.objects | orderBy:'id.name'" 
+					is-open="o.accordionOpened" 
+					is-disabled="false" 
+					title="{{o.description}}"
+					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
 				  <accordion-heading>
 				  {{ o.id.name }}
 			      </accordion-heading>
@@ -60,7 +70,7 @@
 				<li ng-repeat="o in s.objects">
 							{{ o.id.name }} -->
 					<ul class="mitsi-columns-list" >
-						<li ng-repeat="c in o.columns" title="{{c.description}}">
+						<li ng-repeat="c in o.columns" title="{{c.description}}" >
 							{{ c.name }}
 						</li>
 					</ul>

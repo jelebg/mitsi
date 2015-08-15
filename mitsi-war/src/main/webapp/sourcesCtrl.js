@@ -89,6 +89,20 @@ angular.module('mitsiApp')
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	
+	$scope.isObjectExcludedByFilter = function(objectName, source) {
+		if(!source.searchObject) {
+			return false;
+		}
+		
+		var filter = source.searchObject.trim().toLowerCase();
+		if(filter.length == 0) {
+			return false;
+		}
+		var name = objectName.toLowerCase();
+		return name.indexOf( filter ) === -1;
+
+	}
+	
 	$scope.$on('DatasourceConnected', function (event, source) {
 	    $scope.refresh(source);
 	});
