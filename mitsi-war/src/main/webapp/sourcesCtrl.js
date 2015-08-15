@@ -7,6 +7,10 @@ angular.module('mitsiApp')
 
 	
 	$scope.init = function() {
+		if($scope.datasources.length > 0) {
+			return;
+		}
+		
 		userService.getClientStatus()
 		  .then(function(response) {
 			  $scope.datasources = response.data.datasources;

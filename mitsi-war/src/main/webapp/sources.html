@@ -23,7 +23,10 @@
 <div  ng-controller="sourcesCtrl">
 <!--a href="" class="btn btn-info" ng-click="init()">init</a><br -->
 >{{ tutu }}<  <br/>
-
+	<div class="form-group has-feedback">
+		<i class="glyphicon glyphicon-filter form-control-feedback"></i>
+		<input type="text" ng-model="searchSource" class="form-control" placeholder="Search datasources here..."/>
+	</div>
 	<!--ul class="mitsi-source-list" >
 		<li ng-repeat="s in datasources" title="{{s.description}}">
 			{{ s.name }}
@@ -31,7 +34,7 @@
 	</ul -->
 	
 	<accordion close-others="true">
-		<accordion-group ng-repeat="s in datasources" is-open="s.accordionOpened" is-disabled="false" title="{{s.description}}" >
+		<accordion-group ng-repeat="s in datasources | filter:searchSource | orderBy:'name'" is-open="s.accordionOpened" is-disabled="false" title="{{s.description}}" >
 		  <accordion-heading >
             <span class="datasource-accordion-{{s.connected}}">{{s.name}}</span>
 	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
