@@ -54,6 +54,18 @@
 .datasource-accordion-false {
 	font-weight:normal;
 }
+
+.filter-glyphicon {
+	color:grey;
+	pointer-events: all;
+}
+.filter-glyphicon:hover {
+	text-decoration : none;
+}
+.filter-glyphicon:focus {
+	text-decoration : none;
+	outline-style: none;
+}
 </style>
 
 <script>
@@ -77,7 +89,7 @@ function montutu() {
 	      
       </header -->
       <ui-layout options="{ flow : 'column' }">
-        <sidebar ui-layout-container size="300px" style="overflow-y: scroll">
+        <sidebar ui-layout-container size="500px" style="overflow-y: scroll">
         	<ng-include src="'sources.html'" ></ng-include>
         </sidebar>
         

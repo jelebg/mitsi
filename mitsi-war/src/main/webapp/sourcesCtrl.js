@@ -75,6 +75,20 @@ angular.module('mitsiApp')
 		  });
 	}
 	
+	$scope.isSourceExcludedByFilter = function(source) {
+		if(!$scope.searchSource) {
+			return false;
+		}
+		
+		var filter = $scope.searchSource.trim().toLowerCase();
+		if(filter.length == 0) {
+			return false;
+		}
+		var name = source.name.toLowerCase();
+		var tags = source.tags.join(" ");
+		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
+	}
+	
 	$scope.$on('DatasourceConnected', function (event, source) {
 	    $scope.refresh(source);
 	});
