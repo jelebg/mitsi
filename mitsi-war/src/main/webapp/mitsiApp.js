@@ -32,7 +32,7 @@ angular
 			   		 controller:'wdataCtrl' 
         	   	   });
 
-	   $urlRouterProvider.otherwise("/workbench");
+	   $urlRouterProvider.otherwise("workbench.details");
 	   //$locationProvider.html5Mode(true);
 
 });

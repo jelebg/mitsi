@@ -24,11 +24,44 @@
 <!--a href="" class="btn btn-info" ng-click="init()">init</a><br -->
 >{{ tutu }}<  <br/>
 
-	<ul>
+	<!--ul class="mitsi-source-list" >
 		<li ng-repeat="s in datasources" title="{{s.description}}">
 			{{ s.name }}
 		</li>
-	</ul>
+	</ul -->
+	
+	<accordion close-others="true">
+		<accordion-group ng-repeat="s in datasources" is-open="s.accordionOpened" is-disabled="false" title="{{s.description}}" >
+		  <accordion-heading >
+            <span class="datasource-accordion-{{s.connected}}">{{s.name}}</span>
+	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
+            <a href=""  ng-click="connect(s); $event.stopPropagation();">
+	            <i class="pull-right glyphicon" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
+            </a>
+            <br/>
+            <span class="sourceTags">{{ s.tags.join(", ") }}</span>
+          </accordion-heading>
+	      This content is brought to you by myself
+	      	<accordion close-others="false">
+				<accordion-group ng-repeat="o in s.objects" is-open="o.accordionOpened" is-disabled="false" title="{{o.description}}">
+				  <accordion-heading>
+				  {{ o.id.name }}
+			      </accordion-heading>
+			<!--ul>
+				<li ng-repeat="o in s.objects">
+							{{ o.id.name }} -->
+					<ul class="mitsi-columns-list" >
+						<li ng-repeat="c in o.columns" title="{{c.description}}">
+							{{ c.name }}
+						</li>
+					</ul>
+				<!--/li>
+			</ul-->
+			    </accordion-group>
+			</accordion>
+	    </accordion-group>
+	</accordion>
+	
 	end
 </div>
 </body>

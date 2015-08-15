@@ -24,6 +24,7 @@
 <script src="wsqlCtrl.js"></script>
 <script src="sourcesCtrl.js"></script>
 <script src="services/userService.js"></script>
+<script src="services/sourceService.js"></script>
 
 <style>
 
@@ -34,7 +35,25 @@
 	font-size : 70%;
 }
 
+.sourceTags {
+	font-size:70%;
+	font-style:italic;
+	color:grey;
+}
 
+.mitsi-columns-list {
+	list-style-type:none;
+	padding-left:0px;
+}
+
+.datasource-accordion-true {
+	font-weight:bold;
+	color:green;
+}
+
+.datasource-accordion-false {
+	font-weight:normal;
+}
 </style>
 
 <script>
@@ -58,7 +77,7 @@ function montutu() {
 	      
       </header -->
       <ui-layout options="{ flow : 'column' }">
-        <sidebar ui-layout-container size="200px" >
+        <sidebar ui-layout-container size="300px" style="overflow-y: scroll">
         	<ng-include src="'sources.html'" ></ng-include>
         </sidebar>
         

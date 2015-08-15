@@ -67,7 +67,7 @@ public class DatabaseObject {
 	// TODO : sub-partitions ...
 	
 	private Id id;
-	private String descriSption;
+	private String description;
 	private String jsonDetails;
 	private List<Column> columns = new ArrayList<>();
 	private List<Index> indexes = new ArrayList<>();
@@ -137,12 +137,12 @@ public class DatabaseObject {
 		return id.getSchema();
 	}
 
-	public String getDescriSption() {
-		return descriSption;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDescriSption(String descriSption) {
-		this.descriSption = descriSption;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public List<Index> getIndexes() {

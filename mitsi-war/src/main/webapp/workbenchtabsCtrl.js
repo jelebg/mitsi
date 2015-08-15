@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('workbenchtabsCtrl', function($scope) {
+    .controller('workbenchtabsCtrl', function($scope, $state) {
 
 	$scope.mya = true;
 	$scope.tutu = "bouh";
@@ -7,4 +7,5 @@ angular.module('mitsiApp')
 	$scope.coucou = function() {
 		alert("coucou");
 	}
+	
 });
