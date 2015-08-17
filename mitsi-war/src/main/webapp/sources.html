@@ -22,7 +22,23 @@
 <body data-ng-app="mitsiApp">
 <div  ng-controller="sourcesCtrl">
 <!--a href="" class="btn btn-info" ng-click="init()">init</a><br -->
->{{ tutu }}<  <br/>
+>{{ tutu }}<  
+
+
+
+	<span dropdown on-toggle="toggled(open)">
+      <a href id="simple-dropdown" dropdown-toggle>
+        Click me for a dropdown, yo!
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
+        <li ><a href>tutu</a></li>
+        <li ><a href>titi</a></li>
+        <li ><a href>toto</a></li>
+      </ul>
+    </span>
+
+
+<br/>
 	<div class="form-group has-feedback">
 		<!--i class="glyphicon glyphicon-filter form-control-feedback"></i-->
 		<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="searchSource=null; $event.stopPropagation();"></a>
@@ -52,7 +68,8 @@
 	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
             </a>
             <br/>
-            <span class="sourceTags">{{ s.tags.join(", ") }}</span>
+            <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
+            <span class="label label-danger" title="{{ s.errorDetails }}" ng-if="s.errorMessage!=null">{{ s.errorMessage }}</span><br/>
           </accordion-heading>
             {{ s.description }}
 	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
@@ -60,11 +77,32 @@
 		        <a href="" class="btn btn-default"><img src="img/view.png"/></a>
 		        <a href="" class="btn btn-default"><img src="img/matview.png"/></a>
 		    </td><td>
-		      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
-					<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
-					<a href="" style="pointer-events: all;margin-right:20px;" class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon" ng-click="s.searchObject=('tutu'); $event.stopPropagation();"></a>
-					<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
-				</div>
+				<span dropdown on-toggle="toggled(open)" >
+			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
+						<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
+						<a href="" dropdown-toggle style="pointer-events: all;margin-right:20px;" class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon"></a>
+						
+						<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
+					</div>
+				    <ul class="dropdown-menu" >
+				        <li ><a href="" ng-click="s.filter.tableName=!s.filter.tableName; $event.stopPropagation();">
+				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.tableName}"></i>
+				        	filter tables names
+				        </a></li>
+				        <li ><a href="" ng-click="s.filter.columnName=!s.filter.columnName; $event.stopPropagation();">
+				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.columnName}"></i>
+				        	filter columns names
+				        </a></li>
+				        <li ><a href="" ng-click="s.filter.indexName=!s.filter.indexName; $event.stopPropagation();">
+				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.indexName}"></i> 
+				        	filter indexes names
+				        </a></li>
+				        <li ><a href="" ng-click="s.filter.constraintName=!s.filter.constraintName; $event.stopPropagation();">
+				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.constraintName}"></i>
+				        	filter constraints names
+				        </a></li>
+				    </ul>
+			   </span>
 			</td></table>
 			      
 	      	<accordion close-others="false">
