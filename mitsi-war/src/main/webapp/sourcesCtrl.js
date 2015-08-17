@@ -62,6 +62,10 @@ angular.module('mitsiApp')
 	}
 
 	$scope.refresh = function(source) {
+		if(!source.connected) {
+			return;
+		}
+		
 		sourceService.getObjects(source.name, null)
 		  .then(function(response) {
 			  source.objects = response.data.databaseObjects;

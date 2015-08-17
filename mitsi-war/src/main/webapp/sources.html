@@ -45,16 +45,27 @@
             <span class="datasource-accordion-{{s.connected}}">{{s.name}}</span>
 	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
             <a href=""  ng-click="connect(s); $event.stopPropagation();">
-	            <i class="pull-right glyphicon" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
+	            <i class="pull-right glyphicon" style="margin-right:5px" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
+            </a>
+             
+            <a href=""  ng-click="refresh(s); $event.stopPropagation();">
+	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
             </a>
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span>
           </accordion-heading>
-	      This content is brought to you by myself
-	      	<div class="form-group has-feedback">
-				<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
-				<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
-			</div>
+            {{ s.description }}
+	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
+		        <a href="" class="btn btn-default"><img src="img/table.png"/></a>
+		        <a href="" class="btn btn-default"><img src="img/view.png"/></a>
+		        <a href="" class="btn btn-default"><img src="img/matview.png"/></a>
+		    </td><td>
+		      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
+					<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
+					<a href="" style="pointer-events: all;margin-right:20px;" class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon" ng-click="s.searchObject=('tutu'); $event.stopPropagation();"></a>
+					<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
+				</div>
+			</td></table>
 			      
 	      	<accordion close-others="false">
 				<accordion-group 
@@ -64,7 +75,8 @@
 					title="{{o.description}}"
 					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
 				  <accordion-heading>
-				  {{ o.id.name }}
+			        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
+				  	{{ o.id.name }}
 			      </accordion-heading>
 			<!--ul>
 				<li ng-repeat="o in s.objects">
