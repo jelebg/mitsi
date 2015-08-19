@@ -63,6 +63,8 @@ angular.module('mitsiApp')
 
 	$scope.refresh = function(source) {
 		if(!source.connected) {
+			source.errorMessage = "my error";
+			source.errorDetails = "my details";
 			return;
 		}
 		

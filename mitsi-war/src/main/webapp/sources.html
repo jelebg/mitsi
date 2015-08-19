@@ -58,7 +58,14 @@
 			title="{{s.description}}" 
 			ng-hide="isSourceExcludedByFilter(s)">
 		  <accordion-heading >
-            <span class="datasource-accordion-{{s.connected}}">{{s.name}}</span>
+		  	<i class="glyphicon glyphicon-exclamation-sign datasource-error"
+		  		ng-if="s.errorMessage != null"></i>
+            <span class="datasource-accordion-{{s.connected}}"  
+            	popover="test popover" 
+            	popover-title="test popover title"
+            	popover-trigger="click"
+            	popover-placement="right"
+            >{{s.name}}</span>
 	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
             <a href=""  ng-click="connect(s); $event.stopPropagation();">
 	            <i class="pull-right glyphicon" style="margin-right:5px" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
@@ -69,9 +76,22 @@
             </a>
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
-            <span class="label label-danger" title="{{ s.errorDetails }}" ng-if="s.errorMessage!=null">{{ s.errorMessage }}</span><br/>
-          </accordion-heading>
+            <!--alert type="danger" 
+            	popover="les details" 
+            	popover-trigger="mouseenter"
+            	popover-placement="bottom"
+            	>hello</alert-->
+           </accordion-heading>
             {{ s.description }}
+           <alert type="danger" 
+            	popover="{{ s.errorDetails }}" 
+            	popover-trigger="mouseenter"
+            	popover-placement="bottom" 
+            	close="s.errorMessage=null; s.errorDetails=null; "
+            	dismiss-on-timeout="10000"
+            	ng-if="s.errorMessage!=null"
+            	>{{ s.errorMessage }}
+            </alert>
 	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
 		        <a href="" class="btn btn-default"><img src="img/table.png"/></a>
 		        <a href="" class="btn btn-default"><img src="img/view.png"/></a>
