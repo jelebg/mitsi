@@ -71,7 +71,13 @@ angular.module('mitsiApp')
 		sourceService.getObjects(source.name, null)
 		  .then(function(response) {
 			  source.objects = response.data.databaseObjects;
-			  // TODO : response.data.schemas
+			  source.schemas = response.data.schemas;
+			  for(var i=0; i!=source.schemas.length; i++) {
+				  if(source.schemas[i].current) {
+					  source.currentSchema = source.schemas[i];
+					  break;
+				  }
+			  }
 			  
 		  }, function(errorMessage) {
 		      // called asynchronously if an error occurs

@@ -83,6 +83,30 @@
             	>hello</alert-->
            </accordion-heading>
             {{ s.description }}
+            <!--table style="width:100%"><tr><td >schema : {{ s.currentSchema.name }}</td>
+            <td ><input type="text" 
+            	ng-model="selected" 
+            	typeahead="schema.name for schema in s.schemas | limitTo:20 | orderBy:'schema.name' " 
+            	class="form-control"
+            	placeholder="change current schema here"/></td></tr></table-->
+            <br/>
+		    <!-- div class="btn-group" dropdown style="width:100%">
+		      <button id="single-button" type="button" class="btn btn-default" dropdown-toggle style="width:100%">
+		        {{ s.currentSchema.name }} <span class="caret"></span>
+		      </button>            
+		      <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+           	    <li role="menuitem" ng-repeat="schema in s.schemas | orderBy:'name' ">
+           	  	  <a href="#">{{ schema.name }}</a>
+           	    </li>
+              </ul>
+	        </div -->
+	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" style="width:100%">
+	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " ng-selected="schema.current">
+					{{ schema.name }}
+           	    </option>
+              </ul>
+	        </select></td></tr></table>
+            <br/>
            <alert type="danger" 
             	popover="{{ s.errorDetails }}" 
             	popover-trigger="mouseenter"
