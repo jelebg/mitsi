@@ -1,6 +1,6 @@
 angular
 
-.module("mitsiApp", ["ui.bootstrap", "ui.layout", "ui.router"])
+.module("mitsiApp", ["ui.bootstrap", "ui.layout", "ui.router", 'ui.grid'])
 
 .config(function($stateProvider, $urlRouterProvider, $locationProvider, $injector){
 	 
