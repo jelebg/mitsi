@@ -158,7 +158,8 @@
 					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
 				  <accordion-heading>
 			        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
-			        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
+			        <i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i>
+				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
 				  	{{ o.id.name }}
 			      </accordion-heading>
 			<!--ul>
