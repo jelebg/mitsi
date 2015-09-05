@@ -61,11 +61,12 @@
 		  	<i class="glyphicon glyphicon-exclamation-sign datasource-error"
 		  		ng-if="s.errorMessage != null"></i>
             <span class="datasource-accordion-{{s.connected}}"  
-            	popover="test popover" 
+            	ng-click="selectSource(s)"
+            >{{s.name}}</span>
+            <!--  popover="test popover" 
             	popover-title="test popover title"
             	popover-trigger="click"
-            	popover-placement="right"
-            >{{s.name}}</span>
+            	popover-placement="right" -->
 	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
             <a href=""  ng-click="connect(s); $event.stopPropagation();">
 	            <i class="pull-right glyphicon" style="margin-right:5px" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
@@ -160,7 +161,9 @@
 			        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
 			        <i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i>
 				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
-				  	{{ o.id.name }}
+				  	<span ng-click="selectObject(s, o)">
+				  		{{ o.id.name }}
+				  	</span>
 			      </accordion-heading>
 			<!--ul>
 				<li ng-repeat="o in s.objects">

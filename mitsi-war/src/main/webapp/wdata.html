@@ -1,3 +1,22 @@
-THE data<br/>
+THE data
+<a href="" class="btn btn-info" ng-click="gridFit()">grid fit</a>
+<a href="" class="btn btn-info" ng-click="toggleFilter()">filter : {{ enableFilter }}</a><br/>
 
-  <div ui-grid="{ data: mesdatas }" ui-grid-auto-resize class="grid" ></div>
+	 <!-- ui-grid-auto-resize   ui-grid="{ data: mesdatas }" style="height:200px; width:200px;" class="mitsi-fit-viewport-height" 
+	 ui-grid-auto-resize  ng-style="getTableHeight()"
+	 
+	 style="width:200px;" 
+	 ng-style="getTableStyle();"
+	 ng-style="{ width: windowWidth, height: windowHeight }"
+	 -->
+	 
+  <div  ng-if="!gridRefresh" 
+  		class="mitsi-fit-viewport-height" 
+  		ui-grid-exporter 
+  		ui-grid-selection
+  		ui-grid-resize-columns
+  		ui-grid-auto-resize
+  		mitsi-resizable-grid 
+  		ui-grid-infinite-scroll
+  		ui-grid="dataGrid"  
+  		ng-style="getTableStyle();" ></div>

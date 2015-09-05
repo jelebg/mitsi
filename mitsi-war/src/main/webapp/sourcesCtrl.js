@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $http, userService, sourceService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, userService, sourceService) {
 
 	$scope.mya = true;
 	$scope.tutu = "sources";
@@ -115,7 +115,20 @@ angular.module('mitsiApp')
 
 	}
 	
+	$scope.selectSource = function(source) {
+		$rootScope.currentSource = source;
+	}
+	
+	$scope.selectObject = function(source, object) {
+		$rootScope.currentSource = source;
+		source.currentObject = object;
+		
+        $rootScope.$broadcast('DabaseObjectSelected', source, object);
+
+	}
+	
 	$scope.$on('DatasourceConnected', function (event, source) {
+		//$rootScope.currentSource = source;
 	    $scope.refresh(source);
 	});
 	

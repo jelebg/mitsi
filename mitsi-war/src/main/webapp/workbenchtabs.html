@@ -23,14 +23,15 @@
 </head>
 
 <!-- body data-ng-app="mitsiApp" data-ng-controller="workbenchtabsCtrl" -->
-<body data-ng-app="mitsiApp"  >
+<body data-ng-app="mitsiApp" >
 			<!-- a href="" class="btn btn-default" ui-sref="workbench.graph">click here</a>
 			<a href="" class="btn btn-info" data-ng-click="$window.alert('bou')">click here too</a>
 			<button data-ng-click="$window.alert('bou');">coucou</button>
 			<button data-ng-click="tutu = 'blabla';">coucou</button>
 			<button data-ng-click="coucou()">coucou</button>
 			<button onclick="montutu();">coucou</button -->
-			>{{ tutu }}< 
+			<!--  >{{ tutu }}< -->
+			{{ currentSource.name }} : {{ currentSource.currentObject.id.schema }}.{{ currentSource.currentObject.id.name }} ({{ currentSource.currentObject.id.type }}) 
         	<tabset >
 			  <tab  ui-sref="workbench.details" >
 			  	<tab-heading>
