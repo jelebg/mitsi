@@ -6,8 +6,6 @@ angular.module('mitsiApp')
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
 	$scope.divPrefix = "mitsiObject_";
-	$scope.mestables = { tlist:[] };
-	$scope.mestablesNames = [];
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -24,18 +22,7 @@ angular.module('mitsiApp')
 
 	}
 	
-	$scope.jsplumbReinit = function() {
-		//$scope.jsplumb.empty($scope.jsplumbContainer.id);
-		$scope.jsplumb.detachEveryConnection();
-		if($scope.mestables.tlist == null) {
-			return;
-		}
-		for(var i=0; i!=$scope.mestables.tlist.length; i++) {
-			$scope.jsplumb.remove($scope.divPrefix + $scope.mestables.tlist[i].name);
-		}
-		
-	}
-	
+
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
 		//var xy = getAbsoluteXY($scope.jsplumbContainer)
 		//var elt = document.elementFromPoint(left+xy.x, top+xy.y);
@@ -366,12 +353,13 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.$on('DabaseObjectSelected', function (event, source, databaseObject) {
-		$scope.jsplumbReinit();
+		//$scope.jsplumbReinit();
 		var ypos = 0;
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
-			$scope.removeAllTables();
+			$scope.tablesInit();
+			//$scope.removeAllTables();
 			$scope.displayProximityGraph(tableName);
 		}
 		
@@ -473,6 +461,21 @@ angular.module('mitsiApp')
 	}
 	$scope.mouseLeaveDiv = function() {
 		this.showIcons = false;
+	}
+	
+	$scope.tablesInit = function() {
+		
+		$scope.jsplumb.detachEveryConnection();
+		if($scope.mestables !== undefined &&
+				$scope.mestables.tlist != null) {
+			for(var i=0; i!=$scope.mestables.tlist.length; i++) {
+				$scope.jsplumb.remove($scope.divPrefix + $scope.mestables.tlist[i].name);
+			}
+		}
+		
+		$scope.mestables = {};
+		$scope.mestables.tlist = [];
+		$scope.mestablesName = [] ;
 	}
 
 	$scope.appendTable = function(left, top, tableName) {
@@ -622,8 +625,7 @@ angular.module('mitsiApp')
 	
 	
 	$scope.jsplumbInit();
-	$scope.mestables.tlist = [];
-	$scope.mestablesName = [] ;
+	$scope.tablesInit();
 	
 	//$scope.mestables = { tlist:[ {name:"COUCOU", x:"200", y:"200"},
 	//                            {name:"BLABLA", x:"250", y:"300"} ]
