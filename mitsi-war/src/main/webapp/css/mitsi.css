@@ -152,3 +152,10 @@
 	border : 3px solid lightgrey;
 	padding : 5px;
 }
+
+.mitsiMenuGlyphicon {
+	color : blue;
+}
+.mitsiMenuGlyphicon[disabled] {
+	color : lightgrey;
+}

@@ -34,24 +34,41 @@ THE graph<br/>
 	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
 	 	 <td style="padding-right:6px;">
 	 	 	<span dropdown> 
-		      <a href="" dropdown-toggle id="dropdown-tables-from-{{ t.name }}">
+		      <a href="" 
+		         dropdown-toggle 
+		         id="dropdown-tables-from-{{ t.name }}"
+		         ng-disabled="getTableLinksFrom(t.name)==0"
+		         class="mitsiMenuGlyphicon"
+		      >
 		        <i class="glyphicon glyphicon-log-in"></i>
 		      </a>
 		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-from-{{ t.name }}">
-		        <li ng-repeat="tFrom in currentSource.mitsiGraph.getReverseLinksByName(t.name)">
-		        	<a href="" ng-click="appendTableNoStacking(105, 105, tFrom.targetName, -1)">{{ tFrom.targetName }}</a>
+		        <li ng-repeat="tFrom in getTableLinksFrom(t.name)">
+		        	<a href="" 
+		        	   ng-click="appendTableNoStacking(105, 105, tFrom.targetName, -1)"
+		        	   >
+		        	{{ tFrom.targetName }}
+		        	</a>
 		        </li>
 		      </ul>
 		    </span>
 	 	 </td>
 		 <td style="padding-right:6px;">
 	 	 	<span dropdown> 
-		      <a href="" dropdown-toggle id="dropdown-tables-to-{{ t.name }}">
+		      <a href="" 
+		         dropdown-toggle 
+		         id="dropdown-tables-to-{{ t.name }}"
+		         ng-disabled="getTableLinksTo(t.name)==0"
+		         class="mitsiMenuGlyphicon"
+		         >
 		        <i class="glyphicon glyphicon-log-out"></i>
 		      </a>
 		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-to-{{ t.name }}">
-		        <li ng-repeat="tTo in currentSource.mitsiGraph.getLinksByName(t.name)">
-		        	<a href="" ng-click="appendTableNoStacking(105, 105, tTo.targetName, 1)">{{ tTo.targetName }}</a>
+		        <li ng-repeat="tTo in getTableLinksTo(t.name)">
+		        	<a href="" 
+		        	   ng-click="appendTableNoStacking(105, 105, tTo.targetName, 1)">
+		        	   {{ tTo.targetName }}
+		        	</a>
 		        </li>
 		      </ul>
 		    </span>
