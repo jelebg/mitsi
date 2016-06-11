@@ -14,7 +14,7 @@ THE graph<br/>
      style="position:relative;width:200px;height:200px;"
      >
 
-<div ng-repeat="t in mestables.tlist"
+<div ng-repeat="(tableName, t) in tables"
      id="{{divPrefix+t.name}}"
 	 class="linksTable"
 	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;"

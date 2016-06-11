@@ -6,6 +6,7 @@ angular.module('mitsiApp')
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
 	$scope.divPrefix = "mitsiObject_";
+	$scope.tables = {};
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -29,12 +30,9 @@ angular.module('mitsiApp')
 		//console.log(elt.className);
 		//$scope.mestables.tlist.push({ name:tableName, x:350, y:150 });
 
-		// TODO mestablesName
-		for(var i=0; i!=$scope.mestables.tlist.length; i++) {
-			var t = $scope.mestables.tlist[i];
-			if(t.name == tableName) {
-				return;
-			}
+		
+		if($scope.existsTable(tableName)) {
+			return;
 		}
 		
 		var bestPlace = $scope.getTableBestPlace(left, top);
@@ -466,51 +464,34 @@ angular.module('mitsiApp')
 	$scope.tablesInit = function() {
 		
 		$scope.jsplumb.detachEveryConnection();
-		if($scope.mestables !== undefined &&
-				$scope.mestables.tlist != null) {
-			for(var i=0; i!=$scope.mestables.tlist.length; i++) {
-				$scope.jsplumb.remove($scope.divPrefix + $scope.mestables.tlist[i].name);
-			}
+		for(var t in $scope.tables) {
+			$scope.jsplumb.remove($scope.divPrefix + t.name);
 		}
 		
-		$scope.mestables = {};
-		$scope.mestables.tlist = [];
-		$scope.mestablesName = [] ;
+		$scope.tables = {};
 	}
 
 	$scope.appendTable = function(left, top, tableName) {
-		$scope.mestables.tlist.push({name:tableName, x:left, y:top });
-		$scope.mestablesName.push(tableName);
+		$scope.tables[tableName] = {name:tableName, x:left, y:top };
 	}
 	
 	$scope.existsTable = function(tableName) {
-		return ($scope.mestablesName.indexOf(tableName) >= 0);
+		return ($scope.tables[tableName] !=null);
 
 	}
 
 	
 	$scope.removeTable = function(tableName) {
 		$scope.jsplumb.remove($scope.divPrefix + tableName);
-		
-		// TODO perf : faire un associative array
-		for(var i=0; i!=$scope.mestables.tlist.length; i++) {
-			if($scope.mestables.tlist[i].name == tableName) {
-				$scope.mestables.tlist.splice(i, 1);
-				$scope.mestablesName.splice(i, 1);
-				break;
-			}
-		}
-
+		delete $scope.tables[tableName];		
 	}
 	
 	$scope.removeAllTables = function() {
 		//for(i=$scope.mestablesName.length; i>=0; i--) {
-		for(i=0; i!=$scope.mestablesName.length; i++) {
-			var tableName = $scope.mestablesName[i];
-			$scope.jsplumb.remove($scope.divPrefix + tableName);
+		for(var t in $scope.tables) {
+			$scope.jsplumb.remove($scope.divPrefix + t.name);
 		}
-		$scope.mestables.tlist = [];
-		$scope.mestablesName = [];
+		$scope.tables = {};
 	}
 	
 	$scope.displayProximityGraph = function(currentVertexName) {
@@ -630,7 +611,6 @@ angular.module('mitsiApp')
 	//$scope.mestables = { tlist:[ {name:"COUCOU", x:"200", y:"200"},
 	//                            {name:"BLABLA", x:"250", y:"300"} ]
 	//	};
-	var tableName = "saispas";
 	if($rootScope.currentSource 
 			&& $rootScope.currentSource.currentObject 
 			&& $rootScope.currentSource.currentObject.id) {
