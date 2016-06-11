@@ -1,2 +1,69 @@
 THE graph<br/>
->{{ tutu }}<
+<!-- 
+	>{{ tutu }}<
+	<br/>
+	len:{{ mestables.length }}
+	<br/>
+	name[0]:{{ mestables.tlist[0].name }}
+	<br/>
+	<pre>{{ mestables | json }}</pre>
+	<br/>
+ -->
+	
+<div id="jsPlumbContainer" 
+     style="position:relative;width:200px;height:200px;"
+     >
+
+<div ng-repeat="t in mestables.tlist"
+     id="{{divPrefix+t.name}}"
+	 class="linksTable"
+	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;"
+	 draggable
+	 ng-mouseover="mouseOverDiv()"
+	 ng-mouseleave="mouseLeaveDiv()"
+	 >
+	 {{ t.name }}
+	 <a href=""
+	    ng-show="showIcons" 
+	    ng-click="removeTable(t.name)">
+		 <i class="glyphicon glyphicon-remove-circle" 
+		    style="position:absolute;top:-8px;right:-8px;"></i>
+	 </a>
+	 <table 
+	 	     ng-show="showIcons"
+	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
+	 	 <td style="padding-right:6px;">
+	 	 	<span dropdown> 
+		      <a href="" dropdown-toggle id="dropdown-tables-from-{{ t.name }}">
+		        <i class="glyphicon glyphicon-log-in"></i>
+		      </a>
+		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-from-{{ t.name }}">
+		        <li ng-repeat="tFrom in currentSource.mitsiGraph.getReverseLinksByName(t.name)">
+		        	<a href="" ng-click="appendTableNoStacking(105, 105, tFrom.targetName, -1)">{{ tFrom.targetName }}</a>
+		        </li>
+		      </ul>
+		    </span>
+	 	 </td>
+		 <td style="padding-right:6px;">
+	 	 	<span dropdown> 
+		      <a href="" dropdown-toggle id="dropdown-tables-to-{{ t.name }}">
+		        <i class="glyphicon glyphicon-log-out"></i>
+		      </a>
+		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-to-{{ t.name }}">
+		        <li ng-repeat="tTo in currentSource.mitsiGraph.getLinksByName(t.name)">
+		        	<a href="" ng-click="appendTableNoStacking(105, 105, tTo.targetName, 1)">{{ tTo.targetName }}</a>
+		        </li>
+		      </ul>
+		    </span>
+		 </td>
+		 <td style="padding-right:6px;">
+		 	<i class="glyphicon glyphicon-ok-circle"></i>
+		 </td>
+		 <td style="padding-right:6px;">
+		 	<i class="glyphicon glyphicon-comment"></i>
+		 </td>
+	 </tr></table>
+	 
+</div>
+
+</div>

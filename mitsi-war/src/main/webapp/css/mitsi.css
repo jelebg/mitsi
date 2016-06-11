@@ -116,9 +116,11 @@
 
 .linksTable {
 	text-align:center;
-    background-color: lightblue; 
-	border-radius:4px;
+    background-color: #F0F0F0; 
+	border-radius:6px;
 	padding:4px;
+	padding-left:5px;
+	padding-right:5px;
 }
 
 .linksTableHighlight {

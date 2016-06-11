@@ -88,7 +88,8 @@ function MitsiGraph(relations) {
 					
 					var newReverseLink = {
 						"target"     : pos,
-						"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
+						// TODO : BUG ? : ne devrait pas plutot etre la table dobj.id.schema+dobj.id.name ??? bon je corrige
+						"targetName" : dobj.id.schema+"."+dobj.id.name, //constraint.fkConstraintOwner+"."+constraint.fkTable,
 						"properties" : {
 							"keyColumns"  : constraint.columns,
 							"rKeyColumns" : constraint.fkColumns
@@ -195,6 +196,9 @@ function MitsiGraph(relations) {
 
 	this.getLinksByName = function(tableOwner, tableName) {
 		var pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
+		if(pos == undefined) {
+			return null;
+		}
 		return this.vertexes[pos].links;
 	}
 	
@@ -204,6 +208,9 @@ function MitsiGraph(relations) {
 	
 	this.getReverseLinksByName = function(tableOwner, tableName) {
 		var pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
+		if(pos == undefined) {
+			return null;
+		}
 		return this.vertexes[pos].reverseLinks;
 	}
 	

@@ -30,6 +30,7 @@ angular.module('mitsiApp')
         	};
         };
         
+        // todo : récupérer la callback de deregistration renvoyée par $watch ?
         scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
             scope.windowHeight = newValue.h;
             scope.windowWidth = newValue.w;

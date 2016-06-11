@@ -17,6 +17,7 @@ angular.module('mitsiApp')
 
 			  for(var i=0; i!=$scope.datasources.length; i++) {
 				  if($scope.datasources[i].connected) {
+					$scope.initGraph($scope.datasources[i]);
 				  	$rootScope.$broadcast('DatasourceConnected', $scope.datasources[i]);
 				  }
 			  }
@@ -38,6 +39,7 @@ angular.module('mitsiApp')
 				  source.connected = response.data.connected;
 				  
 				  $rootScope.$broadcast('DatasourceConnected', source);
+				  
 				  //$scope.refresh(source);
 			  }, function(errorMessage) {
 			      // called asynchronously if an error occurs
@@ -78,6 +80,7 @@ angular.module('mitsiApp')
 					  break;
 				  }
 			  }
+			  $scope.initGraph(source);
 			  
 		  }, function(errorMessage) {
 		      // called asynchronously if an error occurs
@@ -85,6 +88,14 @@ angular.module('mitsiApp')
 			  console.warn( errorMessage );
 			  alert( errorMessage );
 		  });
+	}
+	
+	$scope.initGraph = function(datasource) {
+		datasource.mitsiGraph = new MitsiGraph(null);
+		if(!datasource.objects) {
+			return;
+		}
+		datasource.mitsiGraph.initWithDatabaseObjects(datasource.objects);
 	}
 	
 	$scope.isSourceExcludedByFilter = function(source) {
@@ -128,7 +139,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.$on('DatasourceConnected', function (event, source) {
-		//$rootScope.currentSource = source;
+		console.log('event DatasourceConnected')
+		$rootScope.currentSource = source;
 	    $scope.refresh(source);
 	});
 	
