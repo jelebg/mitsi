@@ -9,4 +9,5 @@ public class Column {
 	public String defaultValue;
 	public String nullable;
 	public String jsonDetails;
+	public String description;
 }

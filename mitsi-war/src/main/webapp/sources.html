@@ -40,7 +40,6 @@
 			ng-repeat="s in datasources | orderBy:'name'" 
 			is-open="s.accordionOpened" 
 			is-disabled="false" 
-			title="{{s.description}}" 
 			ng-hide="isSourceExcludedByFilter(s)">
 		  <accordion-heading >
 		  	<i class="glyphicon glyphicon-exclamation-sign datasource-error"
@@ -140,13 +139,15 @@
 					ng-repeat="o in s.objects | orderBy:'id.name'" 
 					is-open="o.accordionOpened" 
 					is-disabled="false" 
-					title="{{o.description}}"
 					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
 				  <accordion-heading>
 			        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
-			        <i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i>
+			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
-				  	<span ng-click="selectObject(s, o)">
+				  	<span   ng-click="selectObject(s, o)"   
+						  	popover="{{o.description}}"
+							popover-trigger="mouseenter"
+							popover-popup-delay="2000" >
 				  		{{ o.id.name }}
 				  	</span>
 			      </accordion-heading>
@@ -154,7 +155,11 @@
 				<li ng-repeat="o in s.objects">
 							{{ o.id.name }} -->
 					<ul class="mitsi-columns-list" >
-						<li ng-repeat="c in o.columns" title="{{c.description}}" >
+						<li ng-repeat="c in o.columns" 
+						    popover="{{ c.type }} / {{ c.description }}"
+						    popover-placement="bottom"
+							popover-trigger="mouseenter"
+							popover-popup-delay="2000" >
 							{{ c.name }}
 						</li>
 					</ul>

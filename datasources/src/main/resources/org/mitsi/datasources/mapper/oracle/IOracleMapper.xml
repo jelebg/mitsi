@@ -32,8 +32,11 @@
     <idArg column="id_name" javaType="String"/>
   </constructor>
   <result property="jsonDetails" column="json_details"/>
+  <result property="description" column="object_comment"/>
   <collection property="columns" ofType="org.mitsi.datasources.Column">
       <result property="name" column="column_name"/>
+      <result property="description" column="column_comment"/>
+      <result property="type" column="column_type"/>
   </collection>
 </resultMap>
 
@@ -55,9 +58,14 @@
 			'MATERIALIZED VIEW', 'matview', 
 			null 
 		) id_type,
-    all_tab_columns.column_name column_name
+    all_tab_columns.column_name column_name,
+    all_tab_columns.data_type column_type,
+    all_tab_comments.comments object_comment,
+    all_col_comments.comments column_comment
 	FROM all_objects
 	     LEFT JOIN all_tab_columns ON all_objects.owner=all_tab_columns.owner AND all_objects.object_name=all_tab_columns.table_name 
+       LEFT JOIN all_tab_comments ON all_objects.owner=all_tab_comments.owner AND all_objects.object_name=all_tab_comments.table_name AND all_objects.object_type=all_tab_comments.table_type 
+       LEFT JOIN all_col_comments ON all_tab_columns.owner=all_col_comments.owner AND all_tab_columns.table_name=all_col_comments.table_name AND all_tab_columns.column_name=all_col_comments.column_name
 	WHERE all_objects.object_type IN ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
 	AND all_objects.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
 	AND all_objects.owner NOT LIKE 'APEX_%'
