@@ -265,7 +265,7 @@ angular.module('mitsiApp')
 
 	}
 	
-	$scope.$on('DabaseObjectSelected', function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
 		var ypos = 0;
 		
 		if(databaseObject && databaseObject.id) {

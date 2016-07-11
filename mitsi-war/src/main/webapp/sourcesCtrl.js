@@ -15,12 +15,12 @@ angular.module('mitsiApp')
 		  .then(function(response) {
 			  $scope.datasources = response.data.datasources;
 
-			  for(var i=0; i!=$scope.datasources.length; i++) {
+			  /* for(var i=0; i!=$scope.datasources.length; i++) {
 				  if($scope.datasources[i].connected) {
 					$scope.initGraph($scope.datasources[i]);
 				  	$rootScope.$broadcast('DatasourceConnected', $scope.datasources[i]);
 				  }
-			  }
+			  }*/
 
 		  }, function(errorMessage) {
 		      // called asynchronously if an error occurs
@@ -30,6 +30,7 @@ angular.module('mitsiApp')
 		  });
 	};
 	
+	// TODO : a supprimer
 	$scope.connect = function(source) {
 		//alert(source.name);
 		//source.connected = !source.connected; 
@@ -128,21 +129,18 @@ angular.module('mitsiApp')
 	
 	$scope.selectSource = function(source) {
 		$rootScope.currentSource = source;
+		if(! source.objects) {
+			$scope.refresh(source)
+		}
 	}
 	
 	$scope.selectObject = function(source, object) {
 		$rootScope.currentSource = source;
 		source.currentObject = object;
 		
-        $rootScope.$broadcast('DabaseObjectSelected', source, object);
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, source, object);
 
 	}
-	
-	$scope.$on('DatasourceConnected', function (event, source) {
-		console.log('event DatasourceConnected')
-		$rootScope.currentSource = source;
-	    $scope.refresh(source);
-	});
 	
 	$scope.init();
 

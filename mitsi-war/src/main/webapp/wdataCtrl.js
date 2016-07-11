@@ -120,7 +120,7 @@ angular.module('mitsiApp')
       };*/
 
 
-	$scope.$on('DabaseObjectSelected', function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
 		//alert(source.name + " - " + databaseObject.id.name);
 		$scope.dataGridSourceName = source.name;
 		sqlService.beginTable(source.name, nbRowToFetch, databaseObject.id.schema, databaseObject.id.name)

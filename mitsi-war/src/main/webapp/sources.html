@@ -44,17 +44,15 @@
 		  <accordion-heading >
 		  	<i class="glyphicon glyphicon-exclamation-sign datasource-error"
 		  		ng-if="s.errorMessage != null"></i>
-            <span class="datasource-accordion-{{s.connected}}"  
+            <span class="datasource-accordion-false"  
             	ng-click="selectSource(s)"
             >{{s.name}}</span>
             <!--  popover="test popover" 
             	popover-title="test popover title"
             	popover-trigger="click"
             	popover-placement="right" -->
-	        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i>
-            <a href=""  ng-click="connect(s); $event.stopPropagation();">
-	            <i class="pull-right glyphicon" style="margin-right:5px" ng-class="{'glyphicon-remove-circle': !s.connected, 'glyphicon-ok-circle': s.connected}"></i>
-            </a>
+	        <!--  i class="pull-right glyphicon" 
+	           ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i -->
              
             <a href=""  ng-click="refresh(s); $event.stopPropagation();">
 	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
@@ -138,10 +136,12 @@
 				<accordion-group 
 					ng-repeat="o in s.objects | orderBy:'id.name'" 
 					is-open="o.accordionOpened" 
-					is-disabled="false" 
+					is-disabled="true" 
 					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
-				  <accordion-heading>
-			        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
+				  <accordion-heading >
+            		<a href=""  ng-click="console.warn('coucou'); o.accordionOpened = !o.accordionOpened;">
+			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
+			        </a>
 			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
 				  	<span   ng-click="selectObject(s, o)"   
