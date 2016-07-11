@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
@@ -17,7 +18,7 @@ import org.mitsi.datasources.Tablespace;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.MultiConnection;
+import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -32,8 +33,7 @@ public class GetAllRelationsServlet extends GsonServlet<GetAllRelations, GetAllR
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	private PublicDatasources publicDatasources;
-
+	private DatasourceManager datasourceManager;
 	
 	public GetAllRelationsServlet() {
         super(GetAllRelations.class);
@@ -43,20 +43,13 @@ public class GetAllRelationsServlet extends GsonServlet<GetAllRelations, GetAllR
 
  
 	@Override
-	public GetAllRelationsResponse proceed(GetAllRelations request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
+	public GetAllRelationsResponse proceed(GetAllRelations request, Client connectedClient) throws Exception {
 		
-		publicDatasources.loadIfNeccessary();
 		GetAllRelationsResponse response = new GetAllRelationsResponse();
 		
-		if(!connectedClient.isConnected(request.datasourceName)) {
-			response.message = "Datasource not connected";
-			return response;
+		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
+			response.relations = connection.getAllRelations();
 		}
-
-		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
-		usingConnections.add(connection.getConnectionForMitsi());
-		response.relations = connection.getConnectionForMitsi().getAllRelations();
-		
 		
 		return response;
 	}

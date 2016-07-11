@@ -29,7 +29,7 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 
  
 	@Override
-	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
+	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		
@@ -40,15 +40,11 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 			datasource.name = publicDatasource.getName();
 			datasource.description = publicDatasource.getDescription();
 			datasource.tags = publicDatasource.getTags();
-			datasource.connected = connectedClient.isConnected(publicDatasource.getName());
+			// TODO : supprimer cet attribut dans la gui aussi
+			datasource.connected = true;
 			response.datasources.add(datasource);
 		}
 		
-		/*response.resultats.add("un");
-		response.resultats.add("deux");
-		response.resultats.add("trois");
-		response.resultats.add("quatre");
-		response.resultats.add("cinq");*/
 		return response;
 	}
 

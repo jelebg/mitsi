@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Servlet implementation class TestGsonServlet
  */
+// TODO : supprimer cette servlet
 public class ConnectServlet extends GsonServlet<Connect, ConnectResponse> {
 	private static final long serialVersionUID = 1L;
 
@@ -28,12 +29,12 @@ public class ConnectServlet extends GsonServlet<Connect, ConnectResponse> {
 
  
 	@Override
-	public ConnectResponse proceed(Connect request, Client client, List<MitsiConnection> usingConnections) throws Exception {
+	public ConnectResponse proceed(Connect request, Client client) throws Exception {
 		
 		
 		ConnectResponse response = new ConnectResponse();
 		
-		try {
+		/*try {
 			client.connectDatasource(request.datasourceName);
 			response.connected = true;
 			response.errorMessage = null;
@@ -45,11 +46,11 @@ public class ConnectServlet extends GsonServlet<Connect, ConnectResponse> {
 		catch (java.sql.SQLException|PersistenceException e) {
 			response.connected = false;
 			response.errorMessage = getErrorMessageFromException(e);
-		}
+		}*/
 		return response;
 	}
 	
-	private String getErrorMessageFromException(Exception e) {
+	/*private String getErrorMessageFromException(Exception e) {
 		String message = e.getMessage();
 		if(e instanceof java.sql.SQLException) {
 			message = "SQL error : "+((java.sql.SQLException) e).getMessage();
@@ -61,6 +62,6 @@ public class ConnectServlet extends GsonServlet<Connect, ConnectResponse> {
 			}
 		}
 		return message;
-	}
+	}*/
 
 }

@@ -24,7 +24,7 @@ public class TestGsonServlet extends GsonServlet<TestGsonRequest, TestGsonRespon
 
  
 	@Override
-	public TestGsonResponse proceed(TestGsonRequest request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
+	public TestGsonResponse proceed(TestGsonRequest request, Client connectedClient) throws Exception {
 		System.out.println("sql='"+request.sql+"'");
 		System.out.println("message='"+request.message+"'");
 		

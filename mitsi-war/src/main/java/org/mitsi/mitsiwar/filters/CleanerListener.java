@@ -5,7 +5,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 import org.mitsi.mitsiwar.connections.Clients;
-import org.mitsi.mitsiwar.connections.MultiConnection;
+import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 

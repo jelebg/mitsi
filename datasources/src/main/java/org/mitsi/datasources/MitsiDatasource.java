@@ -17,7 +17,7 @@ public class MitsiDatasource {
 	private String password;
 	private String connectSchema;
 	private List<String> tags;
-	private long maxConnectionPerUser;
+	//private long maxConnectionPerUser;
 	private boolean useSchemaCache;
 	private Map<String, Cache> schemasCache;
 	
@@ -28,7 +28,7 @@ public class MitsiDatasource {
 	
 	public MitsiDatasource(String name, String description, String provider,
 			String driver, String jdbcUrl, String user, String password, List<String> tags,
-			long maxConnectionPerUser, boolean useSchemaCache) {
+			/*long maxConnectionPerUser,*/ boolean useSchemaCache) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -37,7 +37,7 @@ public class MitsiDatasource {
 		this.user = user;
 		this.password = password;
 		this.tags = tags;
-		this.maxConnectionPerUser = maxConnectionPerUser;
+		//this.maxConnectionPerUser = maxConnectionPerUser;
 		this.useSchemaCache = useSchemaCache;
 		
 		this.schemasCache = new HashMap<String, Cache>();
@@ -123,13 +123,13 @@ public class MitsiDatasource {
 		this.tags = tags;
 	}
 
-	public long getMaxConnectionPerUser() {
+	/*public long getMaxConnectionPerUser() {
 		return maxConnectionPerUser;
 	}
 
 	public void setMaxConnectionPerUser(long maxConnectionPerUser) {
 		this.maxConnectionPerUser = maxConnectionPerUser;
-	}
+	}*/
 	
 	public boolean isUseSchemaCache() {
 		return useSchemaCache;
@@ -147,7 +147,7 @@ public class MitsiDatasource {
 				+ ", provider=" + provider + ", driver=" + driver
 				+ ", jdbcUrl=" + jdbcUrl + ", user=" + user + ", password="
 				+ password + ", connectSchema=" + connectSchema + ", tags="
-				+ tags + ", maxConnectionPerUser=" + maxConnectionPerUser
+				+ tags /*+ ", maxConnectionPerUser=" + maxConnectionPerUser +*/
 				+ ", useSchemaCache=" + useSchemaCache + "]";
 	}
 

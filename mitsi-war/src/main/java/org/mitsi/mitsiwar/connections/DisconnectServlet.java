@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Servlet implementation class TestGsonServlet
  */
+// TODO : supprimer cette servlet
 public class DisconnectServlet extends GsonServlet<Disconnect, DisconnectResponse> {
 	private static final long serialVersionUID = 1L;
 
@@ -28,12 +29,12 @@ public class DisconnectServlet extends GsonServlet<Disconnect, DisconnectRespons
 
  
 	@Override
-	public DisconnectResponse proceed(Disconnect request, Client client, List<MitsiConnection> usingConnections) throws Exception {
+	public DisconnectResponse proceed(Disconnect request, Client client) throws Exception {
 		
 		
 		DisconnectResponse response = new DisconnectResponse();
 		
-		try {
+		/*try {
 			client.disconnectDatasource(request.datasourceName);
 			response.disconnected = true;
 			response.warningMessage = null;
@@ -41,7 +42,7 @@ public class DisconnectServlet extends GsonServlet<Disconnect, DisconnectRespons
 		catch (NotConnectedException e) {
 			response.disconnected = false;
 			response.warningMessage = "Not connected to "+request.datasourceName;
-		}
+		}*/
 		return response;
 	}
 

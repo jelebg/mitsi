@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.Index;
@@ -13,7 +14,7 @@ import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.MultiConnection;
+import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +27,8 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 	private static final Logger log = Logger.getLogger(GetDatabaseObjectsServlet.class);
 
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private DatasourceManager datasourceManager;
+	//private PublicDatasources publicDatasources;
 
 	
 	public GetDatabaseObjectsServlet() {
@@ -35,37 +37,27 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 
  
 	@Override
-	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
-		
-		MultiConnection connection = connectedClient.getConnection(request.datasourceName);
-		usingConnections.add(connection.getConnectionForMitsi());
+	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
 		
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
-		// TODO problèmes dans la gestion du cache MyBatis à revoir complètement
-		//connection.getConnectionForMitsi().clearCache();
-		//try {
-
-		response.schemas = connection.getConnectionForMitsi().getAllSchemas();
-		String schema = request.schema;
-		if(schema == null) {
-			for(Schema s : response.schemas) {
-				if(s.current) {
-					schema = s.name;
-					break;
+		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
+			
+			response.schemas = connection.getAllSchemas();
+			String schema = request.schema;
+			if(schema == null) {
+				for(Schema s : response.schemas) {
+					if(s.current) {
+						schema = s.name;
+						break;
+					}
 				}
 			}
+			boolean disableCaching = (request.disableCaching!=null && request.disableCaching==true);
+			
+			response.databaseObjects = connection.getTablesAndViews(schema, disableCaching);
+			
 		}
-		boolean disableCaching = (request.disableCaching!=null && request.disableCaching==true);
-		
-		response.databaseObjects = connection.getConnectionForMitsi().getTablesAndViews(schema, disableCaching);
-		
-		
-		
-		//}
-		//finally {
-		//	connection.getConnectionForMitsi().rollback();
-		//}
 
 		return response;
 	}

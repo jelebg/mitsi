@@ -30,7 +30,7 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		this.requestClass = requestClass;
 	}
 	
-	public abstract Response proceed(Request request, Client client, List<MitsiConnection> usingConnections) throws Exception;
+	public abstract Response proceed(Request request, Client client) throws Exception;
 	
 	@Override
 	public void init() throws ServletException {
@@ -47,14 +47,12 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 			request.getSession().setAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE, connectedClient);
 		}
 		
-		List<MitsiConnection> usingConnections = new ArrayList<>();
-		
 		response.setContentType("application/json; charset=UTF-8");
 		Gson gson = new Gson();
 		try {
 			
 			Request gsonRequest = gson.fromJson(in, requestClass);
-			Response gsonResponse = proceed(gsonRequest, connectedClient, usingConnections);
+			Response gsonResponse = proceed(gsonRequest, connectedClient);
 			gson.toJson(gsonResponse, out);
 			
 		} 
@@ -66,11 +64,6 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		} 
 		catch(Exception e){
 			throw new ServletException("Unexpected Exception", e);
-		}
-		finally {
-			for(MitsiConnection mitsiConnection : usingConnections) {
-				mitsiConnection.rollback();
-			}
 		}
 		
 	

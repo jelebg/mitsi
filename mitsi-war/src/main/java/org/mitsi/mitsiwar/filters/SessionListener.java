@@ -19,11 +19,14 @@ public class SessionListener implements HttpSessionListener {
 	@Override
 	public void sessionDestroyed(HttpSessionEvent event) {
 		log.info("destroying session : "+event.getSession().getId());
-		Client client = (Client) event.getSession().getAttribute(GsonServlet.CONNECTED_CLIENTSESSION_ATTRIBUTE);
+		
+		// TODO : supprimer ce listener si il ne sert plus à rien ?
+		
+		/* Client client = (Client) event.getSession().getAttribute(GsonServlet.CONNECTED_CLIENTSESSION_ATTRIBUTE);
 		if(client != null) {
 			log.info("clogins all "+client.getConnectionCount()+" remaining connections of client");
 			client.disconnect();
-		}
+		} */
 	}
 
 }

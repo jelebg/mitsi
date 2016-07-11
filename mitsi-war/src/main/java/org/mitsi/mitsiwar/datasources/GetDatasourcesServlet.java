@@ -29,7 +29,7 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 
  
 	@Override
-	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
+	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws Exception {
 		
 		publicDatasources.loadIfNeccessary();
 		

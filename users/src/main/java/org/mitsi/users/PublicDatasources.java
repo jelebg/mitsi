@@ -14,6 +14,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -95,7 +96,6 @@ public class PublicDatasources extends PooledResource {
 							(String) v.get(FIELD_USER),
 							(String) v.get(FIELD_PASSWORD),
 							tags,
-							(maxConnectionsPerUser==null ? 2L : maxConnectionsPerUser),
 							(useSchemaCache==null ? true : useSchemaCache)
 						);
 				datasource.setConnectSchema((String) v.get(FIELD_CONNECT_SCHEMA));
@@ -123,6 +123,6 @@ public class PublicDatasources extends PooledResource {
 		loadIfNeccessary();
 		return datasources.get(datasource);
 	}
-
+	
 
 }

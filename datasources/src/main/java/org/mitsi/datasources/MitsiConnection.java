@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -36,38 +37,45 @@ import org.mitsi.datasources.mapper.oracle.IOracleMapper;
 public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
 
-	MitsiDatasource datasource;
+	//MitsiDatasource datasource;
 	//Connection connection = null;
-	DataSource jdbcDataSource = null;
-	SqlSessionFactory sqlSessionFactory = null;
-	SqlSession sqlSession = null; // TODO : gérer la thread-safeitude de la sqlSession un peu mieux qu'avec des synchronized (faire des MitsiSession, et prévoir le cas de les mettre de coté pour pour pouvoir garder des resultsets ouverts (resultset ouvert)
+	//DataSource jdbcDataSource = null;
+	//SqlSessionFactory sqlSessionFactory = null;
+	SqlSession sqlSession = null; 
 	IMitsiMapper mapper = null;
-	PreparedStatement currentStatement = null; // TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
-	ResultSet currentResultSet = null;// TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
+	//PreparedStatement currentStatement = null; // TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
+	//ResultSet currentResultSet = null;// TODO : permettre d'ouvrir plusieurs statements, un par page/tabulation/autre chose ?
 	//int currentResultSetNbColumns = 0;
-	int [] currentResultSetJdbTypes = null;
+	//int [] currentResultSetJdbTypes = null;
 	
-	public MitsiConnection(MitsiDatasource datasource) {
+	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper) {
+		this.sqlSession = sqlSession;
+		this.mapper = mapper;
+	}
+	/*public MitsiConnection(MitsiDatasource datasource) {
 		this.datasource = datasource;
 	}
 	
 	public MitsiDatasource getDatasource() {
 		return datasource;
-	}
+	}*/
 	
 	
-	public void connect() throws SQLException, ClassNotFoundException {
+	/*public void connect() throws SQLException, ClassNotFoundException {
 		//Class.forName(datasource.getDriver());
 		//connection = DriverManager.getConnection(
 		//		datasource.getJdbcUrl(),
 		//		datasource.getUser(),
 		//		datasource.getPassword());
-		jdbcDataSource = new UnpooledDataSource(datasource.getDriver(), 
+		
+		TODO : 1 pool pour une MitsiConnection ou 1 pool pour N MitsiConnection
+		
+		jdbcDataSource = new PooledDataSource(datasource.getDriver(), 
 				datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
 		//connection = jdbcDataSource.getConnection();
 		
 		TransactionFactory transactionFactory = new JdbcTransactionFactory();
-		/* TODO : vérifier à quoi sert le nom de l'environment */
+		// TODO : vérifier à quoi sert le nom de l'environment 
 		Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);
 		Configuration configuration = new Configuration(environment);
 		configuration.setCacheEnabled(false);
@@ -88,23 +96,14 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 	}
 	
-	public void clearCache() {
+	/*public void clearCache() {
 		sqlSession.clearCache();
-	}
+	}*/
 	
 	@Override
 	public void close() {
-		//if(connection != null) {
-		//	try {
-		//		connection.close();
-		//	} catch (SQLException e) {
-		//		// nothing
-		//	}
-		//}
-		
+		sqlSession.rollback();
 		sqlSession.close();
-		sqlSession = null;
-		mapper = null;
 	}
 	
 	//public IMitsiMapper getMapper() {
@@ -113,8 +112,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	public synchronized void rollback() {
 		sqlSession.rollback();
-		
 	}
+
+	/* "pour l'instant" on supprime les fonctionnalités de l'onget SQL 
+	 
 	public synchronized void commit() {
 		sqlSession.commit();
 		
@@ -199,7 +200,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			//currentResultSetNbColumns = 0;
 			currentResultSetJdbTypes = null;
 
-	}
+	}*/
 
 	
 	@Override
@@ -207,6 +208,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return mapper.testOK();
 	}
 
+	// TODO : supprimer car on ne garde plus la connexion ouverte sur un schéma
 	@Override
 	public synchronized void changeSchema(String schema) {
 		mapper.changeSchema(schema);
@@ -250,8 +252,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	// pas d'override ici pour cause de gestion de cache explicite (disableCaching)
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner, boolean disableCaching) {
-		if(datasource.isUseSchemaCache()) {
-			log.info("use of cache for owner "+owner);
+		/* TODO : revoir le systeme de cache 
+		 if(datasource.isUseSchemaCache()) {
+		 	log.info("use of cache for owner "+owner);
 			Date begining = new Date();
 
 			MitsiDatasource.Cache cache = null;
@@ -285,6 +288,8 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 		
 		log.info("cache not used for owner "+owner);
+		*/
+		
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
 		getTablesAndViewsSubObjects(databaseObjects);
 		return databaseObjects;

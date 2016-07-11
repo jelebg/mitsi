@@ -15,7 +15,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class Client {
 	private String userName; // null for anonymous
-	private Map<String, MultiConnection> publicConnections = new TreeMap<>();
+	private Map<String, ClientVirtualConnection> publicConnections = new TreeMap<>();
 	//private List<Connection> userConnections; // TODO : pour plus tard
 	private boolean disconnected = false;
 	
@@ -34,14 +34,14 @@ public class Client {
 	
 	public void disconnect() {
 		disconnected = true;
-		for(MultiConnection connection : publicConnections.values()) {
+		for(ClientVirtualConnection connection : publicConnections.values()) {
 			connection.disconnectAll();
 		}
 	}
 
-	public void connectDatasource(String datasourceName)
+/*	public void connectDatasource(String datasourceName)
 			throws AlreadyConnectedException, ClassNotFoundException, SQLException {
-		MultiConnection connection = publicConnections.get(datasourceName);
+		ClientVirtualConnection connection = publicConnections.get(datasourceName);
 		if(connection != null) {
 			if(!connection.isConnected()) {
 				publicConnections.remove(datasourceName);
@@ -52,11 +52,11 @@ public class Client {
 		}
 		
 		MitsiDatasource mitsiDatasource = publicDatasources.getDatasource(datasourceName);
-		publicConnections.put(datasourceName, new MultiConnection(mitsiDatasource));
+		publicConnections.put(datasourceName, new ClientVirtualConnection(mitsiDatasource));
 	}
 
 	public void disconnectDatasource(String datasourceName) throws NotConnectedException {
-		MultiConnection connection = publicConnections.get(datasourceName);
+		ClientVirtualConnection connection = publicConnections.get(datasourceName);
 		if(connection == null || !connection.isConnected()) {
 			throw new NotConnectedException();
 		}
@@ -70,14 +70,15 @@ public class Client {
 		return publicConnections.containsKey(datasourceName);
 	}
 	
-	public MultiConnection getConnection(String datasourceName) throws ClassNotFoundException, SQLException {
-		MultiConnection connection = publicConnections.get(datasourceName);
+	TODO : virer getConnection
+	public ClientVirtualConnection getConnection(String datasourceName) throws ClassNotFoundException, SQLException {
+		ClientVirtualConnection connection = publicConnections.get(datasourceName);
 		if(connection != null) {
 			return connection;
 		}
 		
 		MitsiDatasource mitsiDatasource = publicDatasources.getDatasource(datasourceName);
-		connection = new MultiConnection(mitsiDatasource);
+		connection = new ClientVirtualConnection(mitsiDatasource);
 		publicConnections.put(datasourceName, connection);
 		return connection;
 	}
@@ -85,6 +86,6 @@ public class Client {
 	
 	public int getConnectionCount() {
 		return publicConnections.size();
-	}
+	}*/
 	
 }

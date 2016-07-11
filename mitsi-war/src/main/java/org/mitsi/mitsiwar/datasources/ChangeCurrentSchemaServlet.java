@@ -3,12 +3,13 @@ package org.mitsi.mitsiwar.datasources;
 import java.util.List;
 import java.util.Map;
 
+import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.MultiConnection;
+import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
 import org.mitsi.mitsiwar.exception.NotConnectedException;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema,
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private DatasourceManager datasourceManager;
 
 	
 	public ChangeCurrentSchemaServlet() {
@@ -31,16 +32,13 @@ public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema,
 
  
 	@Override
-	public ChangeCurrentSchemaResponse proceed(ChangeCurrentSchema request, Client connectedClient, List<MitsiConnection> usingConnections) throws Exception {
+	public ChangeCurrentSchemaResponse proceed(ChangeCurrentSchema request, Client connectedClient) throws Exception {
 		
-		publicDatasources.loadIfNeccessary();
+
+		try (MitsiConnection connection = datasourceManager.getConnection(request.datasource)) { 
 		
-		if(!connectedClient.isConnected(request.datasource)) {
-			throw new NotConnectedException();
+			connection.changeSchema(request.schema);
 		}
-		
-		MultiConnection connection = connectedClient.getConnection(request.datasource);
-		connection.getConnectionForMitsi().changeSchema(request.schema);
 		
 		return new ChangeCurrentSchemaResponse();
 	}
