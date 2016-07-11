@@ -1,10 +1,9 @@
 package org.mitsi.mitsicore;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
-
-
-
-
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -20,12 +19,9 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
-import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/application-context.xml")
