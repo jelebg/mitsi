@@ -113,7 +113,22 @@ angular.module('mitsiApp')
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	
-	$scope.isObjectExcludedByFilter = function(objectName, source) {
+	$scope.isObjectExcludedByFilter = function(id, source) {
+		var objectName = id.name; 
+		var objectType = id.type; 
+		
+		if(source.filter) {
+			if(source.filter.hideTables===true && objectType=="table") {
+				return true;
+			}
+			if(source.filter.hideViews===true && objectType=="view") {
+				return true;
+			}
+			if(source.filter.hideMViews===true && objectType=="matview") {
+				return true;
+			}
+		}
+		
 		if(!source.searchObject) {
 			return false;
 		}

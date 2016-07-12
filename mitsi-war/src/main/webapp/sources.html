@@ -100,9 +100,9 @@
             	>{{ s.errorMessage }}
             </alert>
 	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
-		        <a href="" class="btn btn-default"><img src="img/table.png"/></a>
-		        <a href="" class="btn btn-default"><img src="img/view.png"/></a>
-		        <a href="" class="btn btn-default"><img src="img/matview.png"/></a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"><img src="img/table.png"/></a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideViews=!s.filter.hideViews" ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"><img src="img/view.png"/></a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideMViews=!s.filter.hideMViews" ng-class="{'mitsiGrayscale':s.filter.hideMViews==true}"><img src="img/matview.png"/></a>
 		    </td><td>
 				<span dropdown on-toggle="toggled(open)" >
 			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
@@ -137,7 +137,7 @@
 					ng-repeat="o in s.objects | orderBy:'id.name'" 
 					is-open="o.accordionOpened" 
 					is-disabled="true" 
-					ng-hide="isObjectExcludedByFilter(o.id.name, s)">
+					ng-hide="isObjectExcludedByFilter(o.id, s)">
 				  <accordion-heading >
             		<a href=""  ng-click="console.warn('coucou'); o.accordionOpened = !o.accordionOpened;">
 			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>

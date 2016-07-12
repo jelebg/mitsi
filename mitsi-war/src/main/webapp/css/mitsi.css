@@ -159,3 +159,8 @@
 .mitsiMenuGlyphicon[disabled] {
 	color : lightgrey;
 }
+
+.mitsiGrayscale {
+	filter: grayscale(100%),;
+	filter: opacity(40%);
+}
