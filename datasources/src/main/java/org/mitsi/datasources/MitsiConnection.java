@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -31,6 +33,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.log4j.Logger;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
+import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.datasources.mapper.oracle.IOracleMapper;
 
@@ -435,5 +438,73 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	/*public List<DatabaseObject> getTablesAndViews() {
 		return mapper.getTablesAndViews();
 	}*/
+	
+	
+	public static void securityCheckDbObject(String tableName) throws MitsiSecurityException {
+		// TODO : conserver le pattern pour ne pas le recompiler systématiquement
+		
+		String regex = "[^a-zA-Z0-9_]";
+	    Pattern pattern = Pattern.compile(regex);
+	    Matcher match = pattern.matcher(tableName);
+		if(match.matches()) {
+			log.warn("invalid table name : "+tableName);
+			throw new MitsiSecurityException("invalid table name : "+tableName);
+		}
+	}
+	
+	public static class GetDataResult {
+		public List<Column> columns;
+		public List<String[]> results;
+
+	}
+	
+	public GetDataResult getData(String owner, String tableName, long fromRow, long count) throws SQLException, MitsiSecurityException {
+		securityCheckDbObject(tableName);
+		if(owner != null) {
+			securityCheckDbObject(owner);
+		}
+		
+		
+		GetDataResult result = new GetDataResult();
+		
+		// TODO : passer par le mapper pour bdd autres qu'oracle
+		
+		// back to JDBC
+		Connection jdbcConnection  = sqlSession.getConnection();
+		PreparedStatement  statement = jdbcConnection.prepareStatement("SELECT * FROM ( SELECT rownum rnum, t.* FROM "+(owner==null?"":owner+".")+tableName+" t where rownum<=?) where rnum>?");
+		statement.setLong(1, fromRow+count);
+		statement.setLong(2, fromRow);
+		statement.execute();
+		ResultSet resultSet = statement.getResultSet();
+		
+		// get columns
+		ResultSetMetaData rsmd = resultSet.getMetaData();
+		List<Column> columns = new ArrayList<Column>();
+		//currentResultSetNbColumns = rsmd.getColumnCount();
+		int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
+		for(int i=1; i<rsmd.getColumnCount(); i++) {
+			Column column = new Column();
+			jdbcTypes[i-1] =  rsmd.getColumnType(i+1);
+			column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i+1));
+			column.name = rsmd.getColumnName(i+1);
+			// TODO : précision ? possible ?
+			columns.add(column);
+		}
+		result.columns = columns;
+		
+		// get data
+		List<String[]> results = new ArrayList<>();
+		while(resultSet.next() ) {
+			String[] row = new String[jdbcTypes.length];
+			for(int i=0; i!=row.length; i++) {
+				row[i] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+2);
+			}
+			results.add(row);
+		}
+		
+		result.results = results;
+		
+		return result;
+	}
 	
 }

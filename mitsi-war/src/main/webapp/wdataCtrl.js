@@ -1,9 +1,10 @@
 angular.module('mitsiApp')
-    .controller('wdataCtrl', function($scope, $timeout, $q, uiGridConstants, sqlService) {
+    .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService) {
 
 	$scope.tutu = "wdata";
 	$scope.enableFilter = false;
-	var nbRowToFetch = 100; // TODO
+	$scope.allReadyFetched = 0;
+	$scope.nbRowToFetch = 100; 
 	
 	//$scope.mesdatas = [
 	                  // {"col1":"tutu", "col2":"tata", "col3":"toto"},
@@ -58,15 +59,7 @@ angular.module('mitsiApp')
 				
 		};
 	}
-	$scope.initGrid();
 
-	$scope.gridRefresh = false;
-	$scope.currentGridHeight = "300px";
-    $timeout(function() {
-    	// TODO : reste un bug : si on agrandit la fenetre, le nombre de lignes affichées n'évolue pas tant qu'on ne scrolle pas
-        $scope.dataGridApi.grid.queueGridRefresh();
-  	  //$scope.dataGridApi.grid.refreshRows();
-    }, 0);
 
 	$scope.toggleFilter = function() {
 		$scope.enableFilter = ! $scope.enableFilter;
@@ -121,9 +114,14 @@ angular.module('mitsiApp')
 
 
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
+		$scope.beginData(source, databaseObject);
+	});
+	
+	$scope.beginData = function(source, databaseObject) {
 		//alert(source.name + " - " + databaseObject.id.name);
-		$scope.dataGridSourceName = source.name;
-		sqlService.beginTable(source.name, nbRowToFetch, databaseObject.id.schema, databaseObject.id.name)
+		//$scope.dataGridSourceName = source.name;
+		$scope.allReadyFetched = 0;
+		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch)
 		  .then(function(response) {
 			  //alert(response);
 			  //response.data.columns
@@ -160,7 +158,8 @@ angular.module('mitsiApp')
 				  //$scope.mesdatas.push(r);
 				  $scope.dataGrid.data.push(r);
 			  }
-				
+		      $scope.allReadyFetched = response.data.results.length;
+
 			  /*if($scope.dataGrid.data.length > 0) {
 				  $scope.dataGridApi.core.scrollTo(
 						  $scope.dataGrid.data[0],
@@ -179,20 +178,32 @@ angular.module('mitsiApp')
 			  console.warn( errorMessage );
 			  alert( errorMessage );
 		  });
-	});
+	};
 	
 	$scope.getDataDown = function() {
-		if(!$scope.dataGridSourceName) {
+		/*if(!$scope.dataGridSourceName) {
+			return;
+		}*/
+		if(!$rootScope.currentSource) {
+			return;
+		}
+		if(!$rootScope.currentSource.currentObject) {
 			return;
 		}
 		
+		$rootScope.currentSource.currentObject.id.schema
 	    var promise = $q.defer();
-	    sqlService.fetch($scope.dataGridSourceName, nbRowToFetch)
+		sqlService.getData(
+				$rootScope.currentSource.name, 
+				$rootScope.currentSource.currentObject.id.schema, 
+				$rootScope.currentSource.currentObject.id.name, 
+				$scope.allReadyFetched, 
+				$scope.nbRowToFetch)
 	    .success(function(response) {
 	    	
 	      //$scope.dataGridApi.infiniteScroll.saveScrollPercentage();
 		  var t = response.results;
-		  var noMoreData = (t.length==0 || t.length<nbRowToFetch);
+		  var noMoreData = (t.length==0 || t.length<$scope.nbRowToFetch);
 		  for(var i=0; i!=t.length; i++) {
 			  var r = {};
 			  r["num"] = $scope.dataGrid.data.length+1;
@@ -202,16 +213,31 @@ angular.module('mitsiApp')
 			  //$scope.mesdatas.push(r);
 			  $scope.dataGrid.data.push(r);
 		  }
+	      $scope.allReadyFetched = $scope.allReadyFetched+t.length;
           $scope.dataGridApi.infiniteScroll.dataLoaded(false, !noMoreData);
           promise.resolve();
 	    })
 	    .error(function(error) {
-	      $scope.gridApi.infiniteScroll.dataLoaded();
+	      $scope.dataGridApi.infiniteScroll.dataLoaded();
 	      promise.reject();
 	    });
 	    return promise.promise;
 		
 	}
+	
+	$scope.initGrid();
+	if($rootScope.currentSource &&
+		$rootScope.currentSource.currentObject) {
+		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject);
+	}
+
+	$scope.gridRefresh = false;
+	$scope.currentGridHeight = "300px";
+    $timeout(function() {
+    	// TODO : reste un bug : si on agrandit la fenetre, le nombre de lignes affichées n'évolue pas tant qu'on ne scrolle pas
+        $scope.dataGridApi.grid.queueGridRefresh();
+  	  //$scope.dataGridApi.grid.refreshRows();
+    }, 0);
 });
 
 /* recuperer la hauteur de la fenetre */

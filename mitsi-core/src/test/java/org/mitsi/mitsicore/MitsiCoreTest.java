@@ -19,6 +19,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
+import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -150,6 +151,21 @@ public class MitsiCoreTest {
 			assertTrue(lr != null);
 			assertTrue(lr==null || lr.size() > 0);
 		}		
+	}
+	
+	@Test
+	public void getData() throws SQLException, MitsiSecurityException {
+		try(MitsiConnection connection = datasourceManager.getConnection("LOCALHOST-TEST")) {
+			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2);
+			assertEquals(result.columns.get(0).name, "ID");
+			assertEquals(result.columns.get(1).name, "STR");
+			assertEquals(result.results.size(), 2);
+			
+			result = connection.getData("TEST", "TATA", 2, 2);
+			assertEquals(result.columns.get(0).name, "ID");
+			assertEquals(result.columns.get(1).name, "STR");
+			assertEquals(result.results.size(), 2);
+		}
 	}
 		
 }

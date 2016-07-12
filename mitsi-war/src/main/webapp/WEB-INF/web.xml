@@ -85,23 +85,13 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>RawSQLBeginServlet</display-name>
-    <servlet-name>RawSQLBeginServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.rawsql.RawSQLBeginServlet</servlet-class>
+    <display-name>GetDataServlet</display-name>
+    <servlet-name>GetDataServlet</servlet-name>
+    <servlet-class>org.mitsi.mitsiwar.data.GetDataServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>RawSQLBeginServlet</servlet-name>
-    <url-pattern>/RawSQLBeginServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>RawSQLFetchServlet</display-name>
-    <servlet-name>RawSQLFetchServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.rawsql.RawSQLFetchServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>RawSQLFetchServlet</servlet-name>
-    <url-pattern>/RawSQLFetchServlet</url-pattern>
+    <servlet-name>GetDataServlet</servlet-name>
+    <url-pattern>/GetDataServlet</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>
