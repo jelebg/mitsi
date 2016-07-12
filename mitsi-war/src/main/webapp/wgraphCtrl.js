@@ -1,8 +1,6 @@
 angular.module('mitsiApp')
     .controller('wgraphCtrl', function($scope, $rootScope, $timeout) {
 
-	$scope.mya = true;
-	$scope.tutu = "wgraph";
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
 	$scope.divPrefix = "mitsiObject_";
@@ -113,7 +111,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getTableLinksFrom = function(tableName) {
-		if(! $scope.currentSource) {
+		if(! $scope.currentSource ||
+				! $scope.currentSource.mitsiGraph) {
 			return;
 		}
 		var linkedTables = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
@@ -132,7 +131,8 @@ angular.module('mitsiApp')
 		return result;
 	}
 	$scope.getTableLinksTo = function(tableName) {
-		if(! $scope.currentSource) {
+		if(! $scope.currentSource||
+				! $scope.currentSource.mitsiGraph) {
 			return;
 		}
 		var linkedTables = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
@@ -270,7 +270,7 @@ angular.module('mitsiApp')
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
-			$scope.tablesInit();
+			$scope.removeAllTables();
 			$scope.displayProximityGraph(tableName);
 		}
 		
@@ -285,6 +285,8 @@ angular.module('mitsiApp')
 	
 	$scope.tablesInit = function() {
 		
+		//$scope.jsplumb.deleteEveryEndpoint();;
+		// TODO : hum ca ne sert surement à rien tout ça
 		$scope.jsplumb.detachEveryConnection();
 		for(var t in $scope.tables) {
 			$scope.jsplumb.remove($scope.divPrefix + t.name);
@@ -310,7 +312,9 @@ angular.module('mitsiApp')
 	
 	$scope.removeAllTables = function() {
 		for(var t in $scope.tables) {
-			$scope.jsplumb.remove($scope.divPrefix + t.name);
+			$scope.jsplumb.detachAllConnections($scope.divPrefix + t);
+			$scope.jsplumb.removeAllEndpoints($scope.divPrefix + t);
+			$scope.jsplumb.remove($scope.divPrefix + t);
 		}
 		$scope.tables = {};
 	}
@@ -319,7 +323,7 @@ angular.module('mitsiApp')
 		var depth = 1;
 		var name = currentVertexName;
 		
-		var graph = $rootScope.currentSource.mitsiGraph
+		var graph = $rootScope.currentSource.mitsiGraph;
 		var currentVertexIndex = graph.getIndex(currentVertexName);
 		var proximityGraph = graph.getProximityGraph(currentVertexIndex, depth);
 		
