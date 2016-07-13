@@ -81,6 +81,15 @@ angular.module('mitsiApp')
 					  break;
 				  }
 			  }
+			  source.filter = {
+					  hideTables:false,
+					  hideViews:false,
+					  hideMViews:false,
+					  tableName:true,
+					  columnName:true,
+					  indexName:true,
+					  constraintName:true
+			  };
 			  $scope.initGraph(source);
 			  
 		  }, function(errorMessage) {
@@ -117,18 +126,16 @@ angular.module('mitsiApp')
 		var objectName = object.id.name; 
 		var objectType = object.id.type; 
 		
-		if(source.filter) {
-			if(source.filter.hideTables===true && objectType=="table") {
-				return true;
-			}
-			if(source.filter.hideViews===true && objectType=="view") {
-				return true;
-			}
-			if(source.filter.hideMViews===true && objectType=="matview") {
-				return true;
-			}
+		if(source.filter.hideTables===true && objectType=="table") {
+			return true;
 		}
-		
+		if(source.filter.hideViews===true && objectType=="view") {
+			return true;
+		}
+		if(source.filter.hideMViews===true && objectType=="matview") {
+			return true;
+		}
+	
 		if(!source.searchObject) {
 			return false;
 		}
@@ -137,11 +144,14 @@ angular.module('mitsiApp')
 		if(filter.length == 0) {
 			return false;
 		}
-		if(objectName.toLowerCase().indexOf( filter ) !== -1) {
-			return false
+		
+		if(source.filter.tableName!== false) {
+			if(objectName.toLowerCase().indexOf( filter ) !== -1) {
+				return false
+			}
 		}
 		
-		if(object.columns) {
+		if(object.columns && source.filter.columnName!== false) {
 			for(var i=0; i!=object.columns.length; i++) {
 				var columnName=object.columns[i].name;
 				if(columnName.toLowerCase().indexOf( filter ) !== -1) {
@@ -150,7 +160,7 @@ angular.module('mitsiApp')
 			}
 		}
 				
-		if(object.constraints) {
+		if(object.constraints && source.filter.constraintName!== false) {
 			for(var i=0; i!=object.constraints.length; i++) {
 				var constraintName=object.constraints[i].name;
 				if(constraintName.toLowerCase().indexOf( filter ) !== -1) {
@@ -159,7 +169,7 @@ angular.module('mitsiApp')
 			}
 		}
 				
-		if(object.indexes) {
+		if(object.indexes && source.filter.indexName!== false) {
 			for(var i=0; i!=object.indexes.length; i++) {
 				var indexName=object.indexes[i].name;
 				if(indexName.toLowerCase().indexOf( filter ) !== -1) {
@@ -167,7 +177,6 @@ angular.module('mitsiApp')
 				}
 			}
 		}
-				
 		
 		return true;
 
