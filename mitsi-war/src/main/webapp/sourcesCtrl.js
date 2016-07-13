@@ -113,9 +113,9 @@ angular.module('mitsiApp')
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	
-	$scope.isObjectExcludedByFilter = function(id, source) {
-		var objectName = id.name; 
-		var objectType = id.type; 
+	$scope.isObjectExcludedByFilter = function(object, source) {
+		var objectName = object.id.name; 
+		var objectType = object.id.type; 
 		
 		if(source.filter) {
 			if(source.filter.hideTables===true && objectType=="table") {
@@ -137,8 +137,39 @@ angular.module('mitsiApp')
 		if(filter.length == 0) {
 			return false;
 		}
-		var name = objectName.toLowerCase();
-		return name.indexOf( filter ) === -1;
+		if(objectName.toLowerCase().indexOf( filter ) !== -1) {
+			return false
+		}
+		
+		if(object.columns) {
+			for(var i=0; i!=object.columns.length; i++) {
+				var columnName=object.columns[i].name;
+				if(columnName.toLowerCase().indexOf( filter ) !== -1) {
+					return false;
+				}
+			}
+		}
+				
+		if(object.constraints) {
+			for(var i=0; i!=object.constraints.length; i++) {
+				var constraintName=object.constraints[i].name;
+				if(constraintName.toLowerCase().indexOf( filter ) !== -1) {
+					return false;
+				}
+			}
+		}
+				
+		if(object.indexes) {
+			for(var i=0; i!=object.indexes.length; i++) {
+				var indexName=object.indexes[i].name;
+				if(indexName.toLowerCase().indexOf( filter ) !== -1) {
+					return false;
+				}
+			}
+		}
+				
+		
+		return true;
 
 	}
 	
