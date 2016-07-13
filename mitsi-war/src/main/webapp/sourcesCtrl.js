@@ -174,13 +174,19 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.selectSource = function(source) {
+		document.title = source.name;
+
 		$rootScope.currentSource = source;
 		if(! source.objects) {
 			$scope.refresh(source)
 		}
+		
+        $rootScope.$broadcast(EVENT_DATABASE_SELECTED, source);
 	}
 	
 	$scope.selectObject = function(source, object) {
+		document.title = source.name+" - "+object.id.name;
+
 		$rootScope.currentSource = source;
 		source.currentObject = object;
 		
