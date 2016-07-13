@@ -64,20 +64,22 @@ angular.module('mitsiApp')
 		}
 	}
 
-	$scope.refresh = function(source) {
-		if(!source.connected) {
+	$scope.refresh = function(source, schema) {
+		if(!source.connected) { // TODO : gerer les erreurs de connexion correctement
 			source.errorMessage = "my error";
 			source.errorDetails = "my details";
 			return;
 		}
 		
-		sourceService.getObjects(source.name, null)
+		sourceService.getObjects(source.name, schema)
 		  .then(function(response) {
 			  source.objects = response.data.databaseObjects;
 			  source.schemas = response.data.schemas;
+			  source.currentSchemaName = null;
+			  
 			  for(var i=0; i!=source.schemas.length; i++) {
-				  if(source.schemas[i].current) {
-					  source.currentSchema = source.schemas[i];
+				  if( source.schemas[i].current) {
+					  source.currentSchemaName = source.schemas[i].name;
 					  break;
 				  }
 			  }
@@ -187,7 +189,7 @@ angular.module('mitsiApp')
 
 		$rootScope.currentSource = source;
 		if(! source.objects) {
-			$scope.refresh(source)
+			$scope.refresh(source, null)
 		}
 		
         $rootScope.$broadcast(EVENT_DATABASE_SELECTED, source);

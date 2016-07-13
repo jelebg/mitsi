@@ -53,6 +53,11 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 					}
 				}
 			}
+			else {
+				for(Schema s : response.schemas) {
+					s.current = s.name.equals(schema);
+				}
+			}
 			boolean disableCaching = (request.disableCaching!=null && request.disableCaching==true);
 			
 			response.databaseObjects = connection.getTablesAndViews(schema, disableCaching);

@@ -1,10 +1,10 @@
 angular.module('mitsiApp')
 .service( 'sourceService', function($http) {
-	this.connectDatasource = function(datasourceName) {
+	this.connectDatasource = function(datasourceName) { // TODO : a supprimer
 		return $http.post('ConnectServlet', { "datasourceName" : datasourceName });
 	}
 
-	this.disconnectDatasource = function(datasourceName) {
+	this.disconnectDatasource = function(datasourceName) { // TODO : a supprimer
 		return $http.post('DisconnectServlet', { "datasourceName" : datasourceName });
 	}
 	
@@ -12,7 +12,7 @@ angular.module('mitsiApp')
 		return $http.post('GetDatabaseObjectsServlet', { 
 			"datasourceName" : datasourceName,
 			"schema" : schema,
-			"disableCaching" : true
+			"disableCaching" : true // TODO : a supprimer
 		});
 	}
 

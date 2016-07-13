@@ -54,7 +54,7 @@
 	        <!--  i class="pull-right glyphicon" 
 	           ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i -->
              
-            <a href=""  ng-click="refresh(s); $event.stopPropagation();">
+            <a href=""  ng-click="refresh(s, s.currentSchemaName); $event.stopPropagation();">
 	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
             </a>
             <br/>
@@ -83,8 +83,8 @@
            	    </li>
               </ul>
 	        </div -->
-	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" style="width:100%">
-	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " ng-selected="schema.current">
+	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
+	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
 					{{ schema.name }}
            	    </option>
               </ul>
