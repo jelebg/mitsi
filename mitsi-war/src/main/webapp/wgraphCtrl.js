@@ -18,6 +18,7 @@ angular.module('mitsiApp')
 	}
 	
 
+	// TODO : supprimer
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
 		// TODO : refaire avec un proximity graph
 		if($scope.existsTable(tableName)) {
@@ -35,11 +36,13 @@ angular.module('mitsiApp')
 			for(var i=0; i!=links.length; i++) {
 				var link = links[i];
 				rtable = link.targetName;
-				fkList.push({
-					fromTable:tableName,
-					fromColumns:link.properties.keyColumns,
-					toTable:link.targetName,
-					toColumns:link.properties.keyColumns});
+				if(link.targetName in $scope.tables && tableName in $scope.tables) {
+					fkList.push({
+						fromTable:tableName,
+						fromColumns:link.properties.keyColumns,
+						toTable:link.targetName,
+						toColumns:link.properties.keyColumns});
+				} 
 			}
 		}
 		
@@ -48,11 +51,13 @@ angular.module('mitsiApp')
 			for(var i=0; i!=rlinks.length; i++) {
 				var link = rlinks[i];
 				rtable2 = $rootScope.currentSource.mitsiGraph.getVertexName(link.target);
-				fkList.push({
-					fromTable:rtable2,
-					fromColumns:link.properties.keyColumns,
-					toTable:tableName,
-					toColumns:link.properties.keyColumns});
+				if(rtable2 in $scope.tables && tableName in $scope.tables) {
+					fkList.push({
+						fromTable:rtable2,
+						fromColumns:link.properties.keyColumns,
+						toTable:tableName,
+						toColumns:link.properties.keyColumns});
+				}
 			}
 		}
 		
@@ -154,6 +159,14 @@ angular.module('mitsiApp')
 	$scope.fk = function(from, to, columnsFrom, columnsTo) {
 		var autoCycle = (from==to);
 		
+		if($scope.jsplumb.select({source:$scope.divPrefix+from, target:$scope.divPrefix+to}).length > 0) {
+			// TODO : checker qu'on est bien sur les meme champs en récupérant les labels
+			//console.log("allready connected : "+from+" to "+to);
+			return;
+		};
+		
+		console.log("connect "+from+" to "+to);
+		
 		if(autoCycle) {
 			try {
 				$scope.jsplumb.addEndpoint($scope.divPrefix+from, 
@@ -201,6 +214,7 @@ angular.module('mitsiApp')
 						[ "Label", { label:columnsFrom, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
 						,[ "Label", { label:columnsTo, location:0.7, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
 					  ]
+			    	,detachable:false
 				});
 			}
 			catch(e) {
@@ -229,6 +243,7 @@ angular.module('mitsiApp')
 					[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
 					,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
 				  ]
+		    	,detachable:false
 			});
 		}
 		if(connection) {
@@ -296,7 +311,9 @@ angular.module('mitsiApp')
 	}
 
 	$scope.appendTable = function(left, top, tableName) {
-		$scope.tables[tableName] = {name:tableName, x:left, y:top };
+		if(!(tableName in $scope.tables)) {
+			$scope.tables[tableName] = {name:tableName, x:left, y:top };
+		}
 	}
 	
 	$scope.existsTable = function(tableName) {
@@ -322,6 +339,8 @@ angular.module('mitsiApp')
 	$scope.displayProximityGraph = function(currentVertexName) {
 		var depth = 1;
 		var name = currentVertexName;
+		var existingTables = [];
+		var appendedTables = [];
 		
 		var graph = $rootScope.currentSource.mitsiGraph;
 		var currentVertexIndex = graph.getIndex(currentVertexName);
@@ -336,68 +355,93 @@ angular.module('mitsiApp')
 			if(max > maxmax) {
 				maxmax = max;
 			}
-			var r = (i+1)*Math.max(250, maxmax * 50);
+			var r = (i+1)*Math.max(100, maxmax * 30);
 			radiu[i] = r;
 		}
-		var x0 = radiu[depth-1];
-		var y0 = radiu[depth-1];
+		var x0 = radiu[depth-1]+100;
+		var y0 = radiu[depth-1]+50;
+		if(name in $scope.tables) {
+			var tdiv = document.getElementById($scope.divPrefix+name);
+			x0 = tdiv.offsetLeft;
+			y0 = tdiv.offsetTop;
+			existingTables.push(name);
+		}
+		else {
+			$scope.appendTable(x0+40, y0+20, name);
+			appendedTables.push(name);
+		}
 		
 		// append tables
-		$scope.appendTable(x0+40, y0+20, name);
 		for(var i=0; i!=depth; i++) {
 			for(var j=0; j!=proximityGraph.before[i].length; j++) {
 				var index = proximityGraph.before[i][j];
 				var vertexName = graph.getVertexName(index);
-				$scope.appendTable( 
-						x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3)), 
-						y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3)), 
-						vertexName);
+				if(vertexName in $scope.tables) {
+					existingTables.push(vertexName);
+				}
+				else {
+					$scope.appendTable( 
+							Math.max(0, x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
+							Math.max(0, y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
+							vertexName);
+					appendedTables.push(vertexName);
+				}
 			}
 			for(var j=0; j!=proximityGraph.after[i].length; j++) {
 				var index = proximityGraph.after[i][j];
 				var vertexName = graph.getVertexName(index);
-				$scope.appendTable( 
-						x0+80+radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.after[i].length+3)), 
-						y0+40-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.after[i].length+3)), 
-						vertexName);
+				if(vertexName in $scope.tables) {
+					existingTables.push(vertexName);
+				}
+				else {
+					$scope.appendTable( 
+							Math.max(0, x0+80+radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
+							Math.max(0, y0+40-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
+							vertexName);
+					appendedTables.push(vertexName);
+				}
 			}
 		}
 		
 		// append links between tables
+		// TODO : verifier qu'on n'ajoute pas deux fois la même FK
 		var fklist = [];
-		$scope.appendVertexLinks(graph, fklist, graph.getVertex(currentVertexIndex));
+		$scope.appendVertexLinks(graph, fklist, graph.getVertex(currentVertexIndex), existingTables);
 		for(var i=0; i!=depth; i++) {
 			for(var j=0; j!=proximityGraph.before[i].length; j++) {
 				var index = proximityGraph.before[i][j];
 				var vertex = graph.getVertex(index);
-				$scope.appendVertexLinks(graph, fklist, vertex);
+				$scope.appendVertexLinks(graph, fklist, vertex, existingTables);
 			}
 			for(var j=0; j!=proximityGraph.after[i].length; j++) {
 				var index = proximityGraph.after[i][j];
 				var vertex = graph.getVertex(index);
-				$scope.appendVertexLinks(graph, fklist, vertex);
+				$scope.appendVertexLinks(graph, fklist, vertex, existingTables);
 			}
 		}
 		
 		$scope.appendFKList(fklist);
 	}
 	
-	$scope.appendVertexLinks = function(graph, fklist, vertex) {
-		var missingLinks = []; 
+	$scope.appendVertexLinks = function(graph, fklist, vertex, existingTables) {
+		//var missingLinks = []; // TODO : lue seulement. a supprimer ?
 		
 		for(var i=0; i!=vertex.links.length; i++) {
 			var l = vertex.links[i];
 			var targetVertexName = graph.getVertexName(l.target);
 			
-			if($scope.existsTable(targetVertexName)==null) {
-				missingLinks.push(targetVertexName);
-			}
-			else {
-				fklist.push({
+			//if($scope.existsTable(targetVertexName)==null) {
+			//	missingLinks.push(targetVertexName);
+			//}
+			//else {
+			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
+				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
+					fklist.push({
 						fromTable:vertex.name,
 						fromColumns:l.properties.keyColumns,
 						toTable:targetVertexName,
 						toColumns:l.properties.rKeyColumns});
+				}
 			}
 		}
 
@@ -405,15 +449,18 @@ angular.module('mitsiApp')
 			var l = vertex.reverseLinks[i];
 			var targetVertexName = graph.getVertexName(l.target);
 			
-			if($scope.existsTable(targetVertexName)==null) {
-				missingLinks.push(targetVertexName);
-			}
-			else {
-				fklist.push({
-					fromTable:targetVertexName,
-					fromColumns:l.properties.keyColumns,
-					toTable:vertex.name,
-					toColumns:l.properties.rKeyColumns});
+			//if($scope.existsTable(targetVertexName)==null) {
+			//	missingLinks.push(targetVertexName);
+			//}
+			//else {
+			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
+				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
+					fklist.push({
+						fromTable:targetVertexName,
+						fromColumns:l.properties.keyColumns,
+						toTable:vertex.name,
+						toColumns:l.properties.rKeyColumns});
+				}
 			}
 		}
 	}

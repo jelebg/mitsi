@@ -73,11 +73,21 @@
 		    </span>
 		 </td>
 		 <td style="padding-right:6px;">
+		     <a href="" 
+		        ng-disabled="getTableLinksTo(t.name)==0 && getTableLinksFrom(t.name)==0"
+		        ng-click="displayProximityGraph(t.name)">
+			 	<i class="glyphicon glyphicon-asterisk"></i>
+			 </a>
+		 </td>
+		 <td style="padding-right:6px;">
+		 	<i class="glyphicon glyphicon-info-sign"></i>
+		 </td>
+		 <!-- td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-ok-circle"></i>
 		 </td>
 		 <td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-comment"></i>
-		 </td>
+		 </td-->
 	 </tr></table>
 	 
 </div>
