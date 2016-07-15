@@ -36,7 +36,7 @@
 		      <a href="" 
 		         dropdown-toggle 
 		         id="dropdown-tables-from-{{ t.name }}"
-		         ng-disabled="getTableLinksFrom(t.name)==0"
+		         ng-disabled="hasTableMissingLinks(t.name, true, false)==false"
 		         class="mitsiMenuGlyphicon"
 		      >
 		        <i class="glyphicon glyphicon-log-in"></i>
@@ -57,7 +57,7 @@
 		      <a href="" 
 		         dropdown-toggle 
 		         id="dropdown-tables-to-{{ t.name }}"
-		         ng-disabled="getTableLinksTo(t.name)==0"
+		         ng-disabled="hasTableMissingLinks(t.name, false, true)==false"
 		         class="mitsiMenuGlyphicon"
 		         >
 		        <i class="glyphicon glyphicon-log-out"></i>
@@ -74,7 +74,7 @@
 		 </td>
 		 <td style="padding-right:6px;">
 		     <a href="" 
-		        ng-disabled="getTableLinksTo(t.name)==0 && getTableLinksFrom(t.name)==0"
+		        ng-class="{'anchorDisabled':hasTableMissingLinks(t.name, true, true)==false}"
 		        ng-click="displayProximityGraph(t.name)">
 			 	<i class="glyphicon glyphicon-asterisk"></i>
 			 </a>

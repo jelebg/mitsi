@@ -156,6 +156,40 @@ angular.module('mitsiApp')
 		return result;
 	}
 	
+	$scope.hasTableMissingLinks = function(tableName, checkFrom, checkTo) {
+		if(! $scope.currentSource||
+				! $scope.currentSource.mitsiGraph) {
+			return false;
+		}
+		
+		var linkedTables = null;
+		if(checkTo) {
+			linkedTables = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
+			if(linkedTables != null) {
+				for(var i=0; i!=linkedTables.length; i++) {
+					var t = linkedTables[i];
+					if(! (t.targetName in $scope.tables)) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		if(checkFrom) {		
+			linkedTables = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
+			if(linkedTables != null) {
+				for(var i=0; i!=linkedTables.length; i++) {
+					var t = linkedTables[i];
+					if(! (t.targetName in $scope.tables)) {
+						return true;
+					}
+				}
+			}		
+		}
+	
+		return false;
+	}
+
 	$scope.fk = function(from, to, columnsFrom, columnsTo) {
 		var autoCycle = (from==to);
 		

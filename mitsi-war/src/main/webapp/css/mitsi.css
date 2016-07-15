@@ -164,3 +164,14 @@
 	filter: grayscale(100%),;
 	filter: opacity(40%);
 }
+
+.anchorDisabled {
+  cursor: default;
+  color : grey;
+}
+.anchorDisabled:hover {
+  cursor: default;
+  color : grey;
+}
+
+
