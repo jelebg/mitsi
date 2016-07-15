@@ -5,6 +5,8 @@ angular.module('mitsiApp')
 	$scope.jsplumbContainer = null;
 	$scope.divPrefix = "mitsiObject_";
 	$scope.tables = {};
+	$scope.tablesTemporary = [];
+	$scope.hideProximityGraphTimeoutPromise = null;
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -199,8 +201,6 @@ angular.module('mitsiApp')
 			return;
 		};
 		
-		console.log("connect "+from+" to "+to);
-		
 		if(autoCycle) {
 			try {
 				$scope.jsplumb.addEndpoint($scope.divPrefix+from, 
@@ -325,11 +325,28 @@ angular.module('mitsiApp')
 		
 	});
 	
-	$scope.mouseOverDiv = function() {
+	$scope.mouseOverDiv = function(table) {
 		this.showIcons = true;
+		
+		if($scope.hideProximityGraphTimeoutPromise != null) {
+			$timeout.cancel($scope.hideProximityGraphTimeoutPromise);
+			$scope.hideProximityGraphTimeoutPromise = null;
+		}
+		if($scope.hasTableMissingLinks(table.name, true, true)) {
+			$scope.displayProximityGraph(table.name, true);
+		}
 	}
-	$scope.mouseLeaveDiv = function() {
+	$scope.mouseLeaveDiv = function(table) {
 		this.showIcons = false;
+
+		if($scope.hideProximityGraphTimeoutPromise != null) {
+			$timeout.cancel($scope.hideProximityGraphTimeoutPromise);
+			$scope.hideProximityGraphTimeoutPromise = null;
+		}
+		$scope.hideProximityGraphTimeoutPromise = $timeout(function() {
+			$scope.hideProximityGraph();
+		}, 3000);
+
 	}
 	
 	$scope.tablesInit = function() {
@@ -370,7 +387,16 @@ angular.module('mitsiApp')
 		$scope.tables = {};
 	}
 	
-	$scope.displayProximityGraph = function(currentVertexName) {
+	$scope.hideProximityGraph = function() {
+		
+		for(var i=0; i!=$scope.tablesTemporary.length; i++) {
+			$scope.removeTable($scope.tablesTemporary[i]);
+		}
+		
+		$scope.tablesTemporary = [];
+	}
+	
+	$scope.displayProximityGraph = function(currentVertexName, temporary) {
 		var depth = 1;
 		var name = currentVertexName;
 		var existingTables = [];
@@ -418,6 +444,9 @@ angular.module('mitsiApp')
 							Math.max(0, x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
 							Math.max(0, y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
 							vertexName);
+					if(temporary===true) {
+						$scope.tablesTemporary.push(vertexName);
+					}
 					appendedTables.push(vertexName);
 				}
 			}
@@ -432,6 +461,9 @@ angular.module('mitsiApp')
 							Math.max(0, x0+80+radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
 							Math.max(0, y0+40-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
 							vertexName);
+					if(temporary===true) {
+						$scope.tablesTemporary.push(vertexName);
+					}
 					appendedTables.push(vertexName);
 				}
 			}
