@@ -387,6 +387,18 @@ angular.module('mitsiApp')
 		$scope.tables = {};
 	}
 	
+	$scope.pinTemporaryTable = function(tableName) {
+		var i = $scope.tablesTemporary.indexOf(tableName);
+		if(i >= 0) {
+			$scope.tablesTemporary.splice(i, 1);
+		}
+		
+	}
+
+	$scope.isTableTemporary = function(tableName) {
+		return $scope.tablesTemporary.indexOf(tableName)!=-1;
+	}
+	
 	$scope.hideProximityGraph = function() {
 		
 		for(var i=0; i!=$scope.tablesTemporary.length; i++) {

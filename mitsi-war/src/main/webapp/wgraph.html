@@ -23,7 +23,7 @@
 	 >
 	 {{ t.name }}
 	 <a href=""
-	    ng-show="showIcons" 
+	    ng-show="showIcons && !isTableTemporary(t.name)" 
 	    ng-click="removeTable(t.name)">
 		 <i class="glyphicon glyphicon-remove-circle" 
 		    style="position:absolute;top:-8px;right:-8px;"></i>
@@ -31,6 +31,13 @@
 	 <table 
 	 	     ng-show="showIcons"
 	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
+		 <td style="padding-right:6px;">
+		     <a href="" 
+		        ng-show="isTableTemporary(t.name)"
+		        ng-click="pinTemporaryTable(t.name)">
+			 	<i class="glyphicon glyphicon-pushpin"></i>
+			 </a>
+		 </td>
 	 	 <td style="padding-right:6px;">
 	 	 	<span dropdown> 
 		      <a href="" 
