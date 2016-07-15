@@ -15,6 +15,7 @@
 
 <div ng-repeat="(tableName, t) in tables"
      id="{{divPrefix+t.name}}"
+     ng-class="{'linksTableTemporary':isTableTemporary(t.name)}"
 	 class="linksTable"
 	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;"
 	 draggable
@@ -23,8 +24,8 @@
 	 >
 	 {{ t.name }}
 	 <a href=""
-	    ng-show="showIcons && !isTableTemporary(t.name)" 
-	    ng-click="removeTable(t.name)">
+	    ng-show="showIcons" 
+	    ng-click="removeTable(t.name, true)">
 		 <i class="glyphicon glyphicon-remove-circle" 
 		    style="position:absolute;top:-8px;right:-8px;"></i>
 	 </a>
@@ -38,7 +39,7 @@
 			 	<i class="glyphicon glyphicon-pushpin"></i>
 			 </a>
 		 </td>
-	 	 <td style="padding-right:6px;">
+	 	 <!-- td style="padding-right:6px;">
 	 	 	<span dropdown> 
 		      <a href="" 
 		         dropdown-toggle 
@@ -85,7 +86,7 @@
 		        ng-click="displayProximityGraph(t.name)">
 			 	<i class="glyphicon glyphicon-asterisk"></i>
 			 </a>
-		 </td>
+		 </td-->
 		 <td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-info-sign"></i>
 		 </td>

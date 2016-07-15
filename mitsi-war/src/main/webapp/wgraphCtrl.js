@@ -373,9 +373,17 @@ angular.module('mitsiApp')
 	}
 
 	
-	$scope.removeTable = function(tableName) {
+	$scope.removeTable = function(tableName, withTemporary) {
 		$scope.jsplumb.remove($scope.divPrefix + tableName);
-		delete $scope.tables[tableName];		
+		delete $scope.tables[tableName];	
+		
+		if(withTemporary===true) {
+			var i = $scope.tablesTemporary.indexOf(tableName);
+			if(i >= 0) {
+				$scope.tablesTemporary.splice(i, 1);
+			}
+		}
+
 	}
 	
 	$scope.removeAllTables = function() {

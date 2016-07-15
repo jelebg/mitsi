@@ -122,6 +122,14 @@
 	padding-left:5px;
 	padding-right:5px;
 }
+.linksTableTemporary {
+	text-align:center;
+    background-color: #c6c6ff; 
+	border-radius:6px;
+	padding:4px;
+	padding-left:5px;
+	padding-right:5px;
+}
 
 .linksTableHighlight {
 	text-align:center;
