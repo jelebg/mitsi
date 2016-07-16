@@ -7,6 +7,8 @@ angular.module('mitsiApp')
 	$scope.tables = {};
 	$scope.tablesTemporary = [];
 	$scope.hideProximityGraphTimeoutPromise = null;
+
+	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 3000;
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -233,11 +235,11 @@ angular.module('mitsiApp')
 					uuids : [ $scope.divPrefix+to+"ToUUID", $scope.divPrefix+from+"FromUUID" ]
 				    ,paintStyle:{ 
 				    	strokeStyle:"lightgrey", 
-				    	lineWidth:2
+				    	lineWidth:3
 				    }
 			    	,hoverPaintStyle:{ 
 			    		strokeStyle:"black", 
-			    	    lineWidth:3
+			    	    lineWidth:4
 			    	}
 			    	,endpointStyle:{ 
 			    		fillStyle:"lightgrey", 
@@ -262,17 +264,18 @@ angular.module('mitsiApp')
 				target:$scope.divPrefix+to
 			    ,paintStyle:{ 
 			    	strokeStyle:"lightgrey", 
-			    	lineWidth:2
+			    	lineWidth:3
 			    }
 		    	,hoverPaintStyle:{ 
 		    		strokeStyle:"black", 
-		    	    lineWidth:3
+		    	    lineWidth:4
 		    	}
 		    	,endpointStyle:{ 
 		    		fillStyle:"lightgrey", 
 		    		outlineWidth:1 
 		    	}
 		    	,anchor: [ "Right", "Left" ]
+		    	,connector: [ "Bezier", { curviness:50 } ]
 				,overlays:[ "Arrow", 
 					[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
 					,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
@@ -336,7 +339,7 @@ angular.module('mitsiApp')
 			$scope.displayProximityGraph(table.name, true);
 		}
 	}
-	$scope.mouseLeaveDiv = function(table) {
+	$scope.mouseLeaveDiv = function() {
 		this.showIcons = false;
 
 		if($scope.hideProximityGraphTimeoutPromise != null) {
@@ -345,7 +348,7 @@ angular.module('mitsiApp')
 		}
 		$scope.hideProximityGraphTimeoutPromise = $timeout(function() {
 			$scope.hideProximityGraph();
-		}, 3000);
+		}, $scope.TEMPORARY_TABLE_HIDE_TIMEOUT);
 
 	}
 	
@@ -382,6 +385,7 @@ angular.module('mitsiApp')
 			if(i >= 0) {
 				$scope.tablesTemporary.splice(i, 1);
 			}
+			$scope.mouseLeaveDiv()
 		}
 
 	}
@@ -435,10 +439,10 @@ angular.module('mitsiApp')
 			if(max > maxmax) {
 				maxmax = max;
 			}
-			var r = (i+1)*Math.max(100, maxmax * 30);
+			var r = (i+1)*Math.max(150, maxmax * 30);
 			radiu[i] = r;
 		}
-		var x0 = radiu[depth-1]+100;
+		var x0 = radiu[depth-1]+200;
 		var y0 = radiu[depth-1]+50;
 		if(name in $scope.tables) {
 			var tdiv = document.getElementById($scope.divPrefix+name);
