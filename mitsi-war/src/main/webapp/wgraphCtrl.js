@@ -7,6 +7,8 @@ angular.module('mitsiApp')
 	$scope.tables = {};
 	$scope.tablesTemporary = [];
 	$scope.hideProximityGraphTimeoutPromise = null;
+	$scope.sqlTables = [];
+	$scope.sqlText = [];
 
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 3000;
 	
@@ -277,8 +279,12 @@ angular.module('mitsiApp')
 		    	,anchor: [ "Right", "Left" ]
 		    	,connector: [ "Bezier", { curviness:50 } ]
 				,overlays:[ "Arrow", 
-					[ "Label", { label:columnsFrom, location:0.2, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
-					,[ "Label", { label:columnsTo, location:0.8, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
+					[ "Label", { label:columnsFrom, location:0.2,
+						labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}
+					} ] 
+					,[ "Label", { label:columnsTo, location:0.8,
+						labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}
+					} ]
 				  ]
 		    	,detachable:false
 			});
@@ -555,6 +561,35 @@ angular.module('mitsiApp')
 		}
 	}
 	
+	$scope.removeAllTablesInSQL = function() {
+		$scope.sqlTables = [];
+		$scope.updateSQLText();
+	}
+	
+	$scope.toggleTableInSQL = function(table) {
+		var i = $scope.sqlTables.indexOf(table.name);
+		if(i == -1) {
+			$scope.sqlTables.push(table.name);
+		}
+		else {
+			$scope.sqlTables.splice(i);
+		}
+		$scope.updateSQLText();
+	}
+	
+	$scope.isTableInSQL = function(table) {
+		return $scope.sqlTables.indexOf(table.name) != -1;
+	}
+	
+	$scope.updateSQLText = function() {
+		$scope.sqlText = "";
+		if($scope.sqlTables.length == 0) {
+			return;
+		}
+		
+		$scope.sqlText = $scope.sqlTables;
+	}
+	
 	
 	$scope.jsplumbInit();
 	$scope.tablesInit();
@@ -564,10 +599,6 @@ angular.module('mitsiApp')
 			&& $rootScope.currentSource.currentObject.id) {
 		tableName = $rootScope.currentSource.currentObject.id.schema+"."+$rootScope.currentSource.currentObject.id.name;
 		$scope.displayProximityGraph(tableName);
-	}
-	else {
-		$scope.appendTable(100, 100, "O_o");
-	
 	}
 	
 

@@ -182,4 +182,19 @@
   color : grey;
 }
 
-
+.tableActionLabel {
+	background-color:grey;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	border-radius:2px;
+	vertical-align:top;"	
+}
+.tableActionLabelSelected {
+	background-color:#b100f4;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	border-radius:2px;
+	vertical-align:top;"	
+}

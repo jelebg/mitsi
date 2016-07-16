@@ -8,10 +8,22 @@
 	<pre>{{ mestables | json }}</pre>
 	<br/>
  -->
-	
+ <div style="position:absolute">
+  <div style="z-index:2;font-familly:Monospace;color:#707070;font-weight: bold;position:relative;top:5px;left:5px;">
+  <span ng-repeat="text in sqlText">{{ text }}<br/></span>
+  <span style="background-color:grey;font-weight:bold;padding-left:2px;padding-right:2px;border-radius:2px;"
+  	    ng-show="sqlText.length > 0"
+  		ng-click="removeAllTablesInSQL();">
+  	<a href=""  
+  	   style="color:white;"
+  	   >clear</a>
+  </span>
+  </div>
+
 <div id="jsPlumbContainer" 
-     style="position:relative;width:200px;height:200px;"
+     style="position:absolute;top:0px;width:200px;height:200px;"
      >
+     
 
 <div ng-repeat="(tableName, t) in tables"
      id="{{divPrefix+t.name}}"
@@ -90,6 +102,16 @@
 		 <td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-info-sign"></i>
 		 </td>
+		 <td style="padding-right:6px;">
+		   <span 
+		   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
+		   		>
+		  	<a href=""  
+		  	   style="color:white;font-size:65%;vertical-align:middle;"
+		  	   ng-click="toggleTableInSQL(t)"
+		  	   >SQL</a>
+		  	</span>
+		 </td>		 
 		 <!-- td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-ok-circle"></i>
 		 </td>
@@ -99,5 +121,5 @@
 	 </tr></table>
 	 
 </div>
-
+</div>
 </div>
