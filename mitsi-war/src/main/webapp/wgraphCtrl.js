@@ -613,7 +613,7 @@ angular.module('mitsiApp')
 				}
 				if(link.found!="isolate") {
 					$scope.sqlText.push(
-							  "join "+(link.found=="from"?link.toName:link.toName)
+							  "join "+(link.found=="to"?link.fromName:link.toName)
 							+ " on ("
 							+ $scope.getJoinConditionFromColumns(link.fromName, link.toName, link.fromKeyColumns, link.toKeyColumns)
 							+")");
