@@ -573,10 +573,17 @@ angular.module('mitsiApp')
 		var i = $scope.sqlTables.indexOf(table.name);
 		if(i == -1) {
 			$scope.sqlTables.push(table.name);
+			
+			i = $scope.tablesTemporary.indexOf(table.name);
+			if(i != -1) {
+				$scope.tablesTemporary.splice(i, 1);
+			}
 		}
 		else {
-			$scope.sqlTables.splice(i);
+			$scope.sqlTables.splice(i, 1);
 		}
+
+		
 		$scope.updateSQLText();
 	}
 	

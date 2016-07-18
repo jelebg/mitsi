@@ -1,3 +1,7 @@
+.mitsiHidden {
+	visibility: hidden;
+}
+
 .mitsiFilter
 { 
     border: 1;

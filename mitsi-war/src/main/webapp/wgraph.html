@@ -42,7 +42,6 @@
 		    style="position:absolute;top:-8px;right:-8px;"></i>
 	 </a>
 	 <table 
-	 	     ng-show="showIcons"
 	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
 		 <td style="padding-right:6px;">
 		     <a href="" 
@@ -99,10 +98,14 @@
 			 	<i class="glyphicon glyphicon-asterisk"></i>
 			 </a>
 		 </td-->
-		 <td style="padding-right:6px;">
+		 <td style="padding-right:6px;"
+		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
+		 >
 		 	<i class="glyphicon glyphicon-info-sign"></i>
 		 </td>
-		 <td style="padding-right:6px;">
+		 <td style="padding-right:6px;"
+		     ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
+		 >
 		   <span 
 		   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
 		   		>
