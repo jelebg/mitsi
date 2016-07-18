@@ -391,7 +391,7 @@ angular.module('mitsiApp')
 			if(i >= 0) {
 				$scope.tablesTemporary.splice(i, 1);
 			}
-			$scope.mouseLeaveDiv()
+			$scope.mouseLeaveDiv();
 		}
 
 	}
@@ -605,11 +605,34 @@ angular.module('mitsiApp')
 					$scope.sqlText.push((i==0 ? "FROM" : ",")+" "+link.fromName);
 				}
 				if(link.found!="isolate") {
-					$scope.sqlText.push("join "+(link.found=="from"?link.toName:link.toName)+ " on ("+link.fromKeyColumns+" = "+link.toKeyColumns+")");
+					$scope.sqlText.push(
+							  "join "+(link.found=="from"?link.toName:link.toName)
+							+ " on ("
+							+ $scope.getJoinConditionFromColumns(link.fromName, link.toName, link.fromKeyColumns, link.toKeyColumns)
+							+")");
 				}
 				
 			}
 		}
+	}
+	
+	$scope.getJoinConditionFromColumns = function(fromName, toName, fromKeyColumns, toKeyColumns) {
+		var froms = fromKeyColumns.split(",");
+		var tos = toKeyColumns.split(",");
+		
+		var condition = "";
+		var first = true;
+		for(var i=0; i!=froms.length; i++) {
+			if(first == true) {
+				first = false;
+			}
+			else {
+				condition = condition + " and ";
+			}
+			condition = condition + fromName + "." + froms[i] + " = " + toName + "." + tos[i];
+		}
+		
+		return condition;
 	}
 	
 	$scope.getConnectedSubGroups = function(tableNames) {
