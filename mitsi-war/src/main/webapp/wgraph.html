@@ -29,7 +29,7 @@
      id="{{divPrefix+t.name}}"
      ng-class="{'linksTableTemporary':isTableTemporary(t.name)}"
 	 class="linksTable"
-	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;"
+	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:120px;cursor:default;"
 	 draggable
 	 ng-mouseover="mouseOverDiv(t)"
 	 ng-mouseleave="mouseLeaveDiv()"

@@ -448,7 +448,7 @@ angular.module('mitsiApp')
 			if(max > maxmax) {
 				maxmax = max;
 			}
-			var r = (i+1)*Math.max(150, maxmax * 30);
+			var r = (i+1)*Math.max(170, maxmax * 30);
 			radiu[i] = r;
 		}
 		var x0 = radiu[depth-1]+200;
