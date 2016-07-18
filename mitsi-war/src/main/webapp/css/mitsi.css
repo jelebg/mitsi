@@ -202,3 +202,7 @@
 	border-radius:2px;
 	vertical-align:top;"	
 }
+
+.objectPinSelected {
+	color : #00ce00;
+}
