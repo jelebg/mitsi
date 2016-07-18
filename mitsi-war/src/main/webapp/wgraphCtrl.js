@@ -403,6 +403,9 @@ angular.module('mitsiApp')
 			$scope.jsplumb.remove($scope.divPrefix + t);
 		}
 		$scope.tables = {};
+		$scope.tablesTemporary = [];
+		$scope.sqlTables = [];
+		$scope.sqlText = [];
 	}
 	
 	$scope.pinTemporaryTable = function(tableName) {
@@ -595,89 +598,119 @@ angular.module('mitsiApp')
 		}
 		for(var i=0; i!=connectedSubGroups.length; i++) {
 			var subGroup = connectedSubGroups[i];
-			$scope.sqlText.push(subGroup.join(","));
+			
+			//$scope.sqlText.push(subGroup.join(","));
+			$scope.sqlText.push(subGroup.map(function(sg){
+			    return "("+sg.fromName+","+sg.toName+","+sg.fromkeyColumns+","+sg.toKeyColumns+","+sg.found+")";
+			}).join(","));
 		}
 	}
 	
-	// TODO : mettre la gestion des sous-graphes et de connected components dans mitsi.graph.js ??
 	$scope.getConnectedSubGroups = function(tableNames) {
-		// should be vertices sorry for that
-		var vertexes = [];
 		var graph = $scope.currentSource.mitsiGraph;
-		var vertexIndexMapping = {};
+		var links = [];
+		var currentSubGroup = [];
+		var subGroups = [];
+		var tablesWithLinks = {};
 		
 		for(var i=0; i!=tableNames.length; i++) {
-			var vertexIndex = graph.getIndex(tableNames[i]);
-			vertexIndexMapping[vertexIndex] = i;
-		}
-		
-		for(var i=0; i!=tableNames.length; i++) {
-			var vertexIndex = graph.getIndex(tableNames[i]);
-			var vertexInnnerConnections = []; 
-			var vertexConnections = graph.getLinks(vertexIndex);
-		
+			var tableName = tableNames[i];
+			var vertexConnections = graph.getLinksByName(tableName);
 			for(var j=0; j!=vertexConnections.length; j++) {
 				var vertexConnection = vertexConnections[j];
-				if(tableNames.indexOf(vertexConnection.targetName) != -1) {
-					var targetIndex = vertexConnection.target;
-					
-					// ignore auto-loop
-					if(targetIndex==vertexIndex) {
-						continue;
-					}
-					
-					if(vertexInnnerConnections.indexOf(targetIndex) == -1) {
-						vertexInnnerConnections.push(vertexIndexMapping[vertexConnection.target]);
-					}
-				}
-			}
-			
-			vertexes.push({ group:i, index:vertexIndex, innerConnections:vertexInnnerConnections});
-		}
-		for(var i=0; i!=vertexes.length; i++) {
-			// simple algo, not the most efficient
-			var vertex = vertexes[i];
-			
-			for(var j=0; j!=vertex.innerConnections.length; j++) {
-				var connection = vertex.innerConnections[j];
+				var targetName = vertexConnection.targetName;
 				
-				var connectedVertexGroup = vertexes[connection].group;
-				if(connectedVertexGroup != vertex.group) {
-					for(var k=0; k!=vertexes.length; k++) {
-						var v2 = vertexes[k];
-						if(v2.group == connectedVertexGroup) {
-							v2.group = vertex.group;
-						}
-					}
+				// ignore auto-loop 
+				if(targetName==tableName) {
+					continue;
 				}
 				
+				// ignore where link does not concern one of the selected tables
+				if(tableNames.indexOf(targetName) == -1) {
+					continue;
+				}
+				
+				tablesWithLinks[tableName] = 0;
+				tablesWithLinks[targetName] = 0;
+				links.push({fromName:tableName,
+							toName:targetName,
+							fromkeyColumns:vertexConnection.properties.keyColumns,
+							toKeyColumns:vertexConnection.properties.rKeyColumns,
+							done:false,
+							found:""});
 			}
 			
 		}
 		
-		var groups = {};
-		for(var i=0; i!=vertexes.length; i++) {
-			var vertex = vertexes[i];
-			if(!(vertex.group in groups)) {
-				groups[vertex.group] = [];
+		var allDone = false;
+		var nothingFoundThisLoop = false;
+		var currentSubGroupTables = [];
+		while(allDone == false) {
+			allDone = true;
+			nothingFoundThisLoop = true;
+			for(var i=0; i!=links.length; i++) {
+				var link = links[i]
+				if(link.done == true) {
+					continue;
+				}
+				allDone = false;
+
+				// for the first link, we add it without question
+				if(currentSubGroup.length==0) {
+					nothingFoundThisLoop = false;
+					link.done = true;
+					link.found = "none_first";
+					currentSubGroup.push(link);
+					currentSubGroupTables.push(link.fromName);
+					currentSubGroupTables.push(link.toName);
+					nothingFoundThisLoop = false;
+					continue;
+				}
+				
+				// found link from the current subgroup ?
+				if(currentSubGroupTables.indexOf(link.fromName) != -1) {
+					nothingFoundThisLoop = false;
+					link.done = true;
+					link.found = "from";
+					currentSubGroup.push(link);
+					currentSubGroupTables.push(link.toName);
+					continue;
+				}
+				
+				// found link to the current subgroup ?
+				if(currentSubGroupTables.indexOf(link.toName) != -1) {
+					nothingFoundThisLoop = false;
+					link.done = true;
+					link.found = "to";
+					currentSubGroup.push(link);
+					currentSubGroupTables.push(link.fromName);
+					continue;
+				}
+		
 			}
-			groups[vertex.group].push(i);			
+			
+			if(nothingFoundThisLoop == true && allDone==false) {
+				// subGroup finished, let's create a new subGroup
+				subGroups.push(currentSubGroup);
+				currentSubGroup = [];
+			}
 		}
 		
-		
-		// TODO : rajouter les labels des fks
-		var groupsArray = [];
-		for(var groupId in groups) {
-			var vs = groups[groupId];
-			var ts = [];
-			for(var i=0; i!=vs.length; i++) {
-				var v = vs[i];
-				ts.push(tableNames[v]);
-			}
-			groupsArray.push(ts);
+		// TODO : should be useles, because the last loop did nothing. remove ?
+		if(currentSubGroup.length > 0) {
+			subGroups.push(currentSubGroup);
 		}
 		
-		return groupsArray;
+		// we should not forget the tables with no link at all
+		for(var i=0; i!=tableNames.length; i++) {
+			var tableName = tableNames[i];
+			if( ! (tableName in tablesWithLinks)) {
+				subGroups.push( [ { fromName:tableName, toName:null } ] );
+			}
+		}
+		
+		return subGroups;
+		
 	}
 	
 	
