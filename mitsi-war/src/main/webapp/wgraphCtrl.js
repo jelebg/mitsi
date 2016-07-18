@@ -617,8 +617,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getJoinConditionFromColumns = function(fromName, toName, fromKeyColumns, toKeyColumns) {
-		var froms = fromKeyColumns.split(",");
-		var tos = toKeyColumns.split(",");
+		var froms = fromKeyColumns.split("\n");
+		var tos = toKeyColumns.split("\n");
 		
 		var condition = "";
 		var first = true;
