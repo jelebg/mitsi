@@ -614,18 +614,42 @@ angular.module('mitsiApp')
 				if(link.found!="isolate") {
 					$scope.sqlText.push(
 							  "join "+(link.found=="to"?link.fromName:link.toName)
-							+ " on ("
-							+ $scope.getJoinConditionFromColumns(link.fromName, link.toName, link.fromKeyColumns, link.toKeyColumns)
-							+")");
+							+ " on "
+							+ $scope.getJoinConditionFromFKs(link.fromName, link.toName, link.fromKeyColumns, link.toKeyColumns)
+							);
 				}
 				
 			}
 		}
 	}
 	
-	$scope.getJoinConditionFromColumns = function(fromName, toName, fromKeyColumns, toKeyColumns) {
+	$scope.getJoinConditionFromFKs = function(fromName, toName, fromKeyColumns, toKeyColumns) {
 		var froms = fromKeyColumns.split("\n");
 		var tos = toKeyColumns.split("\n");
+		
+		var condition = "";
+
+		if(froms.length > 1) {
+			var first = true;
+			for(var i=0; i!=froms.length; i++) {
+				condition = condition 
+						+ (first==false ? " or " : "")
+						+ "(" 
+						+ $scope.getJoinConditionFromColumns(fromName, toName, froms[0], tos[0])
+						+ ")"
+						;
+				first = false;
+			}
+		}
+		else {
+			condition = $scope.getJoinConditionFromColumns(fromName, toName, froms[0], tos[0]);
+		}
+		return condition;
+	}
+	
+	$scope.getJoinConditionFromColumns = function(fromName, toName, fromKeyColumns, toKeyColumns) {
+		var froms = fromKeyColumns.split(",");
+		var tos = toKeyColumns.split(",");
 		
 		var condition = "";
 		var first = true;
