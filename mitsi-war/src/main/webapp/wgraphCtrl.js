@@ -587,8 +587,100 @@ angular.module('mitsiApp')
 			return;
 		}
 		
-		$scope.sqlText = $scope.sqlTables;
+		var connectedSubGroups = $scope.getConnectedSubGroups($scope.sqlTables);
+		$scope.sqlText = [];
+		
+		if(connectedSubGroups.length > 1) {
+			$scope.sqlText.push("/!\\ not all tables connected together /!\\");
+		}
+		for(var i=0; i!=connectedSubGroups.length; i++) {
+			var subGroup = connectedSubGroups[i];
+			$scope.sqlText.push(subGroup.join(","));
+		}
 	}
+	
+	// TODO : mettre la gestion des sous-graphes et de connected components dans mitsi.graph.js ??
+	$scope.getConnectedSubGroups = function(tableNames) {
+		// should be vertices sorry for that
+		var vertexes = [];
+		var graph = $scope.currentSource.mitsiGraph;
+		var vertexIndexMapping = {};
+		
+		for(var i=0; i!=tableNames.length; i++) {
+			var vertexIndex = graph.getIndex(tableNames[i]);
+			vertexIndexMapping[vertexIndex] = i;
+		}
+		
+		for(var i=0; i!=tableNames.length; i++) {
+			var vertexIndex = graph.getIndex(tableNames[i]);
+			var vertexInnnerConnections = []; 
+			var vertexConnections = graph.getLinks(vertexIndex);
+		
+			for(var j=0; j!=vertexConnections.length; j++) {
+				var vertexConnection = vertexConnections[j];
+				if(tableNames.indexOf(vertexConnection.targetName) != -1) {
+					var targetIndex = vertexConnection.target;
+					
+					// ignore auto-loop
+					if(targetIndex==vertexIndex) {
+						continue;
+					}
+					
+					if(vertexInnnerConnections.indexOf(targetIndex) == -1) {
+						vertexInnnerConnections.push(vertexIndexMapping[vertexConnection.target]);
+					}
+				}
+			}
+			
+			vertexes.push({ group:i, index:vertexIndex, innerConnections:vertexInnnerConnections});
+		}
+		for(var i=0; i!=vertexes.length; i++) {
+			// simple algo, not the most efficient
+			var vertex = vertexes[i];
+			
+			for(var j=0; j!=vertex.innerConnections.length; j++) {
+				var connection = vertex.innerConnections[j];
+				
+				var connectedVertexGroup = vertexes[connection].group;
+				if(connectedVertexGroup != vertex.group) {
+					for(var k=0; k!=vertexes.length; k++) {
+						var v2 = vertexes[k];
+						if(v2.group == connectedVertexGroup) {
+							v2.group = vertex.group;
+						}
+					}
+				}
+				
+			}
+			
+		}
+		
+		var groups = {};
+		for(var i=0; i!=vertexes.length; i++) {
+			var vertex = vertexes[i];
+			if(!(vertex.group in groups)) {
+				groups[vertex.group] = [];
+			}
+			groups[vertex.group].push(i);			
+		}
+		
+		
+		// TODO : rajouter les labels des fks
+		var groupsArray = [];
+		for(var groupId in groups) {
+			var vs = groups[groupId];
+			var ts = [];
+			for(var i=0; i!=vs.length; i++) {
+				var v = vs[i];
+				ts.push(tableNames[v]);
+			}
+			groupsArray.push(ts);
+		}
+		
+		return groupsArray;
+	}
+	
+	
 	
 	
 	$scope.jsplumbInit();
