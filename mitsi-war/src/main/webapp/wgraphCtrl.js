@@ -599,10 +599,16 @@ angular.module('mitsiApp')
 		for(var i=0; i!=connectedSubGroups.length; i++) {
 			var subGroup = connectedSubGroups[i];
 			
-			//$scope.sqlText.push(subGroup.join(","));
-			$scope.sqlText.push(subGroup.map(function(sg){
-			    return "("+sg.fromName+","+sg.toName+","+sg.fromkeyColumns+","+sg.toKeyColumns+","+sg.found+")";
-			}).join(","));
+			for(var j=0; j!=subGroup.length; j++) {
+				var link=subGroup[j];
+				if(link.found=="none_first" || link.found=="isolate") {
+					$scope.sqlText.push((i==0 ? "FROM" : ",")+" "+link.fromName);
+				}
+				if(link.found!="isolate") {
+					$scope.sqlText.push("join "+(link.found=="from"?link.toName:link.toName)+ " on ("+link.fromKeyColumns+" = "+link.toKeyColumns+")");
+				}
+				
+			}
 		}
 	}
 	
@@ -634,7 +640,7 @@ angular.module('mitsiApp')
 				tablesWithLinks[targetName] = 0;
 				links.push({fromName:tableName,
 							toName:targetName,
-							fromkeyColumns:vertexConnection.properties.keyColumns,
+							fromKeyColumns:vertexConnection.properties.keyColumns,
 							toKeyColumns:vertexConnection.properties.rKeyColumns,
 							done:false,
 							found:""});
@@ -705,7 +711,7 @@ angular.module('mitsiApp')
 		for(var i=0; i!=tableNames.length; i++) {
 			var tableName = tableNames[i];
 			if( ! (tableName in tablesWithLinks)) {
-				subGroups.push( [ { fromName:tableName, toName:null } ] );
+				subGroups.push( [ { fromName:tableName, toName:null, found:"isolate" } ] );
 			}
 		}
 		
