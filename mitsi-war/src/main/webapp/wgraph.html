@@ -101,7 +101,10 @@
 		 <td style="padding-right:6px;"
 		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
 		 >
-		 	<i class="glyphicon glyphicon-info-sign"></i>
+		 	<a href="" 
+		       ng-click="requestInfo(t)">
+		        <i class="glyphicon glyphicon-info-sign"></i>
+		     </a>
 		 </td>
 		 <td style="padding-right:6px;"
 		     ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"

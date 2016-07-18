@@ -206,3 +206,8 @@
 .objectPinSelected {
 	color : #00ce00;
 }
+
+.sourceObjectSelect {
+	color:green;
+	font-weight:bold;
+}

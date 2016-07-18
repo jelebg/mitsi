@@ -137,8 +137,10 @@
 					ng-repeat="o in s.objects | orderBy:'id.name'" 
 					is-open="o.accordionOpened" 
 					is-disabled="true" 
-					ng-hide="!o.filterPined && isObjectExcludedByFilter(o, s)">
-				  <accordion-heading >
+					ng-hide="!o.filterPined && isObjectExcludedByFilter(o, s)"
+				>
+				  <accordion-heading>
+				  <div id="sourceDbObject_{{s.name}}_{{o.id.schema}}_{{o.id.name}}">
             		<a href=""  
             			ng-click="o.accordionOpened = !o.accordionOpened;">
 			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
@@ -150,11 +152,13 @@
 			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
 				  	<span   ng-click="selectObject(s, o)"   
+							ng-class="{'sourceObjectSelect':s.selectedId.name==o.id.name && s.selectedId.schema==o.id.schema}"
 						  	popover="{{o.description}}"
 							popover-trigger="mouseenter"
 							popover-popup-delay="2000" >
 				  		{{ o.id.name }}
 				  	</span>
+				  	</div>
 			      </accordion-heading>
 			<!--ul>
 				<li ng-repeat="o in s.objects">

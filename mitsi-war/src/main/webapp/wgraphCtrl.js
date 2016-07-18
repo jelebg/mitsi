@@ -773,6 +773,10 @@ angular.module('mitsiApp')
 		
 	}
 	
+	$scope.requestInfo = function(object) {
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_INFO_REQUESTED, $rootScope.currentSource, object);
+	}
+	
 	
 	
 	

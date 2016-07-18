@@ -189,7 +189,7 @@ angular.module('mitsiApp')
 
 		$rootScope.currentSource = source;
 		if(! source.objects) {
-			$scope.refresh(source, null)
+			$scope.refresh(source, null);
 		}
 		
         $rootScope.$broadcast(EVENT_DATABASE_SELECTED, source);
@@ -204,6 +204,26 @@ angular.module('mitsiApp')
         $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, source, object);
 
 	}
+	
+	$scope.$on(EVENT_DATABASE_OBJECT_INFO_REQUESTED, function (event, source, databaseObject) {
+		if(!source.objects) {
+			return;
+		}
+		
+		for(var i=0; i!=source.objects.length; i++) {
+			var o = source.objects[i];
+			if(o.id.schema+"."+o.id.name == databaseObject.name) {
+				if(source.searchObject && !source.searchObject=="") {
+					o.filterPined = true;
+				}
+				o.accordionOpened = true;
+				break;
+			}
+		}
+		
+		source.selectedId = {schema:o.id.schema, name:o.id.name, type:o.id.type};
+		document.getElementById("sourceDbObject_"+source.name+"_"+o.id.schema+"_"+o.id.name).scrollIntoView(true);
+	});
 	
 	$scope.init();
 
