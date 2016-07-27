@@ -6,11 +6,13 @@ angular.module('mitsiApp')
 	$scope.divPrefix = "mitsiObject_";
 	$scope.tables = {};
 	$scope.tablesTemporary = [];
+	$scope.showProximityGraphTimeoutPromise = null;
 	$scope.hideProximityGraphTimeoutPromise = null;
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
 
-	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 3000;
+	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
+	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -334,24 +336,35 @@ angular.module('mitsiApp')
 		
 	});
 	
-	$scope.mouseOverDiv = function(table) {
-		this.showIcons = true;
-		
+	$scope.resetTimeoutPromises = function() {
+		if($scope.showProximityGraphTimeoutPromise != null) {
+			$timeout.cancel($scope.showProximityGraphTimeoutPromise);
+			$scope.showProximityGraphTimeoutPromise = null;
+		}
 		if($scope.hideProximityGraphTimeoutPromise != null) {
 			$timeout.cancel($scope.hideProximityGraphTimeoutPromise);
 			$scope.hideProximityGraphTimeoutPromise = null;
 		}
+	}
+	
+	$scope.mouseOverDiv = function(table) {
+		this.showIcons = true;
+		
+		$scope.resetTimeoutPromises();
+
 		if($scope.hasTableMissingLinks(table.name, true, true)) {
-			$scope.displayProximityGraph(table.name, true);
+			
+			$scope.showProximityGraphTimeoutPromise = $timeout(function() {
+				$scope.displayProximityGraph(table.name, true);
+			}, $scope.TEMPORARY_TABLE_SHOW_TIMEOUT);
+			
 		}
 	}
 	$scope.mouseLeaveDiv = function() {
 		this.showIcons = false;
 
-		if($scope.hideProximityGraphTimeoutPromise != null) {
-			$timeout.cancel($scope.hideProximityGraphTimeoutPromise);
-			$scope.hideProximityGraphTimeoutPromise = null;
-		}
+		$scope.resetTimeoutPromises();
+		
 		$scope.hideProximityGraphTimeoutPromise = $timeout(function() {
 			$scope.hideProximityGraph();
 		}, $scope.TEMPORARY_TABLE_HIDE_TIMEOUT);
