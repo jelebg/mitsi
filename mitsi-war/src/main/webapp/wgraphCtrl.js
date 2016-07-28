@@ -79,7 +79,14 @@ angular.module('mitsiApp')
 				var mafk = fklist[i];
 				$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
 			}
+			
+			// maybe there is a better place for dragg management
+			// TODO : drag selection only if we move the table that we hovered in the first place
 			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"));
+			$scope.jsplumb.clearDragSelection();
+			for(var i=0; i!=$scope.tablesTemporary.length; i++) {
+				$scope.jsplumb.addToDragSelection(document.getElementById($scope.divPrefix+$scope.tablesTemporary[i]));
+			}
 		}, 0);
 	}
 
@@ -384,6 +391,7 @@ angular.module('mitsiApp')
 	}
 
 	$scope.appendTable = function(left, top, tableName) {
+
 		if(!(tableName in $scope.tables)) {
 			$scope.tables[tableName] = {name:tableName, x:left, y:top };
 		}
