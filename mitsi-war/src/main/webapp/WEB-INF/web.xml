@@ -9,14 +9,6 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <servlet-name>TestGsonServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.TestGsonServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TestGsonServlet</servlet-name>
-    <url-pattern>/TestGsonServlet</url-pattern>
-  </servlet-mapping>
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/classes/spring/application-context.xml</param-value>
@@ -34,35 +26,15 @@
     <servlet-name>GetDatasourcesServlet</servlet-name>
     <url-pattern>/GetDatasourcesServlet</url-pattern>
   </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>ConnectServlet</display-name>
-    <servlet-name>ConnectServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.connections.ConnectServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ConnectServlet</servlet-name>
-    <url-pattern>/ConnectServlet</url-pattern>
-  </servlet-mapping>
   <session-config>
     <session-timeout>720</session-timeout>
   </session-config>
-  <listener>
+  <!--listener>
     <listener-class>org.mitsi.mitsiwar.filters.SessionListener</listener-class>
   </listener>
   <listener>
     <listener-class>org.mitsi.mitsiwar.filters.CleanerListener</listener-class>
-  </listener>
-  <servlet>
-    <description></description>
-    <display-name>DisconnectServlet</display-name>
-    <servlet-name>DisconnectServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.connections.DisconnectServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DisconnectServlet</servlet-name>
-    <url-pattern>/DisconnectServlet</url-pattern>
-  </servlet-mapping>
+  </listener-->
   <servlet>
     <description></description>
     <display-name>GetDatabaseObjectsServlet</display-name>

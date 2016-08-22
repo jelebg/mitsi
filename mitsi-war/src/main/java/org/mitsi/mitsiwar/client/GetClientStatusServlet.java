@@ -1,9 +1,7 @@
 package org.mitsi.mitsiwar.client;
 
-import java.util.List;
 import java.util.Map;
 
-import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;

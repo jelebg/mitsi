@@ -3,15 +3,12 @@ package org.mitsi.mitsiwar;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;

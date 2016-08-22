@@ -7,6 +7,5 @@
 	   					   http://www.springframework.org/schema/context 
 	   					   http://www.springframework.org/schema/context/spring-context.xsd">
 	   					   
-    <bean id="clients" class="org.mitsi.mitsiwar.connections.Clients"/>
-	   					   
+<!-- supprimer ? -->	   					   
 </beans>
