@@ -43,11 +43,6 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 			response.datasources.add(datasource);
 		}
 		
-		/*response.resultats.add("un");
-		response.resultats.add("deux");
-		response.resultats.add("trois");
-		response.resultats.add("quatre");
-		response.resultats.add("cinq");*/
 		return response;
 	}
 

@@ -27,7 +27,6 @@ public abstract class PooledResource {
 		}
 		else if( lastLoadTry.getTime()+reloadIntervalMilliSec < current.getTime()) {
 			Date resourceTimestamp = getResourceTimestamp();
-			//log.debug("lastLoadTry="+lastLoadTry.getTime()+" and current="+current.getTime());
 			if(resourceTimestamp == null || resourceTimestamp.after(lastLoadTry)	) {
 				log.debug("reload of "+this+
 						" because lastLoadTry="+lastLoadTry.getTime()+" and current="+current.getTime());

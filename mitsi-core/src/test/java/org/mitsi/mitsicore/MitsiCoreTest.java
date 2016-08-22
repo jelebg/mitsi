@@ -28,9 +28,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:spring/application-context.xml")
 public class MitsiCoreTest {
 	
-	//@Autowired
-	//private PublicDatasources publicDatasources;
-
 	@Autowired
 	private DatasourceManager datasourceManager;
 

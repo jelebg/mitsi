@@ -1,6 +1,5 @@
 package org.mitsi.mitsiwar.datasources;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mitsi.datasources.DatabaseObject;

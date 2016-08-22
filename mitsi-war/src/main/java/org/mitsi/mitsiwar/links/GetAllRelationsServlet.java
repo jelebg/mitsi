@@ -1,27 +1,11 @@
 package org.mitsi.mitsiwar.links;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
-import org.mitsi.datasources.Column;
-import org.mitsi.datasources.Constraint;
-import org.mitsi.datasources.DatabaseObject;
-import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.MitsiDatasource;
-import org.mitsi.datasources.Partition;
-import org.mitsi.datasources.Schema;
-import org.mitsi.datasources.Tablespace;
 import org.mitsi.mitsiwar.GsonServlet;
-import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
-import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 
 /**

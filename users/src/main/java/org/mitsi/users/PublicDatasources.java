@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 
 public class PublicDatasources extends PooledResource {
 	private static final Logger log = Logger.getLogger(PublicDatasources.class);
-	//public static final String JSON_FILE = "datasources-public.json";
 
 	public static final String TAG_DATASOURCES = "datasources";
 	public static final String FIELD_DESCRIPTION = "description";
@@ -36,12 +35,6 @@ public class PublicDatasources extends PooledResource {
 	public static final String FIELD_USE_SCHEMA_CACHE = "use.schema.cache";
 	public static final String FIELD_TAGS = "tags";
 
-	//@Autowired
-	//public String mitsiHome;
-	//public void setMitsiHome(String mitsiHome) {
-	//	this.mitsiHome = mitsiHome;
-	//}
-	
 	@Autowired
 	private Resource publicDatasourcesFile; 
 
@@ -100,8 +93,6 @@ public class PublicDatasources extends PooledResource {
 						);
 				datasource.setConnectSchema((String) v.get(FIELD_CONNECT_SCHEMA));
 				datasources.put((String) k, datasource);
-				
-				//System.out.println("public datasource : "+datasource);
 				
 			}
 		}

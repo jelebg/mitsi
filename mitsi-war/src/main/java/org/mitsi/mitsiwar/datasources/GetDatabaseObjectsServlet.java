@@ -1,21 +1,11 @@
 package org.mitsi.mitsiwar.datasources;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
-import org.mitsi.datasources.Constraint;
-import org.mitsi.datasources.DatabaseObject;
-import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.connections.ClientVirtualConnection;
-import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -28,8 +18,6 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 
 	@Autowired
 	private DatasourceManager datasourceManager;
-	//private PublicDatasources publicDatasources;
-
 	
 	public GetDatabaseObjectsServlet() {
         super(GetDatabaseObjects.class);

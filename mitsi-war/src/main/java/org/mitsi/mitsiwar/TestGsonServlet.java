@@ -36,11 +36,6 @@ public class TestGsonServlet extends GsonServlet<TestGsonRequest, TestGsonRespon
 			testGsonResponse.resultats.add(datasourceName);
 		}
 		
-		/*testGsonResponse.resultats.add("un");
-		testGsonResponse.resultats.add("deux");
-		testGsonResponse.resultats.add("trois");
-		testGsonResponse.resultats.add("quatre");
-		testGsonResponse.resultats.add("cinq");*/
 		return testGsonResponse;
 	}
 
