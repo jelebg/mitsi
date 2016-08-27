@@ -149,6 +149,9 @@
             			ng-click="o.filterPined = !o.filterPined">
 				  		<i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'objectPinSelected': o.filterPined}"></i>
 				    </a>
+            		<a href="" >
+			        	<i class="pull-right glyphicon glyphicon-asterisk"></i>
+			        </a>
 			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ o.id.type=='table' ? 'table' : o.id.type=='matview' ? 'matview' : o.id.type=='view' ? 'view' : '' }}.png"/>
 				  	<span   ng-click="selectObject(s, o)"   
