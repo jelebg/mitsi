@@ -136,7 +136,7 @@
 }
 .linksTableSelected{
 	text-align:center;
-    background-color: #f0d200; 
+    background-color: #80ff80; 
 	border-radius:6px;
 	padding:4px;
 	padding-left:5px;
@@ -203,7 +203,7 @@
 	vertical-align:top;"	
 }
 .tableActionLabelSelected {
-	background-color:#b100f4;
+	background-color:#cd48ff;
 	font-weight:bold;
 	padding-left:2px;
 	padding-right:2px;

@@ -11,6 +11,9 @@ angular.module('mitsiApp')
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
 
+	$scope.pathStart = "";
+	$scope.pathEnd = "";
+
 	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
 	
@@ -25,6 +28,36 @@ angular.module('mitsiApp')
 
 	}
 	
+	$scope.isTablePathEnd = function(table) {
+		return $scope.pathEnd == table.name;
+	}
+	$scope.setTablePathEnd = function(table) {
+		if($scope.pathStart == table.name) {
+			$scope.pathStart = "";
+		}
+		if($scope.pathEnd == table.name) {
+			$scope.pathEnd = "";
+		}
+		else {
+			$scope.pinTemporaryTable(table.name);
+			$scope.pathEnd = table.name;
+		}
+	}
+	$scope.isTablePathStart = function(table) {
+		return $scope.pathStart == table.name;
+	}
+	$scope.setTablePathStart = function(table) {
+		if($scope.pathEnd == table.name) {
+			$scope.pathEnd = "";
+		}
+		if($scope.pathStart == table.name) {
+			$scope.pathStart = "";
+		}
+		else {
+			$scope.pinTemporaryTable(table.name);
+			$scope.pathStart = table.name;
+		}
+	}
 
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
 		if($scope.existsTable(tableName)) {
@@ -334,7 +367,7 @@ angular.module('mitsiApp')
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
-			$scope.appendTableNoStacking(50, 50, tableName);
+			$scope.appendTableNoStacking(150, 150, tableName);
 		}
 		
 	});

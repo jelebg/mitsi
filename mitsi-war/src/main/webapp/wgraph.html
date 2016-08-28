@@ -118,15 +118,23 @@
 		  	   >SQL</a>
 		  	</span>
 		 </td>		 
-		 <td style="padding-left:6px;transform: scale(-1, 1);"
-		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
+		 <td style="padding-right:6px;"
+		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathStart(t)}"
 		 >
-		 	<img src="img/flag_path.png"/>
+		 	<span ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
+		 	  <a href="" ng-click="setTablePathStart(t)">
+		 	    <img style="transform: scale(-1, 1);" src="img/flag_path.png"/>
+		 	  </a>
+		   </span>
 		 </td>
 		 <td style="padding-right:6px;"
-		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
+		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathEnd(t)}"
 		 >
-		 	<img src="img/flag_path.png"/>
+		   <span ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
+		 	  <a href="" ng-click="setTablePathEnd(t)">
+		 	    <img src="img/flag_path.png"/>
+		 	  </a>
+		   </span>
 		 </td>
 		 <!-- td style="padding-right:6px;">
 		 	<i class="glyphicon glyphicon-ok-circle"></i>
