@@ -26,14 +26,12 @@ angular.module('mitsiApp')
 	}
 	
 
-	// TODO : supprimer
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
-		// TODO : refaire avec un proximity graph
 		if($scope.existsTable(tableName)) {
 			return;
 		}
 		
-		var bestPlace = $scope.getTableBestPlace(left, top);
+		var bestPlace = $scope.getTableBestPlace(left, top, horizontalSide);
 		
 		$scope.appendTable(bestPlace.x, bestPlace.y, tableName);
 		
@@ -91,22 +89,23 @@ angular.module('mitsiApp')
 	}
 
 	
-	$scope.getTableBestPlace = function(left, top, horizontalSide) {
+	$scope.getTableBestPlace = function(left, top) {
 		var dx = 40;
 		var dy = 40;
-		var maxIJ = 4;
+		var maxIJ = 10;
 		var newLeft = left;
+		var maxLeft = 500;
 		var newTop = top
-		for(var i=1; i!=maxIJ; i++) {
-			for(var j=0; j!=i; j++) {
-				newLeft = left+horizontalSide*(i-j)*dx;
-				if(newLeft<0) {
-					newLeft = 0;
-				}
-				newTop  = top+(j)*dx;
-				if($scope.getTableAtXY(newLeft, newTop) == null) {
+		for(var i=0; i<maxIJ; i++) {
+			newLeft = left;
+			newTop  = top+(i)*dx;
+
+			while(newLeft < maxLeft) {
+				var elt = $scope.getTableAtXY(newLeft, newTop);
+				if(elt == null) {
 					return {x:newLeft, y:newTop};
 				}
+				newLeft = elt.offsetLeft + elt.offsetWidth + dx;
 			}
 		}
 		return {x:(left+10), y:(top+10)};
@@ -333,6 +332,15 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
+		var ypos = 0;
+		
+		if(databaseObject && databaseObject.id) {
+			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
+			$scope.appendTableNoStacking(50, 50, tableName);
+		}
+		
+	});
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, function (event, source, databaseObject) {
 		var ypos = 0;
 		
 		if(databaseObject && databaseObject.id) {

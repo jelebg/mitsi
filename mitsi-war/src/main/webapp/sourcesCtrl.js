@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, userService, sourceService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, $state, userService, sourceService) {
 
 	$scope.mya = true;
 	$scope.tutu = "sources";
@@ -205,6 +205,16 @@ angular.module('mitsiApp')
 
 	}
 	
+	$scope.displayProximityGraph = function(source, object) {
+		document.title = source.name+" - "+object.id.name;
+
+		$rootScope.currentSource = source;
+		source.currentObject = object;
+		
+		$state.go("workbench.graph");
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, source, object);
+	}
+	
 	$scope.$on(EVENT_DATABASE_OBJECT_INFO_REQUESTED, function (event, source, databaseObject) {
 		if(!source.objects) {
 			return;
@@ -224,6 +234,8 @@ angular.module('mitsiApp')
 		source.selectedId = {schema:o.id.schema, name:o.id.name, type:o.id.type};
 		document.getElementById("sourceDbObject_"+source.name+"_"+o.id.schema+"_"+o.id.name).scrollIntoView(true);
 	});
+	
+
 	
 	$scope.init();
 

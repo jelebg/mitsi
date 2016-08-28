@@ -149,7 +149,7 @@
             			ng-click="o.filterPined = !o.filterPined">
 				  		<i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'objectPinSelected': o.filterPined}"></i>
 				    </a>
-            		<a href="" >
+            		<a href="" ng-click="displayProximityGraph(s, o)" >
 			        	<i class="pull-right glyphicon glyphicon-asterisk"></i>
 			        </a>
 			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
