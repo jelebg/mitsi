@@ -1,8 +1,6 @@
 angular.module('mitsiApp')
     .controller('sourcesCtrl', function($scope, $rootScope, $state, userService, sourceService) {
 
-	$scope.mya = true;
-	$scope.tutu = "sources";
 	$scope.datasources = [];
 
 	

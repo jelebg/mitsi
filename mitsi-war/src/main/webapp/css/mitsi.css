@@ -134,6 +134,14 @@
 	padding-left:5px;
 	padding-right:5px;
 }
+.linksTableSelected{
+	text-align:center;
+    background-color: #f0d200; 
+	border-radius:6px;
+	padding:4px;
+	padding-left:5px;
+	padding-right:5px;
+}
 
 .linksTableHighlight {
 	text-align:center;

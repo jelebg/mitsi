@@ -121,8 +121,6 @@ angular.module('mitsiApp')
 			}
 			if((left+myMargin)>elt.offsetLeft && (left-myMargin)<(elt.offsetLeft+elt.offsetWidth) &&
 			   (top+myMargin)>elt.offsetTop && (top-myMargin)<(elt.offsetTop+elt.offsetHeight)	) {
-				console.log("left="+elt.offsetLeft+",top="+elt.offsetTop+","+
-					"width="+elt.offsetWidth+",height="+elt.offsetHeight);
 				return elt;
 			}
 		}
@@ -443,6 +441,18 @@ angular.module('mitsiApp')
 			$scope.tablesTemporary.splice(i, 1);
 		}
 		
+	}
+
+	$scope.isTableSelected = function(tableName) {
+		if(!$rootScope.currentSource) {
+			return false;
+		}
+		var currentObject = $rootScope.currentSource.currentObject
+		if(!currentObject) {
+			return false;
+		}
+		var currentObjectName = currentObject.id.schema+"."+currentObject.id.name;
+		return currentObjectName == tableName;
 	}
 
 	$scope.isTableTemporary = function(tableName) {
