@@ -134,9 +134,17 @@
 	padding-left:5px;
 	padding-right:5px;
 }
-.linksTableSelected{
+.linksTableSelected {
 	text-align:center;
     background-color: #80ff80; 
+	border-radius:6px;
+	padding:4px;
+	padding-left:5px;
+	padding-right:5px;
+}
+.linksTableInPath {
+	text-align:center;
+    background-color: #00ffff; 
 	border-radius:6px;
 	padding:4px;
 	padding-left:5px;

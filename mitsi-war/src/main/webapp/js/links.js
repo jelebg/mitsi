@@ -1,3 +1,5 @@
+// TODO : remove ?
+
 var jsplumb = null;
 var divPrefix = "mitsiObject_";
 var relations = null;

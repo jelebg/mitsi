@@ -13,6 +13,8 @@ angular.module('mitsiApp')
 
 	$scope.pathStart = "";
 	$scope.pathEnd = "";
+	$scope.paths = [];
+	$scope.rpaths = [];
 
 	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
@@ -34,13 +36,16 @@ angular.module('mitsiApp')
 	$scope.setTablePathEnd = function(table) {
 		if($scope.pathStart == table.name) {
 			$scope.pathStart = "";
+			$scope.clearPath();
 		}
 		if($scope.pathEnd == table.name) {
 			$scope.pathEnd = "";
+			$scope.clearPath();
 		}
 		else {
 			$scope.pinTemporaryTable(table.name);
 			$scope.pathEnd = table.name;
+			$scope.computePathIfNecessary();
 		}
 	}
 	$scope.isTablePathStart = function(table) {
@@ -49,16 +54,75 @@ angular.module('mitsiApp')
 	$scope.setTablePathStart = function(table) {
 		if($scope.pathEnd == table.name) {
 			$scope.pathEnd = "";
+			$scope.clearPath();
 		}
 		if($scope.pathStart == table.name) {
 			$scope.pathStart = "";
+			$scope.clearPath();
 		}
 		else {
 			$scope.pinTemporaryTable(table.name);
 			$scope.pathStart = table.name;
+			$scope.computePathIfNecessary();
 		}
 	}
 
+	$scope.clearPath = function() {
+		$scope.paths  = [];
+		$scope.rpaths = [];
+	}
+	
+	$scope.computePathIfNecessary = function() {
+		if($scope.pathStart=="" || $scope.pathEnd=="") {
+			return;
+		}
+		
+		if(!$rootScope.currentSource) {
+			return;
+		}
+		var graph = $rootScope.currentSource.mitsiGraph;
+		if(!graph) {
+			return;
+		}
+		
+		var startIndex = graph.getIndex($scope.pathStart);
+		var endIndex = graph.getIndex($scope.pathEnd);
+		
+		$scope.paths  = graph.getAllPaths(startIndex, endIndex, false);
+		$scope.rpaths = graph.getAllPaths(endIndex, startIndex, false);
+		
+	}
+
+	
+	$scope.isTableInPath= function(tableName) {
+		if($scope.paths.length == 0) {
+			return false;
+		}
+		var graph = $rootScope.currentSource.mitsiGraph;
+		if(!graph) {
+			return false;
+		}
+		
+		var index = graph.getIndex(tableName);
+		
+		for(var i=0; i!=$scope.paths.length; i++) {
+			var path = $scope.paths[i];
+			
+			if(path.indexOf(index) >= 0) {
+				return true;
+			}
+		}
+		for(var i=0; i!=$scope.rpaths.length; i++) {
+			var path = $scope.rpaths[i];
+			
+			if(path.indexOf(index) >= 0) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
 		if($scope.existsTable(tableName)) {
 			return;

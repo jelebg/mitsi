@@ -27,7 +27,7 @@
 
 <div ng-repeat="(tableName, t) in tables"
      id="{{divPrefix+t.name}}"
-     ng-class="{'linksTableSelected':isTableSelected(t.name), 'linksTableTemporary':isTableTemporary(t.name)}"
+     ng-class="{'linksTableSelected':isTableSelected(t.name), 'linksTableInPath':isTableInPath(t.name), 'linksTableTemporary':isTableTemporary(t.name)}"
 	 class="linksTable"
 	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:120px;cursor:default;"
 	 draggable

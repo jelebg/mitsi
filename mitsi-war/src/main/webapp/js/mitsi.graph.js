@@ -1,3 +1,5 @@
+// TODO : supprimer les références à Eppstein et remplacer par du BFS, valable ici pour un K-shortest
+
 function MitsiGraph(relations) {
 	this.nameTable = {};	
 	this.vertexes = []; // BTW, should be vertices not vertexes
