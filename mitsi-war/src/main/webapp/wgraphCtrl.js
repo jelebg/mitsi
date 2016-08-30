@@ -18,6 +18,27 @@ angular.module('mitsiApp')
 
 	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
+
+	$scope.zoomSlider = {
+			  value: 100,
+			  options: {
+			    floor: 25,
+			    ceil: 100,
+			    step: 25,
+			    hideLimitLabels: true,
+			    showTicks: true,
+			    showTicksValues: false,
+			    boundPointerLabels: false
+			    ,vertical: true
+			    ,getPointerColor: function(value) {
+		            return 'grey';
+		        }
+			    ,translate: function(value) {
+			        return value+"%";
+			    }
+
+			  }
+			};
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
@@ -926,5 +947,4 @@ angular.module('mitsiApp')
 		$scope.displayProximityGraph(tableName);
 	}
 	
-
 });
