@@ -18,6 +18,19 @@ angular.module('mitsiApp')
 
 	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
+	
+	$scope.showGraph = true;
+	$scope.showSQL = false;
+
+	$scope.displayGraph = function() {
+		$scope.showGraph = true;
+		$scope.showSQL = false;
+	}
+
+	$scope.displaySQL = function() {
+		$scope.showGraph = false;
+		$scope.showSQL = true;
+	}
 
 	$scope.zoomSlider = {
 			  value: 100,

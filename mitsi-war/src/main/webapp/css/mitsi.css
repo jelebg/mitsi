@@ -235,7 +235,26 @@
 
 .verticalMenuTd {
 	text-align:center;
+	font-weight:bold;
 	border-radius:5px;
 	background-color:#e2e2e2;
 	padding:4px;
 }
+
+.verticalMenuTdSelected {
+	background-color:#cd48ff;
+	color:white;
+}
+.verticalMenuTdSelected a {
+	color:white;
+}
+.verticalMenuTdSelected a:link  {
+	color:white;
+}
+.verticalMenuTdSelected a:visited  {
+	color:white;
+}
+
+
+
+
