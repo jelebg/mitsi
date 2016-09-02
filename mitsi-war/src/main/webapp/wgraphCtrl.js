@@ -19,17 +19,28 @@ angular.module('mitsiApp')
 	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
 	
-	$scope.showGraph = true;
+	$scope.graphOpacity = true;
 	$scope.showSQL = false;
-
+	$scope.showPaths = false;
+	
 	$scope.displayGraph = function() {
-		$scope.showGraph = true;
+		$scope.graphOpacity = "1.0";
 		$scope.showSQL = false;
+		$scope.showPaths = false;
 	}
 
 	$scope.displaySQL = function() {
-		$scope.showGraph = false;
+		$scope.graphOpacity = "0.3";
 		$scope.showSQL = true;
+		$scope.showPaths = false;
+	}
+	$scope.displayPaths = function() {
+		$scope.graphOpacity = "0.3";
+		$scope.showSQL = false;
+		$scope.showPaths = true;
+	}
+	$scope.getPathIndexName = function(index) {
+		return $rootScope.currentSource.mitsiGraph.getVertexName(index);
 	}
 
 	$scope.zoomSlider = {

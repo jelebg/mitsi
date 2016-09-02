@@ -11,9 +11,9 @@
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
-  	<tr><td ng-class="{'verticalMenuTdSelected':showGraph}"  class="verticalMenuTd"><a href="" ng-click="displayGraph()">Graph</a></td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd"><a href="" ng-click="displayGraph()">Graph</a></td></tr>
   	<tr><td ng-class="{'verticalMenuTdSelected':showSQL}"  class="verticalMenuTd"><a href="" ng-click="displaySQL()">SQL</a></td></tr>
-  	<tr><td class="verticalMenuTd">Paths</td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':showPaths}"  class="verticalMenuTd"><a href="" ng-click="displayPaths()">Paths</a></td></tr>
   	<tr><td style="height:150px">
   	  <rzslider rz-slider-model="zoomSlider.value" rz-slider-options="zoomSlider.options"></rzslider>
     </td></tr>
@@ -31,10 +31,31 @@
   	   >clear</a>
   </span>
   </div>
+  <div
+  	ng-show="showPaths==true" 
+  	style="z-index:3;font-familly:Monospace;color:#707070;font-weight: bold;position:absolute;top:20px;left:80px;width:1200px;">
+   <div ng-repeat="path in paths" style="margin-bottom:10px">
+       <svg ng-repeat-start="pt in path" height="24px" width="12px" style="vertical-align:bottom;">
+      	  <polygon style="fill:lightgreen;" points="0,0 12,12 0,24 12,24 12,0"/>
+        </svg><span
+         style="vertical-align:bottom;display:inline-block;background-color:lightgreen;height:24px;">{{ getPathIndexName(pt) }}
+         </span><svg ng-repeat-end height="24px" width="12px" style="vertical-align:bottom;">
+          <polygon style="fill:lightgreen;" points="0,0 0,24 12,12"/>
+       </svg>
+   </div>
+   <div ng-repeat="path in rpaths" style="margin-bottom:10px">
+       <svg ng-repeat-start="pt in path" height="24px" width="12px" style="vertical-align:bottom;">
+      	  <polygon style="fill:lightgreen;" points="0,0 12,12 0,24 12,24 12,0"/>
+        </svg><span
+         style="vertical-align:bottom;display:inline-block;background-color:lightgreen;height:24px;">{{ getPathIndexName(pt) }}
+         </span><svg ng-repeat-end height="24px" width="12px" style="vertical-align:bottom;">
+          <polygon style="fill:lightgreen;" points="0,0 0,24 12,12"/>
+       </svg>
+   </div>
+  </div>
 
 <div id="jsPlumbContainer"
-   	 ng-show="showGraph==true" 
-     style="position:absolute;top:0px;left:0px;width:5px;height:5px;transform:scale({{ zoomSlider.value/100  }});"
+     style="opacity:{{graphOpacity}};position:absolute;top:0px;left:0px;width:5px;height:5px;transform:scale({{ zoomSlider.value/100  }});"
      >
      
 
