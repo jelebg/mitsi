@@ -13,13 +13,6 @@ angular.module('mitsiApp')
 		  .then(function(response) {
 			  $scope.datasources = response.data.datasources;
 
-			  /* for(var i=0; i!=$scope.datasources.length; i++) {
-				  if($scope.datasources[i].connected) {
-					$scope.initGraph($scope.datasources[i]);
-				  	$rootScope.$broadcast('DatasourceConnected', $scope.datasources[i]);
-				  }
-			  }*/
-
 		  }, function(errorMessage) {
 		      // called asynchronously if an error occurs
 		      // or server returns response with an error status.
@@ -28,46 +21,7 @@ angular.module('mitsiApp')
 		  });
 	};
 	
-	// TODO : a supprimer
-	$scope.connect = function(source) {
-		//alert(source.name);
-		//source.connected = !source.connected; 
-		if(!source.connected) {
-			sourceService.connectDatasource(source.name)
-			  .then(function(response) {
-				  source.connected = response.data.connected;
-				  
-				  $rootScope.$broadcast('DatasourceConnected', source);
-				  
-				  //$scope.refresh(source);
-			  }, function(errorMessage) {
-			      // called asynchronously if an error occurs
-			      // or server returns response with an error status.
-				  source.connected = false;
-				  console.warn( errorMessage );
-				  alert( errorMessage );
-			  });
-		}
-		else {
-			sourceService.disconnectDatasource(source.name)
-			  .then(function(response) {
-				  source.connected = !response.data.disconnected;
-			  }, function(errorMessage) {
-			      // called asynchronously if an error occurs
-			      // or server returns response with an error status.
-				  source.connected = false;
-				  console.warn( errorMessage );
-				  alert( errorMessage );
-			  });
-		}
-	}
-
 	$scope.refresh = function(source, schema) {
-		if(!source.connected) { // TODO : gerer les erreurs de connexion correctement
-			source.errorMessage = "my error";
-			source.errorDetails = "my details";
-			return;
-		}
 		
 		sourceService.getObjects(source.name, schema)
 		  .then(function(response) {

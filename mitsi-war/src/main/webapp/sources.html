@@ -29,11 +29,6 @@
 		<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="searchSource=null; $event.stopPropagation();"></a>
 		<input type="text" ng-model="searchSource" class="form-control" placeholder="Search datasources here..."/>
 	</div>
-	<!--ul class="mitsi-source-list" >
-		<li ng-repeat="s in datasources" title="{{s.description}}">
-			{{ s.name }}
-		</li>
-	</ul -->
 	
 	<accordion close-others="true">
 		<accordion-group 
@@ -47,42 +42,16 @@
             <span class="datasource-accordion-false"  
             	ng-click="selectSource(s)"
             >{{s.name}}</span>
-            <!--  popover="test popover" 
-            	popover-title="test popover title"
-            	popover-trigger="click"
-            	popover-placement="right" -->
-	        <!--  i class="pull-right glyphicon" 
-	           ng-class="{'glyphicon-chevron-down': s.accordionOpened, 'glyphicon-chevron-right': !s.accordionOpened}"></i -->
              
             <a href=""  ng-click="refresh(s, s.currentSchemaName); $event.stopPropagation();">
 	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
             </a>
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
-            <!--alert type="danger" 
-            	popover="les details" 
-            	popover-trigger="mouseenter"
-            	popover-placement="bottom"
-            	>hello</alert-->
+ 
            </accordion-heading>
             {{ s.description }}
-            <!--table style="width:100%"><tr><td >schema : {{ s.currentSchema.name }}</td>
-            <td ><input type="text" 
-            	ng-model="selected" 
-            	typeahead="schema.name for schema in s.schemas | limitTo:20 | orderBy:'schema.name' " 
-            	class="form-control"
-            	placeholder="change current schema here"/></td></tr></table-->
             <br/>
-		    <!-- div class="btn-group" dropdown style="width:100%">
-		      <button id="single-button" type="button" class="btn btn-default" dropdown-toggle style="width:100%">
-		        {{ s.currentSchema.name }} <span class="caret"></span>
-		      </button>            
-		      <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
-           	    <li role="menuitem" ng-repeat="schema in s.schemas | orderBy:'name' ">
-           	  	  <a href="#">{{ schema.name }}</a>
-           	    </li>
-              </ul>
-	        </div -->
 	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
 	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
 					{{ schema.name }}
@@ -163,9 +132,6 @@
 				  	</span>
 				  	</div>
 			      </accordion-heading>
-			<!--ul>
-				<li ng-repeat="o in s.objects">
-							{{ o.id.name }} -->
 					<ul class="mitsi-columns-list" >
 						<li ng-repeat="c in o.columns" 
 						    popover="{{ c.type }} / {{ c.description }}"
@@ -175,8 +141,6 @@
 							{{ c.name }}
 						</li>
 					</ul>
-				<!--/li>
-			</ul-->
 			    </accordion-group>
 			</accordion>
 	    </accordion-group>

@@ -1,19 +1,11 @@
 angular.module('mitsiApp')
     .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService) {
 
-	$scope.tutu = "wdata";
 	$scope.enableFilter = false;
 	$scope.allReadyFetched = 0;
 	$scope.nbRowToFetch = 100; 
 	
-	//$scope.mesdatas = [
-	                  // {"col1":"tutu", "col2":"tata", "col3":"toto"},
-	                  // {"col1":"abc", "col2":"def", "col3":"ghi"}
-	//];
-/*for(var i=0; i!=100; i++) {
-		$scope.mesdatas.push({ "col1":""+i, "col2":""+i, "col3":""+i })
-		
-	}*/
+
 	
 	$scope.initGrid = function() {
 		$scope.dataGrid = { 
@@ -25,8 +17,6 @@ angular.module('mitsiApp')
 	            enableFiltering: $scope.enableFilter,
 	            exporterMenuCsv: true,
 	            enableGridMenu: true,
-	            //infiniteScrollDown: true,
-	            //gridMenuTitleFilter: fakeI18n,
 	            columnDefs: [
 	                 // default
 	                 { field: 'num',
@@ -104,28 +94,14 @@ angular.module('mitsiApp')
 
 	}
 	
-	
-     /*$scope.getTableStyle = function() {
-         return {
-             height: $scope.currentGridHeight,
-             width: "200px"
-         };
-      };*/
-
-
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
 		$scope.beginData(source, databaseObject);
 	});
 	
 	$scope.beginData = function(source, databaseObject) {
-		//alert(source.name + " - " + databaseObject.id.name);
-		//$scope.dataGridSourceName = source.name;
 		$scope.allReadyFetched = 0;
 		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch)
 		  .then(function(response) {
-			  //alert(response);
-			  //response.data.columns
-			  //$scope.mesdatas = [];
 			  $scope.dataGridApi.core.scrollTo(
 					  $scope.dataGrid.data[0],
 					  $scope.dataGrid.columnDefs[0]
@@ -147,7 +123,6 @@ angular.module('mitsiApp')
 			  }
 
 			  
-			  //$scope.initGrid();
 			  var t = response.data.results;
 			  for(var i=0; i!=t.length; i++) {
 				  var r = {};
@@ -155,23 +130,10 @@ angular.module('mitsiApp')
 				  for(var j=0; j!=t[i].length; j++) {
 					  r["col"+j] = t[i][j];
 				  }
-				  //$scope.mesdatas.push(r);
 				  $scope.dataGrid.data.push(r);
 			  }
 		      $scope.allReadyFetched = response.data.results.length;
 
-			  /*if($scope.dataGrid.data.length > 0) {
-				  $scope.dataGridApi.core.scrollTo(
-						  $scope.dataGrid.data[0],
-						  $scope.dataGrid.columnDefs[0]
-				  );
-			  }*/
-
-				/*$scope.gridRefresh = true;
-			  $timeout(function() {
-					$scope.gridRefresh = false;
-			    	$scope.dataGridApi.grid.queueGridRefresh();
-			  });*/
 		  }, function(errorMessage) {
 		      // called asynchronously if an error occurs
 		      // or server returns response with an error status.
@@ -181,9 +143,7 @@ angular.module('mitsiApp')
 	};
 	
 	$scope.getDataDown = function() {
-		/*if(!$scope.dataGridSourceName) {
-			return;
-		}*/
+
 		if(!$rootScope.currentSource) {
 			return;
 		}
@@ -201,7 +161,6 @@ angular.module('mitsiApp')
 				$scope.nbRowToFetch)
 	    .success(function(response) {
 	    	
-	      //$scope.dataGridApi.infiniteScroll.saveScrollPercentage();
 		  var t = response.results;
 		  var noMoreData = (t.length==0 || t.length<$scope.nbRowToFetch);
 		  for(var i=0; i!=t.length; i++) {
@@ -210,7 +169,6 @@ angular.module('mitsiApp')
 			  for(var j=0; j!=t[i].length; j++) {
 				  r["col"+j] = t[i][j];
 			  }
-			  //$scope.mesdatas.push(r);
 			  $scope.dataGrid.data.push(r);
 		  }
 	      $scope.allReadyFetched = $scope.allReadyFetched+t.length;

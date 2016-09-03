@@ -1,13 +1,3 @@
-<!-- 
-	>{{ tutu }}<
-	<br/>
-	len:{{ mestables.length }}
-	<br/>
-	name[0]:{{ mestables.tlist[0].name }}
-	<br/>
-	<pre>{{ mestables | json }}</pre>
-	<br/>
- -->
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
@@ -89,54 +79,7 @@
 			 	<i class="glyphicon glyphicon-pushpin"></i>
 			 </a>
 		 </td>
-	 	 <!-- td style="padding-right:6px;">
-	 	 	<span dropdown> 
-		      <a href="" 
-		         dropdown-toggle 
-		         id="dropdown-tables-from-{{ t.name }}"
-		         ng-disabled="hasTableMissingLinks(t.name, true, false)==false"
-		         class="mitsiMenuGlyphicon"
-		      >
-		        <i class="glyphicon glyphicon-log-in"></i>
-		      </a>
-		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-from-{{ t.name }}">
-		        <li ng-repeat="tFrom in getTableLinksFrom(t.name)">
-		        	<a href="" 
-		        	   ng-click="appendTableNoStacking(105, 105, tFrom.targetName, -1)"
-		        	   >
-		        	{{ tFrom.targetName }}
-		        	</a>
-		        </li>
-		      </ul>
-		    </span>
-	 	 </td>
-		 <td style="padding-right:6px;">
-	 	 	<span dropdown> 
-		      <a href="" 
-		         dropdown-toggle 
-		         id="dropdown-tables-to-{{ t.name }}"
-		         ng-disabled="hasTableMissingLinks(t.name, false, true)==false"
-		         class="mitsiMenuGlyphicon"
-		         >
-		        <i class="glyphicon glyphicon-log-out"></i>
-		      </a>
-		      <ul class="dropdown-menu" aria-labelledby="dropdown-tables-to-{{ t.name }}">
-		        <li ng-repeat="tTo in getTableLinksTo(t.name)">
-		        	<a href="" 
-		        	   ng-click="appendTableNoStacking(105, 105, tTo.targetName, 1)">
-		        	   {{ tTo.targetName }}
-		        	</a>
-		        </li>
-		      </ul>
-		    </span>
-		 </td>
-		 <td style="padding-right:6px;">
-		     <a href="" 
-		        ng-class="{'anchorDisabled':hasTableMissingLinks(t.name, true, true)==false}"
-		        ng-click="displayProximityGraph(t.name)">
-			 	<i class="glyphicon glyphicon-asterisk"></i>
-			 </a>
-		 </td-->
+
 		 <td style="padding-right:6px;"
 		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
 		 >
@@ -175,12 +118,6 @@
 		 	  </a>
 		   </span>
 		 </td>
-		 <!-- td style="padding-right:6px;">
-		 	<i class="glyphicon glyphicon-ok-circle"></i>
-		 </td>
-		 <td style="padding-right:6px;">
-		 	<i class="glyphicon glyphicon-comment"></i>
-		 </td-->
 	 </tr></table>
 	 
 </div>

@@ -4,10 +4,8 @@
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
     <welcome-file>default.html</welcome-file>
     <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
   <context-param>
     <param-name>contextConfigLocation</param-name>
@@ -67,16 +65,6 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>DetailsJspServlet</display-name>
-    <servlet-name>DetailsJspServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.details.DetailsJspServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DetailsJspServlet</servlet-name>
-    <url-pattern>/details</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>GetDetailsServlet</display-name>
     <servlet-name>GetDetailsServlet</servlet-name>
     <servlet-class>org.mitsi.mitsiwar.details.GetDetailsServlet</servlet-class>
@@ -87,16 +75,6 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>TableJspServlet</display-name>
-    <servlet-name>TableJspServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.table.TableJspServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TableJspServlet</servlet-name>
-    <url-pattern>/table</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>ChangeCurrentSchemaServlet</display-name>
     <servlet-name>ChangeCurrentSchemaServlet</servlet-name>
     <servlet-class>org.mitsi.mitsiwar.datasources.ChangeCurrentSchemaServlet</servlet-class>
@@ -104,16 +82,6 @@
   <servlet-mapping>
     <servlet-name>ChangeCurrentSchemaServlet</servlet-name>
     <url-pattern>/ChangeCurrentSchemaServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>LinksJspServlet</display-name>
-    <servlet-name>LinksJspServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.links.LinksJspServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LinksJspServlet</servlet-name>
-    <url-pattern>/links</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>

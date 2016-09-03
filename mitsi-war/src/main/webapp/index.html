@@ -7,15 +7,12 @@
 <link rel="icon" type="image/png" href="img/favicon.png" />
 
 <link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
-<!--  link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap-theme.min.css"/ -->
 <link rel="stylesheet" href="ui-layout-0.0.0/ui-layout.css"/>
 <link rel="styleSheet" href="ui-grid-3.0.4/ui-grid.css"/>
 <link rel="stylesheet" type="text/css" href="rzslider/rzslider-5.4.3.min.css"/>
 <link rel="styleSheet" href="css/mitsi.css"/>
 
 <script src="angularjs-1.4.8/angular.js"></script>
-<!-- script src="angularjs-1.4.3/angular.js"></script -->
-<!-- script src="angularjs-1.4.3/angular-route.js"></script -->
 <script src="ui-router-0.2.15/angular-ui-router.js"></script>
 <script src="ui-bootstrap-0.13.3/ui-bootstrap-tpls-0.13.3.js"></script>
 <script src="ui-layout-master/ui-layout.js"></script>
@@ -115,13 +112,7 @@ function montutu() {
 		<a href="" class="btn btn-default">export datasources</a>
 
    <div ui-layout style="top:40px">
-      <!-- header  >
-      	<img src="img/logo-transparent.png" style="height:26px;vertical-align:bottom;"/>
-		<a href="" class="btn btn-default">import datasources</a>
-		<a href="" class="btn btn-default">export datasources</a>
-	      
-      </header -->
-      <ui-layout options="{ flow : 'column' }">
+       <ui-layout options="{ flow : 'column' }">
         <sidebar ui-layout-container size="500px" style="overflow-y: scroll">
         	<ng-include src="'sources.html'" ></ng-include>
         </sidebar>
@@ -129,25 +120,9 @@ function montutu() {
         <div ui-layout-container >
          <div ui-view ></div>
         </div>
-        <!-- div >
-        	<div ui-layout-container>coucou</div>
-        	<div ui-layout-container>coucou2</div>
-        </div -->
-        
-        
-        <!-- ui-layout ui-layout-container options="{ flow : 'row' }" >
-  	      <div ui-layout-container  >
-  	      	center-back
-  	      </div>
-  	      <div ui-layout-container >
-  	      	center-back-2
-  	      </div>
-  	    </ui-layout -->
-      </ui-layout>
-      <!-- footer >south-back</footer -->
-    </div>
 
-	
+      </ui-layout>
+    </div>
 
     </body>
 </html>
