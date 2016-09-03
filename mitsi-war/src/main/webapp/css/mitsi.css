@@ -256,5 +256,12 @@
 }
 
 
+.anchorDisabled {
+	color : #515151;
+	text-decoration:none;
+}
 
-
+.anchorDisabled:hover {
+	color : #515151;
+	text-decoration:none;
+}
