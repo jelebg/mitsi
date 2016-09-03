@@ -133,6 +133,7 @@ angular.module('mitsiApp')
 	$scope.clearPath = function() {
 		$scope.paths  = [];
 		$scope.rpaths = [];
+		$scope.unhighlightAllConnections();
 	}
 	
 	$scope.computePathIfNecessary = function() {
@@ -154,11 +155,51 @@ angular.module('mitsiApp')
 		$scope.paths  = graph.getAllPaths(startIndex, endIndex, false);
 		$scope.rpaths = graph.getAllPaths(endIndex, startIndex, false);
 		
+		$scope.unhighlightAllConnections();
+		$scope.highlightPathsConnections($scope.paths)
+		$scope.highlightPathsConnections($scope.rpaths)
 	}
+	
+	$scope.unhighlightAllConnections = function() {
+		var connectionList = $scope.jsplumb.getConnections();
+		if(!connectionList) { 
+			return; 
+		}
+		for(key in connectionList) { 
+			var connection = connectionList[key];
+			connection.setPaintStyle ({ strokeStyle:"lightgrey", lineWidth:3 });
+		}
+	}
+	
+	$scope.highlightPathsConnections = function(paths) {
+		for(var iPath=0; iPath!=paths.length; iPath++) {
+			var path=paths[iPath];
+			
+			for(var iTable=0; iTable<path.length-1; iTable++) {
+				var tableFrom = $scope.getPathIndexName(path[iTable]);
+				var tableTo = $scope.getPathIndexName(path[iTable+1]);
+				if(!tableFrom) {
+					continue;
+				}
+				if(!tableTo) {
+					continue;
+				}
+				
+				var connectionList = $scope.jsplumb.getConnections({ source:$scope.divPrefix+tableFrom, target:$scope.divPrefix+tableTo }); 
+				if(!connectionList) { 
+					continue; 
+				}
+				for(key in connectionList) { 
+					var connection = connectionList[key];
+					connection.setPaintStyle ({ strokeStyle:"#00ffff", lineWidth:3 });
+				}
+			}
+		}
+	};
 
 	
 	$scope.isTableInPath= function(tableName) {
-		if($scope.paths.length == 0) {
+		if($scope.paths.length == 0 && $scope.rpaths.length == 0) {
 			return false;
 		}
 		var graph = $rootScope.currentSource.mitsiGraph;
