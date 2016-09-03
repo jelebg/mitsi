@@ -40,6 +40,13 @@ angular.module('mitsiApp')
 		$scope.showPaths = true;
 	}
 	$scope.getPathIndexName = function(index) {
+		if(!$rootScope.currentSource) {
+			return;
+		}
+		if(!$rootScope.currentSource.mitsiGraph) {
+			return;
+		}		
+		
 		return $rootScope.currentSource.mitsiGraph.getVertexName(index);
 	}
 
