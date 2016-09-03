@@ -23,6 +23,17 @@ angular.module('mitsiApp')
 	$scope.showSQL = false;
 	$scope.showPaths = false;
 	
+	
+	$scope.initGraphDisplay = function() {
+		$scope.removeAllTables();
+		$scope.sqlTables = [];
+		$scope.sqlText = [];
+		$scope.pathStart = "";
+		$scope.pathEnd = "";
+		$scope.paths = [];
+		$scope.rpaths = [];		
+	}	
+	
 	$scope.displayGraph = function() {
 		$scope.graphOpacity = "1.0";
 		$scope.showSQL = false;
@@ -478,8 +489,11 @@ angular.module('mitsiApp')
 
 	}
 	
+	$scope.$on(EVENT_DATABASE_SELECTED, function (event, source) {
+		$scope.initGraphDisplay();	
+	});
+	
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
-		var ypos = 0;
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
@@ -488,7 +502,6 @@ angular.module('mitsiApp')
 		
 	});
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, function (event, source, databaseObject) {
-		var ypos = 0;
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
