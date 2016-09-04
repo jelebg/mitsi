@@ -281,11 +281,14 @@ angular.module('mitsiApp')
 			
 			// maybe there is a better place for dragg management
 			// TODO : drag selection only if we move the table that we hovered in the first place
-			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"));
-			$scope.jsplumb.clearDragSelection();
+			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"), {});
+			
+			
+			/*$scope.jsplumb.clearDragSelection();
 			for(var i=0; i!=$scope.tablesTemporary.length; i++) {
 				$scope.jsplumb.addToDragSelection(document.getElementById($scope.divPrefix+$scope.tablesTemporary[i]));
-			}
+			}*/
+			
 		}, 0);
 	}
 
