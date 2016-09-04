@@ -268,27 +268,35 @@ angular.module('mitsiApp')
 			}
 		}
 		
-		$scope.appendFKList(fkList);
+		$scope.afterTableUpdate(fkList, {});
 
 	}
-
-	$scope.appendFKList = function(fklist) {
+	
+	$scope.afterTableUpdate = function(fklist, posses) {
 		$timeout(function() {
 			for(var i=0; i!=fklist.length; i++) {
 				var mafk = fklist[i];
 				$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
 			}
 			
-			// maybe there is a better place for dragg management
-			// TODO : drag selection only if we move the table that we hovered in the first place
 			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"), {});
 			
-			
-			/*$scope.jsplumb.clearDragSelection();
-			for(var i=0; i!=$scope.tablesTemporary.length; i++) {
-				$scope.jsplumb.addToDragSelection(document.getElementById($scope.divPrefix+$scope.tablesTemporary[i]));
-			}*/
-			
+			if(posses) {
+				for(var posse in posses) {
+					var tables = posses[posse];
+					
+					if(tables.length > 0) {
+						$scope.jsplumb.addToPosse($scope.divPrefix+posse, posse);					
+					}
+					
+					for(var i=0; i!=tables.length; i++) {
+						var tableName = tables[i];
+						console.log
+						$scope.jsplumb.addToPosse($scope.divPrefix+tableName, posse);					
+					}
+					
+				}
+			}
 		}, 0);
 	}
 
@@ -616,6 +624,8 @@ angular.module('mitsiApp')
 
 	
 	$scope.removeTable = function(tableName, withTemporary) {
+		$scope.jsplumb.detachAllConnections($scope.divPrefix + tableName);
+		$scope.jsplumb.removeAllEndpoints($scope.divPrefix + tableName);
 		$scope.jsplumb.remove($scope.divPrefix + tableName);
 		delete $scope.tables[tableName];	
 		
@@ -647,6 +657,8 @@ angular.module('mitsiApp')
 			$scope.tablesTemporary.splice(i, 1);
 		}
 		
+		$scope.jsplumb.removeFromAllPosses(document.getElementById($scope.divPrefix+tableName));
+
 	}
 
 	$scope.isTableSelected = function(tableName) {
@@ -668,10 +680,13 @@ angular.module('mitsiApp')
 	$scope.hideProximityGraph = function() {
 		
 		for(var i=0; i!=$scope.tablesTemporary.length; i++) {
-			$scope.removeTable($scope.tablesTemporary[i]);
+			var tableName = $scope.tablesTemporary[i];
+			$scope.jsplumb.removeFromAllPosses(document.getElementById($scope.divPrefix+tableName));
+			$scope.removeTable(tableName);
 		}
 		
 		$scope.tablesTemporary = [];
+
 	}
 	
 	$scope.displayProximityGraph = function(currentVertexName, temporary) {
@@ -679,6 +694,10 @@ angular.module('mitsiApp')
 		var name = currentVertexName;
 		var existingTables = [];
 		var appendedTables = [];
+		var posses = {};
+		if(temporary) {
+			posses[currentVertexName] = []; 
+		}
 		
 		var graph = $rootScope.currentSource.mitsiGraph;
 		var currentVertexIndex = graph.getIndex(currentVertexName);
@@ -724,6 +743,7 @@ angular.module('mitsiApp')
 							vertexName);
 					if(temporary===true) {
 						$scope.tablesTemporary.push(vertexName);
+						posses[currentVertexName].push(vertexName);
 					}
 					appendedTables.push(vertexName);
 				}
@@ -741,6 +761,7 @@ angular.module('mitsiApp')
 							vertexName);
 					if(temporary===true) {
 						$scope.tablesTemporary.push(vertexName);
+						posses[currentVertexName].push(vertexName);
 					}
 					appendedTables.push(vertexName);
 				}
@@ -764,7 +785,7 @@ angular.module('mitsiApp')
 			}
 		}
 		
-		$scope.appendFKList(fklist);
+		$scope.afterTableUpdate(fklist, posses);
 	}
 	
 	$scope.appendVertexLinks = function(graph, fklist, vertex, existingTables) {
