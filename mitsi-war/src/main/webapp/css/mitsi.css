@@ -265,3 +265,19 @@
 	color : #515151;
 	text-decoration:none;
 }
+
+/* animations */
+
+.glyphicon.fast-right-spinner {
+    animation: glyphicon-spin-r 1s infinite linear;
+}
+
+@keyframes glyphicon-spin-r {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(359deg);
+    }
+}

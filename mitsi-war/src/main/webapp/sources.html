@@ -44,7 +44,9 @@
             >{{s.name}}</span>
              
             <a href=""  ng-click="refresh(s, s.currentSchemaName); $event.stopPropagation();">
-	            <i class="pull-right glyphicon glyphicon-refresh" style="margin-right:5px" ></i>
+	            <i class="pull-right glyphicon glyphicon-refresh "
+	               ng-class="{'fast-right-spinner':s.loading}" 
+	               style="margin-right:5px" ></i>
             </a>
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>

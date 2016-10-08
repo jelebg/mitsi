@@ -23,8 +23,11 @@ angular.module('mitsiApp')
 	
 	$scope.refresh = function(source, schema) {
 		
-		sourceService.getObjects(source.name, schema)
+	   source.loading = true;
+
+	   sourceService.getObjects(source.name, schema)
 		  .then(function(response) {
+			  source.loading = false;
 			  source.objects = response.data.databaseObjects;
 			  source.schemas = response.data.schemas;
 			  source.currentSchemaName = null;
@@ -47,6 +50,7 @@ angular.module('mitsiApp')
 			  $scope.initGraph(source);
 			  
 		  }, function(errorMessage) {
+			  source.loading = false;
 		      // called asynchronously if an error occurs
 		      // or server returns response with an error status.
 			  console.warn( errorMessage );
