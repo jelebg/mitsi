@@ -126,7 +126,7 @@
 			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ (o.id.type=='table' ? 'table' : (o.id.type=='matview' ? 'matview' : (o.id.type=='view' ? 'view' : ''))) }}.png"/>
 				  	<span   ng-click="selectObject(s, o)"   
-							ng-class="{'sourceObjectSelect':s.selectedId.name==o.id.name && s.selectedId.schema==o.id.schema}"
+							ng-class="{'sourceObjectSelect':s.currentObject.id.name==o.id.name && s.currentObject.id.schema==o.id.schema}"
 						  	popover="{{o.description}}"
 							popover-trigger="mouseenter"
 							popover-popup-delay="2000" >

@@ -1,3 +1,61 @@
+    .ui-grid-menu-button {
+      height: 31px;
+    }
+.ui-splitbar {
+	border: 1px solid lightgrey;
+}
+.ui-splitbar a {
+	font-size : 70%;
+}
+
+.sourceTags {
+	font-size:70%;
+	font-style:italic;
+	color:grey;
+}
+
+.mitsi-columns-list {
+	list-style-type:none;
+	padding-left:0px;
+}
+
+.datasource-accordion-true {
+	font-weight:bold;
+}
+
+.datasource-accordion-false {
+	font-weight:normal;
+}
+
+.filter-glyphicon {
+	color:grey;
+	pointer-events: all;
+}
+.filter-glyphicon:hover {
+	text-decoration : none;
+}
+.filter-glyphicon:focus {
+	text-decoration : none;
+	outline-style: none;
+}
+
+
+.mitsi-grey {
+	color : grey;
+}
+
+.datasource-error {
+	color : red
+}
+
+.database-object-unpined {
+	color : grey;
+}
+
+.database-object-pined {
+}
+
+
 .mitsiHidden {
 	visibility: hidden;
 }
@@ -224,7 +282,7 @@
 }
 
 .sourceObjectSelect {
-	color:green;
+/*	color : #4d6c37;*/
 	font-weight:bold;
 }
 
