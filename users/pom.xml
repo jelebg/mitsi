@@ -25,9 +25,7 @@
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>oracle-jdbc-driver</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/../lib/ojdbc7.jar</systemPath>
+			<version>1.0.0-repo</version>
 		</dependency>
 		
 		<dependency>
