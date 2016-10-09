@@ -1,5 +1,25 @@
 angular.module('mitsiApp')
-    .controller('wgraphCtrl', function($scope, $rootScope, $timeout) {
+    .controller('wgraphOptionsCtrl', function($scope, $rootScope, $modalInstance, options) {
+    	$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
+    	
+    	$scope.init = function(options) {
+    		$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
+    	}
+    	
+        $scope.closeAndSaveOptionsDialog = function() {
+        	$modalInstance.close( {
+        		alwaysDisplaySchema : $scope.alwaysDisplaySchema
+        	});
+        }
+        
+        $scope.closeOptionsDialog = function() {
+        	$modalInstance.dismiss();
+        }
+    
+});
+
+angular.module('mitsiApp')
+    .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal) {
 
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
@@ -11,6 +31,10 @@ angular.module('mitsiApp')
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
 
+	$scope.options = {
+		alwaysDisplaySchema : true
+	}
+	
 	$scope.pathStart = "";
 	$scope.pathEnd = "";
 	$scope.paths = [];
@@ -1043,8 +1067,43 @@ angular.module('mitsiApp')
         $rootScope.$broadcast(EVENT_DATABASE_OBJECT_INFO_REQUESTED, $rootScope.currentSource, object);
 	}
 	
+	$scope.showOptionsDialog = function() {
+
+		modalInstance = $modal.open({
+		      animation: true,
+		      ariaLabelledBy: 'modal-title',
+		      ariaDescribedBy: 'modal-body',
+		      templateUrl: 'popups/graphOptions.inline.html',
+		      controller: 'wgraphOptionsCtrl',
+		      //controllerAs: '$ctrl',
+		      resolve: {
+		          options: function () {
+		            return $scope.options;
+		          }
+		        }
+
+		    });
 	
+		modalInstance.result.then(function (options) {
+		      $scope.options.alwaysDisplaySchema = options.alwaysDisplaySchema;
+		    }, function () {
+		      // nothing
+		    });
 	
+	}
+	
+	$scope.getTableDisplayName = function(name) {
+		if($scope.options.alwaysDisplaySchema) {
+			return name;
+		}
+		
+		var i = name.indexOf(".");
+		if(i<0 || name.substring(0, i)!==$rootScope.currentSource.currentSchemaName) {
+			return name;
+		}
+		
+		return name.substring(i+1);
+	}
 	
 	$scope.jsplumbInit();
 	$scope.tablesInit();

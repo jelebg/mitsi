@@ -41,7 +41,7 @@
 
 
 .mitsi-grey {
-	color : grey;
+	color : grey !important;
 }
 
 .datasource-error {
@@ -323,6 +323,11 @@
 	color : #515151;
 	text-decoration:none;
 }
+
+.mitsiCheckOption {
+	text-decoration : none !important;
+}
+
 
 /* animations */
 

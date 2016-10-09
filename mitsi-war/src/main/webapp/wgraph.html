@@ -1,9 +1,29 @@
+<script type="text/ng-template" id="popups/graphOptions.inline.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Options des graphs</h3>
+        </div>
+        <div class="modal-body" id="modal-body"  >
+            <a href="" 
+               ng-click="alwaysDisplaySchema=!alwaysDisplaySchema; $event.stopPropagation();"
+               class="mitsiCheckOption"
+			   ng-class="{'mitsi-grey':!alwaysDisplaySchema}" >
+				<i class="glyphicon glyphicon-ok" ></i>
+				always display schema name with tables in graphs
+			</a>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="closeAndSaveOptionsDialog()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="closeOptionsDialog()">Cancel</button>
+        </div>
+</script>
+ 
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
   	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd"><a href="" ng-click="displayGraph()">Graph</a></td></tr>
   	<tr><td ng-class="{'verticalMenuTdSelected':showSQL}"  class="verticalMenuTd"><a href="" ng-click="displaySQL()">SQL</a></td></tr>
   	<tr><td ng-class="{'verticalMenuTdSelected':showPaths}"  class="verticalMenuTd"><a href="" ng-click="displayPaths()">Paths</a></td></tr>
+  	<tr><td class="verticalMenuTd"><a href="" ng-click="showOptionsDialog()"><i class="glyphicon glyphicon-option-horizontal" style="font-size:120%;"></i></a></td></tr>
   	<tr><td style="height:150px">
   	  <rzslider rz-slider-model="zoomSlider.value" rz-slider-options="zoomSlider.options"></rzslider>
     </td></tr>
@@ -63,7 +83,7 @@
 	 ng-mouseover="mouseOverDiv(t)"
 	 ng-mouseleave="mouseLeaveDiv()"
 	 >
-	 {{ t.name }}
+	 {{ getTableDisplayName(t.name) }}
 	 <a href=""
 	    ng-show="showIcons" 
 	    ng-click="removeTable(t.name, true)">
