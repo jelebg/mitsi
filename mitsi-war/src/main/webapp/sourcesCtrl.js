@@ -26,25 +26,21 @@ angular.module('mitsiApp')
 	   source.loading = true;
 
 	   sourceService.getObjects(source.name, schema, true)
-		  .then(function(response) {
+	   .then(function(response) {
 			  $scope.initSources(source, response)
-			  
-			  sourceService.getObjects(source.name, schema, false)
-				  .then(function(response) {
-					  source.loading = false;
-					  $scope.initSources(source, response)				  
-				  }, function(errorMessage) {
-					  source.loading = false;
-					  console.warn( errorMessage );
-					  alert( errorMessage );
-				  });
-
-			  
-		  }, function(errorMessage) {
-			  source.loading = false;
-			  console.warn( errorMessage );
-			  alert( errorMessage );
-		  });
+			  return sourceService.getObjects(source.name, schema, false);
+	   })
+	   .then(function(response) {
+			  $scope.initSources(source, response)				  
+	   })
+	   .catch(function(error) {
+	     // this catches errors from the $http calls as well as from the explicit throw
+	     console.log("An error occured: " + error);
+	     alert(error);
+	   })
+	   .finally(function() {
+		  source.loading = false;
+	   });
 	}
 	
 	$scope.initSources = function(source, response) {
