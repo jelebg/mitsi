@@ -1,6 +1,8 @@
-    .ui-grid-menu-button {
-      height: 31px;
-    }
+.accordion-toggle:focus{outline: none;}
+
+.ui-grid-menu-button {
+    height: 31px;
+}
 .ui-splitbar {
 	border: 1px solid lightgrey;
 }
