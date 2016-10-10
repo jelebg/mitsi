@@ -26,7 +26,6 @@ angular.module('mitsiApp')
 	$scope.divPrefix = "mitsiObject_";
 	$scope.tables = {};
 	$scope.tablesTemporary = [];
-	$scope.showProximityGraphTimeoutPromise = null;
 	$scope.hideProximityGraphTimeoutPromise = null;
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
@@ -40,8 +39,7 @@ angular.module('mitsiApp')
 	$scope.paths = [];
 	$scope.rpaths = [];
 
-	$scope.TEMPORARY_TABLE_SHOW_TIMEOUT = 1000;
-	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 1000;
+	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 600;
 	
 	$scope.graphOpacity = true;
 	$scope.showSQL = false;
@@ -588,31 +586,37 @@ angular.module('mitsiApp')
 	});
 	
 	$scope.resetTimeoutPromises = function() {
-		if($scope.showProximityGraphTimeoutPromise != null) {
-			$timeout.cancel($scope.showProximityGraphTimeoutPromise);
-			$scope.showProximityGraphTimeoutPromise = null;
-		}
 		if($scope.hideProximityGraphTimeoutPromise != null) {
 			$timeout.cancel($scope.hideProximityGraphTimeoutPromise);
 			$scope.hideProximityGraphTimeoutPromise = null;
 		}
 	}
 	
-	$scope.mouseOverDiv = function(table) {
+	$scope.mouseOverTableName = function(table) {
 		this.showIcons = true;
+		
+		$scope.resetTimeoutPromises();
+		
+	}
+	$scope.mouseLeaveTableName = function() {
+		this.showIcons = false;
+
+		$scope.resetTimeoutPromises();
+		
+		$scope.hideProximityGraphTimeoutPromise = $timeout(function() {
+			$scope.hideProximityGraph();
+		}, $scope.TEMPORARY_TABLE_HIDE_TIMEOUT);
+	}
+	
+	$scope.mouseOverAsterisk = function(table) {
 		
 		$scope.resetTimeoutPromises();
 
 		if($scope.hasTableMissingLinks(table.name, true, true)) {
-			
-			$scope.showProximityGraphTimeoutPromise = $timeout(function() {
-				$scope.displayProximityGraph(table.name, true);
-			}, $scope.TEMPORARY_TABLE_SHOW_TIMEOUT);
-			
+			$scope.displayProximityGraph(table.name, true);
 		}
 	}
-	$scope.mouseLeaveDiv = function() {
-		this.showIcons = false;
+	$scope.mouseLeaveAsterisk = function() {
 
 		$scope.resetTimeoutPromises();
 		
@@ -658,7 +662,7 @@ angular.module('mitsiApp')
 			if(i >= 0) {
 				$scope.tablesTemporary.splice(i, 1);
 			}
-			$scope.mouseLeaveDiv();
+			$scope.mouseLeaveTableName();
 		}
 
 	}
@@ -683,6 +687,24 @@ angular.module('mitsiApp')
 		
 		$scope.jsplumb.removeFromAllPosses(document.getElementById($scope.divPrefix+tableName));
 
+	}
+
+	$scope.pinTemporaryLinkedTables = function(tableName) {
+		var linkedTablesTo = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
+		if(linkedTablesTo != null) {
+			for(var i=0; i!=linkedTablesTo.length; i++) {
+				var t=linkedTablesTo[i];
+				$scope.pinTemporaryTable(t.targetName);
+			}
+		}
+		var linkedTablesFrom = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
+		if(linkedTablesFrom != null) {
+			for(var i=0; i!=linkedTablesFrom.length; i++) {
+				var t=linkedTablesFrom[i];
+				$scope.pinTemporaryTable(t.targetName);
+			}
+		}
+		
 	}
 
 	$scope.isTableSelected = function(tableName) {
@@ -736,7 +758,7 @@ angular.module('mitsiApp')
 			if(max > maxmax) {
 				maxmax = max;
 			}
-			var r = (i+1)*Math.max(170, maxmax * 30);
+			var r = (i+1)*Math.max(200, maxmax * 30);
 			radiu[i] = r;
 		}
 		var x0 = radiu[depth-1]+200;

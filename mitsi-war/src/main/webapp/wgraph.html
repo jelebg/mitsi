@@ -78,10 +78,10 @@
      id="{{divPrefix+t.name}}"
      ng-class="{'linksTableSelected':isTableSelected(t.name), 'linksTableInPath':isTableInPath(t.name), 'linksTableTemporary':isTableTemporary(t.name)}"
 	 class="linksTable"
-	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:120px;cursor:default;"
+	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:130px;cursor:default;"
 	 draggable="true"
-	 ng-mouseover="mouseOverDiv(t)"
-	 ng-mouseleave="mouseLeaveDiv()"
+	 ng-mouseover="mouseOverTableName(t)"
+	 ng-mouseleave="mouseLeaveTableName()"
 	 >
 	 {{ getTableDisplayName(t.name) }}
 	 <a href=""
@@ -92,7 +92,7 @@
 	 </a>
 	 <table 
 	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
-		 <td style="padding-right:6px;">
+		 <td style="padding-right:5px;">
 		     <a href="" 
 		        ng-show="isTableTemporary(t.name)"
 		        ng-click="pinTemporaryTable(t.name)">
@@ -100,18 +100,31 @@
 			 </a>
 		 </td>
 
-		 <td style="padding-right:6px;"
+		 <td style="padding-right:5px;"
 		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
 		 >
 		 	<a href="" 
-		       ng-click="requestInfo(t)">
+		        ng-show="! isTableTemporary(t.name)"
+				ng-mouseover="mouseOverAsterisk(t)"
+				ng-mouseleave="mouseLeaveAsterisk()"
+ 		        ng-click="pinTemporaryLinkedTables(t.name)">
+		        <i class="glyphicon glyphicon-asterisk"></i>
+		     </a>
+		 </td>
+		 <td style="padding-right:5px;"
+		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
+		 >
+		 	<a href="" 
+		        ng-show="! isTableTemporary(t.name)"
+ 		        ng-click="requestInfo(t)">
 		        <i class="glyphicon glyphicon-info-sign"></i>
 		     </a>
 		 </td>
-		 <td style="padding-right:6px;"
+		 <td style="padding-right:5px;"
 		     ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
 		 >
 		   <span 
+		        ng-show="! isTableTemporary(t.name)"
 		   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
 		   		>
 		  	<a href=""  
@@ -120,19 +133,23 @@
 		  	   >SQL</a>
 		  	</span>
 		 </td>		 
-		 <td style="padding-right:6px;"
+		 <td style="padding-right:5px;"
 		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathStart(t)}"
 		 >
-		 	<span ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
+		 	<span 
+		 		ng-show="! isTableTemporary(t.name)"
+		 		ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
 		 	  <a href="" ng-click="setTablePathStart(t)">
 		 	    <img style="transform: scale(-1, 1);" src="img/flag_path.png"/>
 		 	  </a>
 		   </span>
 		 </td>
-		 <td style="padding-right:6px;"
+		 <td style="padding-right:5px;"
 		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathEnd(t)}"
 		 >
-		   <span ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
+		   <span 
+		   		ng-show="! isTableTemporary(t.name)"
+		   		ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
 		 	  <a href="" ng-click="setTablePathEnd(t)">
 		 	    <img src="img/flag_path.png"/>
 		 	  </a>
