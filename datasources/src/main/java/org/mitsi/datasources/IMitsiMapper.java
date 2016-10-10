@@ -12,6 +12,7 @@ public interface IMitsiMapper {
 	void changeSchema(@Param("schema") String schema);
 	List<Schema> getAllSchemas();
 	List<DatabaseObject> getTablesAndViews(@Param("owner") String owner);
+	List<DatabaseObject> getTablesAndViewsLight(@Param("owner") String owner);
 	List<Date> getLastSchemaUpdateTime(@Param("owner") String owner);
 	List<Index> getSchemaIndexes(@Param("owner") String owner);
 	List<Constraint> getSchemaConstraints(@Param("owner") String owner);

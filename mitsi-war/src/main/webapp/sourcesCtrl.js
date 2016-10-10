@@ -25,37 +25,49 @@ angular.module('mitsiApp')
 		
 	   source.loading = true;
 
-	   sourceService.getObjects(source.name, schema)
+	   sourceService.getObjects(source.name, schema, true)
 		  .then(function(response) {
-			  source.loading = false;
-			  source.objects = response.data.databaseObjects;
-			  source.schemas = response.data.schemas;
-			  source.currentSchemaName = null;
+			  $scope.initSources(source, response)
 			  
-			  for(var i=0; i!=source.schemas.length; i++) {
-				  if( source.schemas[i].current) {
-					  source.currentSchemaName = source.schemas[i].name;
-					  break;
-				  }
-			  }
-			  source.filter = {
-					  hideTables:false,
-					  hideViews:false,
-					  hideMViews:false,
-					  tableName:true,
-					  columnName:true,
-					  indexName:true,
-					  constraintName:true
-			  };
-			  $scope.initGraph(source);
+			  sourceService.getObjects(source.name, schema, false)
+				  .then(function(response) {
+					  source.loading = false;
+					  $scope.initSources(source, response)				  
+				  }, function(errorMessage) {
+					  source.loading = false;
+					  console.warn( errorMessage );
+					  alert( errorMessage );
+				  });
+
 			  
 		  }, function(errorMessage) {
 			  source.loading = false;
-		      // called asynchronously if an error occurs
-		      // or server returns response with an error status.
 			  console.warn( errorMessage );
 			  alert( errorMessage );
 		  });
+	}
+	
+	$scope.initSources = function(source, response) {
+		  source.objects = response.data.databaseObjects;
+		  source.schemas = response.data.schemas;
+		  source.currentSchemaName = null;
+		  
+		  for(var i=0; i!=source.schemas.length; i++) {
+			  if( source.schemas[i].current) {
+				  source.currentSchemaName = source.schemas[i].name;
+				  break;
+			  }
+		  }
+		  source.filter = {
+				  hideTables:false,
+				  hideViews:false,
+				  hideMViews:false,
+				  tableName:true,
+				  columnName:true,
+				  indexName:true,
+				  constraintName:true
+		  };
+		  $scope.initGraph(source);
 	}
 	
 	$scope.initGraph = function(datasource) {

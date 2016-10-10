@@ -4,7 +4,7 @@ public class GetDatabaseObjects {
 	String filter; // maybe null
 	String datasourceName;
 	String schema;
-	Boolean disableCaching;
+	Boolean light;
 	
 	public GetDatabaseObjects() {
 	}

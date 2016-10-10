@@ -83,6 +83,37 @@
 
 </select>
 
+<select id="getTablesAndViewsLight" resultMap="DatabaseObjectResultMap">
+	
+	SELECT 
+		all_objects.owner 		id_schema, 
+		all_objects.object_name id_name, 
+		decode(all_objects.object_type, 
+			'TABLE', 'table', 
+			'VIEW', 'view', 
+			'MATERIALIZED VIEW', 'matview', 
+			null 
+		) id_type
+	FROM all_objects
+	     LEFT JOIN all_tab_columns ON all_objects.owner=all_tab_columns.owner AND all_objects.object_name=all_tab_columns.table_name 
+       LEFT JOIN all_tab_comments ON all_objects.owner=all_tab_comments.owner AND all_objects.object_name=all_tab_comments.table_name AND all_objects.object_type=all_tab_comments.table_type 
+       LEFT JOIN all_col_comments ON all_tab_columns.owner=all_col_comments.owner AND all_tab_columns.table_name=all_col_comments.table_name AND all_tab_columns.column_name=all_col_comments.column_name
+	WHERE all_objects.object_type IN ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
+	AND all_objects.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_objects.owner NOT LIKE 'APEX_%'
+	AND NOT (all_objects.object_type='TABLE' and 
+          exists (SELECT 1 FROM all_objects ao WHERE ao.owner=all_objects.owner AND ao.object_name=all_objects.object_name AND ao.object_type='MATERIALIZED VIEW'))
+   <choose>
+	    <when test="owner==null">
+	    	AND all_objects.owner = sys_context( 'userenv', 'current_schema' )
+	    </when>
+	    <otherwise>
+	    	AND all_objects.owner = #{owner}
+	    </otherwise>
+    </choose>
+	ORDER BY all_objects.owner, all_objects.object_name, all_objects.object_type
+
+</select>
 
 <!--  todo : encoder le json autrement ? -->
 <select id="getTablesDetails" resultMap="DatabaseObjectResultMap">

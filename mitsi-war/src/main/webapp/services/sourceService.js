@@ -1,11 +1,11 @@
 angular.module('mitsiApp')
 .service( 'sourceService', function($http) {
 
-	this.getObjects = function(datasourceName, schema) {
+	this.getObjects = function(datasourceName, schema, light) {
 		return $http.post('GetDatabaseObjectsServlet', { 
 			"datasourceName" : datasourceName,
 			"schema" : schema,
-			"disableCaching" : true // TODO : a supprimer
+			"light" : light 
 		});
 	}
 

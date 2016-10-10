@@ -57,6 +57,17 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
+	public void getTablesLight() throws IOException, ParseException, ClassNotFoundException, SQLException {
+
+		try(MitsiConnection connection = datasourceManager.getConnection("LOCALHOST-TEST")) {
+			List<DatabaseObject> ldo = connection.getTablesAndViewsLight(null);
+			assertTrue(ldo != null);
+			assertTrue(ldo==null || ldo.size() > 0);
+		
+		}
+	}
+	
+	@Test
 	public void getIndexes() throws IOException, ParseException, ClassNotFoundException, SQLException {
 
 		
