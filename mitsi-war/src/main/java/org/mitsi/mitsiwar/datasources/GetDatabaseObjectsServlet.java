@@ -26,7 +26,6 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
  
 	@Override
 	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
-		
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
 		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
@@ -44,6 +43,7 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 			else {
 				for(Schema s : response.schemas) {
 					s.current = s.name.equals(schema);
+					break;
 				}
 			}
 			

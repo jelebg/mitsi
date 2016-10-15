@@ -82,11 +82,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		for(DatabaseObject dobj : databaseObjects) {
 			doMap.put(dobj.getId(), dobj);
 		}
-		
+
 		for(Index i : indexes) {
 			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, i.owner, i.tableName));
 			if(dobj == null) {
-				log.warn("cannot find table "+i.owner+"."+i.tableName+" for index "+i.owner+"."+i.name);
+				log.debug("cannot find table "+i.owner+"."+i.tableName+" for index "+i.owner+"."+i.name);
 			}
 			else {
 				dobj.getIndexes().add(i);
@@ -96,7 +96,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		for(Constraint c : constraints) {
 			DatabaseObject dobj = doMap.get(new DatabaseObject.Id(null, c.owner, c.tableName));
 			if(dobj == null) {
-				log.warn("cannot find table "+c.owner+"."+c.tableName+" for index "+c.owner+"."+c.name);
+				log.debug("cannot find table "+c.owner+"."+c.tableName+" for index "+c.owner+"."+c.name);
 			}
 			else {
 				dobj.getConstraints().add(c);
@@ -206,53 +206,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public List<Constraint> getSchemaConstraints(String schema) {
 		return mapper.getSchemaConstraints(schema);
 	}
-	
-	/*public void testOK() {
-		//boolean ret = false;
-		//try {
-			//String str = sqlSession.selectOne("testOK" /*"mapper.oracle.testOK"* /);
-			String str = mapper.testOK();
-			if(str != null) {
-				log.debug("mapper.testOK : '"+str+"'");
-				//ret = true;
-			}
-			
-			//Statement stmt = connection.createStatement();
-			//ResultSet rs = stmt.executeQuery("select 1 from dual");
-			
-			//if(rs.next()) {
-			//	ret = true;
-			//}
-			
-		//} catch(Exception e) {
-		//	e.printStackTrace();
-		//	ret = false;
-		//}
-		//return ret;
-	}*/
-
-	/* TODO 
-	public List<DatabaseObject> getTables() {
-		
-	}
-	public List<DatabaseObject> getTablesAndColumns() {
-		
-	}
-	public List<DatabaseObject> getTablesAndLinkedObjets() {
-		
-	}
-	public List<DatabaseObject> getUserObjets() {
-		
-	}
-	public List<DatabaseObject> getAllObjets() {
-		
-	}
-	*/
-	
-	/*public List<DatabaseObject> getTablesAndViews() {
-		return mapper.getTablesAndViews();
-	}*/
-	
 	
 	public static void securityCheckDbObject(String tableName) throws MitsiSecurityException {
 		// TODO : conserver le pattern pour ne pas le recompiler systématiquement
