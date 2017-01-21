@@ -1,10 +1,6 @@
-package org.mitsi.mitsiwar.utils;
+package org.mitsi.commons;
 
-// TODO : a deplacer dans un package commons
-public class StringUtils {
-	public static boolean isEmpty(String str) {
-		return str==null || str.isEmpty();
-	}
+public class MitsiStringUtils {
 	
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String toHexaString(byte [] bytes) {

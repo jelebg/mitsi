@@ -14,6 +14,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mitsi</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
 			<artifactId>datasources</artifactId>
 		</dependency>
 

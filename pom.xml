@@ -9,6 +9,7 @@
 	<name>Mitsi webapp for centralized database access</name>
 
 	<modules>
+		<module>commons</module>
 		<module>users</module>
 		<module>datasources</module>
 		<module>mitsi-core</module>
@@ -45,6 +46,12 @@
 				<artifactId>mitsi-war</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
+			</dependency>
+			<dependency>
+				<groupId>org.mitsi</groupId>
+				<artifactId>commons</artifactId>
+				<version>${project.version}</version>
+				<type>jar</type>
 			</dependency>
 			<dependency>
 				<groupId>org.mitsi</groupId>
