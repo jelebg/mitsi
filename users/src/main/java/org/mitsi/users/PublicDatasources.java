@@ -59,7 +59,7 @@ public class PublicDatasources extends PooledResource {
 	public void load() {
 
 		try {
-			log.info("loading '"+publicDatasourcesFile.getFilename()+"'");
+			log.info("loading '"+publicDatasourcesFile.getFilename()+"' (path:"+publicDatasourcesFile.getFile().getPath()+")");
 			
 			JSONParser parser = new JSONParser();
 	// TODO : à remplacer par du GSON

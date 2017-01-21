@@ -4,5 +4,11 @@ angular.module('mitsiApp')
 		return $http.post('GetClientStatusServlet', { });
 	}
 
+	this.login = function(loginUser, loginPassword) {
+		return $http.post('LoginServlet', { "login":loginUser, "password":loginPassword });
+	}
 	
+	this.logout = function() {
+		$http.post('LoginServlet', { "login":null, "password":null });
+	}
 });

@@ -7,11 +7,17 @@
 	   					   http://www.springframework.org/schema/context 
 	   					   http://www.springframework.org/schema/context/spring-context.xsd">
 
+<context:annotation-config/>
 <bean id="publicDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
 	<constructor-arg value="mitsi-datasources-public.json"/>
+</bean>
+<bean id="usersFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-users.json"/>
 </bean>
 
 <import resource="classpath:spring/application-context-core.xml"/>
 <import resource="classpath:spring/application-context-war.xml"/>
+
+<bean id="mitsiAuthenticator" class="org.mitsi.mitsiwar.authent.MitsiAuthenticatorImpl"/>
 
 </beans>

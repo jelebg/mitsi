@@ -93,4 +93,14 @@
     <servlet-name>GetAllRelationsServlet</servlet-name>
     <url-pattern>/GetAllRelationsServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LoginServlet</display-name>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>org.mitsi.mitsiwar.client.LoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/LoginServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

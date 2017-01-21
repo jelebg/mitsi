@@ -9,11 +9,6 @@ import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.PublicDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-/**
- * Servlet implementation class TestGsonServlet
- */
-// TODO : to be replaced by GetClientStatus
 public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClientStatusResponse> {
 	private static final long serialVersionUID = 1L;
 

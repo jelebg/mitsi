@@ -30,6 +30,7 @@
 <script src="wgraphCtrl.js"></script>
 <script src="wsqlCtrl.js"></script>
 <script src="sourcesCtrl.js"></script>
+<script src="loginCtrl.js"></script>
 <script src="services/userService.js"></script>
 <script src="services/sourceService.js"></script>
 <script src="services/sqlService.js"></script>
@@ -42,6 +43,18 @@
       	<img src="img/logo-transparent.png" style="height:26px;vertical-align:bottom;"/>
 		<a href="" class="btn btn-default">import datasources</a>
 		<a href="" class="btn btn-default">export datasources</a>
+		
+		<div class="pull-right" ng-controller="loginCtrl">
+		<table ng-hide="isUserLoggedIn()">
+			<tr><td><input type="text"     ng-model="loginUser"     style="width:200px" class="form-control" placeholder="username"/>
+			</td><td><input type="password" ng-model="loginPassword" style="width:200px" class="form-control" placeholder="password"/>
+			</td><td><a href="" class="btn btn-default" ng-click="login()">log in</a>
+			</td>
+		</table>
+		<table ng-hide="!isUserLoggedIn()">
+			<tr><td><a href="" class="btn btn-default" ng-click="logout()">log out</a></td></tr>
+		</table>
+		</div>
 
    <div ui-layout style="top:40px">
        <ui-layout options="{ flow : 'column' }">

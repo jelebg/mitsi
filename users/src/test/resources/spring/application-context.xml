@@ -11,6 +11,9 @@
 <bean id="publicDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
 	<constructor-arg value="mitsi-datasources-public.json"/>
 </bean>
+<bean id="usersFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-users.json"/>
+</bean>
 
 <import resource="classpath:spring/application-context-users.xml"/>
 

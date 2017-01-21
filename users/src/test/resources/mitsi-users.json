@@ -1,0 +1,19 @@
+{
+	"users" : {
+		"test"  : "{clear}testclearpassword" ,
+		"guest" : "{ssha256}a9a5352be5b944d28716b177a0133507ebdb7bb8f1fa4d7a8a689b1129e263ae:9bb1c8d0ac23d3365c6daa773d9cc2dcb6cc948297bace832984f3402d758992"
+	},
+	"ldapAuthent" : {
+		"url"                 : "ldap://localhost:10389/",
+		"applicationDN"       : "sn=mitsi+cn=mitsi,dc=applications",
+		"applicationPassword" : "bonnevaux",
+		"userDNPattern"       : "n={0}+sn={0},dc=users",
+		"groupSearchPattern"  : "ou=groups",
+		"groupRoleAttribute"  : "ou",
+		"mandatoryRole"       : "ROLE_MITSIGROUP"
+	},
+	"groups" : {
+		"xe2" : [ "test", "guest" ],
+		"guestgroup" : [ "guest" ]
+	}
+}
