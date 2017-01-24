@@ -10,7 +10,7 @@ import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.MitsiUsersConfig;
-import org.mitsi.users.PublicDatasources;
+import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClientStatusResponse> {
@@ -18,7 +18,7 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private MitsiDatasources mitsiDatasources;
 	@Autowired
 	private MitsiUsersConfig mitsiUsersConfig;
 
@@ -31,7 +31,7 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 	@Override
 	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient) throws Exception {
 		
-		publicDatasources.loadIfNeccessary();
+		mitsiDatasources.loadIfNeccessary();
 		mitsiUsersConfig.loadIfNeccessary();
 	
 		GetClientStatusResponse response = new GetClientStatusResponse();
@@ -42,19 +42,19 @@ public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClie
 			groups = mitsiUsersConfig.getUserGrantedGroups(response.connectedUsername);
 		}
 		
-		Map<String, MitsiDatasource> datasources = publicDatasources.getDatasources();
-		for(MitsiDatasource publicDatasource : datasources.values()) {
-			if(!publicDatasource.getUserGroups().contains(  MitsiUsersConfig.GROUP_PUBLIC ) &&
-			   !(response.connectedUsername!=null && publicDatasource.getUserGroups().contains(  MitsiUsersConfig.GROUP_CONNECTED)) && 
-				(groups == null || Collections.disjoint(publicDatasource.getUserGroups(), groups))) {
+		Map<String, MitsiDatasource> datasources = mitsiDatasources.getDatasources();
+		for(MitsiDatasource mitsiDatasources : datasources.values()) {
+			if(!mitsiDatasources.getUserGroups().contains(  MitsiUsersConfig.GROUP_PUBLIC ) &&
+			   !(response.connectedUsername!=null && mitsiDatasources.getUserGroups().contains(  MitsiUsersConfig.GROUP_CONNECTED)) && 
+				(groups == null || Collections.disjoint(mitsiDatasources.getUserGroups(), groups))) {
 				// skip if no group in common with user, and datasource is not public, and datasource is not reserved to connected users (if user is connected)
 				continue;
 			}
 			
 			Datasource datasource = new Datasource();
-			datasource.name = publicDatasource.getName();
-			datasource.description = publicDatasource.getDescription();
-			datasource.tags = publicDatasource.getTags();
+			datasource.name = mitsiDatasources.getName();
+			datasource.description = mitsiDatasources.getDescription();
+			datasource.tags = mitsiDatasources.getTags();
 			response.datasources.add(datasource);
 		}
 		

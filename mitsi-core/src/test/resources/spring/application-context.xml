@@ -12,8 +12,8 @@
   <constructor-arg value="/"/>
 </bean> -->
       
-<bean id="publicDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
-	<constructor-arg value="mitsi-datasources-public.json"/>
+<bean id="mitsiDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-datasources.json"/>
 </bean>
 
 <import resource="classpath:spring/application-context-core.xml"/>

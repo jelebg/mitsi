@@ -1,39 +1,33 @@
 { 
   "datasources" : {
 	  "LOCALHOST-TEST" :  {
+	    "user.groups" : [ "_public" ],
 		"description" : "the test datasource for anything",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"connect.schema" : "TEST",
-		"tags" : [ "tag4", "tag5", "tag3" ],
-		"max.connections.per.user" : 2,
-		"use.schema.cache" : true
+		"connect.schema" : "TEST"
 	  },
 	  "LOCALHOST-XE2": {
+	    "user.groups" : [ "xe2", "guest" ],
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
-		"password" : "xe2",
-		"tags" : [ "tag4", "tag5", "tag3" ],
-		"max.connections.per.user" : 2,
-		"use.schema.cache" : true
+		"password" : "xe2"
 	  },
 	  "LOCALHOST-XE2-ON-TEST": {
+	    "user.groups" : [ "xe2" ],
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
-		"connect.schema" : "TEST",
-		"tags" : [ "bla", "blabla", "blablabla" ],
-		"max.connections.per.user" : 2,
-		"use.schema.cache" : true
-	 }
+		"connect.schema" : "TEST"
+	  }
   } 
 }

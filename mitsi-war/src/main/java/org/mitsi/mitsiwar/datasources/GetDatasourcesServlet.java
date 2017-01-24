@@ -8,7 +8,7 @@ import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.users.PublicDatasources;
+import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -20,7 +20,7 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private MitsiDatasources mitsiDatasources;
 
 	
 	public GetDatasourcesServlet() {
@@ -31,15 +31,15 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 	@Override
 	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws Exception {
 		
-		publicDatasources.loadIfNeccessary();
+		mitsiDatasources.loadIfNeccessary();
 		
 		GetDatasourcesResponse response = new GetDatasourcesResponse();
-		Map<String, MitsiDatasource> datasources = publicDatasources.getDatasources();
-		for(MitsiDatasource publicDatasource : datasources.values()) {
+		Map<String, MitsiDatasource> datasources = mitsiDatasources.getDatasources();
+		for(MitsiDatasource mitsiDatasources : datasources.values()) {
 			Datasource datasource = new Datasource();
-			datasource.name = publicDatasource.getName();
-			datasource.description = publicDatasource.getDescription();
-			datasource.tags = publicDatasource.getTags();
+			datasource.name = mitsiDatasources.getName();
+			datasource.description = mitsiDatasources.getDescription();
+			datasource.tags = mitsiDatasources.getTags();
 			response.datasources.add(datasource);
 		}
 		

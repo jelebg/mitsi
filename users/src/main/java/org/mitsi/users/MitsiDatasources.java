@@ -20,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.apache.log4j.Logger;
 
-// TODO : rename MitsiDatasources
-public class PublicDatasources extends PooledResource {
-	private static final Logger log = Logger.getLogger(PublicDatasources.class);
+public class MitsiDatasources extends PooledResource {
+	private static final Logger log = Logger.getLogger(MitsiDatasources.class);
 
 	public static final String TAG_DATASOURCES = "datasources";
 	public static final String FIELD_DESCRIPTION = "description";
@@ -36,7 +35,7 @@ public class PublicDatasources extends PooledResource {
 	public static final String FIELD_USER_GROUPS = "user.groups";
 
 	@Autowired
-	private Resource publicDatasourcesFile; 
+	private Resource mitsiDatasourcesFile; 
 
 	private Map<String, MitsiDatasource> datasources = new TreeMap<String, MitsiDatasource>();
 
@@ -44,7 +43,7 @@ public class PublicDatasources extends PooledResource {
 	public Date getResourceTimestamp() {
 		long l = 0;
 		try {
-			l = publicDatasourcesFile.getFile().lastModified();
+			l = mitsiDatasourcesFile.getFile().lastModified();
 		}
 		catch(Exception e) {
 			//nothing
@@ -59,12 +58,12 @@ public class PublicDatasources extends PooledResource {
 	public void load() {
 
 		try {
-			log.info("loading '"+publicDatasourcesFile.getFilename()+"' (path:"+publicDatasourcesFile.getFile().getPath()+")");
+			log.info("loading '"+mitsiDatasourcesFile.getFilename()+"' (path:"+mitsiDatasourcesFile.getFile().getPath()+")");
 			
 			JSONParser parser = new JSONParser();
 	// TODO : à remplacer par du GSON
 			JSONObject jsonObject = (JSONObject) parser.parse(
-					new BufferedReader(new InputStreamReader(publicDatasourcesFile.getInputStream(), "UTF-8")));
+					new BufferedReader(new InputStreamReader(mitsiDatasourcesFile.getInputStream(), "UTF-8")));
 			JSONObject jsonDatasoures = (JSONObject) jsonObject.get(TAG_DATASOURCES);
 			for(Object k : jsonDatasoures.keySet()) {
 				JSONObject v = (JSONObject) jsonDatasoures.get(k);
@@ -100,7 +99,7 @@ public class PublicDatasources extends PooledResource {
 			}
 		}
 		catch(IOException|ParseException e) {
-			log.error("cannot load publicDatasourcesFile:'"+publicDatasourcesFile.getFilename()+"'", e);
+			log.error("cannot load mitsiDatasourcesFile:'"+mitsiDatasourcesFile.getFilename()+"'", e);
 		}
 		
 	}

@@ -8,8 +8,8 @@
 	   					   http://www.springframework.org/schema/context/spring-context.xsd">
 
 <context:annotation-config/>
-<bean id="publicDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
-	<constructor-arg value="mitsi-datasources-public.json"/>
+<bean id="mitsiDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-datasources.json"/>
 </bean>
 <bean id="usersFile" class="org.springframework.core.io.ClassPathResource">
 	<constructor-arg value="mitsi-users.json"/>

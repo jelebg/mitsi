@@ -9,7 +9,7 @@ import org.mitsi.datasources.IMitsiMapper;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.mapper.oracle.IOracleMapper;
-import org.mitsi.users.PublicDatasources;
+import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -22,14 +22,14 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 public class DatasourceManager {
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private MitsiDatasources mitsiDatasources;
 
 	
 	Map<String, SqlSessionFactory> pools = new HashMap<String, SqlSessionFactory>();
 	
 	// TODO : faire plus performant que ce synchonized (la plupart du temps les pools sont deja initialises)
 	public synchronized MitsiConnection getConnection(String datasourceName) {
-		MitsiDatasource datasource = publicDatasources.getDatasource(datasourceName);
+		MitsiDatasource datasource = mitsiDatasources.getDatasource(datasourceName);
 		
 		SqlSessionFactory sqlSessionFactory = pools.get(datasourceName);
 		if(sqlSessionFactory==null) {

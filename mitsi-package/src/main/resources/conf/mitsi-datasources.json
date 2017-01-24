@@ -1,6 +1,7 @@
 { 
   "datasources" : {
 	  "LOCALHOST-TEST" :  {
+	    "user.groups" : [ "_connected" ],
 		"description" : "the test datasource for anything",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
@@ -8,12 +9,10 @@
 		"user" : "test",
 		"password" : "test",
 		"connect.schema" : "TEST",
-		"connect.schema" : "TEST",
-		"tags" : [ "tag4", "tag5", "tag3" ],
-		"max.connections.per.user" : 2,
-		"use.schema.cache" : true
+		"tags" : [ "tag4", "tag5", "tag3" ]
 	  },
 	  "LOCALHOST-XE2": {
+	    "user.groups" : [ "_connected" ],
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
@@ -21,9 +20,7 @@
 		"user" : "xe2",
 		"password" : "xe2",
 		"connect.schema" : "XE2",
-		"tags" : [ "tag4", "tag5", "tag3" ],
-		"max.connections.per.user" : 2,
-		"use.schema.cache" : true
+		"tags" : [ "tag4", "tag5", "tag3" ]
 	  }
   } 
 }

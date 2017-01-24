@@ -19,27 +19,27 @@ import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
-import org.mitsi.users.PublicDatasources;
+import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/application-context.xml")
-public class PublicDatasourcesTest {
+public class MitsiDatasourcesTest {
 
 	@Autowired
-	private PublicDatasources publicDatasources;
+	private MitsiDatasources mitsiDatasources;
 	
 	@Test
-	public void publicDatasourcesTest() throws IOException {
-		publicDatasources.loadIfNeccessary();
+	public void mitsiDatasourcesTest() throws IOException {
+		mitsiDatasources.loadIfNeccessary();
 	}
 
 	@Test
 	public void test() throws IOException, ParseException, ClassNotFoundException, SQLException {
 
-		assertEquals(publicDatasources.getDatasource("LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
+		assertEquals(mitsiDatasources.getDatasource("LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
 		
 	}
 

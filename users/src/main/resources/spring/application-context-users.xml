@@ -6,7 +6,7 @@
 	   					   http://www.springframework.org/schema/context 
 	   					   http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="publicDatasources" class="org.mitsi.users.PublicDatasources" />
+	<bean id="mitsiDatasources" class="org.mitsi.users.MitsiDatasources" />
 	<bean id="mitsiUsersConfig" class="org.mitsi.users.MitsiUsersConfig" />
 	
 </beans>
