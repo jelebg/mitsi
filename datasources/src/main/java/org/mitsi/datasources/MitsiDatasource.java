@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class MitsiDatasource {
 	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
@@ -17,8 +18,7 @@ public class MitsiDatasource {
 	private String password;
 	private String connectSchema;
 	private List<String> tags;
-	private boolean useSchemaCache;
-	private Map<String, Cache> schemasCache;
+	private TreeSet<String> userGroups;
 	
 	public class Cache 	{
 		List<DatabaseObject> databaseObjects;
@@ -27,7 +27,7 @@ public class MitsiDatasource {
 	
 	public MitsiDatasource(String name, String description, String provider,
 			String driver, String jdbcUrl, String user, String password, List<String> tags,
-			boolean useSchemaCache) {
+			TreeSet<String> userGroups) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -36,18 +36,8 @@ public class MitsiDatasource {
 		this.user = user;
 		this.password = password;
 		this.tags = tags;
-		this.useSchemaCache = useSchemaCache;
-		
-		this.schemasCache = new HashMap<String, Cache>();
+		this.userGroups = userGroups;
 	}
-
-	public Cache getCache(String schema) {
-		return schemasCache.get(schema);
-	}
-	public void setCache(String schema, Cache cache) {
-		schemasCache.put(schema, cache);
-	}
-
 
 	public String getName() {
 		return name;
@@ -121,15 +111,13 @@ public class MitsiDatasource {
 		this.tags = tags;
 	}
 
-	public boolean isUseSchemaCache() {
-		return useSchemaCache;
+	public TreeSet<String> getUserGroups() {
+		return userGroups;
 	}
 
-	public void setUseSchemaCache(boolean useSchemaCache) {
-		this.useSchemaCache = useSchemaCache;
+	public void setUserGroups(TreeSet<String> userGroups) {
+		this.userGroups = userGroups;
 	}
-
-
 
 	@Override
 	public String toString() {
@@ -137,8 +125,8 @@ public class MitsiDatasource {
 				+ ", provider=" + provider + ", driver=" + driver
 				+ ", jdbcUrl=" + jdbcUrl + ", user=" + user + ", password="
 				+ password + ", connectSchema=" + connectSchema + ", tags="
-				+ tags 
-				+ ", useSchemaCache=" + useSchemaCache + "]";
+				+ tags + ", userGroups=" + userGroups
+				+ "]";
 	}
 
 

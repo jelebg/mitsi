@@ -9,17 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.apache.log4j.Logger;
 
+// TODO : rename MitsiDatasources
 public class PublicDatasources extends PooledResource {
 	private static final Logger log = Logger.getLogger(PublicDatasources.class);
 
@@ -31,9 +32,8 @@ public class PublicDatasources extends PooledResource {
 	public static final String FIELD_USER = "user";
 	public static final String FIELD_PASSWORD = "password";
 	public static final String FIELD_CONNECT_SCHEMA = "connect.schema";
-	public static final String FIELD_MAX_CONECTIONS_PER_USER = "max.connections.per.user";
-	public static final String FIELD_USE_SCHEMA_CACHE = "use.schema.cache";
 	public static final String FIELD_TAGS = "tags";
+	public static final String FIELD_USER_GROUPS = "user.groups";
 
 	@Autowired
 	private Resource publicDatasourcesFile; 
@@ -63,7 +63,6 @@ public class PublicDatasources extends PooledResource {
 			
 			JSONParser parser = new JSONParser();
 	// TODO : à remplacer par du GSON
-			//JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(new File(mitsiHome, JSON_FILE)));
 			JSONObject jsonObject = (JSONObject) parser.parse(
 					new BufferedReader(new InputStreamReader(publicDatasourcesFile.getInputStream(), "UTF-8")));
 			JSONObject jsonDatasoures = (JSONObject) jsonObject.get(TAG_DATASOURCES);
@@ -77,9 +76,14 @@ public class PublicDatasources extends PooledResource {
 						tags.add((String) o);
 					}
 				}
+				TreeSet<String> userGroups = new TreeSet<>();
+				JSONArray jsonUserGroups = (JSONArray) v.get(FIELD_USER_GROUPS);
+				if(jsonUserGroups != null) {
+					for(Object o : jsonUserGroups) {
+						userGroups.add((String) o);
+					}
+				}
 				
-				Long maxConnectionsPerUser = (Long) v.get(FIELD_MAX_CONECTIONS_PER_USER);
-				Boolean useSchemaCache = (Boolean) v.get(FIELD_USE_SCHEMA_CACHE);
 				MitsiDatasource datasource = new MitsiDatasource(
 							(String) k,
 							(String) v.get(FIELD_DESCRIPTION),
@@ -89,8 +93,7 @@ public class PublicDatasources extends PooledResource {
 							(String) v.get(FIELD_USER),
 							(String) v.get(FIELD_PASSWORD),
 							tags,
-							(useSchemaCache==null ? true : useSchemaCache)
-						);
+							userGroups);
 				datasource.setConnectSchema((String) v.get(FIELD_CONNECT_SCHEMA));
 				datasources.put((String) k, datasource);
 				

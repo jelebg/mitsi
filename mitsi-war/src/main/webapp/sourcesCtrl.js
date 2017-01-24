@@ -9,13 +9,17 @@ angular.module('mitsiApp')
 			return;
 		}
 		
+		$scope.globalRefresh();
+	}
+	
+	$scope.globalRefresh = function() {
 		userService.getClientStatus()
 		  .then(function(response) {
 			  $scope.datasources = response.data.datasources;
+			  $rootScope.loggedUser = response.data.connectedUsername;
 
 		  }, function(errorMessage) {
-		      // called asynchronously if an error occurs
-		      // or server returns response with an error status.
+		      // TODO : error management
 			  console.warn( errorMessage );
 			  alert( errorMessage );
 		  });
@@ -34,7 +38,7 @@ angular.module('mitsiApp')
 			  $scope.initSources(source, response)				  
 	   })
 	   .catch(function(error) {
-	     // this catches errors from the $http calls as well as from the explicit throw
+	     // TODO : error management
 	     console.log("An error occured: " + error);
 	     alert(error);
 	   })
@@ -178,6 +182,11 @@ angular.module('mitsiApp')
 		$state.go("workbench.graph");
         $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, source, object);
 	}
+	
+	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) {
+		$scope.globalRefresh();
+	});
+
 	
 	$scope.$on(EVENT_DATABASE_OBJECT_INFO_REQUESTED, function (event, source, databaseObject) {
 		if(!source.objects) {

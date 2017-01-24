@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,16 @@ public class MitsiUsersConfig extends PooledResource {
 	class User {
 		
 		public User(String username, String encodedPassword) {
-			super();
 			this.username = username;
 			this.encodedPassword = encodedPassword;
 		}
 		public String username;
 		public String encodedPassword;
 	}
+	// map of users configured in file
 	Map<String, User> users = null;
+	// maps of user groups, for users configured in file OR in ldap
+	Map<String, TreeSet<String>> userGroups = null;
 	
 	@Override
 	public Date getResourceTimestamp() {
@@ -70,12 +73,29 @@ public class MitsiUsersConfig extends PooledResource {
 			
 				Gson gson = new Gson();
 				usersFileLoaded = gson.fromJson(bfr, MitsiUsersFile.class);
-				users = new HashMap<String, User>();
+				users = new HashMap<>();
 				for(Entry<String, String> userAndPassword : usersFileLoaded.users.entrySet()) {
 					String username = userAndPassword.getKey();
 					String encodedPassword = userAndPassword.getValue();
 					users.put(username, new User(username, encodedPassword));
 				}	
+				
+				this.userGroups = new HashMap<>();
+				if(usersFileLoaded.groups != null) {
+					for(Entry<String, String[]> groupEntry : usersFileLoaded.groups.entrySet()) {
+						String group = groupEntry.getKey();
+						String [] groupGrantees = groupEntry.getValue();
+						for(String grantee : groupGrantees) {
+							// TODO : groups containing other groups (spoiler alert : will need to be protected against cycles)
+							// grantee is a user
+							if(!userGroups.containsKey(grantee)) {
+								userGroups.put(grantee, new TreeSet<String>());
+							}
+							userGroups.get(grantee).add(group);
+						}
+					}	
+				}
+
 			}			
 		}
 		catch(IOException e) {
@@ -101,10 +121,9 @@ public class MitsiUsersConfig extends PooledResource {
 			return encodedPassword.equals(checkPassword);
 		}
 		else if(encodedPassword.toLowerCase().startsWith(PASSWORD_PREFIX_SSHA256)) {
-			// TODO vérifier que ce calcul de ssha n'est pas incorrect
 			int i = encodedPassword.indexOf(PASSWORD_SALT_SEP);
 			if(i <= 0) {
-				// TODO : log error
+				log.error("wrong password format for user "+username);
 				throw new MitsiUsersException("wrong password format for user "+username);
 			}
 			
@@ -122,7 +141,7 @@ public class MitsiUsersConfig extends PooledResource {
 			}
 		}
 
-		// TODO : log error
+		log.error("wrong password format for user "+username);
 		throw new MitsiUsersException("wrong password format for user "+username);
 		
 	}
@@ -182,6 +201,10 @@ public class MitsiUsersConfig extends PooledResource {
 	
 	public Map<String, String[]> getGroups() {
 		return usersFileLoaded.groups;
+	}
+	
+	public TreeSet<String> getUserGrantedGroups(String username) {
+		return userGroups.get(username);
 	}
 
 }

@@ -1,4 +1,5 @@
 
+var EVENT_LOGIN_LOGOUT = "loginLogout"; 
 
 var EVENT_DATABASE_SELECTED = "DabaseSelected"; 
 var EVENT_DATABASE_OBJECT_SELECTED = "DabaseObjectSelected";

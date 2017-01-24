@@ -52,7 +52,8 @@
 			</td>
 		</table>
 		<table ng-hide="!isUserLoggedIn()">
-			<tr><td><a href="" class="btn btn-default" ng-click="logout()">log out</a></td></tr>
+			<tr><td style="font-weight:bold;padding-right:10px;">{{ loggedUser }}</td>
+			<td><a href="" class="btn btn-default" ng-click="logout()">log out</a></td></tr>
 		</table>
 		</div>
 

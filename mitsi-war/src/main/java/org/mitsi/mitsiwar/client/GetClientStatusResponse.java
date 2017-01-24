@@ -8,6 +8,7 @@ import org.mitsi.mitsiwar.common.Datasource;
 
 public class GetClientStatusResponse {
 
+	String connectedUsername;
 	List<Datasource> datasources = new ArrayList<>();
 	
 	public GetClientStatusResponse() {}

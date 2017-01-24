@@ -40,7 +40,7 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		Client connectedClient = (Client) request.getSession().getAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE);
 		if(connectedClient == null) {
-			connectedClient = new Client(null); // null forcement car on ne peut pas être déjà connecté ?
+			connectedClient = new Client(); 
 			request.getSession().setAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE, connectedClient);
 		}
 		

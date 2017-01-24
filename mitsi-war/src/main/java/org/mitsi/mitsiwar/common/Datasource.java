@@ -8,7 +8,6 @@ public class Datasource {
 	public String name;
 	public String description;
 	public List<String> tags;
-	public boolean connected;
 	public List<Schema> schemas;
 
 }

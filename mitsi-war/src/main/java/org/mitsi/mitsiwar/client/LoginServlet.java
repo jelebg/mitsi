@@ -1,11 +1,13 @@
 package org.mitsi.mitsiwar.client;
 
+import org.apache.log4j.Logger;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.authent.MitsiAuthenticator;
 import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoginServlet extends GsonServlet<Login, LoginResponse> {
+	private static final Logger log = Logger.getLogger(LoginServlet.class);
 	private static final long serialVersionUID = 1L;
 
 
@@ -23,17 +25,18 @@ public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 		LoginResponse response = new LoginResponse();
 		
 		if(request.login == null || request.login.isEmpty()) {
-			// TODO : DECONNEXION
+			connectedClient.logout();
 			System.out.println("logout");
 		}
 		else {
-			// CONNEXION
-			// TODO : log
-			System.out.println("login:"+request.login+" pwd="+request.password);
-			
 			response.authenticationOK = mitsiAuthenticator.authenticate(request.login, request.password);
-			// TODO : log
-			System.out.println("response.authenticationOK:"+response.authenticationOK);
+			if(response.authenticationOK) {
+				connectedClient.login(request.login);
+			}
+			else {
+				connectedClient.logout();
+			}
+			log.info("request.login:"+request.login+" response.authenticationOK:"+response.authenticationOK);
 		}
 		
 		return response;

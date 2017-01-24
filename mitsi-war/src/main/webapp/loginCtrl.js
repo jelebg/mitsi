@@ -1,10 +1,10 @@
 angular.module('mitsiApp')
     .controller('loginCtrl', function($scope, $rootScope, $state, userService) {
 
-    $scope.loggedUser = null;
+    $rootScope.loggedUser = null;
 	
 	$scope.login = function() {
-		if($scope.loggedUser) {
+		if($rootScope.loggedUser) {
 			return;
 		}
 		if(!$scope.loginUser) {
@@ -24,15 +24,16 @@ angular.module('mitsiApp')
 						// TODO : show error
 					}
 					else {
-						$scope.loggedUser = { 
+						$rootScope.loggedUser = { 
 								// TODO
 								username: $scope.loginUser.trim()
 						}
+				        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
 					};
 			    },
 			    function(response) {
 			    	// TODO : show error
-			    	$scope.loggedUser = null;
+			    	$rootScope.loggedUser = null;
 			    }
 			);
 		}
@@ -43,11 +44,12 @@ angular.module('mitsiApp')
 	
 	$scope.logout = function() {
 		userService.logout();
-		$scope.loggedUser = null;
+		$rootScope.loggedUser = null;
+        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
 	}
 	
 	$scope.isUserLoggedIn = function() {
-		return $scope.loggedUser != null;
+		return $rootScope.loggedUser != null;
 	}
 
 
