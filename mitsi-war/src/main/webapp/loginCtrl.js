@@ -3,6 +3,24 @@ angular.module('mitsiApp')
 
     $rootScope.loggedUser = null;
 	
+    $scope.loginOnEnter = function(e) {
+    	if(e.code == "Enter") {
+    		$scope.login();
+    	}
+    }
+
+    $scope.loginOnSpacebar = function(e) {
+    	if(e.code == "Space") {
+    		$scope.login();
+    	}
+    }
+    
+    $scope.logoutOnSpacebar = function(e) {
+    	if(e.code == "Space") {
+    		$scope.logout();
+    	}
+    }
+    
 	$scope.login = function() {
 		if($rootScope.loggedUser) {
 			return;

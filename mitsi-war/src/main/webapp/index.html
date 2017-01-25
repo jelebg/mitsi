@@ -40,24 +40,22 @@
 </head>
 
 <body data-ng-app="mitsiApp">
-      	<img src="img/logo-transparent.png" style="height:26px;vertical-align:bottom;"/>
-		<a href="" class="btn btn-default">import datasources</a>
-		<a href="" class="btn btn-default">export datasources</a>
+      	<img src="img/logo-transparent.png" style="height:34px;vertical-align:bottom;"/>
 		
 		<div class="pull-right" ng-controller="loginCtrl">
 		<table ng-hide="isUserLoggedIn()">
-			<tr><td><input type="text"     ng-model="loginUser"     style="width:200px" class="form-control" placeholder="username"/>
-			</td><td><input type="password" ng-model="loginPassword" style="width:200px" class="form-control" placeholder="password"/>
-			</td><td><a href="" class="btn btn-default" ng-click="login()">log in</a>
+			<tr><td><input type="text"      ng-model="loginUser"     style="width:200px;" class="form-control" placeholder="username"/>
+			</td><td><input type="password" ng-model="loginPassword" ng-keypress="loginOnEnter($event)" style="width:200px;" class="form-control" placeholder="password"/>
+			</td><td><a href="" class="btn btn-default" ng-click="login()" ng-keypress="loginOnSpacebar($event)">log in</a>
 			</td>
 		</table>
 		<table ng-hide="!isUserLoggedIn()">
 			<tr><td style="font-weight:bold;padding-right:10px;">{{ loggedUser }}</td>
-			<td><a href="" class="btn btn-default" ng-click="logout()">log out</a></td></tr>
+			<td><a href="" class="btn btn-default" ng-keypress="logoutOnSpacebar($event)" ng-click="logout()">log out</a></td></tr>
 		</table>
 		</div>
 
-   <div ui-layout style="top:40px">
+   <div ui-layout style="top:35px">
        <ui-layout options="{ flow : 'column' }">
         <sidebar ui-layout-container size="500px" style="overflow-y: scroll">
         	<ng-include src="'sources.html'" ></ng-include>
