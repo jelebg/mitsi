@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('loginCtrl', function($scope, $rootScope, $state, userService) {
+    .controller('loginCtrl', function($scope, $rootScope, $state, userService, errorService) {
 
     $rootScope.loggedUser = null;
 	
@@ -38,21 +38,16 @@ angular.module('mitsiApp')
 			userService.login($scope.loginUser.trim(), $scope.loginPassword)
 				.then(function(response) {
 					if(!response.data.authenticationOK) {
-						console.log("not authenticated");
-						// TODO : show error
+						errorService.showGeneralError("wrong credentials");
 					}
 					else {
 						$rootScope.loggedUser = { 
-								// TODO
-								username: $scope.loginUser.trim()
+							username: $scope.loginUser.trim()
 						}
 				        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
 					};
 			    },
-			    function(response) {
-			    	// TODO : show error
-			    	$rootScope.loggedUser = null;
-			    }
+			    errorService.getGenericHttpErrorCallback()
 			);
 		}
 		finally {

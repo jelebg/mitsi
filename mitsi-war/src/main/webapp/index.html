@@ -31,6 +31,7 @@
 <script src="wsqlCtrl.js"></script>
 <script src="sourcesCtrl.js"></script>
 <script src="loginCtrl.js"></script>
+<script src="services/errorService.js"></script>
 <script src="services/userService.js"></script>
 <script src="services/sourceService.js"></script>
 <script src="services/sqlService.js"></script>
@@ -41,6 +42,8 @@
 
 <body data-ng-app="mitsiApp">
       	<img src="img/logo-transparent.png" style="height:34px;vertical-align:bottom;"/>
+		
+		<span style="color:red;padding-left:60px;">{{ mitsiGeneralError }}</span>
 		
 		<div class="pull-right" ng-controller="loginCtrl">
 		<table ng-hide="isUserLoggedIn()">
