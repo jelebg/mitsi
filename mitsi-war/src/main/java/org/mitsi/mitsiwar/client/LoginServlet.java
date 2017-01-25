@@ -25,7 +25,7 @@ public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 		LoginResponse response = new LoginResponse();
 		
 		if(request.login == null || request.login.isEmpty()) {
-			log.info("logout"+connectedClient.getConnectedUsername());
+			log.info("logout:"+connectedClient.getConnectedUsername());
 			connectedClient.logout();
 		}
 		else {
