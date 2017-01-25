@@ -25,8 +25,8 @@ public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 		LoginResponse response = new LoginResponse();
 		
 		if(request.login == null || request.login.isEmpty()) {
+			log.info("logout"+connectedClient.getConnectedUsername());
 			connectedClient.logout();
-			System.out.println("logout");
 		}
 		else {
 			response.authenticationOK = mitsiAuthenticator.authenticate(request.login, request.password);
