@@ -134,12 +134,8 @@ angular.module('mitsiApp')
 			  }
 		      $scope.allReadyFetched = response.data.results.length;
 
-		  }, function(errorMessage) {
-		      // called asynchronously if an error occurs
-		      // or server returns response with an error status.
-			  console.warn( errorMessage );
-			  alert( errorMessage );
-		  });
+		  }, 
+		  errorService.getGenericHttpErrorCallback());
 	};
 	
 	$scope.getDataDown = function() {

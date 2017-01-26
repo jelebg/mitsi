@@ -6,6 +6,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
+import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -28,7 +29,16 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
-		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
+		MitsiConnection connection = null;
+		try  {
+			try {
+				connection = datasourceManager.getConnection(request.datasourceName);
+			}
+			catch(Exception e) {
+				log.error("could not connect to database : "+request.datasourceName, e);
+				throw new MitsiWarException("could not connect to database : "+request.datasourceName);
+			}
+
 			
 			response.schemas = connection.getAllSchemas();
 			String schema = request.schema;
@@ -54,7 +64,20 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 				response.databaseObjects = connection.getTablesAndViews(schema);
 			}
 			
+		} 
+		catch(MitsiWarException e) {
+			response.errorMessage = e.getMessage();
 		}
+		catch(Exception e) {
+			log.error("could not get database model : "+request.datasourceName, e);
+			response.errorMessage = "could not get database model : "+request.datasourceName;
+		}
+		finally {
+			if(connection != null) {
+				connection.close();
+			}
+		}
+
 
 		return response;
 	}

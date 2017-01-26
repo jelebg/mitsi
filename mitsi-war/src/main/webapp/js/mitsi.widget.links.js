@@ -1104,7 +1104,6 @@ function MitsiLinksPaths(div, linksGraph, linksConfiguration) {
 		a.href = "";
 		a.onclick = function(event) {
 			try {
-				//alert("plus "+vertexName);
 				othis.linksGraph.showTable(vertexName, 100, 100);
 				othis.draw();
 			} catch (e) { console.log(e); }

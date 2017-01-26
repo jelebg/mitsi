@@ -7,11 +7,8 @@ angular.module('mitsiApp')
     	detailsService.getDetails(source.name, "table", databaseObject.id.name, databaseObject.id.schema)
 	    .then(function(response) {
 	    	  $scope.detailsAccordions = response.data.accordions;
-			  //console.log(JSON.stringify(response.data, null, 2));
-	    }, function(errorMessage) {
-			  console.warn( errorMessage );
-     		  alert( errorMessage );
-		});
+	    },
+	    errorService.getGenericHttpErrorCallback());
     }
     	
     $scope.init = function() {

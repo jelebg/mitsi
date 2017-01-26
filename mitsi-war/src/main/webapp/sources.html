@@ -51,15 +51,6 @@
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
  
            </accordion-heading>
-            {{ s.description }}
-            <br/>
-	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
-	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
-					{{ schema.name }}
-           	    </option>
-              </ul>
-	        </select></td></tr></table>
-            <br/>
            <alert type="danger" 
             	popover="{{ s.errorDetails }}" 
             	popover-trigger="mouseenter"
@@ -69,6 +60,15 @@
             	ng-if="s.errorMessage!=null"
             	>{{ s.errorMessage }}
             </alert>
+            {{ s.description }}
+            <br/>
+	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
+	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
+					{{ schema.name }}
+           	    </option>
+              </ul>
+	        </select></td></tr></table>
+            <br/>
 	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
 		        <a href="" class="btn btn-default" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"><img src="img/table.png"/></a>
 		        <a href="" class="btn btn-default" ng-click="s.filter.hideViews=!s.filter.hideViews" ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"><img src="img/view.png"/></a>

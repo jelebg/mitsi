@@ -9,5 +9,7 @@ public class GetDatabaseObjectsResponse {
 	List<DatabaseObject> databaseObjects;
 	List<Schema> schemas;
 	
+	String errorMessage;
+	
 	public GetDatabaseObjectsResponse() {}
 }

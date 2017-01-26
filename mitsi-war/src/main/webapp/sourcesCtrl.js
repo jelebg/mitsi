@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $state, userService, sourceService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, $state, userService, sourceService, errorService) {
 
 	$scope.datasources = [];
 
@@ -18,11 +18,8 @@ angular.module('mitsiApp')
 			  $scope.datasources = response.data.datasources;
 			  $rootScope.loggedUser = response.data.connectedUsername;
 
-		  }, function(errorMessage) {
-		      // TODO : error management
-			  console.warn( errorMessage );
-			  alert( errorMessage );
-		  });
+		  }, 
+		  errorService.getGenericHttpErrorCallback());
 	};
 	
 	$scope.refresh = function(source, schema) {
@@ -32,18 +29,22 @@ angular.module('mitsiApp')
 	   sourceService.getObjects(source.name, schema, true)
 	   .then(function(response) {
 			  $scope.initSources(source, response)
+			  if(response.data.errorMessage) {
+				  throw false;
+			  }
 			  return sourceService.getObjects(source.name, schema, false);
 	   })
 	   .then(function(response) {
-			  $scope.initSources(source, response)				  
+			  $scope.initSources(source, response);
 	   })
 	   .catch(function(error) {
-	     // TODO : error management
-	     console.log("An error occured: " + error);
-	     alert(error);
+		   if(error !== false) {
+		   	  console.log(error);
+		   	  errorService.showGeneralError("internal error");
+		   }
 	   })
 	   .finally(function() {
-		  source.loading = false;
+		      source.loading = false;
 	   });
 	}
 	
@@ -51,11 +52,15 @@ angular.module('mitsiApp')
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.currentSchemaName = null;
+		  source.errorMessage = response.data.errorMessage;
+		  source.errorDetails = response.data.errorMessage;
 		  
-		  for(var i=0; i!=source.schemas.length; i++) {
-			  if( source.schemas[i].current) {
-				  source.currentSchemaName = source.schemas[i].name;
-				  break;
+		  if(source.schema) {
+			  for(var i=0; i!=source.schemas.length; i++) {
+				  if( source.schemas[i].current) {
+					  source.currentSchemaName = source.schemas[i].name;
+					  break;
+				  }
 			  }
 		  }
 		  source.filter = {
@@ -68,6 +73,8 @@ angular.module('mitsiApp')
 				  constraintName:true
 		  };
 		  $scope.initGraph(source);
+		  
+
 	}
 	
 	$scope.initGraph = function(datasource) {

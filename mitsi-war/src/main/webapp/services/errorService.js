@@ -26,5 +26,11 @@ angular.module('mitsiApp')
 		}, 30000);
 	}
 	
+	// TODO : à supprimer certainement, géré au niveau du sourceCtrl
+	this.sourceError = function(source, error) {
+		// TODO : mettre l'erreur dans l'écran au niveau de la source
+		this.resetGeneralError(source + " : " + error);
+	}
+	
 	
 });
