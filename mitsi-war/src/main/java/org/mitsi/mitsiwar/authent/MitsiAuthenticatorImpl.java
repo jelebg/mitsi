@@ -4,6 +4,7 @@ package org.mitsi.mitsiwar.authent;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.mitsi.users.MitsiUsersConfig;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,8 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 
 
 public class MitsiAuthenticatorImpl implements MitsiAuthenticator {
-	
+	private static final Logger log = Logger.getLogger(MitsiAuthenticatorImpl.class);
+
 	LdapAuthenticationProvider ldapAuthProvider;
 	
 	@Autowired
@@ -59,7 +61,13 @@ public class MitsiAuthenticatorImpl implements MitsiAuthenticator {
 	}
 	
 	public boolean authenticateLDAP(String username, String password) {
-		Authentication authentication = ldapAuthProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		Authentication authentication = null;
+		try {
+			authentication = ldapAuthProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		}
+		catch(org.springframework.security.core.AuthenticationException e) {
+			// nothing
+		}
 		// TODO : recupérer et utiliser les infos renvoyées par l'authent
 		// TODO : checker le role
 		return authentication!=null;

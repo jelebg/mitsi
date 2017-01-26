@@ -74,11 +74,13 @@ public class MitsiUsersConfig extends PooledResource {
 				Gson gson = new Gson();
 				usersFileLoaded = gson.fromJson(bfr, MitsiUsersFile.class);
 				users = new HashMap<>();
-				for(Entry<String, String> userAndPassword : usersFileLoaded.users.entrySet()) {
-					String username = userAndPassword.getKey();
-					String encodedPassword = userAndPassword.getValue();
-					users.put(username, new User(username, encodedPassword));
-				}	
+				if(usersFileLoaded.users != null) {
+					for(Entry<String, String> userAndPassword : usersFileLoaded.users.entrySet()) {
+						String username = userAndPassword.getKey();
+						String encodedPassword = userAndPassword.getValue();
+						users.put(username, new User(username, encodedPassword));
+					}	
+				}
 				
 				this.userGroups = new HashMap<>();
 				if(usersFileLoaded.groups != null) {

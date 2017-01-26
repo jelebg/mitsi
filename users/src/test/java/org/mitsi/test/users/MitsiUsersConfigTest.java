@@ -41,7 +41,7 @@ public class MitsiUsersConfigTest {
 		assertEquals(mitsiUsersConfig.getLdapUrl()                    , "ldap://localhost:10389/");
 		assertEquals(mitsiUsersConfig.getLdapApplicationDN()      , "sn=mitsi+cn=mitsi,dc=applications");
 		assertEquals(mitsiUsersConfig.getLdapApplicationPassword(), "bonnevaux");
-		assertEquals(mitsiUsersConfig.getLdapUserDNPattern()      , "n={0}+sn={0},dc=users");
+		assertEquals(mitsiUsersConfig.getLdapUserDNPattern()      , "cn={0}+sn={0},dc=users");
 		assertEquals(mitsiUsersConfig.getLdapGroupSearchPattern() , "ou=groups");
 		assertEquals(mitsiUsersConfig.getLdapGroupRoleAttribute() , "ou");
 		assertEquals(mitsiUsersConfig.getLdapMandatoryRole()      , "ROLE_MITSIGROUP");

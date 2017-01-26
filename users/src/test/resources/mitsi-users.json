@@ -7,7 +7,7 @@
 		"url"                 : "ldap://localhost:10389/",
 		"applicationDN"       : "sn=mitsi+cn=mitsi,dc=applications",
 		"applicationPassword" : "bonnevaux",
-		"userDNPattern"       : "n={0}+sn={0},dc=users",
+		"userDNPattern"       : "cn={0}+sn={0},dc=users",
 		"groupSearchPattern"  : "ou=groups",
 		"groupRoleAttribute"  : "ou",
 		"mandatoryRole"       : "ROLE_MITSIGROUP"
