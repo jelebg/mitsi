@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wdetailsCtrl', function($scope, $rootScope, detailsService) {
+    .controller('wdetailsCtrl', function($scope, $rootScope, detailsService, errorService) {
 
     $scope.detailsAccordions = [];
     	

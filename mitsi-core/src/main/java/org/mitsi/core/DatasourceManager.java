@@ -2,6 +2,7 @@ package org.mitsi.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -10,6 +11,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.mapper.oracle.IOracleMapper;
 import org.mitsi.users.MitsiDatasources;
+import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -27,9 +29,16 @@ public class DatasourceManager {
 	
 	Map<String, SqlSessionFactory> pools = new HashMap<String, SqlSessionFactory>();
 	
+	public void loadIfNeccessary() {
+		mitsiDatasources.loadIfNeccessary();
+	}
+	
 	// TODO : faire plus performant que ce synchonized (la plupart du temps les pools sont deja initialises)
-	public synchronized MitsiConnection getConnection(String datasourceName) {
-		MitsiDatasource datasource = mitsiDatasources.getDatasource(datasourceName);
+	public synchronized MitsiConnection getConnection(TreeSet<String> userGrantedGroups, boolean isUserConnected, String datasourceName) throws MitsiUsersException {
+		MitsiDatasource datasource = mitsiDatasources.getDatasource(userGrantedGroups, isUserConnected, datasourceName);
+		if(datasource == null) {
+			throw new MitsiUsersException("cannot find datasource "+datasourceName);
+		}
 		
 		SqlSessionFactory sqlSessionFactory = pools.get(datasourceName);
 		if(sqlSessionFactory==null) {

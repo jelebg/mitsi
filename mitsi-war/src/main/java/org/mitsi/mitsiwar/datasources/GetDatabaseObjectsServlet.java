@@ -1,5 +1,7 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
@@ -32,7 +34,9 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 		MitsiConnection connection = null;
 		try  {
 			try {
-				connection = datasourceManager.getConnection(request.datasourceName);
+				String connectedUsername = connectedClient.getConnectedUsername();
+				TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+				connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName);
 			}
 			catch(Exception e) {
 				log.error("could not connect to database : "+request.datasourceName, e);
@@ -65,12 +69,9 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 			}
 			
 		} 
-		catch(MitsiWarException e) {
-			response.errorMessage = e.getMessage();
-		}
 		catch(Exception e) {
 			log.error("could not get database model : "+request.datasourceName, e);
-			response.errorMessage = "could not get database model : "+request.datasourceName;
+			throw new MitsiWarException("could not get database model : "+request.datasourceName);
 		}
 		finally {
 			if(connection != null) {

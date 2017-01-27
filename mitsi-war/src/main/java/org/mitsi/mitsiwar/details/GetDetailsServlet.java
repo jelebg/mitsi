@@ -2,6 +2,7 @@ package org.mitsi.mitsiwar.details;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
@@ -416,7 +417,10 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		
 		GetDetailsResponse response = new GetDetailsResponse();
 		
-		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
+		String connectedUsername = connectedClient.getConnectedUsername();
+		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+
+		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) { 
 			if(StringUtils.isEmpty(request.objectName) || StringUtils.isEmpty(request.objectType) || StringUtils.isEmpty(request.owner)) {
 				getDatasource(response, connection, request.datasourceName);
 			}

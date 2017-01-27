@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService) {
+    .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService, errorService) {
 
 	$scope.enableFilter = false;
 	$scope.allReadyFetched = 0;

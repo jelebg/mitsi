@@ -9,8 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
+import org.mitsi.users.MitsiDatasources;
+import org.mitsi.users.MitsiUsersConfig;
+import org.mitsi.users.MitsiUsersException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.google.gson.Gson;
@@ -18,9 +23,15 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 public abstract class GsonServlet<Request, Response> extends HttpServlet {
+	private static final Logger log = Logger.getLogger(GsonServlet.class);
 	private static final long serialVersionUID = 1L;
 	
 	public static final String CONNECTED_CLIENTSESSION_ATTRIBUTE = "MITSI_CONNECTED_CLIENT";
+
+	@Autowired
+	protected MitsiDatasources mitsiDatasources;
+	@Autowired
+	protected MitsiUsersConfig mitsiUsersConfig;
 
 	Class<Request> requestClass;
 	public GsonServlet(Class<Request> requestClass) {
@@ -36,6 +47,20 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			mitsiDatasources.loadIfNeccessary();
+		} 
+		catch(Throwable t) {
+			log.error("exception while loading datasources", t);
+		}
+		try {
+			mitsiUsersConfig.loadIfNeccessary();
+		} 
+		catch(Throwable t) {
+			log.error("exception while loading datasources", t);
+		}
+		
+
 		BufferedReader in = request.getReader();
 		PrintWriter out = response.getWriter();
 		Client connectedClient = (Client) request.getSession().getAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE);
@@ -51,10 +76,12 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 			Request gsonRequest = gson.fromJson(in, requestClass);
 			Response gsonResponse = proceed(gsonRequest, connectedClient);
 			gson.toJson(gsonResponse, out);
-			
+
 		} 
-		catch(MitsiWarException e){
-			throw new ServletException("MitsiWarException", e);
+		catch(MitsiWarException | MitsiUsersException e){
+			GsonResponse gsonResponse = new GsonResponse();
+			gsonResponse.errorMessage = e.getMessage();
+			gson.toJson(gsonResponse, out);
 		} 
 		catch(JsonSyntaxException|JsonIOException e){
 			throw new ServletException("JSON decoding error", e);
@@ -62,10 +89,8 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		catch(Exception e){
 			throw new ServletException("Unexpected Exception", e);
 		}
-		
+
 	
 	}
-	
-	
 	
 }

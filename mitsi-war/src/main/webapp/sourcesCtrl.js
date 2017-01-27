@@ -55,7 +55,7 @@ angular.module('mitsiApp')
 		  source.errorMessage = response.data.errorMessage;
 		  source.errorDetails = response.data.errorMessage;
 		  
-		  if(source.schema) {
+		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {
 				  if( source.schemas[i].current) {
 					  source.currentSchemaName = source.schemas[i].name;

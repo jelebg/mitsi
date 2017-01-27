@@ -1,5 +1,7 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.TreeSet;
+
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.GsonServlet;
@@ -26,8 +28,10 @@ public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema,
 	@Override
 	public ChangeCurrentSchemaResponse proceed(ChangeCurrentSchema request, Client connectedClient) throws Exception {
 		
+		String connectedUsername = connectedClient.getConnectedUsername();
+		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 
-		try (MitsiConnection connection = datasourceManager.getConnection(request.datasource)) { 
+		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasource)) { 
 		
 			connection.changeSchema(request.schema);
 		}

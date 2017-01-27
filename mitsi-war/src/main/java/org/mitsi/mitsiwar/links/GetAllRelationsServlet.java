@@ -1,5 +1,7 @@
 package org.mitsi.mitsiwar.links;
 
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
@@ -31,7 +33,10 @@ public class GetAllRelationsServlet extends GsonServlet<GetAllRelations, GetAllR
 		
 		GetAllRelationsResponse response = new GetAllRelationsResponse();
 		
-		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) { 
+		String connectedUsername = connectedClient.getConnectedUsername();
+		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+
+		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) { 
 			response.relations = connection.getAllRelations();
 		}
 		

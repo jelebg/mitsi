@@ -1,5 +1,7 @@
 package org.mitsi.mitsiwar.data;
 
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
@@ -18,25 +20,23 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 
 	@Autowired
 	private DatasourceManager datasourceManager;
-	
+
 	public GetDataServlet() {
         super(GetData.class);
     }
-	
-	
-
  
 	@Override
 	public GetDataResponse proceed(GetData request, Client connectedClient) throws Exception {
 		
 		GetDataResponse response = new GetDataResponse();
+
+		String connectedUsername = connectedClient.getConnectedUsername();
+		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
-		try (MitsiConnection connection = datasourceManager.getConnection(request.datasourceName)) {
-			// TODO : securité : faire des chacks sur le nom de la table
+		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
 			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count);
 			response.columns = result.columns;
 			response.results = result.results;
-			
 		}
 		
 		return response;

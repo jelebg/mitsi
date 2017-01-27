@@ -39,7 +39,8 @@ public class MitsiDatasourcesTest {
 	@Test
 	public void test() throws IOException, ParseException, ClassNotFoundException, SQLException {
 
-		assertEquals(mitsiDatasources.getDatasource("LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
+		mitsiDatasources.loadIfNeccessary();
+		assertEquals(mitsiDatasources.getDatasource(null, true, "LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
 		
 	}
 

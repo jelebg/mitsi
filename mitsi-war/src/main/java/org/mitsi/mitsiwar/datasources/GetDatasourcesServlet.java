@@ -1,15 +1,13 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeSet;
 
-import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.users.MitsiDatasources;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -19,10 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDatasourcesResponse> {
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	private MitsiDatasources mitsiDatasources;
-
-	
 	public GetDatasourcesServlet() {
         super(GetDatasources.class);
     }
@@ -31,11 +25,15 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 	@Override
 	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws Exception {
 		
-		mitsiDatasources.loadIfNeccessary();
-		
 		GetDatasourcesResponse response = new GetDatasourcesResponse();
-		Map<String, MitsiDatasource> datasources = mitsiDatasources.getDatasources();
-		for(MitsiDatasource mitsiDatasources : datasources.values()) {
+		
+		String connectedUsername = connectedClient.getConnectedUsername();
+		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+		
+		response.datasources = new ArrayList<>();
+		List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, connectedUsername!=null);
+
+		for(MitsiDatasource mitsiDatasources : mitsiDatasourceList) {
 			Datasource datasource = new Datasource();
 			datasource.name = mitsiDatasources.getName();
 			datasource.description = mitsiDatasources.getDescription();
