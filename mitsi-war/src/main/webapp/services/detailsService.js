@@ -1,8 +1,8 @@
 angular.module('mitsiApp')
-.service( 'detailsService', function($http) {
-	this.getDetails = function(datasourceName, objectType, objectName, owner) {
-		return $http.post('GetDetailsServlet', { 
-			"datasourceName":datasourceName,
+.service( 'detailsService', function(mitsiHttpService) {
+	this.getDetails = function(datasource, objectType, objectName, owner) {
+		return mitsiHttpService.postForDatasource(datasource, 'GetDetailsServlet', { 
+			"datasourceName":datasource.name,
 			"objectType":objectType,
 			"objectName":objectName,
 			"owner":owner

@@ -1,14 +1,14 @@
 angular.module('mitsiApp')
-.service( 'userService', function($http) {
+.service( 'userService', function(mitsiHttpService) {
 	this.getClientStatus = function() {
-		return $http.post('GetClientStatusServlet', { });
+		return mitsiHttpService.post('GetClientStatusServlet', { });
 	}
 
 	this.login = function(loginUser, loginPassword) {
-		return $http.post('LoginServlet', { "login":loginUser, "password":loginPassword });
+		return mitsiHttpService.post('LoginServlet', { "login":loginUser, "password":loginPassword });
 	}
 	
 	this.logout = function() {
-		$http.post('LoginServlet', { "login":null, "password":null });
+		return mitsiHttpService.post('LoginServlet', { "login":null, "password":null });
 	}
 });

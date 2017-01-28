@@ -46,8 +46,7 @@ angular.module('mitsiApp')
 						}
 				        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
 					};
-			    },
-			    errorService.getGenericHttpErrorCallback()
+			    }
 			);
 		}
 		finally {
@@ -56,9 +55,10 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.logout = function() {
-		userService.logout();
-		$rootScope.loggedUser = null;
-        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
+		userService.logout().then(function(result) {
+			$rootScope.loggedUser = null;
+	        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
+		});
 	}
 	
 	$scope.isUserLoggedIn = function() {

@@ -4,7 +4,7 @@ angular.module('mitsiApp')
     $scope.detailsAccordions = [];
     	
     $scope.getTableDetails = function(source, databaseObject) {
-    	detailsService.getDetails(source.name, "table", databaseObject.id.name, databaseObject.id.schema)
+    	detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
 	    .then(function(response) {
 	    	  $scope.detailsAccordions = response.data.accordions;
 	    },

@@ -18,30 +18,20 @@ angular.module('mitsiApp')
 			  $scope.datasources = response.data.datasources;
 			  $rootScope.loggedUser = response.data.connectedUsername;
 
-		  }, 
-		  errorService.getGenericHttpErrorCallback());
+		  });
 	};
 	
 	$scope.refresh = function(source, schema) {
 		
 	   source.loading = true;
 
-	   sourceService.getObjects(source.name, schema, true)
+	   sourceService.getObjects(source, schema, true)
 	   .then(function(response) {
 			  $scope.initSources(source, response)
-			  if(response.data.errorMessage) {
-				  throw false;
-			  }
-			  return sourceService.getObjects(source.name, schema, false);
+			  return sourceService.getObjects(source, schema, false);
 	   })
 	   .then(function(response) {
 			  $scope.initSources(source, response);
-	   })
-	   .catch(function(error) {
-		   if(error !== false) {
-		   	  console.log(error);
-		   	  errorService.showGeneralError("internal error");
-		   }
 	   })
 	   .finally(function() {
 		      source.loading = false;
@@ -52,8 +42,6 @@ angular.module('mitsiApp')
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.currentSchemaName = null;
-		  source.errorMessage = response.data.errorMessage;
-		  source.errorDetails = response.data.errorMessage;
 		  
 		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {

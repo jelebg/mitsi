@@ -1,8 +1,8 @@
 angular.module('mitsiApp')
-.service( 'sqlService', function($http) {
+.service( 'sqlService', function(mitsiHttpService) {
 
 	this.getData = function(datasourceName, owner, objectName, fromRow, count) {
-		return $http.post('GetDataServlet', { 
+		return mitsiHttpService.post('GetDataServlet', { 
 			"datasourceName" : datasourceName,
 			"owner"          : owner,
 			"objectName"     : objectName,

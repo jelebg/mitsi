@@ -70,8 +70,8 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 			
 		} 
 		catch(Exception e) {
-			log.error("could not get database model : "+request.datasourceName, e);
-			throw new MitsiWarException("could not get database model : "+request.datasourceName);
+			log.error("could not connect to database : "+request.datasourceName, e);
+			throw new MitsiWarException("could not connect to database : "+request.datasourceName);
 		}
 		finally {
 			if(connection != null) {
