@@ -70,9 +70,18 @@
 	        </select></td></tr></table>
             <br/>
 	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"><img src="img/table.png"/></a>
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideViews=!s.filter.hideViews" ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"><img src="img/view.png"/></a>
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideMViews=!s.filter.hideMViews" ng-class="{'mitsiGrayscale':s.filter.hideMViews==true}"><img src="img/matview.png"/></a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"
+		           popover="{{ s.filter.hideTables ? 'include tables' : 'exclude tables' }}"  popover-trigger="mouseenter" popover-placement="right-bottom"> 
+		        	<img src="img/table.png"/>
+		        </a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideViews=!s.filter.hideViews"   ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"
+		        	popover="{{ s.filter.hideViews ? 'include views' : 'exclude views' }}"  popover-trigger="mouseenter" popover-placement="bottom">
+		        	<img src="img/view.png"/
+				</a>
+		        <a href="" class="btn btn-default" ng-click="s.filter.hideMViews=!s.filter.hideMViews" ng-class="{'mitsiGrayscale':s.filter.hideMViews==true}"
+		        	popover="{{ s.filter.hideMViews ? 'include materialized views' : 'exclude materialized views' }}"  popover-trigger="mouseenter" popover-placement="bottom">
+		        	<img src="img/matview.png"/>
+		        </a>
 		    </td><td>
 				<span dropdown on-toggle="toggled(open)" >
 			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
