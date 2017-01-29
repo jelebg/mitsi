@@ -19,7 +19,17 @@
 </head>
 
 <body data-ng-app="mitsiApp" >
-			{{ currentSource.name }} : {{ currentSource.currentObject.id.schema }}.{{ currentSource.currentObject.id.name }} ({{ currentSource.currentObject.id.type }}) 
+			<div class="pull-right" style="vertical-align:bottom;line-height:40px;height:40px;display:inline-block;padding-right:10px;" >
+				<span class="datasource-tab-title" style="padding:3px">
+					{{ currentSource ? 
+					   currentSource.name +
+					   		(currentSource.currentObject ? 
+					   			" : " + currentSource.currentObject.id.schema + "." + currentSource.currentObject.id.name + " (" + currentSource.currentObject.id.type + ")"
+					   			: "" ) 
+					   : "" }}
+				</span>
+			</div> 
+        	
         	<tabset >
 			  <tab  ui-sref="workbench.details" >
 			  	<tab-heading>

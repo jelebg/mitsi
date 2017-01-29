@@ -29,6 +29,15 @@
 	font-weight:normal;
 }
 
+.datasource-tab-title {
+	font-weight:bold;
+	font-size:120%;
+	font-style: italic;
+	background-color:#F5F5F5;
+	border-radius:5px;
+}
+
+
 .filter-glyphicon {
 	color:grey;
 	pointer-events: all;
