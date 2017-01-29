@@ -107,6 +107,16 @@
 				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.constraintName}"></i>
 				        	filter constraints names
 				        </a></li>
+				        <li>
+				          <table><tr><td>excl.&nbsp</td><td> 
+				        	<input type="text" 
+				        			ng-model="s.filter.exclusion" 
+				        			class="form-control" 
+				        			ng-click="$event.stopPropagation();"
+				        			placeholder="Exclusion filter ..."
+				        			/>
+				          </td></tr></table>
+				        </li>
 				    </ul>
 			   </span>
 			</td></table>

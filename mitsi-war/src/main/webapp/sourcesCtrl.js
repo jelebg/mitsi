@@ -61,7 +61,8 @@ angular.module('mitsiApp')
 				  tableName:true,
 				  columnName:true,
 				  indexName:true,
-				  constraintName:true
+				  constraintName:true,
+				  exclusion:"^(.*\\$|SYS_)"
 		  };
 		  $scope.initGraph(source);
 		  
@@ -91,7 +92,6 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.isObjectExcludedByFilter = function(object, source) {
-		var objectName = object.id.name; 
 		var objectType = object.id.type; 
 		
 		if(source.filter.hideTables===true && objectType=="table") {
@@ -103,6 +103,23 @@ angular.module('mitsiApp')
 		if(source.filter.hideMViews===true && objectType=="matview") {
 			return true;
 		}
+		
+		var objectNameLC = object.id.name.toLowerCase(); 
+		
+		if(source.filter.exclusion && !source.filter.exclusion.trim()=="") {
+			var exclusionFilter = source.filter.exclusion.trim().toLowerCase();
+			try {
+				if(objectNameLC.match( exclusionFilter ) != null) {
+					return true;
+				}
+			}
+			catch(e) {
+				// if regex syntax is wrong, just use a simple text search 
+				if(objectNameLC.indexOf( exclusionFilter ) !== -1) {
+					return true;
+				}
+			}
+		} 
 	
 		if(!source.searchObject) {
 			return false;
@@ -114,7 +131,7 @@ angular.module('mitsiApp')
 		}
 		
 		if(source.filter.tableName!== false) {
-			if(objectName.toLowerCase().indexOf( filter ) !== -1) {
+			if(objectNameLC.indexOf( filter ) !== -1) {
 				return false
 			}
 		}
