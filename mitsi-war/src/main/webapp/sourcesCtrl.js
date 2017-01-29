@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $state, userService, sourceService, errorService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, userService, sourceService, errorService) {
 
 	$scope.datasources = [];
 
@@ -24,14 +24,17 @@ angular.module('mitsiApp')
 	$scope.refresh = function(source, schema) {
 		
 	   source.loading = true;
+	   
+	   var startLoad = new Date().getTime();
 
-	   sourceService.getObjects(source, schema, true)
+	   sourceService.getObjects(source, schema, false)
 	   .then(function(response) {
+		   var startDisplay = new Date().getTime();
 			  $scope.initSources(source, response)
-			  return sourceService.getObjects(source, schema, false);
-	   })
-	   .then(function(response) {
-			  $scope.initSources(source, response);
+			  $timeout(function() {
+				   var end = new Date().getTime();
+				   console.log("source refresh global time:"+(end-startLoad)+"ms display time:"+(end-startDisplay)+"ms - "+source.name)
+			  }, 0);
 	   })
 	   .finally(function() {
 		      source.loading = false;
