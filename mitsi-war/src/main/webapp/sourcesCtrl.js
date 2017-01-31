@@ -223,7 +223,12 @@ angular.module('mitsiApp')
 		document.getElementById("sourceDbObject_"+source.name+"_"+o.id.schema+"_"+o.id.name).scrollIntoView(true);
 	});
 	
-
+	$scope.openObjectAccordion = function(o) {
+		o.accordionOpened = !o.accordionOpened;
+		if(!o.columnsToDisplay) {
+			o.columnsToDisplay = o.columns;
+		}
+	}
 	
 	$scope.init();
 

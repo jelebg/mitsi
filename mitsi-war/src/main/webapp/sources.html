@@ -123,7 +123,7 @@
 			      
 	      	<accordion close-others="false">
 				<accordion-group 
-					ng-repeat="o in s.objects | orderBy:'id.name'" 
+					ng-repeat="o in s.objects track by o.id.name | orderBy:'id.name'" 
 					is-open="o.accordionOpened" 
 					is-disabled="true" 
 					ng-hide="!o.filterPined && isObjectExcludedByFilter(o, s)"
@@ -131,7 +131,7 @@
 				  <accordion-heading>
 				  <div id="sourceDbObject_{{s.name}}_{{o.id.schema}}_{{o.id.name}}">
             		<a href=""  
-            			ng-click="o.accordionOpened = !o.accordionOpened;">
+            			ng-click="openObjectAccordion(o)">
 			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
 			        </a>
             		<a href=""  
@@ -153,7 +153,7 @@
 				  	</div>
 			      </accordion-heading>
 					<ul class="mitsi-columns-list" >
-						<li ng-repeat="c in o.columns" 
+						<li ng-repeat="c in o.columnsToDisplay" 
 						    popover="{{ c.type }} / {{ c.description }}"
 						    popover-placement="bottom"
 							popover-trigger="mouseenter"
