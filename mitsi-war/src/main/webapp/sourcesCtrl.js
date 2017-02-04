@@ -15,8 +15,39 @@ angular.module('mitsiApp')
 	$scope.globalRefresh = function() {
 		userService.getClientStatus()
 		  .then(function(response) {
-			  $scope.datasources = response.data.datasources;
+			  
+			  var responseDatasources = response.data.datasources;
 			  $rootScope.loggedUser = response.data.connectedUsername;
+
+			  var scopeDatasourceNames = {};
+			  for(var i=0; i!=$scope.datasources.length; i++) {
+				  scopeDatasourceNames[$scope.datasources[i].name] = true;
+			  }
+			  var responseDatasourceNames = {};
+			  for(var i=0; i!=responseDatasources.length; i++) {
+				  responseDatasourceNames[responseDatasources[i].name] = i;
+			  }
+
+			  // add datasources that do exist yet
+			  for(var i=0; i!=responseDatasources.length; i++) {
+				  if(!(responseDatasources[i].name in scopeDatasourceNames)) {
+					  $scope.datasources.push(responseDatasources[i]);
+				  }
+			  }
+			  for(var i=0; i!=$scope.datasources.length; i++) {
+				  // remove datasources that whe do not have right to access anymore
+				  if(!($scope.datasources[i].name in responseDatasourceNames)) {
+					  $scope.datasources.splice(i);
+					  i--;
+				  }
+				  // update the others
+				  else {
+					  var newDatasourceIndex = responseDatasourceNames[$scope.datasources[i].name];
+					  var newDatasource = responseDatasources[newDatasourceIndex];
+					  $scope.datasources[i].description = newDatasource.description;
+					  $scope.datasources[i].tags = newDatasource.tags;
+				  }
+			  }
 
 		  });
 	};
