@@ -33,7 +33,7 @@ public class MitsiUsersConfigTest {
 
 		mitsiUsersConfig.loadIfNeccessary();
 		assertFalse(mitsiUsersConfig.authenticate("user_wrong", "guestmdp"));
-		//assertTrue(mitsiUsersConfig.authenticate("guest", "guestmdp"));
+		assertTrue(mitsiUsersConfig.authenticate("guest", "guestmdp"));
 		assertFalse(mitsiUsersConfig.authenticate("guest", "mdp_wrong"));
 		assertTrue(mitsiUsersConfig.authenticate("test", "testclearpassword"));
 		assertFalse(mitsiUsersConfig.authenticate("test", "mdp_wrong"));

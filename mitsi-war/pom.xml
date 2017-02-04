@@ -14,14 +14,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mitsi</groupId>
-			<artifactId>users</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mitsi</groupId>
-			<artifactId>datasources</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mitsi</groupId>
 			<artifactId>mitsi-core</artifactId>
 		</dependency>
 		

@@ -10,8 +10,6 @@
 
 	<modules>
 		<module>commons</module>
-		<module>users</module>
-		<module>datasources</module>
 		<module>mitsi-core</module>
 		<module>mitsi-war</module>
 		<module>mitsi-package</module>

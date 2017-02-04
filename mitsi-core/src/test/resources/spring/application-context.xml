@@ -7,13 +7,11 @@
 	   					   http://www.springframework.org/schema/context 
 	   					   http://www.springframework.org/schema/context/spring-context.xsd">
 
-
-<!--  <bean id="mitsiHome" class="java.lang.String">
-  <constructor-arg value="/"/>
-</bean> -->
-      
 <bean id="mitsiDatasourcesFile" class="org.springframework.core.io.ClassPathResource">
 	<constructor-arg value="mitsi-datasources.json"/>
+</bean>
+<bean id="usersFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-users.json"/>
 </bean>
 
 <import resource="classpath:spring/application-context-core.xml"/>

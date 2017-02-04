@@ -16,7 +16,6 @@
 </bean>
 
 <import resource="classpath:spring/application-context-core.xml"/>
-<import resource="classpath:spring/application-context-war.xml"/>
 
 <bean id="mitsiAuthenticator" class="org.mitsi.mitsiwar.authent.MitsiAuthenticatorImpl"/>
 
