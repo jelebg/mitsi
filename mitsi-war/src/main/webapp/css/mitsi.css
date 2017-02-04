@@ -310,6 +310,10 @@
 	padding:4px;
 }
 
+.verticalMenuPopover {
+	color:black;
+}
+
 .verticalMenuTdSelected {
 	background-color:#cd48ff;
 	color:white;

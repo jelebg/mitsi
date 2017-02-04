@@ -16,14 +16,82 @@
             <button class="btn btn-warning" type="button" ng-click="closeOptionsDialog()">Cancel</button>
         </div>
 </script>
+
+<script type="text/ng-template" id="popover.pin.action.html">
+    <span>pin&nbsp;table</span>
+</script>
+
+<script type="text/ng-template" id="popover.info.action.html">
+    <span>display&nbsp;details&nbsp;in&nbsp;left&nbsp;panel</span>
+</script>
+
+<script type="text/ng-template" id="popover.sql.action.html">
+    <span>Build&nbsp;SQL&nbsp;FROM&nbsp;clause&nbsp;using&nbsp;foreign&nbsp;keys</span>
+</script>
+
+<script type="text/ng-template" id="popover.startpath.action.html">
+    <span>Use&nbsp;table&nbsp;as&nbsp;start&nbsp;to&nbsp;find&nbsp;paths</span>
+</script>
+
+<script type="text/ng-template" id="popover.finishpath.action.html">
+    <span>Use&nbsp;table&nbsp;as&nbsp;finish&nbsp;to&nbsp;find&nbsp;paths</span>
+</script>
+
+<script type="text/ng-template" id="popover.graphdisplay.html">
+    <span>
+        Display&nbsp;graph&nbsp;only
+    </span>
+</script>
  
+<script type="text/ng-template" id="popover.sqldisplay.html">
+    <span>
+        Display&nbsp;SQL&nbsp;built&nbsp;using&nbsp;<span class="tableActionLabelSelected"><a href="" style="color:white;font-size:65%;vertical-align:middle;">SQL</a></span>&nbsp;labels
+    </span>
+</script>
+
+<script type="text/ng-template" id="popover.pathsdisplay.html">
+    <div style="text-align: center;">
+        Display&nbsp;paths&nbsp;built&nbsp;using&nbsp;<img style="transform: scale(-1, 1);" src="img/flag_path.png"/>&nbsp;and&nbsp;<img src="img/flag_path.png"/>
+    </div>
+</script>
+
+<script type="text/ng-template" id="popover.optionsdisplay.html">
+    <div style="text-align: center;">
+        Display&nbsp;options
+    </div>
+</script>
+
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
-  	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd"><a href="" ng-click="displayGraph()">Graph</a></td></tr>
-  	<tr><td ng-class="{'verticalMenuTdSelected':showSQL}"  class="verticalMenuTd"><a href="" ng-click="displaySQL()">SQL</a></td></tr>
-  	<tr><td ng-class="{'verticalMenuTdSelected':showPaths}"  class="verticalMenuTd"><a href="" ng-click="displayPaths()">Paths</a></td></tr>
-  	<tr><td class="verticalMenuTd"><a href="" ng-click="showOptionsDialog()"><i class="glyphicon glyphicon-option-horizontal" style="font-size:120%;"></i></a></td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd">
+  		<a href="" ng-click="displayGraph()"
+			popover-template="'popover.graphdisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="right"
+		>Graph</a></td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':showSQL}"  class="verticalMenuTd">
+  		<a href="" ng-click="displaySQL()"
+			popover-template="'popover.sqldisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="right"
+  		>SQL</a></td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':showPaths}"  class="verticalMenuTd">
+  		<a href="" ng-click="displayPaths()"
+			popover-template="'popover.pathsdisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="right"
+  		>Paths</a></td></tr>
+  	<tr><td class="verticalMenuTd">
+  		<a href="" ng-click="showOptionsDialog()"
+ 			popover-template="'popover.optionsdisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="right"
+  		><i class="glyphicon glyphicon-option-horizontal" style="font-size:120%;"></i></a></td></tr>
   	<tr><td style="height:150px">
   	  <rzslider rz-slider-model="zoomSlider.value" rz-slider-options="zoomSlider.options"></rzslider>
     </td></tr>
@@ -95,7 +163,11 @@
 		 <td style="padding-right:5px;">
 		     <a href="" 
 		        ng-show="isTableTemporary(t.name)"
-		        ng-click="pinTemporaryTable(t.name)">
+		        ng-click="pinTemporaryTable(t.name)"
+				popover-template="'popover.pin.action.html'"
+				popover-trigger="mouseenter"
+				popover-placement="bottom"
+				>
 			 	<i class="glyphicon glyphicon-pushpin"></i>
 			 </a>
 		 </td>
@@ -107,7 +179,8 @@
 		        ng-show="! isTableTemporary(t.name)"
 				ng-mouseover="mouseOverAsterisk(t)"
 				ng-mouseleave="mouseLeaveAsterisk()"
- 		        ng-click="pinTemporaryLinkedTables(t.name)">
+ 		        ng-click="pinTemporaryLinkedTables(t.name)"
+ 		        >
 		        <i class="glyphicon glyphicon-asterisk"></i>
 		     </a>
 		 </td>
@@ -116,7 +189,11 @@
 		 >
 		 	<a href="" 
 		        ng-show="! isTableTemporary(t.name)"
- 		        ng-click="requestInfo(t)">
+ 		        ng-click="requestInfo(t)"
+ 		        popover-template="'popover.info.action.html'"
+				popover-trigger="mouseenter"
+				popover-placement="bottom"
+ 		        >
 		        <i class="glyphicon glyphicon-info-sign"></i>
 		     </a>
 		 </td>
@@ -128,8 +205,11 @@
 		   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
 		   		>
 		  	<a href=""  
-		  	   style="color:white;font-size:65%;vertical-align:middle;"
-		  	   ng-click="toggleTableInSQL(t)"
+		  	    style="color:white;font-size:65%;vertical-align:middle;"
+		  	    ng-click="toggleTableInSQL(t)"
+ 		        popover-template="'popover.sql.action.html'"
+				popover-trigger="mouseenter"
+				popover-placement="bottom"
 		  	   >SQL</a>
 		  	</span>
 		 </td>		 
@@ -139,7 +219,11 @@
 		 	<span 
 		 		ng-show="! isTableTemporary(t.name)"
 		 		ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
-		 	  <a href="" ng-click="setTablePathStart(t)">
+		 	  <a href="" ng-click="setTablePathStart(t)"
+ 		        popover-template="'popover.startpath.action.html'"
+				popover-trigger="mouseenter"
+				popover-placement="bottom"
+		 	  >
 		 	    <img style="transform: scale(-1, 1);" src="img/flag_path.png"/>
 		 	  </a>
 		   </span>
@@ -150,7 +234,11 @@
 		   <span 
 		   		ng-show="! isTableTemporary(t.name)"
 		   		ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
-		 	  <a href="" ng-click="setTablePathEnd(t)">
+		 	  <a href="" ng-click="setTablePathEnd(t)"
+		 	    popover-template="'popover.finishpath.action.html'"
+				popover-trigger="mouseenter"
+				popover-placement="bottom"
+		 	  >
 		 	    <img src="img/flag_path.png"/>
 		 	  </a>
 		   </span>

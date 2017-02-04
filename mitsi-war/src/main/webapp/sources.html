@@ -18,6 +18,23 @@
 
 <script src="sourcesCtrl.js"></script>
 
+
+<script type="text/ng-template" id="popover.refresh.html">
+    <span>Refresh&nbsp;datasource</span>
+</script>
+<script type="text/ng-template" id="popover.table.filter.options.html">
+    <span>filter&nbsp;options</span>
+</script>
+<script type="text/ng-template" id="popover.table.open.html">
+    <span>display&nbsp;table&nbsp;columns</span>
+</script>
+<script type="text/ng-template" id="popover.table.pin.html">
+    <span>pin&nbsp;table&nbsp;regardless&nbsp;of&nbsp;filter</span>
+</script>
+<script type="text/ng-template" id="popover.table.proxgraph.html">
+    <span>display&nbsp;proximity&nbsp;graph</span>
+</script>
+
 </head>
 
 <body data-ng-app="mitsiApp">
@@ -45,7 +62,11 @@
             <a href=""  ng-click="refresh(s, s.currentSchemaName); $event.stopPropagation();">
 	            <i class="pull-right glyphicon glyphicon-refresh "
 	               ng-class="{'fast-right-spinner':s.loading}" 
-	               style="margin-right:5px" ></i>
+	               style="margin-right:5px" 
+			 	   popover-template="'popover.refresh.html'"
+				   popover-trigger="mouseenter"
+				   popover-placement="left-bottom"
+	            ></i>
             </a>
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
@@ -86,7 +107,12 @@
 				<span dropdown on-toggle="toggled(open)" >
 			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
 						<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
-						<a href="" dropdown-toggle style="pointer-events: all;margin-right:20px;" class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon"></a>
+						<a href="" dropdown-toggle style="pointer-events: all;margin-right:20px;" 
+							class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon"
+					 	    popover-template="'popover.table.filter.options.html'"
+							popover-trigger="mouseenter"
+							popover-placement="bottom"
+						></a>
 						
 						<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
 					</div>
@@ -132,16 +158,27 @@
 				  <div id="sourceDbObject_{{s.name}}_{{o.id.schema}}_{{o.id.name}}">
             		<a href=""  
             			ng-click="openObjectAccordion(o)">
-			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"></i>
+			        	<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': o.accordionOpened, 'glyphicon-chevron-right': !o.accordionOpened}"
+				 	    popover-template="'popover.table.open.html'"
+						popover-trigger="mouseenter"
+						popover-placement="left-bottom"
+            			></i>
 			        </a>
             		<a href=""  
             			ng-click="o.filterPined = !o.filterPined">
-				  		<i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'objectPinSelected': o.filterPined}"></i>
+				  		<i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'objectPinSelected': o.filterPined}"
+				 	    popover-template="'popover.table.pin.html'"
+						popover-trigger="mouseenter"
+						popover-placement="left-bottom"
+            			></i>
 				    </a>
-            		<a href="" ng-click="displayProximityGraph(s, o)" >
-			        	<i class="pull-right glyphicon glyphicon-asterisk"></i>
+            		<a href="" ng-click="displayProximityGraph(s, o)">
+			        	<i class="pull-right glyphicon glyphicon-asterisk" 
+					 	    popover-template="'popover.table.proxgraph.html'"
+							popover-trigger="mouseenter"
+							popover-placement="left-bottom"
+            		></i>
 			        </a>
-			        <!-- i class="pull-right glyphicon glyphicon-pushpin" ng-class="{'database-object-pined': o.accordionPined, 'database-object-unpined': !o.accordionPined }"></i -->
 				        <img src="img/{{ (o.id.type=='table' ? 'table' : (o.id.type=='matview' ? 'matview' : (o.id.type=='view' ? 'view' : ''))) }}.png"/>
 				  	<span   ng-click="selectObject(s, o)"   
 							ng-class="{'sourceObjectSelect':s.currentObject.id.name==o.id.name && s.currentObject.id.schema==o.id.schema}"
