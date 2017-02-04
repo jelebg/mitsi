@@ -31,6 +31,7 @@
 <script src="wsqlCtrl.js"></script>
 <script src="sourcesCtrl.js"></script>
 <script src="loginCtrl.js"></script>
+<script src="menuCtrl.js"></script>
 <script src="services/mitsiHttpService.js"></script>
 <script src="services/errorService.js"></script>
 <script src="services/userService.js"></script>
@@ -44,8 +45,6 @@
 <body data-ng-app="mitsiApp">
       	<img src="img/logo-transparent.png" style="height:34px;vertical-align:bottom;"/>
 		
-		<span style="color:red;padding-left:60px;">{{ mitsiGeneralError }}</span>
-		
 		<div class="pull-right" ng-controller="loginCtrl">
 		<table ng-hide="isUserLoggedIn()">
 			<tr><td><input type="text"      ng-model="loginUser"     style="width:200px;" class="form-control" placeholder="username"/>
@@ -58,6 +57,17 @@
 			<td><a href="" class="btn btn-default" ng-keypress="logoutOnSpacebar($event)" ng-click="logout()">log out</a></td></tr>
 		</table>
 		</div>
+		
+		<div class="pull-right" style="min-width:600px;" ng-controller="menuCtrl">
+           <alert type="danger"
+	           style="min-width:600px;padding-top:5px;padding-bottom:5px;margin-right:10px;text-align:center;"
+	            class="pull-right"
+             	close="closeGeneralError()"
+            	dismiss-on-timeout="10000"
+            	ng-if="mitsiGeneralError!=null"
+            	>{{ mitsiGeneralError }}
+            </alert>
+		</div> 
 
    <div ui-layout style="top:35px">
        <ui-layout options="{ flow : 'column' }">
