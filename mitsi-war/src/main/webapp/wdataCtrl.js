@@ -5,13 +5,19 @@ angular.module('mitsiApp')
 	$scope.allReadyFetched = 0;
 	$scope.nbRowToFetch = 100; 
 	
-
+	$scope.sortChanged = function(grid, columndDefs) {
+		// TODO
+		console.log("TODO : sortChanged");
+	}
 	
 	$scope.initGrid = function() {
 		$scope.dataGrid = { 
 				data: [],
-				onRegisterApi: function(gridApi){ 
+			    useExternalSorting: true,
+			    onRegisterApi: function(gridApi){ 
 				    gridApi.infiniteScroll.on.needLoadMoreData($scope, $scope.getDataDown);
+				    gridApi.core.on.sortChanged( $scope, $scope.sortChanged );
+				    //$scope.sortChanged($scope.gridApi.grid, [ $scope.gridOptions.columnDefs[1] ] );
 					$scope.dataGridApi = gridApi;
 				},
 	            enableFiltering: $scope.enableFilter,
