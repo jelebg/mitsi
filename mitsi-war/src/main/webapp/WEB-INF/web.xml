@@ -51,6 +51,16 @@
   </servlet-mapping>
   <servlet>
     <description></description>
+    <display-name>GetServerInfoServlet</display-name>
+    <servlet-name>GetServerInfoServlet</servlet-name>
+    <servlet-class>org.mitsi.mitsiwar.client.GetServerInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetServerInfoServlet</servlet-name>
+    <url-pattern>/GetServerInfoServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
     <display-name>GetDataServlet</display-name>
     <servlet-name>GetDataServlet</servlet-name>
     <servlet-class>org.mitsi.mitsiwar.data.GetDataServlet</servlet-class>

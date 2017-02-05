@@ -1,12 +1,15 @@
 angular.module('mitsiApp')
-    .controller('menuAboutPopupCtrl', function($scope, $rootScope, $modalInstance) {
+    .controller('menuAboutPopupCtrl', function($scope, $rootScope, $modalInstance, userService) {
     	
-    	$scope.init = function(options) {
-    	}
-    	
-        $scope.closeAbout = function() {
-        	$modalInstance.dismiss();
-        }
+    $scope.warVersion = null;
+    
+    $scope.closeAbout = function() {
+    	$modalInstance.dismiss();
+    }
+    
+    userService.getServerInfo().then(function(response) {
+    	$scope.warVersion = response.data.warVersion;
+    });
     
 });
 
@@ -27,7 +30,7 @@ angular.module('mitsiApp')
 		      ariaDescribedBy: 'modal-body',
 		      templateUrl: 'popups/about.mitsi.html',
 		      controller: 'menuAboutPopupCtrl'
-		    });
+		});
 	
     }
     

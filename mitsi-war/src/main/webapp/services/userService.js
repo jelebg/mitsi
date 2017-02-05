@@ -11,4 +11,9 @@ angular.module('mitsiApp')
 	this.logout = function() {
 		return mitsiHttpService.post('LoginServlet', { "login":null, "password":null });
 	}
+	
+	this.getServerInfo = function() {
+		return mitsiHttpService.post('GetServerInfoServlet', { });
+
+	}
 });
