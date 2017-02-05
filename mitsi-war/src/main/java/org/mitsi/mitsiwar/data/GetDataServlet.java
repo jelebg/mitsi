@@ -10,10 +10,6 @@ import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-/**
- * Servlet implementation class TestGsonServlet
- */
-// TODO : to be replaced by GetClientStatus
 public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 	private static final Logger log = Logger.getLogger(GetDataServlet.class);
 	private static final long serialVersionUID = 1L;
@@ -34,7 +30,7 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
 		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
-			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count);
+			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count, request.orderByColumns);
 			response.columns = result.columns;
 			response.results = result.results;
 		}

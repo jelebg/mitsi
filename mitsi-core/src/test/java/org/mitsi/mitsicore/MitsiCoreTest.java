@@ -13,6 +13,7 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
@@ -174,16 +175,32 @@ public class MitsiCoreTest {
 	@Test
 	public void getData() throws SQLException, MitsiSecurityException, MitsiUsersException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2);
+			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
 			assertEquals(result.results.size(), 2);
 			
-			result = connection.getData("TEST", "TATA", 2, 2);
+			result = connection.getData("TEST", "TATA", 2, 2, null);
+			assertEquals(result.columns.get(0).name, "ID");
+			assertEquals(result.columns.get(1).name, "STR");
+			assertEquals(result.results.size(), 2);
+			
+			OrderByColumn[] orderByColumns = new OrderByColumn[2];
+			OrderByColumn orderById  = new OrderByColumn();
+			orderById.column = "ID";
+			orderById.ascending = true;
+			OrderByColumn orderByStr = new OrderByColumn();
+			orderByStr.column = "STR";
+			orderByStr.ascending = false;
+			orderByColumns[0] = orderById;
+			orderByColumns[1] = orderByStr;
+			result = connection.getData("TEST", "TATA", 2, 2, orderByColumns);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
 			assertEquals(result.results.size(), 2);
 		}
 	}
+	
+	
 		
 }

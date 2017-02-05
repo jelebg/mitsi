@@ -4,10 +4,21 @@ angular.module('mitsiApp')
 	$scope.enableFilter = false;
 	$scope.allReadyFetched = 0;
 	$scope.nbRowToFetch = 100; 
+	$scope.lastOrderByColumns = null;
 	
-	$scope.sortChanged = function(grid, columndDefs) {
-		// TODO
-		console.log("TODO : sortChanged");
+	$scope.sortChanged = function(grid, sortColumns) {
+		if(!$rootScope.currentSource) {
+			return;
+		}
+		if(!$rootScope.currentSource.currentObject) {
+			return;
+		}
+		var orderByColumns = [];
+		for(var i=0; i!=sortColumns.length; i++) {  
+			var col = sortColumns[i];
+			orderByColumns.push({"column":col.displayName, "ascending":(col.sort.direction=="asc"?true:false)});
+		}
+		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, orderByColumns, true);
 	}
 	
 	$scope.initGrid = function() {
@@ -17,7 +28,6 @@ angular.module('mitsiApp')
 			    onRegisterApi: function(gridApi){ 
 				    gridApi.infiniteScroll.on.needLoadMoreData($scope, $scope.getDataDown);
 				    gridApi.core.on.sortChanged( $scope, $scope.sortChanged );
-				    //$scope.sortChanged($scope.gridApi.grid, [ $scope.gridOptions.columnDefs[1] ] );
 					$scope.dataGridApi = gridApi;
 				},
 	            enableFiltering: $scope.enableFilter,
@@ -25,31 +35,8 @@ angular.module('mitsiApp')
 	            enableGridMenu: true,
 	            columnDefs: [
 	                 // default
-	                 { field: 'num',
+	                 { field: '#',
 	                	 width: 50
-	                 },
-	                 { field: 'col1',
-	                	 width: 150
-	                 },
-	                 // pre-populated search field
-	                 { field: 'col2', 
-	                   filter: {
-	                     term: '1',
-	                     type: uiGridConstants.filter.SELECT,
-	                     selectOptions: [ { value: '1', label: 'male' }, { value: '2', label: 'female' }, { value: '3', label: 'unknown'}, { value: '4', label: 'not stated' }, { value: '5', label: 'a really long value that extends things' } ]
-	                   },
-	                   width: 150
-	                   /*,cellFilter: 'mapGender', headerCellClass: $scope.highlightFilteredHeader*/
-	                 },
-	                 // no filter input
-	                 { field: 'col3', enableFiltering: false, 
-	                   filter: {
-	                     noTerm: true,
-	                     condition: function(searchTerm, cellValue) {
-	                       return cellValue.match(/a/);
-	                     }
-	                    },
-	                   width: 150
 	                 }
 	           ]
 				
@@ -101,12 +88,13 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
-		$scope.beginData(source, databaseObject);
+		$scope.beginData(source, databaseObject, null, false);
 	});
 	
-	$scope.beginData = function(source, databaseObject) {
+	$scope.beginData = function(source, databaseObject, orderByColumns, preserveColumns) {
+		$scope.lastOrderByColumns = orderByColumns;
 		$scope.allReadyFetched = 0;
-		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch)
+		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch, orderByColumns)
 		  .then(function(response) {
 			  $scope.dataGridApi.core.scrollTo(
 					  $scope.dataGrid.data[0],
@@ -114,18 +102,22 @@ angular.module('mitsiApp')
 			  );
 			  $scope.dataGrid.data = [];
 			  
-			  $scope.dataGrid.columnDefs = [
-	    	                 { field: 'num',
-	    	                	 width: 50
-	    	                 }
-	    	  ];
-			  
-			  for(var i=0; i!=response.data.columns.length; i++) {
-				  $scope.dataGrid.columnDefs.push(
-					{   field: 'col'+i,
-						displayName: response.data.columns[i].name, 
-						width: 200 }
-				  );
+			  if(!preserveColumns) {
+				  $scope.dataGrid.columnDefs = [
+		    	                 { field: 'num',
+		    	                   displayName:"#",
+		    	                   width: 50,
+		    	                   enableSorting: false
+		    	                 }
+		    	  ];
+				  
+				  for(var i=0; i!=response.data.columns.length; i++) {
+					  $scope.dataGrid.columnDefs.push(
+						{   field: 'col'+i,
+							displayName: response.data.columns[i].name, 
+							width: 200 }
+					  );
+				  }
 			  }
 
 			  
@@ -140,8 +132,7 @@ angular.module('mitsiApp')
 			  }
 		      $scope.allReadyFetched = response.data.results.length;
 
-		  }, 
-		  errorService.getGenericHttpErrorCallback());
+		  });
 	};
 	
 	$scope.getDataDown = function() {
@@ -155,16 +146,17 @@ angular.module('mitsiApp')
 		
 		$rootScope.currentSource.currentObject.id.schema
 	    var promise = $q.defer();
+		var noMoreData = true;
 		sqlService.getData(
 				$rootScope.currentSource.name, 
 				$rootScope.currentSource.currentObject.id.schema, 
 				$rootScope.currentSource.currentObject.id.name, 
 				$scope.allReadyFetched, 
-				$scope.nbRowToFetch)
-	    .success(function(response) {
-	    	
-		  var t = response.results;
-		  var noMoreData = (t.length==0 || t.length<$scope.nbRowToFetch);
+				$scope.nbRowToFetch,
+				$scope.lastOrderByColumns)
+	    .then(function(response) {
+		  var t = response.data.results;
+		  noMoreData = (t.length==0 || t.length<$scope.nbRowToFetch);
 		  for(var i=0; i!=t.length; i++) {
 			  var r = {};
 			  r["num"] = $scope.dataGrid.data.length+1;
@@ -174,12 +166,9 @@ angular.module('mitsiApp')
 			  $scope.dataGrid.data.push(r);
 		  }
 	      $scope.allReadyFetched = $scope.allReadyFetched+t.length;
-          $scope.dataGridApi.infiniteScroll.dataLoaded(false, !noMoreData);
-          promise.resolve();
 	    })
-	    .error(function(error) {
-	      $scope.dataGridApi.infiniteScroll.dataLoaded();
-	      promise.reject();
+	    .finally(function(error) {
+	      $scope.dataGridApi.infiniteScroll.dataLoaded(false, !noMoreData);
 	    });
 	    return promise.promise;
 		
@@ -188,7 +177,7 @@ angular.module('mitsiApp')
 	$scope.initGrid();
 	if($rootScope.currentSource &&
 		$rootScope.currentSource.currentObject) {
-		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject);
+		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, null, false);
 	}
 
 	$scope.gridRefresh = false;

@@ -32,10 +32,9 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.log4j.Logger;
-import org.mitsi.datasources.exceptions.MitsiDatasourceException;
+import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
-import org.mitsi.datasources.mapper.oracle.IOracleMapper;
 
 public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
@@ -222,10 +221,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public static class GetDataResult {
 		public List<Column> columns;
 		public List<String[]> results;
-
 	}
 	
-	public GetDataResult getData(String owner, String tableName, long fromRow, long count) throws SQLException, MitsiSecurityException {
+	public GetDataResult getData(String owner, String tableName, long fromRow, long count, OrderByColumn[] orderByColumns) throws SQLException, MitsiSecurityException {
 		securityCheckDbObject(tableName);
 		if(owner != null) {
 			securityCheckDbObject(owner);
@@ -236,9 +234,31 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		
 		// TODO : passer par le mapper pour bdd autres qu'oracle
 		
+		StringBuilder orderByClause = new StringBuilder();
+		if(orderByColumns != null) {
+			for(OrderByColumn orderByColumn : orderByColumns) {
+				if(orderByClause.length()==0) {
+					orderByClause.append("ORDER BY ");
+				}
+				else {
+					orderByClause.append(",");
+				}
+				orderByClause.append(orderByColumn.column);
+				if(orderByColumn.ascending) {
+					orderByClause.append(" ASC");
+				}
+				else {
+					orderByClause.append(" DESC");
+				}
+			}
+		}
+		
 		// back to JDBC
 		Connection jdbcConnection  = sqlSession.getConnection();
-		PreparedStatement  statement = jdbcConnection.prepareStatement("SELECT * FROM ( SELECT rownum rnum, t.* FROM "+(owner==null?"":owner+".")+tableName+" t where rownum<=?) where rnum>?");
+		PreparedStatement  statement = jdbcConnection.prepareStatement(
+				"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
+							"select * from " + (owner==null?"":owner+".")+tableName+" "+orderByClause.toString()+							
+						" ) t where rownum<=?) where rnum>?");
 		statement.setLong(1, fromRow+count);
 		statement.setLong(2, fromRow);
 		statement.execute();

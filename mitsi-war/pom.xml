@@ -16,6 +16,10 @@
 			<groupId>org.mitsi</groupId>
 			<artifactId>mitsi-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework</groupId>
