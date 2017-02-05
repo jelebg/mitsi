@@ -32,6 +32,7 @@
 	<dependencySets>
 		<dependencySet>
 			<outputDirectory>apache-tomcat-8.0.20/webapps</outputDirectory>
+			<outputFileNameMapping>mitsi.war</outputFileNameMapping>
 			<includes>
 				<include>org.mitsi:mitsi-war</include>
 			</includes>
