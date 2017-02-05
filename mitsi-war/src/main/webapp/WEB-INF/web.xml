@@ -27,12 +27,8 @@
   <session-config>
     <session-timeout>720</session-timeout>
   </session-config>
-  <!--listener>
-    <listener-class>org.mitsi.mitsiwar.filters.SessionListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.mitsi.mitsiwar.filters.CleanerListener</listener-class>
-  </listener-->
+  <!--  enforce session persistence -->
+  <distributable/>
   <servlet>
     <description></description>
     <display-name>GetDatabaseObjectsServlet</display-name>

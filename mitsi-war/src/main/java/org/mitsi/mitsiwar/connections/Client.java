@@ -1,6 +1,10 @@
 package org.mitsi.mitsiwar.connections;
 
-public class Client {
+import java.io.Serializable;
+
+public class Client implements Serializable {
+	private static final long serialVersionUID = -5140866808683891062L;
+
 	private String username; // null for anonymous
 	
 	public Client() {
