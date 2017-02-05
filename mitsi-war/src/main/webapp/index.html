@@ -59,7 +59,19 @@
 		</div>
 		
 		<div class="pull-right" style="min-width:600px;" ng-controller="menuCtrl">
-           <alert type="danger"
+<script type="text/ng-template" id="popups/about.mitsi.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">About Mitsi</h3>
+        </div>
+        <div class="modal-body" id="modal-body" style="text-align:center;" >
+	        <img src="img/favicon.png" style="margin-right:50px;"/>
+			Mitsi version : TODO
+		</div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="closeAbout()">OK</button>
+        </div>
+</script>
+			<alert type="danger"
 	           style="min-width:600px;padding-top:5px;padding-bottom:5px;margin-right:10px;text-align:center;"
 	            class="pull-right"
              	close="closeGeneralError()"
@@ -67,6 +79,22 @@
             	ng-if="mitsiGeneralError!=null"
             	>{{ mitsiGeneralError }}
             </alert>
+			<span dropdown  
+			      class="pull-right"
+			>
+					<a href="" dropdown-toggle 
+						class="btn btn-default"
+						style="pointer-events: all;margin-right:10px;" 
+					>
+					menu <i class="glyphicon glyphicon-menu-down"></i>
+					</a>
+					
+			    <ul class="dropdown-menu" >
+			        <li ><a href="" ng-click="menuAbout()">
+			        	About Mitsi
+			        </a></li>
+			    </ul>
+		   </span>
 		</div> 
 
    <div ui-layout style="top:35px">
