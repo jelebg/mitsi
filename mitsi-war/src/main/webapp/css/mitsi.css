@@ -288,6 +288,11 @@
 	vertical-align:top;"	
 }
 
+.objectMenuIcon {
+	font-size:20px;
+	color:#707070;
+}
+
 .objectPinSelected {
 	color : #00ce00;
 }
@@ -342,7 +347,6 @@
 .mitsiCheckOption {
 	text-decoration : none !important;
 }
-
 
 /* animations */
 
