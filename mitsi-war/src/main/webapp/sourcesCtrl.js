@@ -245,7 +245,9 @@ angular.module('mitsiApp')
 				if(source.searchObject && !source.searchObject=="") {
 					o.filterPined = true;
 				}
-				o.accordionOpened = true;
+				if(!o.accordionOpened) {
+					$scope.openObjectAccordion(o);
+				}
 				break;
 			}
 		}
