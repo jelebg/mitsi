@@ -59,10 +59,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
@@ -82,11 +78,6 @@
 			<artifactId>oracle-jdbc-driver</artifactId>
 			<version>1.0.0-repo</version>
 		</dependency>
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-		</dependency>
-
 	</dependencies>
 	
 	

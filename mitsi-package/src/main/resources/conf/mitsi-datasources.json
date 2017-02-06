@@ -1,24 +1,24 @@
 { 
   "datasources" : {
 	  "MY-FIRST-DATABASE" :  {
-	    "user.groups" : [ "_public" ],
+	    "userGroups" : [ "_public" ],
 		"description" : "my first database",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
 		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  },
 	  "MY-SECOND-DATABASE": {
-	    "user.groups" : [ "_public" ],
+	    "userGroups" : [ "_public" ],
 		"description" : "my second database", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
-		"connect.schema" : "TEST",
+		"connectSchema" : "TEST",
 		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  }
   } 

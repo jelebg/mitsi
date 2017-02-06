@@ -137,11 +137,6 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.googlecode.json-simple</groupId>
-				<artifactId>json-simple</artifactId>
-				<version>1.1.1</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.tomcat</groupId>
 				<artifactId>tomcat</artifactId>
 				<version>8.0.20</version>

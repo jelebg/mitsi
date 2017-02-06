@@ -4,21 +4,10 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
 
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mitsi.datasources.Column;
-import org.mitsi.datasources.Constraint;
-import org.mitsi.datasources.DatabaseObject;
-import org.mitsi.datasources.Index;
-import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.Relation;
-import org.mitsi.datasources.Schema;
-import org.mitsi.datasources.Tablespace;
-import org.mitsi.datasources.exceptions.MitsiDatasourceException;
+import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,10 +26,11 @@ public class MitsiDatasourcesTest {
 	}
 
 	@Test
-	public void test() throws IOException, ParseException, ClassNotFoundException, SQLException {
+	public void test() throws IOException, ClassNotFoundException, SQLException {
 
 		mitsiDatasources.loadIfNeccessary();
-		assertEquals(mitsiDatasources.getDatasource(null, true, "LOCALHOST-TEST").getName(), "LOCALHOST-TEST");
+		MitsiDatasource datasource = mitsiDatasources.getDatasource(null, true, "LOCALHOST-TEST");
+		assertEquals(datasource.getName(), "LOCALHOST-TEST");
 		
 	}
 

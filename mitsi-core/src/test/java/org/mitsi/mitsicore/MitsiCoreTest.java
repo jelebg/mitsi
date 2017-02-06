@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +49,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getTables() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
@@ -66,7 +65,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getTablesLight() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getTablesLight() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<DatabaseObject> ldo = connection.getTablesAndViewsLight(null);
@@ -77,7 +76,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getIndexes() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getIndexes() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
@@ -89,7 +88,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getConstraints() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getConstraints() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<Constraint> lc = connection.getSchemaConstraints(null);
@@ -100,7 +99,7 @@ public class MitsiCoreTest {
 	}
 
 	@Test
-	public void changeSchema() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void changeSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			connection.changeSchema("XE2");
@@ -109,7 +108,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void connectOnOtherSchema() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void connectOnOtherSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		TreeSet<String> groups = new TreeSet<>();
 		groups.add("xe2");
@@ -127,7 +126,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getAllSchema() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getAllSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			
@@ -138,7 +137,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getDetailsTables() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getDetailsTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<DatabaseObject> ldo = connection.getTablesDetails();
@@ -164,7 +163,7 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getAllRelations() throws IOException, ParseException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getAllRelations() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<Relation> lr = connection.getAllRelations();
 			assertTrue(lr != null);

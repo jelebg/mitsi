@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.users.MitsiUsersConfig;
@@ -29,7 +28,7 @@ public class MitsiUsersConfigTest {
 	}
 
 	@Test
-	public void test() throws IOException, ParseException, MitsiUsersException {
+	public void test() throws IOException, MitsiUsersException {
 
 		mitsiUsersConfig.loadIfNeccessary();
 		assertFalse(mitsiUsersConfig.authenticate("user_wrong", "guestmdp"));
