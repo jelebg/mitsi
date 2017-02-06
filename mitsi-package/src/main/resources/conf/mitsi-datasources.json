@@ -1,26 +1,25 @@
 { 
   "datasources" : {
-	  "LOCALHOST-TEST" :  {
-	    "user.groups" : [ "_connected" ],
-		"description" : "the test datasource for anything",
+	  "MY-FIRST-DATABASE" :  {
+	    "user.groups" : [ "_public" ],
+		"description" : "my first database",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"connect.schema" : "TEST",
-		"tags" : [ "tag4", "tag5", "tag3" ]
+		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  },
-	  "LOCALHOST-XE2": {
-	    "user.groups" : [ "_connected" ],
-		"description" : "another test datasource", 
+	  "MY-SECOND-DATABASE": {
+	    "user.groups" : [ "_public" ],
+		"description" : "my second database", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbc.url" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
-		"connect.schema" : "XE2",
-		"tags" : [ "tag4", "tag5", "tag3" ]
+		"connect.schema" : "TEST",
+		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  }
   } 
 }
