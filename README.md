@@ -27,8 +27,8 @@ Others datasource attributes will be used by mitsi :
 * description will be displayed along with the datasource
 * tags will be used to search or filter datasources
 * userGroups is used to specify which users will have the rights to see and access the datasource. Two specials groups mays be used here :
-** _public : the datasource can be accessed by anybody, even if no login has been provided
-** _connected : any connected user will be able to access the datasource
+	* _public : the datasource can be accessed by anybody, even if no login has been provided
+	* _connected : any connected user will be able to access the datasource
 
 #### conf/mitsi-users.json
 
