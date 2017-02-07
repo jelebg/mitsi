@@ -26,6 +26,7 @@
 		
 		<spring.version>4.3.5.RELEASE</spring.version>
 		<spring.security.version>4.2.1.RELEASE</spring.security.version>
+		<project.scm.id>github_jelebg</project.scm.id>
 	</properties>
 
     <dependencyManagement>
