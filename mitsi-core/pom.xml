@@ -73,11 +73,7 @@
 			<!--version>4.12</version-->
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>oracle-jdbc-driver</artifactId>
-			<version>1.0.0-repo</version>
-		</dependency>
+
 	</dependencies>
 	
 	
@@ -85,6 +81,7 @@
 		<plugins>
 			<plugin>
 			    <artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
 			    <configuration>
 			        <archive>                   
 			            <manifest>
