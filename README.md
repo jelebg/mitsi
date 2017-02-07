@@ -10,7 +10,7 @@ Mitsi is a very simple to explore a relationnal database. It is different from m
 
 ## How can I install it ?
 
-If you download it there (TODO), you will have a tomcat packaged just for you with the mitsi war.
+If you download it [there](https://github.com/jelebg/mitsi/releases/), you will have a tomcat packaged just for you with the mitsi war.
 Unzip the archive, then modify the following files with your favorite text editor :
 
 #### conf/mitsi-datasources.json
