@@ -158,44 +158,26 @@
 	</dependencyManagement>
 	  
  	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.3</version>                
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	
-	<!--build>
-		<plugins>
-			<plugin>
-				<groupId>org.jboss.as.plugins</groupId>
-				<artifactId>jboss-as-maven-plugin</artifactId>
-				<version>7.6.Final</version>
-				<configuration>
-					<hostname>localhost</hostname>
-					<username>admin</username>
-					<password>admin</password>
-					<serverName>Standalone</serverName>
-					<fileName>mitsi-war-0.0.1-SNAPSHOT.war</fileName>
-					<jbossHome>C:\DEV\TOOLS\jboss-as-7.1.1.Final</jbossHome>
-					<targetDir>target</targetDir>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build-->
+
 
 
 </project>
