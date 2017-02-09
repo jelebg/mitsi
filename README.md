@@ -2,7 +2,7 @@
 
 ## What is Mitsi ?
 
-Mitsi is a very simple to explore a relationnal database. It is different from many other such tools because it is a webapp. You install it once, and then anybody in your team can access it without having to install anything.
+Mitsi is a very simple wab application to explore a relational database. You install it once, and then anybody in your team can access it without having to install anything.
 
 ## Basic functionnalities
 
