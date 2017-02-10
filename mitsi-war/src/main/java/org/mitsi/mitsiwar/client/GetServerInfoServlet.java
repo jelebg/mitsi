@@ -5,7 +5,23 @@ import org.mitsi.core.DatasourceManager;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
 
-public class GetServerInfoServlet extends GsonServlet<GetServerInfo,GetServerInfoResponse> {
+final class GetServerInfo {
+	
+	public GetServerInfo() {
+	}
+}
+
+final class GetServerInfoResponse {
+
+	String warVersion;
+	
+	public GetServerInfoResponse() {
+		
+	}
+}
+
+
+public class GetServerInfoServlet extends GsonServlet<GetServerInfo, GetServerInfoResponse> {
 	private static final Logger log = Logger.getLogger(GetServerInfoServlet.class);
 	private static final long serialVersionUID = 1L;
 

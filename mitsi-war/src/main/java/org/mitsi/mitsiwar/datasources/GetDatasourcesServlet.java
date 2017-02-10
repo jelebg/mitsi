@@ -9,11 +9,20 @@ import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
 
+class GetDatasources {
+	String datasource; // maybe null
+	
+	public GetDatasources() {
+	}
+}
 
-/**
- * Servlet implementation class TestGsonServlet
- */
-// TODO : to be replaced by GetClientStatus
+class GetDatasourcesResponse {
+
+	List<Datasource> datasources = new ArrayList<>();
+	
+	public GetDatasourcesResponse() {}
+}
+
 public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDatasourcesResponse> {
 	private static final long serialVersionUID = 1L;
 

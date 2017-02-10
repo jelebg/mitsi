@@ -6,6 +6,22 @@ import org.mitsi.mitsiwar.authent.MitsiAuthenticator;
 import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
+class Login {
+	String login;
+	String password;
+	
+	public Login() {
+	}
+}
+
+class LoginResponse {
+
+	public LoginResponse() {}
+	
+	public boolean authenticationOK;
+}
+
+
 public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 	private static final Logger log = Logger.getLogger(LoginServlet.class);
 	private static final long serialVersionUID = 1L;

@@ -8,11 +8,20 @@ import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
+class ChangeCurrentSchema {
+	String datasource;
+	String schema;
+	
+	public ChangeCurrentSchema() {
+	}
+}
 
-/**
- * Servlet implementation class TestGsonServlet
- */
-// TODO : to be replaced by GetClientStatus
+class ChangeCurrentSchemaResponse {
+
+	
+	public ChangeCurrentSchemaResponse() {}
+}
+
 public class ChangeCurrentSchemaServlet extends GsonServlet<ChangeCurrentSchema, ChangeCurrentSchemaResponse> {
 	private static final long serialVersionUID = 1L;
 

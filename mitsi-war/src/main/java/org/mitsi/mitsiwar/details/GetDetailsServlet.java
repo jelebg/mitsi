@@ -19,6 +19,33 @@ import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+class GetDetails {
+	String datasourceName;
+	String objectType;
+	String objectName;
+	String owner;
+	
+	public GetDetails() {
+	}
+}
+
+class GetDetailsResponse {
+	public class Accordion {
+		String message;
+		String title;
+		List<String> columns;
+		List<String[]> data;
+		List<DatabaseObject> databaseObjects;
+		List<Schema> schemas;
+		List<Tablespace> tablespaces;
+		String[] links;
+	}
+
+	String message;
+	List<Accordion> accordions;
+	
+	public GetDetailsResponse() {}
+}
 
 /**
  * Servlet implementation class TestGsonServlet

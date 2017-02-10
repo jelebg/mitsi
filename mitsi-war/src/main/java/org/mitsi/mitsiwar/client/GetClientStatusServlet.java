@@ -10,19 +10,35 @@ import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
 
-public class GetClientStatusServlet extends GsonServlet<GetClientStatus, GetClientStatusResponse> {
+class Request {
+	
+	public Request() {
+	}
+}
+
+class Response {
+
+	String connectedUsername;
+	List<Datasource> datasources;
+	
+	public Response() {
+	}
+}
+
+
+public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 	private static final Logger log = Logger.getLogger(GetClientStatusServlet.class);
 	private static final long serialVersionUID = 1L;
-
+	
 	public GetClientStatusServlet() {
-        super(GetClientStatus.class);
+        super(Request.class);
     }
 
  
 	@Override
-	public GetClientStatusResponse proceed(GetClientStatus request, Client connectedClient) throws Exception {
+	public Response proceed(Request request, Client connectedClient) throws Exception {
 	
-		GetClientStatusResponse response = new GetClientStatusResponse();
+		Response response = new Response();
 
 		response.connectedUsername = connectedClient.getConnectedUsername();
 		TreeSet<String> groups = null;

@@ -1,9 +1,7 @@
 package org.mitsi.datasources;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -254,39 +252,41 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 		
 		// back to JDBC
+		List<String[]> results = new ArrayList<>();
 		Connection jdbcConnection  = sqlSession.getConnection();
-		PreparedStatement  statement = jdbcConnection.prepareStatement(
+		try(PreparedStatement  statement = jdbcConnection.prepareStatement(
 				"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
 							"select * from " + (owner==null?"":owner+".")+tableName+" "+orderByClause.toString()+							
-						" ) t where rownum<=?) where rnum>?");
-		statement.setLong(1, fromRow+count);
-		statement.setLong(2, fromRow);
-		statement.execute();
-		ResultSet resultSet = statement.getResultSet();
-		
-		// get columns
-		ResultSetMetaData rsmd = resultSet.getMetaData();
-		List<Column> columns = new ArrayList<Column>();
-		//currentResultSetNbColumns = rsmd.getColumnCount();
-		int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
-		for(int i=1; i<rsmd.getColumnCount(); i++) {
-			Column column = new Column();
-			jdbcTypes[i-1] =  rsmd.getColumnType(i+1);
-			column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i+1));
-			column.name = rsmd.getColumnName(i+1);
-			// TODO : précision ? possible ?
-			columns.add(column);
-		}
-		result.columns = columns;
-		
-		// get data
-		List<String[]> results = new ArrayList<>();
-		while(resultSet.next() ) {
-			String[] row = new String[jdbcTypes.length];
-			for(int i=0; i!=row.length; i++) {
-				row[i] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+2);
+						" ) t where rownum<=?) where rnum>?")) {
+			
+			statement.setLong(1, fromRow+count);
+			statement.setLong(2, fromRow);
+			statement.execute();
+			ResultSet resultSet = statement.getResultSet();
+			
+			// get columns
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+			List<Column> columns = new ArrayList<Column>();
+			//currentResultSetNbColumns = rsmd.getColumnCount();
+			int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
+			for(int i=1; i<rsmd.getColumnCount(); i++) {
+				Column column = new Column();
+				jdbcTypes[i-1] =  rsmd.getColumnType(i+1);
+				column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i+1));
+				column.name = rsmd.getColumnName(i+1);
+				// TODO : précision ? possible ?
+				columns.add(column);
 			}
-			results.add(row);
+			result.columns = columns;
+			
+			// get data
+			while(resultSet.next() ) {
+				String[] row = new String[jdbcTypes.length];
+				for(int i=0; i!=row.length; i++) {
+					row[i] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+2);
+				}
+				results.add(row);
+			}
 		}
 		
 		result.results = results;

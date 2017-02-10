@@ -29,9 +29,9 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	public static final String CONNECTED_CLIENTSESSION_ATTRIBUTE = "MITSI_CONNECTED_CLIENT";
 
 	@Autowired
-	protected MitsiDatasources mitsiDatasources;
+	protected transient MitsiDatasources mitsiDatasources; //NOSONAR should not inject inside a servlet TODO : rework needed 
 	@Autowired
-	protected MitsiUsersConfig mitsiUsersConfig;
+	protected transient MitsiUsersConfig mitsiUsersConfig; //NOSONAR should not inject inside a servlet TODO : rework needed
 
 	Class<Request> requestClass;
 	public GsonServlet(Class<Request> requestClass) {

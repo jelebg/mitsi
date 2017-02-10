@@ -1,9 +1,11 @@
 package org.mitsi.mitsiwar.datasources;
 
+import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.mitsi.core.DatasourceManager;
+import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
@@ -11,10 +13,23 @@ import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+class GetDatabaseObjects {
+	String filter; // maybe null
+	String datasourceName;
+	String schema;
+	Boolean light;
+	
+	public GetDatabaseObjects() {
+	}
+}
 
-/**
- * Servlet implementation class TestGsonServlet
- */
+class GetDatabaseObjectsResponse {
+	List<DatabaseObject> databaseObjects;
+	List<Schema> schemas;
+	
+	public GetDatabaseObjectsResponse() {}
+}
+
 public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, GetDatabaseObjectsResponse> {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(GetDatabaseObjectsServlet.class);
