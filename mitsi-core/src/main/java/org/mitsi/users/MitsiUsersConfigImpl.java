@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
@@ -65,10 +66,10 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 				BufferedReader bfr = new BufferedReader(isr)) {
 			
 				Gson gson = new Gson();
-				usersFileLoaded = gson.fromJson(bfr, MitsiUsersFile.class);
+				MitsiUsersFile usersFileLoadedTemp = gson.fromJson(bfr, MitsiUsersFile.class);
 				users = new HashMap<>();
-				if(usersFileLoaded.users != null) {
-					for(Entry<String, String> userAndPassword : usersFileLoaded.users.entrySet()) {
+				if(usersFileLoadedTemp.users != null) {
+					for(Entry<String, String> userAndPassword : usersFileLoadedTemp.users.entrySet()) {
 						String username = userAndPassword.getKey();
 						String encodedPassword = userAndPassword.getValue();
 						users.put(username, new User(username, encodedPassword));
@@ -76,8 +77,18 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 				}
 				
 				this.userGroups = new HashMap<>();
-				if(usersFileLoaded.groups != null) {
-					for(Entry<String, String[]> groupEntry : usersFileLoaded.groups.entrySet()) {
+				if(usersFileLoadedTemp.groups != null) {
+				    for(Iterator<Map.Entry<String, String[]>> it = usersFileLoadedTemp.groups.entrySet().iterator(); it.hasNext(); ) {
+				        Map.Entry<String, String[]> entry = it.next();
+				        if(entry.getKey().startsWith(SPECIAL_GROUP_PREFIX) &&
+				        	!GROUP_PUBLIC.equals(entry.getKey()) &&
+				        	!GROUP_CONNECTED.equals(entry.getKey()) ) {
+				        	log.warn("invalid group name, skipped : "+entry.getKey());
+				          it.remove();
+				        }
+				    }
+				    
+					for(Entry<String, String[]> groupEntry : usersFileLoadedTemp.groups.entrySet()) {
 						String group = groupEntry.getKey();
 						String [] groupGrantees = groupEntry.getValue();
 						for(String grantee : groupGrantees) {
@@ -91,7 +102,9 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 					}	
 				}
 
-			}			
+				usersFileLoaded = usersFileLoadedTemp;
+			}
+			
 		}
 		catch(IOException e) {
 			try {
