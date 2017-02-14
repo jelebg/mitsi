@@ -61,6 +61,12 @@
     </div>
 </script>
 
+<script type="text/ng-template" id="popover.cleargraph.html">
+    <div style="text-align: center;">
+        Clear&nbsp;graphs,&nbsp;paths&nbsp;and&nbsp;SQL
+    </div>
+</script>
+
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
@@ -95,6 +101,13 @@
   	<tr><td style="height:150px">
   	  <rzslider rz-slider-model="zoomSlider.value" rz-slider-options="zoomSlider.options"></rzslider>
     </td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':false}"  class="verticalMenuButtonTd" >
+  		<a href="" ng-click="removeAllTables()"
+			popover-template="'popover.cleargraph.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="right"
+  		><i class="glyphicon glyphicon-remove"></i>&nbsp;clear</a></td></tr>
   	</table>
   </div>
   <div

@@ -315,6 +315,15 @@
 	padding:4px;
 }
 
+.verticalMenuButtonTd {
+	text-align:center;
+	font-weight:bold;
+	border-radius:5px;
+	background-color:#e2e2e2;
+	padding-left:4px;
+	padding-right:4px;
+}
+
 .verticalMenuPopover {
 	color:black;
 }
