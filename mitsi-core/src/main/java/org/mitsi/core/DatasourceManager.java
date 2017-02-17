@@ -85,12 +85,10 @@ public class DatasourceManager {
 		
 		SqlSession sqlSession = sqlSessionFactory.openSession();
 		IMitsiMapper mapper = sqlSession.getMapper(IOracleMapper.class);
-		if(datasource.getConnectSchema() != null && !datasource.getConnectSchema().isEmpty()) {
-			mapper.changeSchema(datasource.getConnectSchema());
-		}
 
-
-		return new MitsiConnection(sqlSession, mapper);
+		return new MitsiConnection(sqlSession, mapper, 
+				datasource.getConnectSchema()!=null?datasource.getConnectSchema():datasource.getUser()
+			);
 	}
 	
 }

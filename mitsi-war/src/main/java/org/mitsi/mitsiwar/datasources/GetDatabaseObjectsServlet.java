@@ -14,7 +14,6 @@ import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class GetDatabaseObjects {
-	String filter; // maybe null
 	String datasourceName;
 	String schema;
 	Boolean light;
@@ -59,20 +58,11 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 			}
 
 			
-			response.schemas = connection.getAllSchemas();
 			String schema = request.schema;
-			if(schema == null) {
+			response.schemas = connection.getAllSchemas(schema);
+			if(schema != null) {
 				for(Schema s : response.schemas) {
-					if(s.current) {
-						schema = s.name;
-						break;
-					}
-				}
-			}
-			else {
-				for(Schema s : response.schemas) {
-					s.current = s.name.equals(schema);
-					break;
+					s.current = schema.equals(s.name);
 				}
 			}
 			

@@ -61,7 +61,7 @@ angular.module('mitsiApp')
 	   sourceService.getObjects(source, schema, false)
 	   .then(function(response) {
 		   var startDisplay = new Date().getTime();
-			  $scope.initSources(source, response)
+			  $scope.initSource(source, response)
 			  $timeout(function() {
 				   var end = new Date().getTime();
 				   console.log("source refresh global time:"+(end-startLoad)+"ms display time:"+(end-startDisplay)+"ms - "+source.name)
@@ -72,7 +72,7 @@ angular.module('mitsiApp')
 	   });
 	}
 	
-	$scope.initSources = function(source, response) {
+	$scope.initSource = function(source, response) {
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.currentSchemaName = null;

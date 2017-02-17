@@ -28,10 +28,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	SqlSession sqlSession = null; 
 	IMitsiMapper mapper = null;
+	String defaultOwner = null;
 	
-	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper) {
+	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper, String defaultOwner) {
 		this.sqlSession = sqlSession;
 		this.mapper = mapper;
+		this.defaultOwner = defaultOwner.toUpperCase();	
 	}
 	
 	@Override
@@ -48,21 +50,25 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public synchronized String testOK() {
 		return mapper.testOK();
 	}
+	
+	private String getOwner(String owner) {
+		if(owner == null) {
+			return defaultOwner;
+		}
+		return owner.toUpperCase();
 
-	// TODO : supprimer car on ne garde plus la connexion ouverte sur un schéma
-	@Override
-	public synchronized void changeSchema(String schema) {
-		mapper.changeSchema(schema);
 	}
 
 	@Override
-	public synchronized List<Schema> getAllSchemas() {
-		return mapper.getAllSchemas();
+	public synchronized List<Schema> getAllSchemas(String owner) {
+		owner = getOwner(owner);
+		return mapper.getAllSchemas(owner);
 	}
 	
-	private void getTablesAndViewsSubObjects(List<DatabaseObject> databaseObjects) {
-		List<Index> indexes = mapper.getSchemaIndexes(null);
-		List<Constraint> constraints = mapper.getSchemaConstraints(null);
+	private void getTablesAndViewsSubObjects(List<DatabaseObject> databaseObjects, String owner) {
+		owner = getOwner(owner);
+		List<Index> indexes = mapper.getSchemaIndexes(owner);
+		List<Constraint> constraints = mapper.getSchemaConstraints(owner);
 
 		Map<DatabaseObject.Id, DatabaseObject> doMap = new HashMap<>();
 		for(DatabaseObject dobj : databaseObjects) {
@@ -92,13 +98,15 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+		owner = getOwner(owner);
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
-		getTablesAndViewsSubObjects(databaseObjects);
+		getTablesAndViewsSubObjects(databaseObjects, owner);
 		return databaseObjects;
 	}
 	
 	@Override
 	public synchronized List<DatabaseObject> getTablesAndViewsLight(String owner) {
+		owner = getOwner(owner);
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViewsLight(owner);
 		return databaseObjects;
 	}
@@ -130,40 +138,47 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	public synchronized List<Column> getTableColumnsDetails(String owner, String name) {
+		owner = getOwner(owner);
 		return mapper.getTableColumnsDetails(owner, name);
 	}
 
 	@Override
 	public synchronized List<Column> getTablePartitioninKeysDetails(String owner, String name) {
+		owner = getOwner(owner);
 		return mapper.getTablePartitioninKeysDetails(owner, name);
 	}
 	
 	@Override
 	public synchronized List<Index> getTableIndexesDetails(String tableOwner,
 			String tableName) {
+		tableOwner = getOwner(tableOwner);
 		return mapper.getTableIndexesDetails(tableOwner, tableName);
 	}
 
 	@Override
 	public synchronized List<Partition> getTablePartitionDetails(String tableOwner,
 			String tableName) {
+		tableOwner = getOwner(tableOwner);
 		return mapper.getTablePartitionDetails(tableOwner, tableName);
 	}
 
 	@Override
 	public synchronized List<Constraint> getTableConstraintsDetails(String tableOwner,
 			String tableName) {
+		tableOwner = getOwner(tableOwner);
 		return mapper.getTableConstraintsDetails(tableOwner, tableName);
 	}
 
 	@Override
 	public List<Date> getLastSchemaUpdateTime(String owner) {
+		owner = getOwner(owner);
 		return mapper.getLastSchemaUpdateTime(owner);
 	}
 
 	@Override
 	public List<Constraint> getTablesWithConstraintsTo(String tableOwner,
 			String tableName) {
+		tableOwner = getOwner(tableOwner);
 		return mapper.getTablesWithConstraintsTo(tableOwner, tableName);
 	}
 
@@ -185,11 +200,13 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	public List<Index> getSchemaIndexes(String schema) {
+		schema = getOwner(schema);
 		return mapper.getSchemaIndexes(schema);
 	}
 
 	@Override
 	public List<Constraint> getSchemaConstraints(String schema) {
+		schema = getOwner(schema);
 		return mapper.getSchemaConstraints(schema);
 	}
 	
@@ -200,8 +217,8 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	    Pattern pattern = Pattern.compile(regex);
 	    Matcher match = pattern.matcher(tableName);
 		if(match.matches()) {
-			log.warn("invalid table name : "+tableName);
-			throw new MitsiSecurityException("invalid table name : "+tableName);
+			log.warn("invalid name : "+tableName);
+			throw new MitsiSecurityException("invalid name : "+tableName);
 		}
 	}
 	
@@ -212,10 +229,19 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	public GetDataResult getData(String owner, String tableName, long fromRow, long count, OrderByColumn[] orderByColumns, Filter[] filters) throws SQLException, MitsiSecurityException {
 		securityCheckDbObject(tableName);
-		if(owner != null) {
-			securityCheckDbObject(owner);
+		owner = getOwner(owner);
+		securityCheckDbObject(owner);
+
+		if(orderByColumns != null) {
+			for(OrderByColumn orderByColumn : orderByColumns) {
+				securityCheckDbObject(orderByColumn.column);
+			}
 		}
-		
+		if(filters != null) {
+			for(Filter filter : filters) {
+				securityCheckDbObject(filter.name);
+			}
+		}
 		
 		GetDataResult result = new GetDataResult();
 		
@@ -259,7 +285,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		Connection jdbcConnection  = sqlSession.getConnection();
 		String statementStr = 
 				"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
-						"select * from " + (owner==null?"":owner+".")+tableName+" "+
+						"select * from " + owner + "." + tableName + " " +
 						whereClause.toString()   +
 						orderByClause.toString() +							
 					" ) t where rownum<=?) where rnum>?";

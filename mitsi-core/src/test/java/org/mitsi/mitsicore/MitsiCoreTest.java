@@ -100,29 +100,12 @@ public class MitsiCoreTest {
 	}
 
 	@Test
-	public void changeSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
-
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			connection.changeSchema("XE2");
-
-		}
-	}
-	
-	@Test
 	public void connectOnOtherSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		TreeSet<String> groups = new TreeSet<>();
 		groups.add("xe2");
 		try(MitsiConnection connection = datasourceManager.getConnection(groups, true, "LOCALHOST-XE2-ON-TEST")) {
-			List<Schema> schemas = connection.getAllSchemas();
-			Schema currentSchema = null;
-			for(Schema schema : schemas) {
-				if(schema.current==true) {
-					currentSchema = schema;
-					break;
-				}
-			}
-			assertEquals(currentSchema.name, "TEST");
+			List<Schema> schemas = connection.getAllSchemas(null);
 		}
 	}
 	
@@ -131,7 +114,7 @@ public class MitsiCoreTest {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			
-			List<Schema> schemas = connection.getAllSchemas();
+			List<Schema> schemas = connection.getAllSchemas(null);
 			assertTrue(schemas.size() > 0);
 			
 		}

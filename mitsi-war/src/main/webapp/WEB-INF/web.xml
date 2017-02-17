@@ -81,16 +81,6 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>ChangeCurrentSchemaServlet</display-name>
-    <servlet-name>ChangeCurrentSchemaServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.datasources.ChangeCurrentSchemaServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ChangeCurrentSchemaServlet</servlet-name>
-    <url-pattern>/ChangeCurrentSchemaServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>GetAllRelationsServlet</display-name>
     <servlet-name>GetAllRelationsServlet</servlet-name>
     <servlet-class>org.mitsi.mitsiwar.links.GetAllRelationsServlet</servlet-class>
