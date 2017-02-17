@@ -63,12 +63,23 @@ angular.module('mitsiApp')
 	            exporterMenuCsv: true,
 	            enableGridMenu: true,
 	            columnDefs: [
-	                 // default
-	                 { field: '#',
-	                	 width: 50,
-	                	 enableFiltering: false
-	                 }
-	           ]
+	    	                 { field: 'num',
+		    	                   displayName:"#",
+		    	                   width: 50,
+		    	                   enableSorting: false,
+		    	                   enableFiltering: false,
+		    	                   headerCellTemplate: 
+		    	                	   '<div class="dataCornerDiv" >'+
+		    	                	     '<button ng-click="grid.appScope.refresh();">'+
+		    	                	       '<i id="refreshButton" class="glyphicon glyphicon-refresh "></i>'+
+		    	                	     '</button><br/>'+
+							             '<a id="clearAllfiltersButton" href="" class="dataClearAllFiltersAnchor" style="visibility:hidden;" ng-click="grid.appScope.clearAllFilters();">'+
+							               '<i class="glyphicon glyphicon-remove dataClearAllFiltersIcon1"></i>'+
+							               '<i class="glyphicon glyphicon-filter dataClearAllFiltersIcon2"></i>'+
+							             '</a>'+
+							           '</div>'
+		    	                 }
+		    	  ]
 				
 		};
 	}
@@ -119,11 +130,28 @@ angular.module('mitsiApp')
 		elt.style.visibility = visib ? "visible" : "hidden";
 	}
 
+	$scope.loadingBegins = function() {
+		var elt = document.getElementById("refreshButton");
+		if(!elt) {
+			return;
+		}
+		elt.classList.add('fast-right-spinner');
+	}
+	
+	$scope.loadingEnds = function() {
+		var elt = document.getElementById("refreshButton");
+		if(!elt) {
+			return;
+		}
+		elt.classList.remove('fast-right-spinner');
+	}
+	
 	$scope.beginData = function(source, databaseObject, orderByColumns, filters, preserveColumns) {
 		$scope.updateClearAllFiltersVisibility(filters);
 		
 		$scope.lastOrderByColumns = orderByColumns;
 		$scope.allReadyFetched = 0;
+		$scope.loadingBegins();
 		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch, orderByColumns, filters)
 		  .then(function(response) {
 			  $scope.dataGridApi.core.scrollTo(
@@ -133,24 +161,7 @@ angular.module('mitsiApp')
 			  $scope.dataGrid.data = [];
 			  
 			  if(!preserveColumns) {
-				  $scope.dataGrid.columnDefs = [
-		    	                 { field: 'num',
-		    	                   displayName:"#",
-		    	                   width: 50,
-		    	                   enableSorting: false,
-		    	                   enableFiltering: false,
-		    	                   headerCellTemplate: 
-		    	                	   '<div class="dataCornerDiv" >'+
-		    	                	     '<button ng-click="grid.appScope.refresh();">'+
-		    	                	       '<i class="glyphicon glyphicon-refresh"></i>'+
-		    	                	     '</button><br/>'+
-							             '<a id="clearAllfiltersButton" href="" class="dataClearAllFiltersAnchor" style="visibility:hidden;" ng-click="grid.appScope.clearAllFilters();">'+
-							               '<i class="glyphicon glyphicon-remove dataClearAllFiltersIcon1"></i>'+
-							               '<i class="glyphicon glyphicon-filter dataClearAllFiltersIcon2"></i>'+
-							             '</a>'+
-							           '</div>', 
-		    	                 }
-		    	  ];
+				  $scope.dataGrid.columnDefs = $scope.dataGrid.columnDefs.slice(0, 1);
 				  
 				  for(var i=0; i!=response.data.columns.length; i++) {
 					  $scope.dataGrid.columnDefs.push(
@@ -171,7 +182,6 @@ angular.module('mitsiApp')
 					  );
 				  }
 			  }
-
 			  
 			  var t = response.data.results;
 			  for(var i=0; i!=t.length; i++) {
@@ -184,7 +194,12 @@ angular.module('mitsiApp')
 			  }
 		      $scope.allReadyFetched = response.data.results.length;
 
+		  })
+		  .finally(function() {
+			   $scope.loadingEnds();
 		  });
+
+;
 	};
 	
 	$scope.refreshOnEnter = function(event) {
