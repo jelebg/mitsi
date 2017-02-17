@@ -133,8 +133,11 @@ angular.module('mitsiApp')
 							width: 200,
 					        filterHeaderTemplate: 
 					        	'<div style="position:relative;">'+
-					        	'<a href="" style="pointer-events: all;position:absolute;right:3px;bottom:2px;z-index:2;" ng-click="grid.appScope.refresh();">'+
+					        	'<a href="" style="pointer-events:all;color:grey;position:absolute;right:2px;bottom:2px;z-index:2;" ng-click="grid.appScope.refresh();">'+
 					        	'<i class="glyphicon glyphicon-filter" ></i>'+
+					        	'</a>'+
+					        	'<a href="" style="pointer-events: all;color:grey;position:absolute;right:15px;bottom:2px;z-index:2;" ng-click="grid.appScope.clearFilter(\'mitsiGridFilter_'+i+'\');">'+
+					        	'<i class="glyphicon glyphicon-remove" ></i>'+
 					        	'</a>'+
 					        	'<input id="mitsiGridFilter_'+i+'" style="width:100%;" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
 					        	'</div>', 
@@ -162,6 +165,11 @@ angular.module('mitsiApp')
 		if(event.keyCode == 13) {
 			$scope.refresh();
 		}
+	}
+	
+	$scope.clearFilter = function(eltId) {
+		document.getElementById(eltId).value = "";
+		$scope.refresh();
 	}
 	
 	$scope.getDataDown = function() {
