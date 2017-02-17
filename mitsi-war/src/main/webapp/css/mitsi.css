@@ -372,3 +372,53 @@
         transform: rotate(359deg);
     }
 }
+
+
+.dataCornerDiv {
+	text-align:center;
+	padding-top:3px;
+}
+
+.dataClearAllFiltersAnchor {
+	pointer-events: all;
+	color:grey;
+}
+
+.dataClearAllFiltersIcon1 {
+	margin-top:8px;
+	transform: scale(0.7,0.7);
+}
+
+.dataClearAllFiltersIcon2 {
+	margin-top:8px;
+	left:-8px;
+	top:-3px;
+}
+
+.dataColFilter {
+	pointer-events:all;
+	color:grey;
+	position:absolute;
+	right:2px;
+	bottom:2px;
+	z-index:2;
+}
+
+.dataColFilterClear {
+	pointer-events: all;
+	color:grey;
+	position:absolute;
+	right:15px;
+	bottom:2px;
+	z-index:2;
+}
+
+.dataColFilterText {
+	width:100%; 
+}
+
+
+
+
+
+

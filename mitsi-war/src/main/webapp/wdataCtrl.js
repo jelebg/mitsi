@@ -140,13 +140,13 @@ angular.module('mitsiApp')
 		    	                   enableSorting: false,
 		    	                   enableFiltering: false,
 		    	                   headerCellTemplate: 
-		    	                	   '<div style="text-align:center;padding-top:3px;" >'+
+		    	                	   '<div class="dataCornerDiv" >'+
 		    	                	     '<button ng-click="grid.appScope.refresh();">'+
 		    	                	       '<i class="glyphicon glyphicon-refresh"></i>'+
 		    	                	     '</button><br/>'+
-							             '<a id="clearAllfiltersButton" href="" style="visibility:hidden;pointer-events: all;color:grey;" ng-click="grid.appScope.clearAllFilters();">'+
-							               '<i class="glyphicon glyphicon-remove" style="margin-top:8px;transform: scale(0.7,0.7);"></i>'+
-							               '<i class="glyphicon glyphicon-filter" style="margin-top:8px;left:-8px;top:-3px;"></i>'+
+							             '<a id="clearAllfiltersButton" href="" class="dataClearAllFiltersAnchor" style="visibility:hidden;" ng-click="grid.appScope.clearAllFilters();">'+
+							               '<i class="glyphicon glyphicon-remove dataClearAllFiltersIcon1"></i>'+
+							               '<i class="glyphicon glyphicon-filter dataClearAllFiltersIcon2"></i>'+
 							             '</a>'+
 							           '</div>', 
 		    	                 }
@@ -159,13 +159,13 @@ angular.module('mitsiApp')
 							width: 200,
 					        filterHeaderTemplate: 
 					        	'<div style="position:relative;">'+
-					        	'<a href="" style="pointer-events:all;color:grey;position:absolute;right:2px;bottom:2px;z-index:2;" ng-click="grid.appScope.refresh();">'+
+					        	'<a href="" class="dataColFilter" ng-click="grid.appScope.refresh();">'+
 					        	'<i class="glyphicon glyphicon-filter" ></i>'+
 					        	'</a>'+
-					        	'<a href="" style="pointer-events: all;color:grey;position:absolute;right:15px;bottom:2px;z-index:2;" ng-click="grid.appScope.clearFilter('+i+');">'+
+					        	'<a href="" class="dataColFilterClear" ng-click="grid.appScope.clearFilter('+i+');">'+
 					        	'<i class="glyphicon glyphicon-remove" ></i>'+
 					        	'</a>'+
-					        	'<input id="mitsiGridFilter_'+i+'" style="width:100%;" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
+					        	'<input id="mitsiGridFilter_'+i+'" class="dataColFilterText" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
 					        	'</div>', 
 						}
 					  );
