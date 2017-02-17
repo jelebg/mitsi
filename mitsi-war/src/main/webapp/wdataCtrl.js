@@ -82,28 +82,17 @@ angular.module('mitsiApp')
 			var windowHW = getWindowHW();
 			
 			var elementXY = getAbsoluteXY(element);
-			//angular.element(element).css('height', (windowHW.h-elementXY.y)+"px");
-			//angular.element(element.childNodes[0]).css('height', (windowHW.h-elementXY.y)+"px");
-			//element.style.height = (windowHW.h-elementXY.y)+"px";
-			//var h = (windowHW.h-elementXY.y)+"px";
-			//$scope.dataGrid.refresh();
 			
-
-		      $scope.currentGridHeight = ((windowHW.h-elementXY.y)-3)+"px";
+	        $scope.currentGridHeight = ((windowHW.h-elementXY.y)-3)+"px";
 			break;
 		}
-
-        //$scope.dataGridApi.grid.queueGridRefresh();
-        //$scope.dataGridApi.grid.queueRefresh();
 
 	    $scope.gridRefresh = true;
 	    $timeout(function() {
 	      $scope.gridRefresh = false;
-	      //$scope.dataGridApi.grid.queueGridRefresh();
 	      
 	      $timeout(function() {
 	          $scope.dataGridApi.grid.queueGridRefresh();
-	    	  //$scope.dataGridApi.grid.refreshRows();
 	      }, 0);
 	      
      
