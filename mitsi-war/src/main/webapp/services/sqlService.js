@@ -1,14 +1,15 @@
 angular.module('mitsiApp')
 .service( 'sqlService', function(mitsiHttpService) {
 
-	this.getData = function(datasourceName, owner, objectName, fromRow, count, orderByColumns) {
+	this.getData = function(datasourceName, owner, objectName, fromRow, count, orderByColumns, filters) {
 		return mitsiHttpService.post('GetDataServlet', { 
 			"datasourceName" : datasourceName,
 			"owner"          : owner,
 			"objectName"     : objectName,
 			"fromRow"        : fromRow,
 			"count"          : count,
-			"orderByColumns" : orderByColumns
+			"orderByColumns" : orderByColumns,
+			"filters"        : filters
 		});
 	}
 

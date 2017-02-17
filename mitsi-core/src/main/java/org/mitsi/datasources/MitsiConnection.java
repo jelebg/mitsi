@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,23 +15,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sql.DataSource;
-
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ResultContext;
-import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.log4j.Logger;
+import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
+
 
 public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
@@ -221,7 +210,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		public List<String[]> results;
 	}
 	
-	public GetDataResult getData(String owner, String tableName, long fromRow, long count, OrderByColumn[] orderByColumns) throws SQLException, MitsiSecurityException {
+	public GetDataResult getData(String owner, String tableName, long fromRow, long count, OrderByColumn[] orderByColumns, Filter[] filters) throws SQLException, MitsiSecurityException {
 		securityCheckDbObject(tableName);
 		if(owner != null) {
 			securityCheckDbObject(owner);
@@ -243,24 +232,47 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				}
 				orderByClause.append(orderByColumn.column);
 				if(orderByColumn.ascending) {
-					orderByClause.append(" ASC");
+					orderByClause.append(" ASC ");
 				}
 				else {
-					orderByClause.append(" DESC");
+					orderByClause.append(" DESC ");
 				}
+			}
+		}
+		
+		StringBuilder whereClause = new StringBuilder();
+		if(filters != null) {
+			for(Filter filter : filters) {
+				if(whereClause.length() == 0) {
+					whereClause.append(" where ");
+				}
+				else {
+					whereClause.append(" and ");
+				}
+				whereClause.append(filter.name);
+				whereClause.append(" = ? ");
 			}
 		}
 		
 		// back to JDBC
 		List<String[]> results = new ArrayList<>();
 		Connection jdbcConnection  = sqlSession.getConnection();
-		try(PreparedStatement  statement = jdbcConnection.prepareStatement(
+		String statementStr = 
 				"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
-							"select * from " + (owner==null?"":owner+".")+tableName+" "+orderByClause.toString()+							
-						" ) t where rownum<=?) where rnum>?")) {
+						"select * from " + (owner==null?"":owner+".")+tableName+" "+
+						whereClause.toString()   +
+						orderByClause.toString() +							
+					" ) t where rownum<=?) where rnum>?";
+		try(PreparedStatement  statement = jdbcConnection.prepareStatement(statementStr)) {
 			
-			statement.setLong(1, fromRow+count);
-			statement.setLong(2, fromRow);
+			int iParam = 0;
+			if(filters != null) {
+				for(Filter filter : filters) {
+					statement.setString(++iParam, filter.filter);
+				}
+			}
+			statement.setLong(++iParam, fromRow+count);
+			statement.setLong(++iParam, fromRow);
 			statement.execute();
 			ResultSet resultSet = statement.getResultSet();
 			

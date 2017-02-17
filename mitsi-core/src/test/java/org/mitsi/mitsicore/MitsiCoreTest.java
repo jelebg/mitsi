@@ -26,6 +26,7 @@ import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mitsi.commons.pojos.Filter;
 
 // TODO rajouter des test sur groupes _connected ou user-defined
 
@@ -174,12 +175,12 @@ public class MitsiCoreTest {
 	@Test
 	public void getData() throws SQLException, MitsiSecurityException, MitsiUsersException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null);
+			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
 			assertEquals(result.results.size(), 2);
 			
-			result = connection.getData("TEST", "TATA", 2, 2, null);
+			result = connection.getData("TEST", "TATA", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
 			assertEquals(result.results.size(), 2);
@@ -193,10 +194,30 @@ public class MitsiCoreTest {
 			orderByStr.ascending = false;
 			orderByColumns[0] = orderById;
 			orderByColumns[1] = orderByStr;
-			result = connection.getData("TEST", "TATA", 2, 2, orderByColumns);
+			result = connection.getData("TEST", "TATA", 2, 2, orderByColumns, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
 			assertEquals(result.results.size(), 2);
+			
+			Filter filter1 = new Filter();
+			filter1.name = "ID";
+			filter1.filter = "2";
+			Filter filter2 = new Filter();
+			filter2.name = "STR";
+			filter2.filter = "deux";
+			Filter[] filters = new Filter[2];
+			filters[0] = filter1;
+			filters[1] = filter2;
+			result = connection.getData("TEST", "TATA", 0, 2, null, filters);
+			assertEquals(result.columns.get(0).name, "ID");
+			assertEquals(result.columns.get(1).name, "STR");
+			assertEquals(result.results.size(), 1);
+			
+			result = connection.getData("TEST", "TATA", 0, 2, orderByColumns, filters);
+			assertEquals(result.columns.get(0).name, "ID");
+			assertEquals(result.columns.get(1).name, "STR");
+			assertEquals(result.results.size(), 1);
+
 		}
 	}
 	

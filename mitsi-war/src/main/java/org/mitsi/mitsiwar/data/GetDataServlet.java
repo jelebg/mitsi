@@ -2,6 +2,7 @@ package org.mitsi.mitsiwar.data;
 
 import java.util.List;
 import java.util.TreeSet;
+import org.mitsi.commons.pojos.Filter;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.OrderByColumn;
@@ -21,6 +22,7 @@ class GetData {
 	OrderByColumn[] orderByColumns;
 	long fromRow;
 	long count;
+	Filter[] filters;
 	
 	public GetData() {
 	}
@@ -54,7 +56,7 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
 		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
-			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count, request.orderByColumns);
+			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count, request.orderByColumns, request.filters);
 			response.columns = result.columns;
 			response.results = result.results;
 		}
