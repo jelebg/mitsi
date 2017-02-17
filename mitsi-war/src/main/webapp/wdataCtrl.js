@@ -136,7 +136,7 @@ angular.module('mitsiApp')
 					        	'<a href="" style="pointer-events: all;position:absolute;right:3px;bottom:2px;z-index:2;" ng-click="grid.appScope.refresh();">'+
 					        	'<i class="glyphicon glyphicon-filter" ></i>'+
 					        	'</a>'+
-					        	'<input id="mitsiGridFilter_'+i+'" style="width:100%;" type="text" />'+
+					        	'<input id="mitsiGridFilter_'+i+'" style="width:100%;" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
 					        	'</div>', 
 						}
 					  );
@@ -157,6 +157,12 @@ angular.module('mitsiApp')
 
 		  });
 	};
+	
+	$scope.refreshOnEnter = function(event) {
+		if(event.keyCode == 13) {
+			$scope.refresh();
+		}
+	}
 	
 	$scope.getDataDown = function() {
 
