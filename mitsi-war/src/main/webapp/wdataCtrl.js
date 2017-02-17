@@ -104,7 +104,24 @@ angular.module('mitsiApp')
 		$scope.beginData(source, databaseObject, null, null, false);
 	});
 	
+	$scope.updateClearAllFiltersVisibility = function(filters) {
+		var visib = false;
+		if(filters) {
+			if(filters.length > 0) {
+				visib = true;
+			}
+		}
+		var elt = document.getElementById("clearAllfiltersButton");
+		if(!elt) {
+			return;
+		}
+		
+		elt.style.visibility = visib ? "visible" : "hidden";
+	}
+
 	$scope.beginData = function(source, databaseObject, orderByColumns, filters, preserveColumns) {
+		$scope.updateClearAllFiltersVisibility(filters);
+		
 		$scope.lastOrderByColumns = orderByColumns;
 		$scope.allReadyFetched = 0;
 		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch, orderByColumns, filters)
@@ -127,7 +144,7 @@ angular.module('mitsiApp')
 		    	                	     '<button ng-click="grid.appScope.refresh();">'+
 		    	                	       '<i class="glyphicon glyphicon-refresh"></i>'+
 		    	                	     '</button><br/>'+
-							             '<a href="" style="pointer-events: all;color:grey;" ng-click="grid.appScope.clearAllFilters();">'+
+							             '<a id="clearAllfiltersButton" href="" style="visibility:hidden;pointer-events: all;color:grey;" ng-click="grid.appScope.clearAllFilters();">'+
 							               '<i class="glyphicon glyphicon-remove" style="margin-top:8px;transform: scale(0.7,0.7);"></i>'+
 							               '<i class="glyphicon glyphicon-filter" style="margin-top:8px;left:-8px;top:-3px;"></i>'+
 							             '</a>'+
