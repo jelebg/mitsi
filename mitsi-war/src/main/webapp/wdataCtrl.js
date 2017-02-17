@@ -122,7 +122,16 @@ angular.module('mitsiApp')
 		    	                   width: 50,
 		    	                   enableSorting: false,
 		    	                   enableFiltering: false,
-		    	                   headerCellTemplate: '<div style="text-align:center;padding-top:3px;" ><button ng-click="grid.appScope.refresh();"><i class="glyphicon glyphicon-refresh"><i/></button></div>', 
+		    	                   headerCellTemplate: 
+		    	                	   '<div style="text-align:center;padding-top:3px;" >'+
+		    	                	     '<button ng-click="grid.appScope.refresh();">'+
+		    	                	       '<i class="glyphicon glyphicon-refresh"></i>'+
+		    	                	     '</button><br/>'+
+							             '<a href="" style="pointer-events: all;color:grey;" ng-click="grid.appScope.clearAllFilters();">'+
+							               '<i class="glyphicon glyphicon-remove" style="margin-top:8px;transform: scale(0.7,0.7);"></i>'+
+							               '<i class="glyphicon glyphicon-filter" style="margin-top:8px;left:-8px;top:-3px;"></i>'+
+							             '</a>'+
+							           '</div>', 
 		    	                 }
 		    	  ];
 				  
@@ -136,7 +145,7 @@ angular.module('mitsiApp')
 					        	'<a href="" style="pointer-events:all;color:grey;position:absolute;right:2px;bottom:2px;z-index:2;" ng-click="grid.appScope.refresh();">'+
 					        	'<i class="glyphicon glyphicon-filter" ></i>'+
 					        	'</a>'+
-					        	'<a href="" style="pointer-events: all;color:grey;position:absolute;right:15px;bottom:2px;z-index:2;" ng-click="grid.appScope.clearFilter(\'mitsiGridFilter_'+i+'\');">'+
+					        	'<a href="" style="pointer-events: all;color:grey;position:absolute;right:15px;bottom:2px;z-index:2;" ng-click="grid.appScope.clearFilter('+i+');">'+
 					        	'<i class="glyphicon glyphicon-remove" ></i>'+
 					        	'</a>'+
 					        	'<input id="mitsiGridFilter_'+i+'" style="width:100%;" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
@@ -167,8 +176,15 @@ angular.module('mitsiApp')
 		}
 	}
 	
-	$scope.clearFilter = function(eltId) {
-		document.getElementById(eltId).value = "";
+	$scope.clearFilter = function(filterIndex) {
+		document.getElementById('mitsiGridFilter_'+filterIndex).value = "";
+		$scope.refresh();
+	}
+	
+	$scope.clearAllFilters = function() {
+		for(var i=0; i<$scope.dataGrid.columnDefs.length-1; i++) {
+			document.getElementById('mitsiGridFilter_'+i).value = "";
+		}
 		$scope.refresh();
 	}
 	
