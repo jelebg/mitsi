@@ -571,7 +571,7 @@ angular.module('mitsiApp')
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
-			$scope.appendTableNoStacking(150, 150, tableName);
+			$scope.appendTableNoStacking(400, 300, tableName);
 		}
 		
 	});
