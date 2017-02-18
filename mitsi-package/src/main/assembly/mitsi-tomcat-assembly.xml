@@ -2,6 +2,7 @@
 	<id>bundle</id> 
 	<formats>
 		<format>zip</format>
+		<format>tar.gz</format>
 		<format>dir</format>
 	</formats>
 	<!--files>
@@ -20,9 +21,16 @@
 			</fileSet>
 			<fileSet>
 				<outputDirectory></outputDirectory>
+				<directory>src/main/bin-linux</directory>
+				<filtered>true</filtered>
+			    <lineEnding>unix</lineEnding>
+			    <fileMode>0755</fileMode>
+			</fileSet>
+			<!-- fileSet>
+				<outputDirectory></outputDirectory>
 				<directory>src/main/binary</directory>
 				<filtered>false</filtered>
-			</fileSet>
+			</fileSet -->
 			<fileSet>
 				<outputDirectory>apache-tomcat-8.0.20/lib</outputDirectory>
 				<directory>../lib</directory>
