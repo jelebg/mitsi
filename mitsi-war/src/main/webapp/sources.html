@@ -4,6 +4,9 @@
   <script type="text/ng-template" id="popover.refresh.html">
     <span>Refresh&nbsp;datasource</span>
   </script>
+  <script type="text/ng-template" id="popover.sourceinfo.html">
+    <span>Display&nbsp;datasource&nbsp;global&nbsp;informations</span>
+  </script>
   <script type="text/ng-template" id="popover.table.filter.options.html">
     <span>filter&nbsp;options</span>
   </script>
@@ -46,6 +49,15 @@
 	               ng-class="{'fast-right-spinner':s.loading}" 
 	               style="margin-right:5px" 
 			 	   popover-template="'popover.refresh.html'"
+				   popover-trigger="mouseenter"
+				   popover-placement="left-bottom"
+	            ></i>
+            </a>
+             
+            <a href=""  ng-click="displaySourceInfos(s); $event.stopPropagation();">
+	            <i class="pull-right glyphicon glyphicon-info-sign "
+	               style="margin-right:5px" 
+			 	   popover-template="'popover.sourceinfo.html'"
 				   popover-trigger="mouseenter"
 				   popover-placement="left-bottom"
 	            ></i>

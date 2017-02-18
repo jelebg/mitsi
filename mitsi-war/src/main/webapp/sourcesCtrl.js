@@ -229,6 +229,16 @@ angular.module('mitsiApp')
         $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, source, object);
 	}
 	
+	$scope.displaySourceInfos = function(source) {
+		document.title = source.name;
+
+		$rootScope.currentSource = source;
+		source.currentObject = null;
+		
+		$state.go("workbench.details");
+        $rootScope.$broadcast(EVENT_DATABASE_SELECTED_FOR_DETAILS, source);
+	}
+	
 	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) {
 		$scope.globalRefresh();
 	});
