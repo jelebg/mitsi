@@ -31,14 +31,19 @@
 			</div> 
         	
         	<tabset >
+			  <tab ui-sref="workbench.graph" >
+			  	<tab-heading>
+			      <span>graph</span> 
+			    </tab-heading>
+			  </tab>
 			  <tab  ui-sref="workbench.details" >
 			  	<tab-heading>
 			      <span>details</span> 
 			    </tab-heading>
 			  </tab>
-			  <tab ui-sref="workbench.graph" >
+			  <tab ui-sref="workbench.data" >
 			  	<tab-heading>
-			      <span>graph</span> 
+			      <span>data</span> 
 			    </tab-heading>
 			  </tab>
 			  <!-- tab ui-sref="workbench.sql" >
@@ -46,11 +51,6 @@
 			      <span>sql</span> 
 			    </tab-heading>
 			  </tab -->
-			  <tab ui-sref="workbench.data" >
-			  	<tab-heading>
-			      <span>data</span> 
-			    </tab-heading>
-			  </tab>
 			</tabset>
 			
 			<div ui-view ></div>

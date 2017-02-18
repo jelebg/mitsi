@@ -36,7 +36,7 @@ angular
 			   		 controller:'wdataCtrl' 
         	   	   });
 
-	   $urlRouterProvider.otherwise("/workbench/wdetails");
+	   $urlRouterProvider.otherwise("/workbench/wgraph");
 	   //$locationProvider.html5Mode(true);
 
 });
