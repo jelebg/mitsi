@@ -31,6 +31,7 @@ class GetData {
 class GetDataResponse extends GsonResponse {
 	List<Column> columns;
 	List<String[]> results;
+	boolean maxRowsReached;
 	
 	public GetDataResponse() {}
 }
@@ -39,6 +40,9 @@ class GetDataResponse extends GsonResponse {
 public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 	private static final Logger log = Logger.getLogger(GetDataServlet.class);
 	private static final long serialVersionUID = 1L;
+	
+	// TODO : configure per-datasource
+	public static final int MAX_ROWS = 1000000; 
 
 	@Autowired
 	private DatasourceManager datasourceManager;
@@ -56,9 +60,13 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
 		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
-			MitsiConnection.GetDataResult result = connection.getData(request.owner, request.objectName, request.fromRow, request.count, request.orderByColumns, request.filters);
+			MitsiConnection.GetDataResult result = connection.getData(
+					request.owner, request.objectName, 
+					request.fromRow, request.count<=0||request.count>MAX_ROWS?MAX_ROWS:request.count, 
+					request.orderByColumns, request.filters);
 			response.columns = result.columns;
 			response.results = result.results;
+			response.maxRowsReached = response.results.size()==MAX_ROWS;
 		}
 		
 		return response;

@@ -1,7 +1,7 @@
 angular.module('mitsiApp')
     .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService, errorService) {
 
-	$scope.allReadyFetched = 0;
+	$scope.alreadyFetched = 0;
 	$scope.nbRowToFetch = 100; 
 	$scope.lastOrderByColumns = null;
 	
@@ -23,6 +23,10 @@ angular.module('mitsiApp')
 	
 	$scope.refresh = function() {
 		
+		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, $scope.lastOrderByColumns, $scope.getFilters(), true, false, null);
+	} 
+	
+	$scope.getFilters = function() {
 		var filters = [];
 		for(var i=0; i<$scope.dataGrid.columnDefs.length-1; i++) {
 			var elt = document.getElementById("mitsiGridFilter_"+i);
@@ -30,8 +34,8 @@ angular.module('mitsiApp')
 				filters.push({name:$scope.dataGrid.columnDefs[i+1].displayName, filter:elt.value});
 			}
 		}
-		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, $scope.lastOrderByColumns, filters, true);
-	} 
+		return filters;
+	}
 	
 	$scope.initGrid = function() {
 		$scope.dataGrid = { 
@@ -39,6 +43,18 @@ angular.module('mitsiApp')
 			    enableFiltering: true,
 			    useExternalFiltering: true,
 			    useExternalSorting: true,
+	            exporterMenuCsv: true,
+	            exporterMenuPdf: false,
+	            exporterCsvFilename: ($rootScope.currentSource && $rootScope.currentSource.currentObject ?
+	            		$rootScope.currentSource.currentObject.id.name :
+	            		"download"
+	    			)+".csv",
+	            exporterAllDataFn: function() {
+	        		var defer = $q.defer();
+	        		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, $scope.lastOrderByColumns, $scope.getFilters(), true, true, defer);
+	            	return defer.promise;
+	            },
+	            enableGridMenu: true,
 			    onRegisterApi: function(gridApi){ 
 				    gridApi.infiniteScroll.on.needLoadMoreData($scope, $scope.getDataDown);
 				    gridApi.core.on.sortChanged( $scope, $scope.sortChanged );
@@ -59,12 +75,10 @@ angular.module('mitsiApp')
 
 					$scope.dataGridApi = gridApi;
 				},
-	            enableFiltering: true,
-	            exporterMenuCsv: true,
-	            enableGridMenu: true,
 	            columnDefs: [
 	    	                 { field: 'num',
 		    	                   displayName:"#",
+		    	                   name:"#",
 		    	                   width: 50,
 		    	                   enableSorting: false,
 		    	                   enableFiltering: false,
@@ -73,7 +87,7 @@ angular.module('mitsiApp')
 		    	                	     '<button ng-click="grid.appScope.refresh();">'+
 		    	                	       '<i id="refreshButton" class="glyphicon glyphicon-refresh "></i>'+
 		    	                	     '</button><br/>'+
-							             '<a id="clearAllfiltersButton" href="" class="dataClearAllFiltersAnchor" style="visibility:hidden;" ng-click="grid.appScope.clearAllFilters();">'+
+							             '<a id="clearAllfiltersButton" href="" class="dataClearAllFiltersAnchor" style="visibility:hidden;" ng-click="grid.appScope.clearAllFilters(true);">'+
 							               '<i class="glyphicon glyphicon-remove dataClearAllFiltersIcon1"></i>'+
 							               '<i class="glyphicon glyphicon-filter dataClearAllFiltersIcon2"></i>'+
 							             '</a>'+
@@ -112,7 +126,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
-		$scope.beginData(source, databaseObject, null, null, false);
+		$scope.dataGrid.exporterCsvFilename = databaseObject.id.name+".csv";
+		$scope.beginData(source, databaseObject, null, null, false, false, null);
 	});
 	
 	$scope.updateClearAllFiltersVisibility = function(filters) {
@@ -146,13 +161,15 @@ angular.module('mitsiApp')
 		elt.classList.remove('fast-right-spinner');
 	}
 	
-	$scope.beginData = function(source, databaseObject, orderByColumns, filters, preserveColumns) {
+	$scope.beginData = function(source, databaseObject, orderByColumns, filters, preserveColumns, maxServerRows, endPromise) {
 		$scope.updateClearAllFiltersVisibility(filters);
 		
+		var nbRow = maxServerRows ? 0 : $scope.nbRowToFetch;
+		
 		$scope.lastOrderByColumns = orderByColumns;
-		$scope.allReadyFetched = 0;
+		$scope.alreadyFetched = 0;
 		$scope.loadingBegins();
-		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, $scope.nbRowToFetch, orderByColumns, filters)
+		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, nbRow, orderByColumns, filters)
 		  .then(function(response) {
 			  $scope.dataGridApi.core.scrollTo(
 					  $scope.dataGrid.data[0],
@@ -162,11 +179,13 @@ angular.module('mitsiApp')
 			  
 			  if(!preserveColumns) {
 				  $scope.dataGrid.columnDefs = $scope.dataGrid.columnDefs.slice(0, 1);
+				  $scope.clearAllFilters(false);
 				  
 				  for(var i=0; i!=response.data.columns.length; i++) {
 					  $scope.dataGrid.columnDefs.push(
 						{   field: 'col'+i,
 							displayName: response.data.columns[i].name, 
+							name: response.data.columns[i].name, 
 							width: 200,
 					        filterHeaderTemplate: 
 					        	'<div style="position:relative;">'+
@@ -192,14 +211,27 @@ angular.module('mitsiApp')
 				  }
 				  $scope.dataGrid.data.push(r);
 			  }
-		      $scope.allReadyFetched = response.data.results.length;
+		      $scope.alreadyFetched = response.data.results.length;
+		      
+		      if(response.data.maxRowsReached) {
+		    	  errorService.showGeneralError("maximum server rows has been reached");
+		      }
+		      
+		      if(endPromise) {
+		    	  endPromise.resolve();
+		      }
 
+		  }, function(error) {
+		   	  errorService.showGeneralError("internal error");
+		   	  
+			  if(endPromise) {
+				  endPromise.reject(error);
+			  }
 		  })
 		  .finally(function() {
 			   $scope.loadingEnds();
 		  });
 
-;
 	};
 	
 	$scope.refreshOnEnter = function(event) {
@@ -213,11 +245,13 @@ angular.module('mitsiApp')
 		$scope.refresh();
 	}
 	
-	$scope.clearAllFilters = function() {
+	$scope.clearAllFilters = function(andRefresh) {
 		for(var i=0; i<$scope.dataGrid.columnDefs.length-1; i++) {
 			document.getElementById('mitsiGridFilter_'+i).value = "";
 		}
-		$scope.refresh();
+		if(andRefresh) {
+			$scope.refresh();
+		}
 	}
 	
 	$scope.getDataDown = function() {
@@ -236,7 +270,7 @@ angular.module('mitsiApp')
 				$rootScope.currentSource.name, 
 				$rootScope.currentSource.currentObject.id.schema, 
 				$rootScope.currentSource.currentObject.id.name, 
-				$scope.allReadyFetched, 
+				$scope.alreadyFetched, 
 				$scope.nbRowToFetch,
 				$scope.lastOrderByColumns)
 	    .then(function(response) {
@@ -250,7 +284,7 @@ angular.module('mitsiApp')
 			  }
 			  $scope.dataGrid.data.push(r);
 		  }
-	      $scope.allReadyFetched = $scope.allReadyFetched+t.length;
+	      $scope.alreadyFetched = $scope.alreadyFetched+t.length;
 	    })
 	    .finally(function(error) {
 	      $scope.dataGridApi.infiniteScroll.dataLoaded(false, !noMoreData);
@@ -262,7 +296,7 @@ angular.module('mitsiApp')
 	$scope.initGrid();
 	if($rootScope.currentSource &&
 		$rootScope.currentSource.currentObject) {
-		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, null, null, false);
+		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, null, null, false, false, null);
 	}
 
 	$scope.gridRefresh = false;
