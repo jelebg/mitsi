@@ -2,8 +2,8 @@
 <body data-ng-app="mitsiApp" class="container">
 	<accordion close-others="false">
 		<accordion-group 
-			is-open="false"
 			ng-repeat="accordion in detailsAccordions" 
+			is-open="accordion.isOpen"
 			 >
 		    <accordion-heading>
 			    {{ accordion.title }}
