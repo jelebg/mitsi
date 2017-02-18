@@ -15,6 +15,7 @@ public class MitsiDatasourcesF {
 		String password;
 		String [] tags;
 		String connectSchema;
+		Long maxExportRows;
 	}
 
 }

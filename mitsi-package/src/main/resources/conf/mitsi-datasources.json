@@ -8,7 +8,8 @@
 		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"tags" : [ "you", "may", "add", "some", "tag" ]
+		"tags" : [ "you", "may", "add", "some", "tag" ],
+		"maxExportRows" : 100000 // optional
 	  },
 	  "MY-SECOND-DATABASE": {
 	    "userGroups" : [ "_public" ],

@@ -74,7 +74,8 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 							entry.getValue().user,
 							entry.getValue().password,
 							entry.getValue().tags == null ? null : Arrays.asList(entry.getValue().tags),
-							userGroups);
+							userGroups,
+							entry.getValue().maxExportRows);
 					datasource.setConnectSchema(entry.getValue().connectSchema);
 					datasources.put(entry.getKey(), datasource);
 				}

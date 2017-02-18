@@ -28,12 +28,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	SqlSession sqlSession = null; 
 	IMitsiMapper mapper = null;
-	String defaultOwner = null;
+	MitsiDatasource datasource = null;
 	
-	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper, String defaultOwner) {
+	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper, MitsiDatasource datasource) {
 		this.sqlSession = sqlSession;
 		this.mapper = mapper;
-		this.defaultOwner = defaultOwner.toUpperCase();	
+		this.datasource = datasource;	
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	private String getOwner(String owner) {
 		if(owner == null) {
-			return defaultOwner;
+			return datasource.getConnectSchema().toUpperCase();
 		}
 		return owner.toUpperCase();
 
@@ -330,6 +330,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		result.results = results;
 		
 		return result;
+	}
+	
+	public long getMaxExportRows() {
+		return datasource.getMaxExportRows();
 	}
 	
 }

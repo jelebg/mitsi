@@ -1,13 +1,13 @@
 package org.mitsi.datasources;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 public class MitsiDatasource {
 	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
+	
+	private static final int DEFAULT_MAX_EXPORT_ROWS = 1000000;
 	
 	private String name;
 	private String description;
@@ -19,6 +19,7 @@ public class MitsiDatasource {
 	private String connectSchema;
 	private List<String> tags;
 	private TreeSet<String> userGroups;
+	private Long maxExportRows;
 	
 	public class Cache 	{
 		List<DatabaseObject> databaseObjects;
@@ -27,7 +28,7 @@ public class MitsiDatasource {
 	
 	public MitsiDatasource(String name, String description, String provider,
 			String driver, String jdbcUrl, String user, String password, List<String> tags,
-			TreeSet<String> userGroups) {
+			TreeSet<String> userGroups, Long maxExportRows) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -37,6 +38,7 @@ public class MitsiDatasource {
 		this.password = password;
 		this.tags = tags;
 		this.userGroups = userGroups;
+		this.maxExportRows = maxExportRows;
 	}
 
 	public String getName() {
@@ -96,7 +98,7 @@ public class MitsiDatasource {
 	}
 
 	public String getConnectSchema() {
-		return connectSchema;
+		return connectSchema==null?getUser():connectSchema;
 	}
 
 	public void setConnectSchema(String connectSchema) {
@@ -119,13 +121,21 @@ public class MitsiDatasource {
 		this.userGroups = userGroups;
 	}
 
+	public Long getMaxExportRows() {
+		return maxExportRows==null ? DEFAULT_MAX_EXPORT_ROWS : maxExportRows;
+	}
+
+	public void setMaxExportRows(Long maxExportRows) {
+		this.maxExportRows = maxExportRows;
+	}
+
 	@Override
 	public String toString() {
 		return "MitsiDatasource [name=" + name + ", description=" + description
 				+ ", provider=" + provider + ", driver=" + driver
 				+ ", jdbcUrl=" + jdbcUrl + ", user=" + user + ", password="
 				+ password + ", connectSchema=" + connectSchema + ", tags="
-				+ tags + ", userGroups=" + userGroups
+				+ tags + ", userGroups=" + userGroups + ", maxExportRows=" + maxExportRows
 				+ "]";
 	}
 
