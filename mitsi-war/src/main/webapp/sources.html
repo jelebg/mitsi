@@ -40,7 +40,8 @@
 		  <accordion-heading >
 		  	<i class="glyphicon glyphicon-exclamation-sign datasource-error"
 		  		ng-if="s.errorMessage != null"></i>
-            <span class="datasource-accordion-false"  
+            <span class="datasource-accordion-false" 
+                id="source_{{s.name}}" 
             	ng-click="selectSource(s)"
             >{{s.name}}</span>
              

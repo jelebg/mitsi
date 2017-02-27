@@ -270,8 +270,19 @@ angular.module('mitsiApp')
 		}
 		
 		source.selectedId = {schema:o.id.schema, name:o.id.name, type:o.id.type};
-		document.getElementById("sourceDbObject_"+source.name+"_"+o.id.schema+"_"+o.id.name).scrollIntoView(true);
+		$scope.scrolltoSourceDbObject(source.name, o.id.schema, o.id.name);
 	});
+	
+	$scope.scrolltoSourceDbObject = function(sourceName, schema, objectName) {
+		document.getElementById("sourceDbObject_"+sourceName+"_"+schema+"_"+objectName).scrollIntoView(true);
+	}
+	
+	$scope.scrollToSource = function(sourceName) {
+		document.getElementById("source_"+sourceName).scrollIntoView(true);
+		
+        id="source_{{s.name}}" 
+
+	}
 	
 	$scope.openObjectAccordion = function(o) {
 		o.accordionOpened = !o.accordionOpened;
@@ -310,10 +321,12 @@ angular.module('mitsiApp')
 			$rootScope.currentSource = ds;
 			$scope.refresh(ds, null)
 			.then(function() {
+				$scope.scrollToSource(ds.name);
 				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
 			});
 		}
 		else {
+			$scope.scrollToSource(ds.name);
 	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
 		}
 		
