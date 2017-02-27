@@ -297,7 +297,7 @@ angular.module('mitsiApp')
     
     $scope.initFromLocation = function() {
 		var s = $location.search();
-		if(!s.source || !s.table) {
+		if(!s.source) {
 			return;
 		}
 
@@ -312,8 +312,7 @@ angular.module('mitsiApp')
 				}
 			}
 			if(ds == null) {
-				// TODO : error message
-				console.log("could not find source : "+s.source);
+				errorService.showGeneralError("Source "+s.source+" does not exist (or you have insuffucient privilleges).");
 				return;
 			}
 			

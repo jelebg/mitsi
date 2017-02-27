@@ -17,6 +17,29 @@
         </div>
 </script>
 
+<script type="text/ng-template" id="popups/graphUrl.inline.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Shar your graph</h3>
+        </div>
+        <div class="modal-body" id="modal-body" style="text-align:center;" >
+			right click on the link below and "copy link address"<br/><br/>
+            <a  target="_blank"
+				href="{{ graphUrl }}"
+				ng-show="graphUrl!=null && graphUrl.length>0"
+				ng-click="closeOptionsDialog()"
+				>
+				{{ graphUrl.length<=150 ? graphUrl : graphUrl.substring(0, 150)+"..."}}
+			</a> 
+			<span ng-show="!(graphUrl!=null && graphUrl.length>0)">
+			The graph is empty.<br/>
+        	First build a graph you want to share.
+			</span>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="closeOptionsDialog()">OK</button>
+        </div>
+</script>
+
 <script type="text/ng-template" id="popover.pin.action.html">
     <span>pin&nbsp;table</span>
 </script>
@@ -67,15 +90,14 @@
     </div>
 </script>
 
-<script type="text/ng-template" id="popover.urlgraph.url.html">
-    <div ng-show="graphUrl!=null" style="text-align: center;">
-		Share&nbsp;your&nbsp;graph&nbsp;by&nbsp;using&nbsp;this&nbsp;URL&nbsp;:<br/>
-    	<a href="{{ graphUrl }}">{{ graphUrl.length>80?graphUrl.substr(0, 80)+"...":graphUrl }}</a>
-	</div>
-    <div ng-show="graphUrl==null" style="text-align: center;">
-		The&nbsp;graph&nbsp;is&nbsp;empty.
-        First&nbsp;build&nbsp;a&nbsp;graph&nbsp;you&nbsp;want&nbsp;to&nbsp;share.
-	</div>
+<script type="text/ng-template" id="popover.urlgraph.html">
+    <div style="text-align: center;" ng-show="currentSource">
+        share&nbsp;the&nbsp;current&nbsp;graph
+    </div>
+    <div style="text-align:center;" ng-show="!currentSource">
+        First&nbsp;select&nbsp;a&nbsp;datasource&nbsp;and<br/>
+		build&nbsp;a&nbsp;graph&nbsp;you&nbsp;want&nbsp;to&nbsp;share
+    </div>
 </script>
 
  <div style="position:absolute">
@@ -121,9 +143,9 @@
   		><i class="glyphicon glyphicon-remove"></i>&nbsp;clear</a></td></tr>
   	<tr><td ng-class="{'verticalMenuTdSelected':false}"  class="verticalMenuButtonTd" >
   		<a href="" ng-click="showPermalink()"
-			popover-template="'popover.urlgraph.url.html'"
+			popover-template="'popover.urlgraph.html'"
 			popover-class="verticalMenuPopover"
-			popover-trigger="click"
+			popover-trigger="mouseenter"
 			popover-placement="right"
   		><i class="glyphicon glyphicon-link"></i>&nbsp;&nbsp;url</a></td></tr>
   	</table>

@@ -19,6 +19,20 @@ angular.module('mitsiApp')
 });
 
 angular.module('mitsiApp')
+.controller('wgraphUrlCtrl', function($scope, $rootScope, $modalInstance, graphUrl) {
+	$scope.graphUrl = graphUrl;
+	
+	$scope.init = function(graphUrl) {
+		$scope.graphUrl = graphUrl;
+	}
+    
+    $scope.closeOptionsDialog = function() {
+    	$modalInstance.dismiss();
+    }
+
+});
+
+angular.module('mitsiApp')
     .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal, $location) {
 
 	$scope.jsplumb = null;
@@ -46,7 +60,6 @@ angular.module('mitsiApp')
 	$scope.showPaths = false;
 	
 	$scope.graphUrl = null;
-	
 	
 	$scope.initGraphDisplay = function() {
 		$scope.removeAllTables();
@@ -1101,6 +1114,23 @@ angular.module('mitsiApp')
         $rootScope.$broadcast(EVENT_DATABASE_OBJECT_INFO_REQUESTED, $rootScope.currentSource, object);
 	}
 	
+	$scope.showGraphUrlDialog = function() {
+
+		modalInstance = $modal.open({
+		      animation: true,
+		      ariaLabelledBy: 'modal-title',
+		      ariaDescribedBy: 'modal-body',
+		      templateUrl: 'popups/graphUrl.inline.html',
+		      controller: 'wgraphUrlCtrl',
+		      resolve: {
+		    	  graphUrl: function () {
+		            return $scope.graphUrl;
+		          }
+		        }
+		    });
+	
+	}
+	
 	$scope.showOptionsDialog = function() {
 
 		modalInstance = $modal.open({
@@ -1194,6 +1224,7 @@ angular.module('mitsiApp')
 		}
 		
 		$scope.graphUrl = url;
+		$scope.showGraphUrlDialog();
 	}
 	
 	$scope.jsplumbInit();
