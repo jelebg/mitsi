@@ -141,13 +141,13 @@
 			popover-trigger="mouseenter"
 			popover-placement="right"
   		><i class="glyphicon glyphicon-remove"></i>&nbsp;clear</a></td></tr>
-  	<tr><td ng-class="{'verticalMenuTdSelected':false}"  class="verticalMenuButtonTd" >
+  	<tr><td ng-class="{'verticalMenuTdDisabled':!currentSource}"  class="verticalMenuButtonTd" >
   		<a href="" ng-click="showPermalink()"
 			popover-template="'popover.urlgraph.html'"
 			popover-class="verticalMenuPopover"
 			popover-trigger="mouseenter"
 			popover-placement="right"
-  		><i class="glyphicon glyphicon-link"></i>&nbsp;&nbsp;url</a></td></tr>
+  		><i class="glyphicon glyphicon-share"></i>&nbsp;share</a></td></tr>
   	</table>
   </div>
   <div

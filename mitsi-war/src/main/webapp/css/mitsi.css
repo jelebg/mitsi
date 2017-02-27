@@ -328,6 +328,24 @@
 	color:black;
 }
 
+.verticalMenuTdDisabled {
+	color:#7f7f7f;
+	text-decoration:none;
+}
+.verticalMenuTdDisabled a {
+	color:#7f7f7f;
+	text-decoration:none;
+}
+.verticalMenuTdDisabled a:link {
+	color:#7f7f7f;
+	text-decoration:none;
+}
+.verticalMenuTdDisabled a:visited {
+	color:#7f7f7f;
+	text-decoration:none;
+}
+
+
 .verticalMenuTdSelected {
 	background-color:#cd48ff;
 	color:white;
