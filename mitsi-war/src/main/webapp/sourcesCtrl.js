@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, userService, sourceService, errorService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, $location, $q, userService, sourceService, errorService) {
 
 	$scope.datasources = [];
 
@@ -49,6 +49,9 @@ angular.module('mitsiApp')
 				  }
 			  }
 
+		  })
+		  .then(function() {
+			  $scope.initFromLocation();
 		  });
 	};
 	
@@ -56,20 +59,24 @@ angular.module('mitsiApp')
 		
 	   source.loading = true;
 	   
+	   var deferred = $q.defer();
 	   var startLoad = new Date().getTime();
 
 	   sourceService.getObjects(source, schema, false)
 	   .then(function(response) {
 		   var startDisplay = new Date().getTime();
-			  $scope.initSource(source, response)
-			  $timeout(function() {
+		   $scope.initSource(source, response)
+		   $timeout(function() {
 				   var end = new Date().getTime();
 				   console.log("source refresh global time:"+(end-startLoad)+"ms display time:"+(end-startDisplay)+"ms - "+source.name)
-			  }, 0);
+		   }, 0);
+		   deferred.resolve(null);	  
 	   })
 	   .finally(function() {
 		      source.loading = false;
 	   });
+	   
+	   return deferred.promise;
 	}
 	
 	$scope.initSource = function(source, response) {
@@ -271,6 +278,45 @@ angular.module('mitsiApp')
 		if(!o.columnsToDisplay) {
 			o.columnsToDisplay = o.columns;
 		}
+	}
+	
+    $rootScope.$on('$locationChangeSuccess', function (event) {
+    	$scope.initFromLocation();
+    });
+    
+    $scope.initFromLocation = function() {
+		var s = $location.search();
+		if(!s.source || !s.table) {
+			return;
+		}
+
+		if(!$rootScope.currentSource ||
+			s.source!==$rootScope.currentSource.name) {
+			
+			var ds = null;
+			for(var i=0; i!=$scope.datasources.length; i++) {
+				if($scope.datasources[i].name == s.source) {
+					ds = $scope.datasources[i];
+					break;
+				}
+			}
+			if(ds == null) {
+				// TODO : error message
+				console.log("could not find source : "+s.source);
+				return;
+			}
+			
+			ds.accordionOpened = true;
+			$rootScope.currentSource = ds;
+			$scope.refresh(ds, null)
+			.then(function() {
+				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
+			});
+		}
+		else {
+	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
+		}
+		
 	}
 	
 	$scope.init();

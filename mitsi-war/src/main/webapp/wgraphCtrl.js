@@ -19,7 +19,7 @@ angular.module('mitsiApp')
 });
 
 angular.module('mitsiApp')
-    .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal) {
+    .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal, $location) {
 
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
@@ -44,6 +44,8 @@ angular.module('mitsiApp')
 	$scope.graphOpacity = true;
 	$scope.showSQL = false;
 	$scope.showPaths = false;
+	
+	$scope.graphUrl = null;
 	
 	
 	$scope.initGraphDisplay = function() {
@@ -258,6 +260,13 @@ angular.module('mitsiApp')
 		
 		$scope.appendTable(bestPlace.x, bestPlace.y, tableName);
 		
+		var fkList = $scope.getTableFkList(tableName);
+		
+		$scope.afterTableUpdate(fkList, {});
+
+	}
+	
+	$scope.getTableFkList = function(tableName) {
 		var fkList = [];
 		
 		var links = $rootScope.currentSource.mitsiGraph.getLinksByName(tableName);
@@ -290,16 +299,17 @@ angular.module('mitsiApp')
 			}
 		}
 		
-		$scope.afterTableUpdate(fkList, {});
-
+		return fkList;
 	}
 	
 	$scope.afterTableUpdate = function(fklist, posses) {
 		$timeout(function() {
-			for(var i=0; i!=fklist.length; i++) {
-				var mafk = fklist[i];
-				$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
-			}
+			if(fklist) {
+				for(var i=0; i!=fklist.length; i++) {
+					var mafk = fklist[i];
+					$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
+				}
+			}				
 			
 			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"), {});
 			
@@ -313,7 +323,6 @@ angular.module('mitsiApp')
 					
 					for(var i=0; i!=tables.length; i++) {
 						var tableName = tables[i];
-						console.log
 						$scope.jsplumb.addToPosse($scope.divPrefix+tableName, posse);					
 					}
 					
@@ -630,12 +639,15 @@ angular.module('mitsiApp')
 		
 		//$scope.jsplumb.deleteEveryEndpoint();;
 		// TODO : hum ca ne sert surement à rien tout ça
-		$scope.jsplumb.detachEveryConnection();
-		for(var t in $scope.tables) {
-			$scope.jsplumb.remove($scope.divPrefix + t.name);
+		if($scope.jsplumb) {
+			$scope.jsplumb.detachEveryConnection();
+			for(var t in $scope.tables) {
+				$scope.jsplumb.remove($scope.divPrefix + t.name);
+			}
 		}
-		
+			
 		$scope.tables = {};
+		
 	}
 
 	$scope.appendTable = function(left, top, tableName) {
@@ -1125,6 +1137,63 @@ angular.module('mitsiApp')
 		}
 		
 		return name.substring(i+1);
+	}
+	
+	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tables) {
+		
+		if(tables) {
+			$scope.removeAllTables();
+			
+			var fklist = [];
+			for(var i=0; i!=tables.length; i++) {
+				var table = tables[i];
+				var openPIndex  = table.indexOf("(");
+				var comaIndex   = table.indexOf(",");
+				var closePIndex = table.indexOf(")");
+				if(openPIndex <= 0) {
+					continue;
+				}
+				if(comaIndex <= 0 || comaIndex <=openPIndex) {
+					continue;
+				}
+				if(closePIndex <= 0 || closePIndex <= comaIndex) {
+					continue;
+				}
+				var tableName = table.substring(0, openPIndex);
+				var tableX    = table.substring(openPIndex+1, comaIndex);
+				var tableY    = table.substring(comaIndex+1, closePIndex); 
+				
+				$scope.appendTable(parseInt(tableX), parseInt(tableY), tableName);
+				fklist = fklist.concat($scope.getTableFkList(tableName));
+			}
+			$scope.afterTableUpdate(fklist, {});
+		}
+	}); 
+	
+	$scope.showPermalink = function() {
+		if(!$rootScope.currentSource ||
+			!$scope.tables ||
+			$scope.tables.length==0) {
+			$scope.graphUrl = null;
+			return;
+		}
+		
+		var baseUrl = $location.absUrl();
+		var i = baseUrl.indexOf("?");
+		if(i > 0) {
+			baseUrl = baseUrl.substring(0, i);
+		}
+		
+		url = baseUrl + "?source=" + $rootScope.currentSource.name;
+		
+		for(var tableName in $scope.tables) {
+			var tableDiv = document.getElementById($scope.divPrefix+tableName);
+			if(tableDiv) {
+				url = url + "&table=" + tableName + "("+tableDiv.offsetLeft+","+tableDiv.offsetTop+")";
+			}
+		}
+		
+		$scope.graphUrl = url;
 	}
 	
 	$scope.jsplumbInit();

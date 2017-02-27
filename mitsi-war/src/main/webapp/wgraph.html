@@ -67,6 +67,17 @@
     </div>
 </script>
 
+<script type="text/ng-template" id="popover.urlgraph.url.html">
+    <div ng-show="graphUrl!=null" style="text-align: center;">
+		Share&nbsp;your&nbsp;graph&nbsp;by&nbsp;using&nbsp;this&nbsp;URL&nbsp;:<br/>
+    	<a href="{{ graphUrl }}">{{ graphUrl.length>80?graphUrl.substr(0, 80)+"...":graphUrl }}</a>
+	</div>
+    <div ng-show="graphUrl==null" style="text-align: center;">
+		The&nbsp;graph&nbsp;is&nbsp;empty.
+        First&nbsp;build&nbsp;a&nbsp;graph&nbsp;you&nbsp;want&nbsp;to&nbsp;share.
+	</div>
+</script>
+
  <div style="position:absolute">
   <div style="z-index:10;">
   	<table class="verticalMenuTable">
@@ -108,6 +119,13 @@
 			popover-trigger="mouseenter"
 			popover-placement="right"
   		><i class="glyphicon glyphicon-remove"></i>&nbsp;clear</a></td></tr>
+  	<tr><td ng-class="{'verticalMenuTdSelected':false}"  class="verticalMenuButtonTd" >
+  		<a href="" ng-click="showPermalink()"
+			popover-template="'popover.urlgraph.url.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="click"
+			popover-placement="right"
+  		><i class="glyphicon glyphicon-link"></i>&nbsp;&nbsp;url</a></td></tr>
   	</table>
   </div>
   <div
