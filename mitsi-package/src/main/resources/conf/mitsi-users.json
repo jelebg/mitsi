@@ -1,12 +1,12 @@
 {
 	/* you can add users directly here, but it is not advised to
 	   ldap configuration would be better of course
-	   password may be written as clear text or in salted-sha-256
+	   password may be written as clear text or in salted-sha-256 */
 	"users" : {
-		"testuser"  : "{clear}clearpassword" ,
+		"user"  : "{clear}user" ,
 		"guest" : "{ssha256}a9a5352be5b944d28716b177a0133507ebdb7bb8f1fa4d7a8a689b1129e263ae:9bb1c8d0ac23d3365c6daa773d9cc2dcb6cc948297bace832984f3402d758992"
-	},*/
-	"ldapAuthent" : {
+	},
+	/* "ldapAuthent" : {
 		"url"                 : "ldap://localhost:10389/",
 		"applicationDN"       : "sn=my,dc=applications",
 		"applicationPassword" : "another_password_as_cleartext",
@@ -14,9 +14,9 @@
 		"groupSearchPattern"  : "ou=groups",
 		"groupRoleAttribute"  : "ou",
 		"mandatoryRole"       : "ROLE_MITSI_APPLICATION"
-	},
+	}, */
 	"groups" : {
-		"group_1" : [ "testuser" ],
-		"group_2" : [ "testuser" ]
+		"group_1" : [ "user" ],
+		"group_2" : [ "user", "guest" ]
 	}
 }

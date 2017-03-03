@@ -12,14 +12,24 @@
 		"maxExportRows" : 100000 // optional
 	  },
 	  "MY-SECOND-DATABASE": {
-	    "userGroups" : [ "_public" ],
+	    "userGroups" : [ "_connected" ],
 		"description" : "my second database", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
-		"user" : "xe2",
-		"password" : "xe2",
-		"connectSchema" : "TEST",
+		"user" : "test2",
+		"password" : "test2",
+		"connectSchema" : "TEST2",
+		"tags" : [ "you", "may", "add", "some", "tag" ]
+	  },
+	  "MY-THIRD-DATABASE": {
+	    "userGroups" : [ "group_1" ],
+		"description" : "my third database", 
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"user" : "xe3",
+		"password" : "xe3",
 		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  }
   } 
