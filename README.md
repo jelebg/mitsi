@@ -17,6 +17,12 @@ Unlike other tools, it is quick and cool.
 
 ## How can I install it ?
 
+### prerequisites
+
+Java (version >= 7) must be installed, and the **JAVA_HOME** environment variable must be set.
+
+### download
+
 If you download it [there](https://github.com/jelebg/mitsi/releases/), you will have a tomcat pre-configured with the Mitsi war.
 Unzip the archive (.zip or .tar.gz).
 Then modify the following files to configure your first database connection :
