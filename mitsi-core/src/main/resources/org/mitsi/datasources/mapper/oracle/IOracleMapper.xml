@@ -12,7 +12,7 @@
 <resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
 	<result property="name" column="schema_name"/>
 	<result property="current" column="is_current"/>
-    <result property="jsonDetails" column="json_details"/>
+    <result property="jsonDetails" column="jsonDetails"/>
 </resultMap>
 
 <select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
@@ -27,7 +27,7 @@
     <idArg column="id_schema" javaType="String"/>
     <idArg column="id_name" javaType="String"/>
   </constructor>
-  <result property="jsonDetails" column="json_details"/>
+  <result property="jsonDetails" column="jsonDetails"/>
   <result property="description" column="object_comment"/>
   <collection property="columns" ofType="org.mitsi.datasources.Column">
       <result property="name" column="column_name"/>
@@ -114,7 +114,7 @@
 		  '"temporary":"'     ||temporary    ||'", '||
 		  '"secondary":"'     ||secondary    ||'", '||
 		  '"nested":"'        ||nested       ||'", '||
-		  '"row_movement":"'  ||row_movement ||'" } ' json_details
+		  '"row_movement":"'  ||row_movement ||'" } ' jsonDetails
 	FROM all_tables
 	WHERE all_tables.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
 	AND all_tables.owner NOT LIKE 'APEX_%'
@@ -129,7 +129,7 @@
 		'{ "view_type":"'       ||view_type||'", '||
 		  '"superview_name":"'   ||superview_name  ||'", '||
 		  '"editioning_view":"'  ||editioning_view    ||'", '||
-		  '"read_only":"'        ||read_only    ||'" } ' json_details
+		  '"read_only":"'        ||read_only    ||'" } ' jsonDetails
 	FROM all_views
 	WHERE all_views.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
 	AND all_views.owner NOT LIKE 'APEX_%'
@@ -149,7 +149,7 @@
 		  '"last_refresh_date":"'         ||last_refresh_date    ||'", '||
 		  '"staleness":"'                 ||staleness    ||'", '||
 		  '"compile_state":"'             ||compile_state    ||'", '||
-		  '"stale_since":"'               ||stale_since    ||'" } ' json_details
+		  '"stale_since":"'               ||stale_since    ||'" } ' jsonDetails
 	FROM all_mviews
 	WHERE all_mviews.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
 	AND all_mviews.owner NOT LIKE 'APEX_%'
@@ -160,28 +160,24 @@
 	SELECT username schema_name,
 		DECODE(username, sys_context( 'userenv', 'current_schema' ), '1', '0') is_current,
 		'{ "user_id":"'            ||user_id||'", '||
-		  '"created":"'            ||created||'" } ' json_details
+		  '"created":"'            ||created||'" } ' jsonDetails
 	FROM ALL_USERS 
 </select>
 
 <select id="getTablespaceDetails" resultType="org.mitsi.datasources.Tablespace" fetchSize="2000">
 	SELECT 
 		tablespace_name name,
-		file_name 		file_name,
-		bytes           size_bytes,
-		maxbytes		max_size_bytes,
-		blocks			blocks,
-		maxblocks		max_blocks,
-		'{ "file_id":"'            ||file_id||'", '||
-		  '"status":"'             ||status||'", '||
-		  '"autoextensible":"'     ||autoextensible||'", '||
-		  '"increment_by":"'       ||increment_by||'", '||
-		  '"user_bytes":"'         ||user_bytes||'", '||
-		  '"user_blocks":"'        ||user_blocks||'", '||
-		  '"online_status":"'      ||online_status||'" } ' json_details
-	FROM dba_data_files 
-	ORDER BY 1, 2
-
+		status          status,
+		contents		contents,
+		'{ "block_size":"'            ||block_size||'", '||
+		  '"initial_extent":"'        ||initial_extent||'", '||
+		  '"next_extent":"'           ||next_extent||'", '||
+		  '"min_extents":"'           ||min_extents||'", '||
+		  '"max_extents":"'           ||max_extents||'", '||
+		  '"max_size":"'              ||max_size||'", '||
+		  '"STATUS":"'                ||STATUS||'" } ' jsonDetails
+	FROM user_tablespaces 
+	ORDER BY 1
 </select>
 
 <select id="getTableColumnsDetails" resultType="org.mitsi.datasources.Column" fetchSize="2000">
@@ -194,7 +190,7 @@
 	data_scale scale,
 	data_default defaultValue,
 	nullable,
-			'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'" } ' json_details
+			'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'" } ' jsonDetails
 	from all_tab_columns where owner=#{owner} and table_name=#{name} order by column_id
 </select>
 
@@ -214,15 +210,16 @@
 	  ( select LISTAGG(all_ind_columns.column_name, ',') WITHIN GROUP (ORDER BY column_position)
 	    from all_ind_columns where all_indexes.index_name=all_ind_columns.index_name and all_indexes.owner=all_ind_columns.index_owner
 	  )columns,
+	  all_indexes.tablespace_name tablespace,
+	  all_indexes.partitioned partitioning,
+	  
 			'{ "last_analyzed":"'||to_char(all_indexes.last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'", '||
-			  '"tablespace_name":"'    ||all_indexes.tablespace_name||'", '||
 			  '"logging":"'            ||all_indexes.logging||'", '||
-			  '"partitioned":"'        ||all_indexes.partitioned||'", '||
 			  '"temporary":"'          ||all_indexes.temporary||'", '||
 			  '"generated":"'          ||all_indexes.generated||'", '||
 			  '"secondary":"'          ||all_indexes.secondary||'", '||
 			  '"dropped":"'            ||all_indexes.dropped||'", '||
-			  '"visibility":"'         ||all_indexes.visibility||'" } ' json_details
+			  '"visibility":"'         ||all_indexes.visibility||'" } ' jsonDetails
 	
 	from all_indexes 
 	where all_indexes.table_name=#{tableName} and all_indexes.table_owner=#{tableOwner}
@@ -292,7 +289,7 @@ WHERE exists (
 	interval interval,
 			'{ "subpartition_count":"'    ||subpartition_count||'", '||
 			  '"partition_position":"'            ||partition_position||'", '||
-			  '"max_size":"'        ||max_size||'" } ' json_details
+			  '"max_size":"'        ||max_size||'" } ' jsonDetails
 	from all_tab_partitions
 	where table_owner=#{tableOwner} and table_name=#{tableName}
 </select>

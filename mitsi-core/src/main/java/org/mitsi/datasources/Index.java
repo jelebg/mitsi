@@ -7,6 +7,8 @@ public class Index {
 	public String type;
 	public String uniqueness;
 	public String columns;
+	public String tablespace;
+	public String partitioning;
 	
 	public String jsonDetails;
 }

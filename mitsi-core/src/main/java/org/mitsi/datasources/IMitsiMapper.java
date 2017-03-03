@@ -17,7 +17,6 @@ public interface IMitsiMapper {
 	List<Constraint> getSchemaConstraints(@Param("owner") String owner);
 
 	// for datasource details
-	// TODO : mettre un owner ?
 	List<DatabaseObject> getTablesDetails();
 	List<DatabaseObject> getViewsDetails();
 	List<DatabaseObject> getMatViewsDetails();

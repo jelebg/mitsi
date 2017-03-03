@@ -47,10 +47,6 @@ class GetDetailsResponse {
 	public GetDetailsResponse() {}
 }
 
-/**
- * Servlet implementation class TestGsonServlet
- */
-// TODO : to be replaced by GetClientStatus
 public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsResponse> {
 	private static final Logger log = Logger.getLogger(GetDetailsServlet.class);
 	private static final long serialVersionUID = 1L;
@@ -97,22 +93,16 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 	
 	private void fromTablespaceList(List<Tablespace> tablespaceList, List<String[]> data, List<String> columns) {
 		columns.add("name");
-		columns.add("fileName");
-		columns.add("sizeBytes");
-		columns.add("maxSizeBytes");
-		columns.add("blocks");
-		columns.add("maxBlocks");
+		columns.add("status");
+		columns.add("contents");
 		columns.add("jsonDetails");
 		
 		for(Tablespace tablespace : tablespaceList) {
 			String[] row = new String[columns.size()];
 			row[0] =  tablespace.name;
-			row[1] =  tablespace.fileName;
-			row[2] =  Long.toString(tablespace.sizeBytes);
-			row[3] =  Long.toString(tablespace.maxSizeBytes);
-			row[4] =  Long.toString(tablespace.blocks);
-			row[5] =  Long.toString(tablespace.maxBlocks);
-			row[6] =  tablespace.jsonDetails;
+			row[1] =  tablespace.status;
+			row[2] =  tablespace.contents;
+			row[3] =  tablespace.jsonDetails;
 			data.add(row);
 		}
 	}
@@ -213,6 +203,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			fromTablespaceList(tablespaceList,  tablespaces.data, tablespaces.columns);
 		}
 		catch(Exception e) {
+			// TODO : afficher l'erreur à l'utilisateur
 			tablespaces.message = e.getMessage();
 		}
 
@@ -263,6 +254,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		columns.add("type");
 		columns.add("uniqueness");
 		columns.add("columns");
+		columns.add("tablespace");
+		columns.add("partitioning");
 		columns.add("jsonDetails");
 		
 		for(Index index : indexList) {
@@ -272,7 +265,9 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 			row[2] =  index.type;
 			row[3] =  index.uniqueness;
 			row[4] =  index.columns;
-			row[5] =  index.jsonDetails;
+			row[5] =  index.tablespace;
+			row[6] =  index.partitioning;
+			row[7] =  index.jsonDetails;
 			data.add(row);
 		}
 	}
