@@ -5,6 +5,7 @@
 }
 .ui-splitbar {
 	border: 1px solid lightgrey;
+	z-index: 1 !important;
 }
 .ui-splitbar a {
 	font-size : 70%;
