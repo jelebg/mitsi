@@ -6,7 +6,7 @@
 		"description" : "the test datasource for anything",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
 		"user" : "test",
 		"password" : "test",
 		"connectSchema" : "TEST"
@@ -16,7 +16,7 @@
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2"
 	  },
@@ -25,7 +25,7 @@
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
 		"connectSchema" : "TEST"
