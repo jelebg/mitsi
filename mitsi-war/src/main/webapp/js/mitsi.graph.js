@@ -278,131 +278,13 @@ function MitsiGraph(relations) {
 			"after"  : after
 		};
 	}
-	
-	this.computeDijkstra = function(startIndex, reverse) {
-		var t = [];
-		var visited = []
-		var unvisited = [startIndex]
-		
-		t[startIndex] = { d:0, p:-1 };
-		
-		do {
-			var current = unvisited.pop();
-			visited[current] = true;
-			
-			var v = this.vertexes[current];
-			var ls = reverse ? v.reverseLinks : v.links;
-			for(var i=0; i!=ls.length; i++) {
-				var l = ls[i];
-				
-				if(!t[l.target] || t[l.target].d > t[current].d+1) {
-					t[l.target] = { d:t[current].d+1, p:current };
-				}
-				
-				if(visited[l.target]) {
-					continue;
-				}
-				
-				unvisited.push(l.target);
-			}
-			
-		} while(unvisited.length > 0);
-		
-		return t;
-	}
-	
-	this.getShortestPath = function(dijkstraTable, startIndex, endIndex) {
-		// TODO : trouver pourquoi dans le path on a parfois des entiers, parfois des string
-		var path = [];
-		
-		var current = endIndex;
-		path.push(current);
-		while(dijkstraTable[current] && dijkstraTable[current].p != -1) {
-			current = dijkstraTable[current].p;
-			path.push(current);
-		}
-			
-		if(current != startIndex) {
-			return null;
-		}
-		return path.reverse();
-	}
-	
-	this.computeEppstein = function(startIndex, endIndex, reverse) {
-		var t = [];
-		
-		var tDijkstra = this.computeDijkstra(endIndex, !reverse);
-		for(var i=0; i!=this.vertexes.length; i++) {
-			
-			var nt = {
-				// d : tDijkstra[i].d, should be useless
-				ls : []
-			}
-			
-			var links = reverse ? this.vertexes[i].reverseLinks : this.vertexes[i].links;
-			for(var l=0; l!=links.length; l++) {
-				var target = tDijkstra[links[l].target];
-				if(!target || target.d < 0) { // TODO target.d should not be <0
-					// unreachable vertex
-					continue;
-				}
 
-				nt.ls[l] = {
-					t  : links[l].target,
-					dt : 1 + target.d - tDijkstra[i].d
-				};
-			}
-				
-			if(nt.ls.length > 0) {
-				t[i] = nt;
-			}
-		}
-		
-		
-		
-		
-		return t;
-	}
-	
-	this.getAllEqualsShortestPathDFS = function(tEppstein, path, endIndex) {
-		var index = path[path.length-1];
-		
-		if(index == endIndex) {
-			return [ path ];
-		}
-
-		var retPaths = [];
-		var tEppsteinIndex = tEppstein[index];
-		if(!tEppsteinIndex) {
-			return retPaths;
-		}
-		for(var i=0; i!=tEppsteinIndex.ls.length; i++) {
-			var l = tEppsteinIndex.ls[i];
-			if(!l || l.dt > 0) {
-				continue;
-			}
-			// TODO : protection against cycles
-			var tPath = [];
-			for(var j=0; j!=path.length; j++) {
-				tPath[j] = path[j];
-			}
-			tPath[j] = l.t;
-			
-			var nextPaths = this.getAllEqualsShortestPathDFS(tEppstein, tPath, endIndex);
-
-			for(var j=0; j!=nextPaths.length; j++) {
-				retPaths.push(nextPaths[j]);
-			}
-		}
-		
-		return retPaths;
-	}
-	
-	this.getAllEqualsShortestPath = function(tEppstein, startIndex, endIndex) {
+	this.getAllPaths = function(startIndex, endIndex, reverse) {
 		var path = [ startIndex ];
-		var paths = this.getAllEqualsShortestPathDFS(tEppstein, path, endIndex);
+		var paths = this.getAllPathsDFS(endIndex, path, reverse) ;
 		return paths;
 	}
+
 	
 	this.getKShortestPathBFSTreeSort = function(a, b) {
 		if(a.dt > b.dt) {
@@ -474,28 +356,6 @@ function MitsiGraph(relations) {
 		}
 
 	}
-	
-	/*this.getKShortestPathOrderTreeByDistance = function(tree) {
-		// TODO would be so much faster and easy to program with a true stack 
-		var newchilds = [];
-		for(var k in tree.childs) {
-			var child = tree.childs[k];
-			newchilds.push(child);
-			
-			this.getKShortestPathOrderTreeByDistance(child);
-		}
-		
-		newchilds.sort(function(a, b) {
-			if(a.dt > b.dt) {
-				return 1;
-			}
-			if(a.dt < b.dt) {
-				return -1;
-			}
-			return 0;
-		});
-		tree.sortedChilds = newchilds;
-	}*/
 	
 	this.getKShortestPathBFS = function(tEppstein, tree, visited, tovisit) {
 		var newtovisit = [];
@@ -668,25 +528,7 @@ function MitsiGraph(relations) {
 		
 		return retPaths;
 	}
-		
-	this.getAllPaths = function(startIndex, endIndex, reverse) {
-		var path = [ startIndex ];
-		var paths = this.getAllPathsDFS(endIndex, path, reverse) ;
-		return paths;
-	}
 	
-	this.getMaxConnectedNode = function() {
-		var max = -1;
-		var mvi = -1;
-		for(var i=0; i!=this.vertexes.length; i++) {
-			var v = this.vertexes[i];
-			if(v.reverseLinks.length > max) {
-				mvi = i;
-				max = v.reverseLinks.length;
-			}
-		}
-		return mvi;
-	}
 }
 
 function copyArrayPlusValue(arr, val) {
