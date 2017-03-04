@@ -11,6 +11,7 @@ import org.mitsi.mitsiwar.common.Datasource;
 import org.mitsi.mitsiwar.connections.Client;
 
 class Request {
+	boolean btwGetDatasources;
 	
 	public Request() {
 	}
@@ -41,21 +42,27 @@ public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 		Response response = new Response();
 
 		response.connectedUsername = connectedClient.getConnectedUsername();
+		response.datasources = null;
 		TreeSet<String> groups = null;
 		if(response.connectedUsername != null) {
 			groups = mitsiUsersConfig.getUserGrantedGroups(response.connectedUsername);
 		}
 		
-		response.datasources = new ArrayList<>();
-		List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, response.connectedUsername!=null);
-		
-		for(MitsiDatasource mitsiDatasource : mitsiDatasourceList) {
+		if(request.btwGetDatasources) {
+			response.datasources = new ArrayList<>();
+			List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, response.connectedUsername!=null);
 			
-			Datasource datasource = new Datasource();
-			datasource.name = mitsiDatasource.getName();
-			datasource.description = mitsiDatasource.getDescription();
-			datasource.tags = mitsiDatasource.getTags();
-			response.datasources.add(datasource);
+			for(MitsiDatasource mitsiDatasource : mitsiDatasourceList) {
+				
+				Datasource datasource = new Datasource();
+				datasource.name = mitsiDatasource.getName();
+				datasource.description = mitsiDatasource.getDescription();
+				datasource.tags = mitsiDatasource.getTags();
+				response.datasources.add(datasource);
+			}
+		}
+		else {
+			log.info("keep alive");
 		}
 		
 		return response;

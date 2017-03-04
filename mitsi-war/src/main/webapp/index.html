@@ -53,7 +53,7 @@
 			</td>
 		</table>
 		<table ng-hide="!isUserLoggedIn()">
-			<tr><td style="font-weight:bold;padding-right:10px;">{{ loggedUser }}</td>
+			<tr><td style="font-weight:bold;padding-right:10px;">{{ loggedUser.username }}</td>
 			<td><a href="" class="btn btn-default" ng-keypress="logoutOnSpacebar($event)" ng-click="logout()">log out</a></td></tr>
 		</table>
 		</div>

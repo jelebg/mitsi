@@ -1,7 +1,11 @@
 angular.module('mitsiApp')
 .service( 'userService', function(mitsiHttpService) {
 	this.getClientStatus = function() {
-		return mitsiHttpService.post('GetClientStatusServlet', { });
+		return mitsiHttpService.post('GetClientStatusServlet', { "btwGetDatasources":true });
+	}
+
+	this.keepAlive = function() {
+		return mitsiHttpService.post('GetClientStatusServlet', { "btwGetDatasources":false });
 	}
 
 	this.login = function(loginUser, loginPassword) {

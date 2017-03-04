@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, $location, $q, userService, sourceService, errorService) {
+    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, $interval, $location, $q, userService, sourceService, errorService) {
 
 	$scope.datasources = [];
 
@@ -12,12 +12,61 @@ angular.module('mitsiApp')
 		$scope.globalRefresh();
 	}
 	
+	$scope.keepAlive = function() {
+		userService.keepAlive()
+		  .then(function(response) {
+			  
+			  var userHasChanged = false;
+			  
+			  if($rootScope.loggedUser) {
+				  if($rootScope.loggedUser.username !== response.data.connectedUsername) {
+					  userHasChanged = true;
+				  }
+			  }
+		  	  else { 
+		  		  if(response.data.connectedUsername) {
+		  			userHasChanged = true;
+		  		  }
+		      }
+
+			  if(userHasChanged) {
+				  console.log("connected user has changed : "+response.data.connectedUsername+" (was: "+$rootScope.loggedUser.username+")");
+				  $scope.globalRefresh();
+			  }
+			  else {
+				  console.log("user still connected : " + ($rootScope.loggedUser==null?"null":$rootScope.loggedUser.username));
+			  }
+          });
+	}
+	
+	$scope.initKeepAlive = function() {
+	   $interval(function() {
+		   $scope.keepAlive();
+	   }, 90000);
+
+	} 
+
+	
 	$scope.globalRefresh = function() {
 		userService.getClientStatus()
 		  .then(function(response) {
 			  
 			  var responseDatasources = response.data.datasources;
-			  $rootScope.loggedUser = response.data.connectedUsername;
+			  if($rootScope.loggedUser) {
+				  if(response.data.connectedUsername == null) {
+					  $rootScope.loggedUser = null;
+				  }
+				  else {
+					  if($rootScope.loggedUser.username != response.data.connectedUsername) {
+						  $rootScope.loggedUser.username = response.data.connectedUsername;
+					  }
+				  }
+			  }
+		  	  else { 
+		  		  if(response.data.connectedUsername) {
+		  			  $rootScope.loggedUser = {"username":response.data.connectedUsername};
+		  		  }
+		      }
 
 			  var scopeDatasourceNames = {};
 			  for(var i=0; i!=$scope.datasources.length; i++) {
@@ -332,5 +381,6 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.init();
+	$scope.initKeepAlive();
 
 });
