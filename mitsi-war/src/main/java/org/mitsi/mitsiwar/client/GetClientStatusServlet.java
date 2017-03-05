@@ -61,9 +61,6 @@ public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 				response.datasources.add(datasource);
 			}
 		}
-		else {
-			log.info("keep alive");
-		}
 		
 		return response;
 	}

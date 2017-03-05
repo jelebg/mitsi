@@ -17,9 +17,9 @@
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
 		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
-		"user" : "test2",
-		"password" : "test2",
-		"connectSchema" : "TEST2",
+		"user" : "xe2",
+		"password" : "xe2",
+		"connectSchema" : "TEST",
 		"tags" : [ "you", "may", "add", "some", "tag" ]
 	  },
 	  "MY-THIRD-DATABASE": {

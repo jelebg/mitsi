@@ -33,16 +33,13 @@ angular.module('mitsiApp')
 				  console.log("connected user has changed : "+response.data.connectedUsername+" (was: "+$rootScope.loggedUser.username+")");
 				  $scope.globalRefresh();
 			  }
-			  else {
-				  console.log("user still connected : " + ($rootScope.loggedUser==null?"null":$rootScope.loggedUser.username));
-			  }
           });
 	}
 	
 	$scope.initKeepAlive = function() {
 	   $interval(function() {
 		   $scope.keepAlive();
-	   }, 90000);
+	   }, 300000);
 
 	} 
 
