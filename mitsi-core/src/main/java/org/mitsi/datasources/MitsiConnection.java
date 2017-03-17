@@ -8,7 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,14 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	private String getOwner(String owner) {
 		if(owner == null) {
+			Class<?>[] interfaces = mapper.getClass().getInterfaces();
+			for(Class<?> i : interfaces) {
+				DefaultOwner defaultOwner = i.getAnnotation(DefaultOwner.class);
+				if(defaultOwner != null) {
+					return defaultOwner.value().toUpperCase();
+				}
+			}
+
 			return datasource.getConnectSchema().toUpperCase();
 		}
 		return owner.toUpperCase();
@@ -104,13 +111,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return databaseObjects;
 	}
 	
-	@Override
-	public synchronized List<DatabaseObject> getTablesAndViewsLight(String owner) {
-		owner = getOwner(owner);
-		List<DatabaseObject> databaseObjects = mapper.getTablesAndViewsLight(owner);
-		return databaseObjects;
-	}
-
 	@Override
 	public synchronized List<DatabaseObject> getTablesDetails() {
 		return mapper.getTablesDetails();
@@ -167,12 +167,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
 		return mapper.getTableConstraintsDetails(tableOwner, tableName);
-	}
-
-	@Override
-	public List<Date> getLastSchemaUpdateTime(String owner) {
-		owner = getOwner(owner);
-		return mapper.getLastSchemaUpdateTime(owner);
 	}
 
 	@Override

@@ -1,0 +1,327 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mitsi.datasources.mapper.postgre.IPostgreMapper">
+
+
+<select id="testOK" resultType="String">
+	SELECT TO_CHAR(current_date, 'YYYYMMDD hh24:mi:ss')
+</select>
+
+<resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
+	<result property="name" column="schema_name"/>
+	<result property="current" column="is_current"/>
+    <result property="jsonDetails" column="jsonDetails"/>
+</resultMap>
+
+<select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
+	SELECT schema_name,
+	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current 
+	FROM information_schema.schemata;
+</select>
+
+<resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
+  <constructor>
+    <idArg column="id_type" javaType="String"/>
+    <idArg column="id_schema" javaType="String"/>
+    <idArg column="id_name" javaType="String"/>
+  </constructor>
+  <result property="jsonDetails" column="jsonDetails"/>
+  <result property="description" column="object_comment"/>
+  <collection property="columns" ofType="org.mitsi.datasources.Column">
+      <result property="name" column="column_name"/>
+      <result property="description" column="column_comment"/>
+      <result property="type" column="column_type"/>
+  </collection>
+</resultMap>
+
+<!--  TODO : supprimer pg_attrdef ? -->
+<select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
+	
+  SELECT 
+     (nc.nspname)::information_schema.sql_identifier AS id_schema,
+     (c.relname)::information_schema.sql_identifier AS id_name,
+     case when c.relkind='v' then 'view'
+          when c.relkind='m' then 'matview'
+          else 'table' end id_type, 
+     (a.attname)::information_schema.sql_identifier AS column_name,
+          (
+         CASE
+             WHEN (a.attnotnull OR ((t.typtype = 'd'::"char") AND t.typnotnull)) THEN 'NO'::text
+             ELSE 'YES'::text
+         END)::information_schema.yes_or_no AS is_nullable,
+     (
+         CASE
+             WHEN (t.typtype = 'd'::"char") THEN
+             CASE
+                 WHEN ((bt.typelem &lt;&gt; (0)::oid) AND (bt.typlen = '-1'::integer)) THEN 'ARRAY'::text
+                 WHEN (nbt.nspname = 'pg_catalog'::name) THEN format_type(t.typbasetype, NULL::integer)
+                 ELSE 'USER-DEFINED'::text
+             END
+             ELSE
+             CASE
+                 WHEN ((t.typelem &lt;&gt; (0)::oid) AND (t.typlen = '-1'::integer)) THEN 'ARRAY'::text
+                 WHEN (nt.nspname = 'pg_catalog'::name) THEN format_type(a.atttypid, NULL::integer)
+                 ELSE 'USER-DEFINED'::text
+             END
+         END)::information_schema.character_data AS column_type,
+     des.description object_comment, 
+     pg_catalog.col_description(c.oid, a.attnum) column_comment
+      FROM (((pg_attribute a
+      JOIN (pg_class c
+      JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))) ON ((a.attrelid = c.oid)))
+      JOIN (pg_type t
+      JOIN pg_namespace nt ON ((t.typnamespace = nt.oid))) ON ((a.atttypid = t.oid)))
+      LEFT JOIN (pg_type bt
+      JOIN pg_namespace nbt ON ((bt.typnamespace = nbt.oid))) ON (((t.typtype = 'd'::"char") AND (t.typbasetype = bt.oid))))
+      LEFT JOIN pg_description des ON (c.oid=des.objoid AND des.objsubid=0)
+   WHERE ((NOT pg_is_other_temp_schema(nc.oid)) AND (a.attnum > 0) AND (NOT a.attisdropped) AND (c.relkind = ANY (ARRAY['r'::"char", 'v'::"char", 'm'::"char", 'f'::"char"]))
+     AND (pg_has_role(c.relowner, 'USAGE'::text) OR has_column_privilege(c.oid, a.attnum, 'SELECT, INSERT, UPDATE, REFERENCES'::text)))
+   	AND upper((nc.nspname)::information_schema.sql_identifier) = upper(#{owner})
+	ORDER BY nc.nspname, c.relname, c.relkind, a.attnum
+
+
+</select>
+
+<!--  todo : encoder le json autrement ? -->
+<select id="getTablesDetails" resultMap="DatabaseObjectResultMap" fetchSize="2000">
+  SELECT 
+     (nc.nspname)::information_schema.sql_identifier AS id_schema,
+     (c.relname)::information_schema.sql_identifier AS id_name,
+     case when c.relkind='v' then 'view'
+          when c.relkind='m' then 'matview'
+          else 'table' end id_type, 
+	 '{}' jsonDetails
+      FROM pg_class c
+      JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
+   WHERE NOT pg_is_other_temp_schema(nc.oid) 
+     AND c.relkind = ANY (ARRAY['r'::"char", 'm'::"char"])
+	ORDER BY nc.nspname, c.relname
+</select>
+
+<select id="getViewsDetails" resultMap="DatabaseObjectResultMap" fetchSize="2000">
+  SELECT 
+     (nc.nspname)::information_schema.sql_identifier AS id_schema,
+     (c.relname)::information_schema.sql_identifier AS id_name,
+     'view' id_type, 
+	 '{}' jsonDetails
+      FROM pg_class c
+      JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
+   WHERE NOT pg_is_other_temp_schema(nc.oid) 
+     AND c.relkind = ANY (ARRAY['v'::"char"])
+	ORDER BY nc.nspname, c.relname
+</select>
+
+<select id="getMatViewsDetails" resultMap="DatabaseObjectResultMap" fetchSize="2000">
+  SELECT 
+     (nc.nspname)::information_schema.sql_identifier AS id_schema,
+     (c.relname)::information_schema.sql_identifier AS id_name,
+     'view' id_type, 
+	 '{}' jsonDetails
+      FROM pg_class c
+      JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
+   WHERE NOT pg_is_other_temp_schema(nc.oid) 
+     AND c.relkind = ANY (ARRAY['m'::"char"])
+	ORDER BY nc.nspname, c.relname
+</select>
+
+<select id="getSchemasDetails" resultMap="SchemaResultMap" fetchSize="2000">
+	SELECT schema_name,
+	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current,
+	'{}'  jsonDetails
+	FROM information_schema.schemata
+</select>
+
+<select id="getTablespaceDetails" resultType="org.mitsi.datasources.Tablespace" fetchSize="2000">
+	SELECT 
+		t.spcname AS name,
+		null    AS status,
+		null	AS contents,
+		'{ "owner":"'        ||a.rolname||'", ' ||
+		  '"options":'      || (case when t.spcoptions is null then 'null' else '"'||array_to_string(t.spcoptions,',')||'"' end) ||' } ' AS jsonDetails
+	FROM pg_tablespace t
+	inner join pg_roles a on t.spcowner=a.oid
+	ORDER BY 1
+</select>
+
+<select id="getTableColumnsDetails" resultType="org.mitsi.datasources.Column" fetchSize="2000">
+
+  SELECT 
+     a.attname AS name,
+     format_type(a.atttypid, NULL::integer) AS type,
+     case when a.attlen>0 then a.attlen else a.atttypmod-4 end AS length, <!--  TODO : revoir ce calcul -->
+     0 AS precision, <!-- TODO -->
+     0 AS scale,     <!-- TODO -->
+     ad.adsrc AS defaultValue,
+	 not attnotnull AS nullable,
+     '{ "attndims":"'||a.attndims||'", "attisdropped":"'|| a.attisdropped ||'" } ' AS jsonDetails
+   FROM 
+           pg_class c
+      JOIN pg_namespace nc ON c.relnamespace = nc.oid
+      JOIN pg_attribute a  ON a.attrelid = c.oid
+      LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+   WHERE 
+	upper(nc.nspname)=#{owner} and c.relname=#{name} and a.attnum > 0 
+	order by a.attnum
+
+</select>
+
+<!--  in postgresql, partionning is not implemented directly -->
+<select id="getTablePartitioninKeysDetails" resultType="org.mitsi.datasources.Column" fetchSize="2000">
+	select null AS name where 1=0
+</select>
+
+<select id="getTableIndexesDetails" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+	SELECT
+	    nc.nspname      AS owner,
+	    t.relname       AS tableName,
+	    i.relname       AS name,
+	    am.amname       AS type,
+	    ix.indisunique	AS uniqueness,
+	    string_agg(att.attname, ',' order by array_position(ix.indkey, att.attnum)) AS columns,
+	    tbs.spcname     AS tablespace,
+	    false           AS partitioning
+	FROM
+	         pg_class t
+	    JOIN pg_index ix            ON t.oid = ix.indrelid
+	    JOIN pg_class i             ON i.oid = ix.indexrelid
+        JOIN pg_namespace nc        ON t.relnamespace = nc.oid
+	    JOIN pg_am am               ON i.relam = am.oid
+	    JOIN pg_attribute att       ON t.oid = att.attrelid AND att.attnum = any(ix.indkey) AND NOT att.attisdropped 
+	    LEFT JOIN pg_tablespace tbs ON tbs.oid = i.reltablespace
+	WHERE
+	    t.relkind IN ('r', 'm')
+	    AND upper(nc.nspname) = upper(#{tableOwner}) 
+	    AND t.relname = #{tableName}
+	GROUP BY
+		nc.nspname, t.relname, i.relname, am.amname, ix.indisunique, tbs.spcname 
+</select>
+
+<select id="getTableConstraintsDetails" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT 
+	    c.conname::information_schema.sql_identifier AS name,
+	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+	    fr.relname::information_schema.sql_identifier AS fkTable,
+	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
+	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns,
+		'{}' jsonDetails	
+	FROM pg_namespace nr
+	    join pg_class r on nr.oid = r.relnamespace 
+	    join pg_constraint c on r.oid = c.conrelid 
+	    join pg_namespace nc on nc.oid = c.connamespace 
+	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+	    left join pg_class fr on fr.oid = c.confrelid
+	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+	WHERE 
+	    c.contype = ANY (ARRAY['p'::"char", 'u'::"char", 'f'::"char", 'c'::"char", 'x'::"char"])
+	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+	AND upper(nc.nspname) = upper(#{tableOwner})
+	AND r.relname = #{tableName}
+	group by c.conname, c.contype, c.conkey, fnr.nspname, fr.relname, c.confkey
+</select>
+
+<select id="getTablesWithConstraintsTo" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT 
+	    c.conname::information_schema.sql_identifier AS name,
+	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    nc.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+	    r.relname::information_schema.sql_identifier AS fkTable,
+	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
+	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns,
+		'{}' jsonDetails	
+	FROM pg_namespace nr
+	    join pg_class r on nr.oid = r.relnamespace 
+	    join pg_constraint c on r.oid = c.conrelid 
+	    join pg_namespace nc on nc.oid = c.connamespace 
+	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+	    left join pg_class fr on fr.oid = c.confrelid
+	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+	WHERE 
+	    c.contype = 'f'
+	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+	AND upper(fnr.nspname) = upper(#{tableOwner})
+	AND fr.relname = #{tableName}
+	group by c.conname, c.contype, c.conkey, nc.nspname, fnr.nspname, r.relname, c.confkey
+</select>
+
+<select id="getTablePartitionDetails" resultType="org.mitsi.datasources.Partition" fetchSize="2000">
+	select 
+	    null AS name, 
+	    null AS tablespace_name,
+	    null AS high_value,
+	    null AS high_value_length, 
+	    null AS interval, 
+	    null AS jsonDetails
+	where 1=0
+</select>
+
+<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+	SELECT
+	    nc.nspname      AS owner,
+	    t.relname       AS tableName,
+	    i.relname       AS name,
+	    am.amname       AS type,
+	    ix.indisunique	AS uniqueness
+	FROM
+	    pg_class t
+	    JOIN pg_index ix     ON t.oid = ix.indrelid
+	    JOIN pg_class i      ON i.oid = ix.indexrelid
+	    JOIN pg_namespace nc ON t.relnamespace = nc.oid
+	    JOIN pg_am am        ON     i.relam = am.oid
+	WHERE
+	    t.relkind IN ('r', 'm')
+	    AND upper(nc.nspname) = upper(#{owner}) 
+</select>
+
+<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT 
+	    nc.nspname::information_schema.sql_identifier AS owner,
+	    c.conname::information_schema.sql_identifier AS name,
+	    r.relname::information_schema.sql_identifier AS tableName,
+	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+	    fr.relname::information_schema.sql_identifier AS fkTable,
+	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
+	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
+	
+	FROM pg_namespace nr
+	    join pg_class r on nr.oid = r.relnamespace 
+	    join pg_constraint c on r.oid = c.conrelid 
+	    join pg_namespace nc on nc.oid = c.connamespace 
+	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+	    left join pg_class fr on fr.oid = c.confrelid
+	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+	WHERE 
+	   (c.contype = ANY (ARRAY['p'::"char", 'u'::"char", 'f'::"char", 'c'::"char", 'x'::"char"]))
+	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+	AND upper(nc.nspname) = upper(#{owner})
+	group by nc.nspname, c.conname, r.relname, c.contype, c.conkey, fr.relname, fnr.nspname
+</select>
+
+
+<select id="getAllRelations" resultType="org.mitsi.datasources.Relation" fetchSize="2000">   
+	select
+	  ac1.constraint_name constraint_name,
+	  ac1.owner       tableOwner,
+	  ac1.table_name  tableName,
+	  ( select LISTAGG(acc.column_name, ',') WITHIN GROUP (ORDER BY acc.position)
+		    from all_cons_columns acc where acc.constraint_name=ac1.constraint_name and acc.owner=ac1.owner
+	  ) keyColumnsStr,
+	  ac2.owner       rTableOwner,
+	  ac2.table_name  rTableName,
+	  ( select LISTAGG(acc.column_name, ',') WITHIN GROUP (ORDER BY acc.position)
+		    from all_cons_columns acc where acc.constraint_name=ac2.constraint_name and acc.owner=ac2.owner
+	  ) rKeyColumnsStr  
+	  from all_constraints ac1 join all_constraints ac2 on (ac1.r_constraint_name=ac2.constraint_name and ac1.r_owner=ac2.owner)
+	  where ac1.constraint_type='R'
+	  AND ac1.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	  -- order by ac1.owner, ac1.table_name
+</select>
+</mapper>

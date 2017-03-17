@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -14,10 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
+import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
+import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Relation;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
@@ -50,29 +51,23 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getTablesOracle() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
 			
-			List<Date> ld = connection.getLastSchemaUpdateTime("TEST");
-			assertTrue(ld != null);
-			assertTrue(ld==null || ld.size() == 1);
-
-			
 		}
 	}
 	
 	@Test
-	public void getTablesLight() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getTablesPostgre() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			List<DatabaseObject> ldo = connection.getTablesAndViewsLight(null);
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
+			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
-		
 		}
 	}
 	
@@ -121,7 +116,87 @@ public class MitsiCoreTest {
 	}
 	
 	@Test
-	public void getDetailsTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getDetailsTablePostgre() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
+			List<Column> lc = connection.getTableColumnsDetails("PUBLIC", "TUTU_1");
+			assertTrue(lc != null);
+			assertTrue(lc==null || lc.size() > 0);
+			
+			List<Column> lc2 = connection.getTablePartitioninKeysDetails("PUBLIC", "TUTU_1");
+			assertTrue(lc2==null || lc2.size() == 0);
+
+			List<Index> li = connection.getTableIndexesDetails("PUBLIC", "TUTU_1");
+			assertTrue(li != null);
+			assertTrue(li==null || li.size() > 0);
+			
+			List<Partition> lp = connection.getTablePartitionDetails("PUBLIC", "TUTU_1");
+			assertTrue(lp==null || lp.size() == 0);
+			
+			List<Constraint> lct = connection.getTableConstraintsDetails("PUBLIC", "TUTU_1");
+			assertTrue(lct != null);
+			assertTrue(lct==null || lct.size() > 0);
+			
+			List<Constraint> lct2 = connection.getTablesWithConstraintsTo("PUBLIC", "MATABLE_DE_TEST");
+			assertTrue(lct2 != null);
+			assertTrue(lct2==null || lct2.size() > 0);
+		}
+	}
+	
+	@Test
+	public void getDetailsTableOracle() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+			List<Column> lc = connection.getTableColumnsDetails("TEST", "TOUTOU_1");
+			assertTrue(lc != null);
+			assertTrue(lc==null || lc.size() > 0);
+			
+			List<Column> lc2 = connection.getTablePartitioninKeysDetails("TEST", "TOUTOU_1");
+			assertTrue(lc2==null || lc2.size() == 0);
+
+			List<Index> li = connection.getTableIndexesDetails("TEST", "TOUTOU_1");
+			assertTrue(li != null);
+			assertTrue(li==null || li.size() > 0);
+			
+			List<Partition> lp = connection.getTablePartitionDetails("TEST", "TOUTOU_1");
+			assertTrue(lp==null || lp.size() == 0);
+			
+			List<Constraint> lct = connection.getTableConstraintsDetails("TEST", "TOUTOU_1");
+			assertTrue(lct != null);
+			assertTrue(lct==null || lct.size() > 0);
+			
+			List<Constraint> lct2 = connection.getTablesWithConstraintsTo("TEST", "TOUTOU_1");
+			assertTrue(lct2 != null);
+			assertTrue(lct2==null || lct2.size() > 0);
+		}
+	}
+		
+	@Test
+	public void getDetailsSourcePostgre() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
+			List<DatabaseObject> ldo = connection.getTablesDetails();
+			assertTrue(ldo != null);
+			assertTrue(ldo==null || ldo.size() > 0);
+			
+			ldo = connection.getViewsDetails();
+			assertTrue(ldo != null);
+			assertTrue(ldo==null || ldo.size() > 0);
+			
+			ldo = connection.getMatViewsDetails();
+			assertTrue(ldo != null);
+			assertTrue(ldo==null || ldo.size() > 0);
+			
+			List<Schema> ls = connection.getSchemasDetails();
+			assertTrue(ls != null);
+			assertTrue(ls==null || ls.size() > 0);
+			
+			List<Tablespace> lt = connection.getTablespaceDetails();
+			assertTrue(lt != null);
+			assertTrue(lt==null || lt.size() > 0);
+		}
+	}
+
+	@Test
+	public void getDetailsSourceOracle() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			List<DatabaseObject> ldo = connection.getTablesDetails();

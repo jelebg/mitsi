@@ -108,7 +108,7 @@ angular.module('mitsiApp')
 	   var deferred = $q.defer();
 	   var startLoad = new Date().getTime();
 
-	   sourceService.getObjects(source, schema, false)
+	   sourceService.getObjects(source, schema)
 	   .then(function(response) {
 		   var startDisplay = new Date().getTime();
 		   $scope.initSource(source, response)

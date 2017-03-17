@@ -1,6 +1,5 @@
 package org.mitsi.datasources;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -9,10 +8,9 @@ import org.apache.ibatis.annotations.Param;
 public interface IMitsiMapper {
 
 	String testOK();
+	
 	List<Schema> getAllSchemas(@Param("owner") String owner);
 	List<DatabaseObject> getTablesAndViews(@Param("owner") String owner);
-	List<DatabaseObject> getTablesAndViewsLight(@Param("owner") String owner);
-	List<Date> getLastSchemaUpdateTime(@Param("owner") String owner);
 	List<Index> getSchemaIndexes(@Param("owner") String owner);
 	List<Constraint> getSchemaConstraints(@Param("owner") String owner);
 

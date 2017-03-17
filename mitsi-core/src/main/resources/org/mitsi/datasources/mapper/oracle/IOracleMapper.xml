@@ -36,13 +36,6 @@
   </collection>
 </resultMap>
 
-<select id="getLastSchemaUpdateTime" resultType="Date" fetchSize="2000">
-	select max(last_ddl_time) 
-	from all_objects 
-	where object_type in ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
-	and owner = #{owner}
-</select>
-
 <select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
 	
 	SELECT 
@@ -73,32 +66,6 @@
 
 </select>
 
-<select id="getTablesAndViewsLight" resultMap="DatabaseObjectResultMap" fetchSize="2000">
-	
-	SELECT 
-		all_objects.owner 		id_schema, 
-		all_objects.object_name id_name, 
-		decode(all_objects.object_type, 
-			'TABLE', 'table', 
-			'VIEW', 'view', 
-			'MATERIALIZED VIEW', 'matview', 
-			null 
-		) id_type,
-    all_tab_columns.column_name column_name,
-    all_tab_columns.data_type column_type
-	FROM all_objects
-	     LEFT JOIN all_tab_columns ON all_objects.owner=all_tab_columns.owner AND all_objects.object_name=all_tab_columns.table_name 
-	WHERE all_objects.object_type IN ('TABLE', 'VIEW', 'MATERIALIZED VIEW')
-	AND all_objects.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
-	AND all_objects.owner NOT LIKE 'APEX_%'
-	AND all_objects.object_name NOT LIKE 'BIN$%'
-	AND NOT (all_objects.object_type='TABLE' and 
-          exists (SELECT 1 FROM all_objects ao WHERE ao.owner=all_objects.owner AND ao.object_name=all_objects.object_name AND ao.object_type='MATERIALIZED VIEW'))
-   	AND all_objects.owner = #{owner}
-	ORDER BY all_objects.owner, all_objects.object_name, all_objects.object_type, all_tab_columns.column_id
-
-</select>
-
 <!--  todo : encoder le json autrement ? -->
 <select id="getTablesDetails" resultMap="DatabaseObjectResultMap" fetchSize="2000">
 	SELECT 
@@ -108,7 +75,6 @@
 			1    ,  'matview',
 			'table'
 		) id_type,
-		-- null column_name,
 		'{ "last_analyzed":"'||to_char(last_analyzed, 'YYYY-MM-DD"T"hh24:mi:ss')||'", '||
 		  '"partitioned":"'   ||partitioned  ||'", '||
 		  '"temporary":"'     ||temporary    ||'", '||

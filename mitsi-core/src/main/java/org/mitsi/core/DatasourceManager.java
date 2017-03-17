@@ -10,6 +10,7 @@ import org.mitsi.datasources.IMitsiMapper;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.mapper.oracle.IOracleMapper;
+import org.mitsi.datasources.mapper.postgre.IPostgreMapper;
 import org.mitsi.users.MitsiDatasources;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,28 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 
 public class DatasourceManager {
+	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
+	public static final String PROVIDER_POSTGRE = "postgre";
+
+	private Class<?> getMapper(String datasourceProvider) throws MitsiUsersException {
+		// TODO : faire une annotation et utiliser AbstractProcessor avec roundEnv.getElementsAnnotatedWith
+		datasourceProvider = datasourceProvider.toLowerCase();
+		if(datasourceProvider.equals(PROVIDER_ORACLE_11G)) {
+			return IOracleMapper.class;
+		}
+		if(datasourceProvider.equals(PROVIDER_POSTGRE)) {
+			return IPostgreMapper.class;
+		}
+		
+		throw new MitsiUsersException("unknown provider : '"+datasourceProvider+"'");
+	}
+	
 	@Autowired
 	private MitsiDatasources mitsiDatasources;
 	
@@ -75,7 +91,7 @@ public class DatasourceManager {
 					
 					sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 					pools.put(datasourceName, sqlSessionFactory);
-					sqlSessionFactory.getConfiguration().addMapper(IOracleMapper.class);
+					sqlSessionFactory.getConfiguration().addMapper(getMapper(datasource.getProvider()));
 				}
 			}
 			finally {
@@ -84,7 +100,7 @@ public class DatasourceManager {
 		}
 		
 		SqlSession sqlSession = sqlSessionFactory.openSession();
-		IMitsiMapper mapper = sqlSession.getMapper(IOracleMapper.class);
+		IMitsiMapper mapper = (IMitsiMapper) sqlSession.getMapper(getMapper(datasource.getProvider()));
 
 		return new MitsiConnection(sqlSession, mapper, datasource);
 	}

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 class GetDatabaseObjects {
 	String datasourceName;
 	String schema;
-	Boolean light;
 	
 	public GetDatabaseObjects() {
 	}
@@ -66,12 +65,7 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 				}
 			}
 			
-			if(request.light) {
-				response.databaseObjects = connection.getTablesAndViewsLight(schema);
-			}
-			else {
-				response.databaseObjects = connection.getTablesAndViews(schema);
-			}
+			response.databaseObjects = connection.getTablesAndViews(schema);
 			
 		} 
 		catch(Exception e) {

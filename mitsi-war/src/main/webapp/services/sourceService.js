@@ -1,11 +1,10 @@
 angular.module('mitsiApp')
 .service( 'sourceService', function(mitsiHttpService) {
 
-	this.getObjects = function(datasource, schema, light) {
+	this.getObjects = function(datasource, schema) {
 		return mitsiHttpService.postForDatasource(datasource, 'GetDatabaseObjectsServlet', { 
 			"datasourceName" : datasource.name,
-			"schema" : schema,
-			"light" : light 
+			"schema" : schema
 		});
 	}
 

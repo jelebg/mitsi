@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class MitsiDatasource {
-	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
 	
 	private static final int DEFAULT_MAX_EXPORT_ROWS = 1000000;
 	
