@@ -18,6 +18,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
+import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 
@@ -261,22 +262,54 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		// back to JDBC
 		List<String[]> results = new ArrayList<>();
 		Connection jdbcConnection  = sqlSession.getConnection();
-		String statementStr = 
-				"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
+
+		// TODO : use mapper for getData
+		String statementStr = null;
+		int firstColumnsIndex = 0;
+		switch(datasource.getProvider()) {
+		// TODO : utiliser offset / fetch pour Oracle ?
+			case DatasourceManager.PROVIDER_ORACLE_11G :
+				statementStr = 
+				 		"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
 						"select * from " + owner + "." + tableName + " " +
 						whereClause.toString()   +
 						orderByClause.toString() +							
-					" ) t where rownum<=?) where rnum>?";
+						" ) t where rownum<=?) where rnum>?";
+				firstColumnsIndex = 1;
+				break;
+				
+			case DatasourceManager.PROVIDER_POSTGRE :	
+			default: // by default use offset/fetch first syntax
+				statementStr = 
+					"select * from " + owner + ".\"" + tableName + "\" " +
+					whereClause.toString()   +
+					orderByClause.toString() +							
+					" offset "+fromRow+" rows fetch first "+count+" rows only ";
+				break;
+		}
+				
 		try(PreparedStatement  statement = jdbcConnection.prepareStatement(statementStr)) {
 			
-			int iParam = 0;
+			int iParam = 1;
 			if(filters != null) {
 				for(Filter filter : filters) {
-					statement.setString(++iParam, filter.filter);
+					statement.setString(iParam++, filter.filter);
 				}
 			}
-			statement.setLong(++iParam, fromRow+count);
-			statement.setLong(++iParam, fromRow);
+			switch(datasource.getProvider()) {
+				case DatasourceManager.PROVIDER_ORACLE_11G :
+					statement.setLong(iParam++, fromRow+count);
+					statement.setLong(iParam++, fromRow);
+					break;
+					
+				case DatasourceManager.PROVIDER_POSTGRE :	
+				default: // by default use offset/fetch first syntax
+					// TODO : bind variable pour offset/fetch first
+					//statement.setLong(++iParam, fromRow);
+					//statement.setLong(++iParam, count);
+					break;
+			}
+
 			statement.execute();
 			ResultSet resultSet = statement.getResultSet();
 			
@@ -287,9 +320,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
 			for(int i=1; i<rsmd.getColumnCount(); i++) {
 				Column column = new Column();
-				jdbcTypes[i-1] =  rsmd.getColumnType(i+1);
-				column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i+1));
-				column.name = rsmd.getColumnName(i+1);
+				jdbcTypes[i-1] =  rsmd.getColumnType(i+firstColumnsIndex);
+				column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i+firstColumnsIndex));
+				column.name = rsmd.getColumnName(i+firstColumnsIndex);
 				// TODO : précision ? possible ?
 				columns.add(column);
 			}
@@ -299,7 +332,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			while(resultSet.next() ) {
 				String[] row = new String[jdbcTypes.length];
 				for(int i=0; i!=row.length; i++) {
-					row[i] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+2);
+					row[i] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+1+firstColumnsIndex);
 				}
 				results.add(row);
 			}

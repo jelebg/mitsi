@@ -1,5 +1,6 @@
 package org.mitsi.mitsicore;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.util.TreeSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mitsi.commons.pojos.Filter;
+import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
@@ -19,6 +22,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
+import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -152,55 +156,57 @@ public class MitsiCorePostgreTest {
 		}
 	}
 
-	/* TODO
 	@Test
 	public void getData() throws SQLException, MitsiSecurityException, MitsiUsersException {
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null, null);
-			assertEquals(result.columns.get(0).name, "ID");
-			assertEquals(result.columns.get(1).name, "STR");
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
+			MitsiConnection.GetDataResult result = connection.getData(null, "tata", 2, 2, null, null);
+			assertEquals(result.columns.get(0).name, "id");
+			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 2);
 			
-			result = connection.getData("TEST", "TATA", 2, 2, null, null);
-			assertEquals(result.columns.get(0).name, "ID");
-			assertEquals(result.columns.get(1).name, "STR");
+			result = connection.getData("public", "tata", 2, 2, null, null);
+			assertEquals(result.columns.get(0).name, "id");
+			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 2);
 			
 			OrderByColumn[] orderByColumns = new OrderByColumn[2];
 			OrderByColumn orderById  = new OrderByColumn();
-			orderById.column = "ID";
+			orderById.column = "id";
 			orderById.ascending = true;
 			OrderByColumn orderByStr = new OrderByColumn();
-			orderByStr.column = "STR";
+			orderByStr.column = "str";
 			orderByStr.ascending = false;
 			orderByColumns[0] = orderById;
 			orderByColumns[1] = orderByStr;
-			result = connection.getData("TEST", "TATA", 2, 2, orderByColumns, null);
-			assertEquals(result.columns.get(0).name, "ID");
-			assertEquals(result.columns.get(1).name, "STR");
+			result = connection.getData("public", "tata", 2, 2, orderByColumns, null);
+			assertEquals(result.columns.get(0).name, "id");
+			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 2);
 			
 			Filter filter1 = new Filter();
-			filter1.name = "ID";
+			filter1.name = "id";
 			filter1.filter = "2";
 			Filter filter2 = new Filter();
-			filter2.name = "STR";
+			filter2.name = "str";
 			filter2.filter = "deux";
-			Filter[] filters = new Filter[2];
+			/*Filter[] filters = new Filter[2];
 			filters[0] = filter1;
-			filters[1] = filter2;
-			result = connection.getData("TEST", "TATA", 0, 2, null, filters);
-			assertEquals(result.columns.get(0).name, "ID");
-			assertEquals(result.columns.get(1).name, "STR");
+			filters[1] = filter2;*/
+			// TODO : gerer les types de données dans les filtres
+			Filter[] filters = new Filter[1];
+			filters[0] = filter2;
+			result = connection.getData("public", "tata", 0, 2, null, filters);
+			assertEquals(result.columns.get(0).name, "id");
+			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 1);
 			
-			result = connection.getData("TEST", "TATA", 0, 2, orderByColumns, filters);
-			assertEquals(result.columns.get(0).name, "ID");
-			assertEquals(result.columns.get(1).name, "STR");
+			result = connection.getData("public", "tata", 0, 2, orderByColumns, filters);
+			assertEquals(result.columns.get(0).name, "id");
+			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 1);
 
 		}
-	}*/
+	}
 	
 	
 		
