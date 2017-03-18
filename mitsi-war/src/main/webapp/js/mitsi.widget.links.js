@@ -113,7 +113,6 @@ function MitsiLinksGraph(div) {
 			var objectName= dobj.id.schema+"."+dobj.id.name;
 			objectList.push(objectName);
 		}
-		//objectList.sort();
 		
 		this.linksPaths.updateSuggestions(objectList);
 	}
@@ -130,50 +129,16 @@ function MitsiLinksGraph(div) {
 		this.currentDatasourceName = datasourceName;
 		this.currentVertexName = owner+"."+objectName;
 		if(reload) {
-			// reload graph, change object later
-			//this.load();
 			this.setCurrentDatasource(datasourceName, databaseObjects);
 
 		}
-		//else {
-			// we already have the graph, change the object now
-			this.draw();
-			if(this.linksPaths) {
-				this.linksPaths.highlightCurrentPaths();
-			}
-		//}
+
+		this.draw();
+		if(this.linksPaths) {
+			this.linksPaths.highlightCurrentPaths();
+		}
 		
 	}
-	
-	// TODO : à obsoletiser
-	/*this.load = function() {
-		callGsonServlet("GetAllRelationsServlet", 
-			{
-				"datasourceName" : this.currentDatasourceName
-			},
-			function(response) { 
-				console.log(response);
-				othis.message = response.message;
-				othis.relations = response.relations;
-				if(othis.relations) {
-					othis.graph = new MitsiGraph();
-					othis.graph.initWithRelations(othis.relations);
-				}
-				else {
-					othis.graph = null;
-				}
-				othis.draw();
-				if(othis.linksPaths) {
-					othis.linksPaths.update();
-				}
-			}, 
-			function(code, text) { 
-				console.log("error code="+code+" text="+text); 
-				alert("error code="+code+" text="+text); 
-			}
-		);
-		
-	}*/
 	
 	this.draw = function() {
 		this.div.innerHTML = "";

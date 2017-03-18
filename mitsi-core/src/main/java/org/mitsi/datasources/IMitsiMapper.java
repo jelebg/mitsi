@@ -28,6 +28,5 @@ public interface IMitsiMapper {
 	List<Constraint> getTableConstraintsDetails(@Param("tableOwner") String tableOwner, @Param("tableName") String tableName);
 	List<Constraint> getTablesWithConstraintsTo(@Param("tableOwner") String tableOwner, @Param("tableName") String tableName);
 	
-	// for graph, links and relations
-	List<Relation> getAllRelations();
+
 }

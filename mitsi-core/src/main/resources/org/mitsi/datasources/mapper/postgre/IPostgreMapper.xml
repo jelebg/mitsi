@@ -305,23 +305,4 @@
 	group by nc.nspname, c.conname, r.relname, c.contype, c.conkey, fr.relname, fnr.nspname
 </select>
 
-
-<select id="getAllRelations" resultType="org.mitsi.datasources.Relation" fetchSize="2000">   
-	select
-	  ac1.constraint_name constraint_name,
-	  ac1.owner       tableOwner,
-	  ac1.table_name  tableName,
-	  ( select LISTAGG(acc.column_name, ',') WITHIN GROUP (ORDER BY acc.position)
-		    from all_cons_columns acc where acc.constraint_name=ac1.constraint_name and acc.owner=ac1.owner
-	  ) keyColumnsStr,
-	  ac2.owner       rTableOwner,
-	  ac2.table_name  rTableName,
-	  ( select LISTAGG(acc.column_name, ',') WITHIN GROUP (ORDER BY acc.position)
-		    from all_cons_columns acc where acc.constraint_name=ac2.constraint_name and acc.owner=ac2.owner
-	  ) rKeyColumnsStr  
-	  from all_constraints ac1 join all_constraints ac2 on (ac1.r_constraint_name=ac2.constraint_name and ac1.r_owner=ac2.owner)
-	  where ac1.constraint_type='R'
-	  AND ac1.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
-	  -- order by ac1.owner, ac1.table_name
-</select>
 </mapper>

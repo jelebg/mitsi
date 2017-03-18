@@ -81,16 +81,6 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>GetAllRelationsServlet</display-name>
-    <servlet-name>GetAllRelationsServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.links.GetAllRelationsServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetAllRelationsServlet</servlet-name>
-    <url-pattern>/GetAllRelationsServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>LoginServlet</display-name>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>org.mitsi.mitsiwar.client.LoginServlet</servlet-class>

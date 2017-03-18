@@ -20,6 +20,16 @@
 		"user" : "jebtest",
 		"password" : "jebtest"
 	  },
+	  "POSTGRE-TEST-ON-TEST2" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for postgre",
+		"provider" : "postgre",
+		"driver" : "org.postgresql.Driver",
+		"jdbcUrl" : "jdbc:postgresql://mitsitestserver:5432/pgsql_test",
+		"user" : "jebtest",
+		"password" : "jebtest",
+		"connectSchema" : "TEST2"
+	  },
 	  "LOCALHOST-XE2": {
 	    "userGroups" : [ "xe2", "guest" ],
 		"description" : "another test datasource", 

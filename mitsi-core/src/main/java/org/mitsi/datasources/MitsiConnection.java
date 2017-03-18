@@ -177,22 +177,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
-	public List<Relation> getAllRelations() {
-		List<Relation> relations = mapper.getAllRelations();
-		
-		for(Relation relation : relations) {
-			if(relation.keyColumnsStr != null) {
-				relation.keyColumns = Arrays.asList(relation.keyColumnsStr.split(","));
-			}
-			if(relation.rKeyColumnsStr != null) {
-				relation.rKeyColumns = Arrays.asList(relation.rKeyColumnsStr.split(","));
-			}
-		}
-		
-		return relations;
-	}
-
-	@Override
 	public List<Index> getSchemaIndexes(String schema) {
 		schema = getOwner(schema);
 		return mapper.getSchemaIndexes(schema);
