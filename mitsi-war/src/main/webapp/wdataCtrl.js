@@ -31,7 +31,7 @@ angular.module('mitsiApp')
 		for(var i=0; i<$scope.dataGrid.columnDefs.length-1; i++) {
 			var elt = document.getElementById("mitsiGridFilter_"+i);
 			if(elt && elt.value && elt.value.trim()!="") {
-				filters.push({name:$scope.dataGrid.columnDefs[i+1].displayName, filter:elt.value});
+				filters.push({name:$scope.dataGrid.columnDefs[i+1].displayName, filter:elt.value, type:$scope.dataGrid.columnDefs[i+1].mitsiType});
 			}
 		}
 		return filters;
@@ -187,6 +187,7 @@ angular.module('mitsiApp')
 							displayName: response.data.columns[i].name, 
 							name: response.data.columns[i].name, 
 							width: 200,
+							mitsiType: response.data.columns[i].type, 
 					        filterHeaderTemplate: 
 					        	'<div style="position:relative;">'+
 					        	'<a href="" class="dataColFilter" ng-click="grid.appScope.refresh();">'+
@@ -195,7 +196,7 @@ angular.module('mitsiApp')
 					        	'<a href="" class="dataColFilterClear" ng-click="grid.appScope.clearFilter('+i+');">'+
 					        	'<i class="glyphicon glyphicon-remove" ></i>'+
 					        	'</a>'+
-					        	'<input id="mitsiGridFilter_'+i+'" class="dataColFilterText" type="text" ng-keypress="grid.appScope.refreshOnEnter($event)" />'+
+					        	'<input id="mitsiGridFilter_'+i+'" class="dataColFilterText" type="text" ng-keypress="grid.appScope.filterKeyPressed($event, \''+response.data.columns[i].type+'\')" />'+
 					        	'</div>', 
 						}
 					  );
@@ -237,6 +238,22 @@ angular.module('mitsiApp')
 	$scope.refreshOnEnter = function(event) {
 		if(event.keyCode == 13) {
 			$scope.refresh();
+		}
+	}
+	
+	$scope.filterKeyPressed = function(event, filterFormat) {
+		var keyCode = event.keyCode;
+		var charCode = event.charCode;
+		if(keyCode == 13) {
+			$scope.refresh();
+			return;
+		}
+		
+		if(filterFormat === "integer") {
+			if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+				event.preventDefault();
+				return;
+			}
 		}
 	}
 	

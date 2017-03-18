@@ -293,7 +293,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			int iParam = 1;
 			if(filters != null) {
 				for(Filter filter : filters) {
-					statement.setString(iParam++, filter.filter);
+					if(filter.type!=null && filter.type.equals(TypeHelper.TYPE_INTEGER)) {
+						statement.setLong(iParam++, Long.parseLong(filter.filter));
+					}
+					else {
+						statement.setString(iParam++, filter.filter);
+					}
 				}
 			}
 			switch(datasource.getProvider()) {

@@ -22,6 +22,7 @@ import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
+import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -187,6 +188,7 @@ public class MitsiCoreOracleTest {
 			Filter filter1 = new Filter();
 			filter1.name = "ID";
 			filter1.filter = "2";
+			filter1.type = TypeHelper.TYPE_INTEGER;
 			Filter filter2 = new Filter();
 			filter2.name = "STR";
 			filter2.filter = "deux";

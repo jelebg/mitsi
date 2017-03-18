@@ -23,6 +23,7 @@ import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
+import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -186,15 +187,14 @@ public class MitsiCorePostgreTest {
 			Filter filter1 = new Filter();
 			filter1.name = "id";
 			filter1.filter = "2";
+			filter1.type = TypeHelper.TYPE_INTEGER;
 			Filter filter2 = new Filter();
 			filter2.name = "str";
 			filter2.filter = "deux";
-			/*Filter[] filters = new Filter[2];
+			Filter[] filters = new Filter[2];
 			filters[0] = filter1;
-			filters[1] = filter2;*/
-			// TODO : gerer les types de données dans les filtres
-			Filter[] filters = new Filter[1];
-			filters[0] = filter2;
+			filters[1] = filter2;
+			// TODO : tester les dates
 			result = connection.getData("public", "tata", 0, 2, null, filters);
 			assertEquals(result.columns.get(0).name, "id");
 			assertEquals(result.columns.get(1).name, "str");

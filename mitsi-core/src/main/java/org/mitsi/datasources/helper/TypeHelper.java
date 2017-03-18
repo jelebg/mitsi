@@ -10,7 +10,7 @@ import java.util.TimeZone;
 public class TypeHelper {
 	public static final String TYPE_STRING  = "string";
 	public static final String TYPE_INTEGER = "integer";
-	public static final String TYPE_FLOAT = "integer";
+	public static final String TYPE_FLOAT = "integer"; // TODO
 	public static final String TYPE_DATE    = "date";
 	// TODO : gérer des types plus compliqués
 	
