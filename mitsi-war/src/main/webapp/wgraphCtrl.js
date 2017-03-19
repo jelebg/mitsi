@@ -1,14 +1,17 @@
 angular.module('mitsiApp')
     .controller('wgraphOptionsCtrl', function($scope, $rootScope, $modalInstance, options) {
     	$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
+    	$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
     	
     	$scope.init = function(options) {
-    		$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
+    		$scope.alwaysDisplaySchema    = options.alwaysDisplaySchema;
+    		$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
     	}
     	
         $scope.closeAndSaveOptionsDialog = function() {
         	$modalInstance.close( {
-        		alwaysDisplaySchema : $scope.alwaysDisplaySchema
+        		alwaysDisplaySchema    : $scope.alwaysDisplaySchema,
+        		sqlGeneratedWithSchema : $scope.sqlGeneratedWithSchema
         	});
         }
         
@@ -45,7 +48,8 @@ angular.module('mitsiApp')
 	$scope.sqlText = [];
 
 	$scope.options = {
-		alwaysDisplaySchema : true
+		alwaysDisplaySchema : false,
+		sqlGeneratedWithSchema : false
 	}
 	
 	$scope.pathStart = "";
@@ -938,7 +942,7 @@ angular.module('mitsiApp')
 		$scope.sqlText = [];
 		
 		if(connectedSubGroups.length > 1) {
-			$scope.sqlText.push("/!\\ not all tables connected together /!\\");
+			$scope.sqlText.push("/!\\ not all tables are connected together /!\\");
 		}
 		for(var i=0; i!=connectedSubGroups.length; i++) {
 			var subGroup = connectedSubGroups[i];
@@ -946,16 +950,18 @@ angular.module('mitsiApp')
 			for(var j=0; j!=subGroup.length; j++) {
 				var link=subGroup[j];
 				if(link.found=="none_first" || link.found=="isolate") {
-					$scope.sqlText.push((i==0 ? "FROM" : ",")+" "+link.fromName);
+					var tableName = $scope.getTableNameForSql(link.fromName);
+					$scope.sqlText.push((i==0 ? "FROM" : ",")+" "+tableName);
 				}
 				if(link.found!="isolate") {
+					var fromTableName = $scope.getTableNameForSql(link.fromName);
+					var toTableName   = $scope.getTableNameForSql(link.toName);
 					$scope.sqlText.push(
-							  "join "+(link.found=="to"?link.fromName:link.toName)
+							  "join "+(link.found=="to"?fromTableName:toTableName)
 							+ " on "
-							+ $scope.getJoinConditionFromFKs(link.fromName, link.toName, link.fromKeyColumns, link.toKeyColumns)
-							);
+							+ $scope.getJoinConditionFromFKs(fromTableName, toTableName, link.fromKeyColumns, link.toKeyColumns)
+						);
 				}
-				
 			}
 		}
 	}
@@ -1149,11 +1155,25 @@ angular.module('mitsiApp')
 		    });
 	
 		modalInstance.result.then(function (options) {
-		      $scope.options.alwaysDisplaySchema = options.alwaysDisplaySchema;
+		      $scope.options = options;
+			  $scope.updateSQLText();
 		    }, function () {
 		      // nothing
 		    });
 	
+	}
+	
+	$scope.getTableNameForSql = function(name) {
+		if($scope.options.sqlGeneratedWithSchema) {
+			return name;
+		}
+		
+		var i = name.indexOf(".");
+		if(i<0 || name.substring(0, i)!==$rootScope.currentSource.currentSchemaName) {
+			return name;
+		}
+		
+		return name.substring(i+1);
 	}
 	
 	$scope.getTableDisplayName = function(name) {

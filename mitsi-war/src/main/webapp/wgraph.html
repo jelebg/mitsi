@@ -10,6 +10,15 @@
 				<i class="glyphicon glyphicon-ok" ></i>
 				always display schema name with tables in graphs
 			</a>
+			<br/>
+			<br/>
+            <a href="" 
+               ng-click="sqlGeneratedWithSchema=!sqlGeneratedWithSchema; $event.stopPropagation();"
+               class="mitsiCheckOption"
+			   ng-class="{'mitsi-grey':!sqlGeneratedWithSchema}" >
+				<i class="glyphicon glyphicon-ok" ></i>
+				always insert schemas along with tables in SQL
+			</a>
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="closeAndSaveOptionsDialog()">OK</button>
