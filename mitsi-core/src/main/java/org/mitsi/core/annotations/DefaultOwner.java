@@ -1,4 +1,4 @@
-package org.mitsi.datasources;
+package org.mitsi.core.annotations;
 
 import static java.lang.annotation.ElementType.TYPE;
 

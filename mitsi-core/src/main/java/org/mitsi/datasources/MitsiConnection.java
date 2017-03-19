@@ -19,12 +19,17 @@ import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
+import org.mitsi.core.annotations.DefaultOwner;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 
 
 public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
+
+	// ces constantes ne servent plus que pour getData(). TODO : a supprimer
+	public static final String PROVIDER_ORACLE_11G = "oracle_11g";
+	public static final String PROVIDER_POSTGRE = "postgre";
 
 	SqlSession sqlSession = null; 
 	IMitsiMapper mapper = null;
@@ -268,7 +273,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		int firstColumnsIndex = 0;
 		switch(datasource.getProvider()) {
 		// TODO : utiliser offset / fetch pour Oracle ?
-			case DatasourceManager.PROVIDER_ORACLE_11G :
+			case PROVIDER_ORACLE_11G :
 				statementStr = 
 				 		"SELECT * FROM ( SELECT rownum rnum, t.* FROM ( "+
 						"select * from " + owner + "." + tableName + " " +
@@ -278,14 +283,15 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				firstColumnsIndex = 1;
 				break;
 				
-			case DatasourceManager.PROVIDER_POSTGRE :	
+			case PROVIDER_POSTGRE :	
 			default: // by default use offset/fetch first syntax
 				statementStr = 
 					"select * from " + owner + ".\"" + tableName + "\" " +
 					whereClause.toString()   +
 					orderByClause.toString() +							
-					" offset "+fromRow+" rows fetch first "+count+" rows only ";
-				break;
+					//" offset "+fromRow+" rows fetch first "+count+" rows only ";
+					" offset ? limit ?  ";
+					break;
 		}
 				
 		try(PreparedStatement  statement = jdbcConnection.prepareStatement(statementStr)) {
@@ -293,6 +299,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			int iParam = 1;
 			if(filters != null) {
 				for(Filter filter : filters) {
+					// TODO : gérer les dates
 					if(filter.type!=null && filter.type.equals(TypeHelper.TYPE_INTEGER)) {
 						statement.setLong(iParam++, Long.parseLong(filter.filter));
 					}
@@ -302,16 +309,15 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				}
 			}
 			switch(datasource.getProvider()) {
-				case DatasourceManager.PROVIDER_ORACLE_11G :
+				case PROVIDER_ORACLE_11G :
 					statement.setLong(iParam++, fromRow+count);
 					statement.setLong(iParam++, fromRow);
 					break;
 					
-				case DatasourceManager.PROVIDER_POSTGRE :	
+				case PROVIDER_POSTGRE :	
 				default: // by default use offset/fetch first syntax
-					// TODO : bind variable pour offset/fetch first
-					//statement.setLong(++iParam, fromRow);
-					//statement.setLong(++iParam, count);
+					statement.setLong(iParam++, fromRow);
+					statement.setLong(iParam++, count);
 					break;
 			}
 
