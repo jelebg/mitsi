@@ -1169,29 +1169,18 @@ angular.module('mitsiApp')
 		return name.substring(i+1);
 	}
 	
-	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tables) {
+	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tableList, xList, yList) {
 		
-		if(tables) {
+		if(tableList && xList && yList) {
 			$scope.removeAllTables();
 			
 			var fklist = [];
-			for(var i=0; i!=tables.length; i++) {
-				var table = tables[i];
-				var openPIndex  = table.indexOf("(");
-				var comaIndex   = table.indexOf(",");
-				var closePIndex = table.indexOf(")");
-				if(openPIndex <= 0) {
-					continue;
-				}
-				if(comaIndex <= 0 || comaIndex <=openPIndex) {
-					continue;
-				}
-				if(closePIndex <= 0 || closePIndex <= comaIndex) {
-					continue;
-				}
-				var tableName = table.substring(0, openPIndex);
-				var tableX    = table.substring(openPIndex+1, comaIndex);
-				var tableY    = table.substring(comaIndex+1, closePIndex); 
+			var nbTables = Math.min(tableList.length, xList.length, yList.length);
+			for(var i=0; i!=nbTables; i++) {
+				var table = tableList[i];
+				var tableName = tableList[i];
+				var tableX    = xList[i];
+				var tableY    = yList[i]; 
 				
 				$scope.appendTable(parseInt(tableX), parseInt(tableY), tableName);
 				fklist = fklist.concat($scope.getTableFkList(tableName));
@@ -1219,7 +1208,7 @@ angular.module('mitsiApp')
 		for(var tableName in $scope.tables) {
 			var tableDiv = document.getElementById($scope.divPrefix+tableName);
 			if(tableDiv) {
-				url = url + "&table=" + tableName + "("+tableDiv.offsetLeft+","+tableDiv.offsetTop+")";
+				url = url + "&table=" + tableName + "&x="+tableDiv.offsetLeft+"&y="+tableDiv.offsetTop;
 			}
 		}
 		

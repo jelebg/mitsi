@@ -28,7 +28,7 @@
 				ng-show="graphUrl!=null && graphUrl.length>0"
 				ng-click="closeOptionsDialog()"
 				>
-				{{ graphUrl.length<=150 ? graphUrl : graphUrl.substring(0, 150)+"..."}}
+				{{ graphUrl.length<=70 ? graphUrl : graphUrl.substring(0, 70)+"..."}}
 			</a> 
 			<span ng-show="!(graphUrl!=null && graphUrl.length>0)">
 			The graph is empty.<br/>

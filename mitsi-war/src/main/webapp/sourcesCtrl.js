@@ -367,12 +367,12 @@ angular.module('mitsiApp')
 			$scope.refresh(ds, null)
 			.then(function() {
 				$scope.scrollToSource(ds.name);
-				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
+				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, s.x, s.y);
 			});
 		}
 		else {
 			$scope.scrollToSource(ds.name);
-	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table);
+	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, sx, s.y);
 		}
 		
 	}
