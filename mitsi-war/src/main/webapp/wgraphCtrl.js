@@ -64,6 +64,44 @@ angular.module('mitsiApp')
 	$scope.showPaths = false;
 	
 	$scope.graphUrl = null;
+
+	$scope.backupScope = function() {
+		// get the actual position of the tables in the graph
+		for(var tableName in $scope.tables) {
+			var tableDiv = document.getElementById($scope.divPrefix+tableName);
+			if(tableDiv) {
+				var t = $scope.tables[tableName];
+				t.x = tableDiv.offsetLeft;
+				t.y = tableDiv.offsetTop;
+			}
+		}
+
+    	$rootScope.backupGraphScope = {
+    			tables          : $scope.tables,
+    			sqlTables       : $scope.sqlTables,
+    			sqlText         : $scope.sqlText
+    	};
+	}
+	$scope.restoreScope = function() {
+		if(!$rootScope.backupGraphScope) {
+			return;
+		}
+		$scope.tables          = $rootScope.backupGraphScope.tables;
+		$scope.sqlTables       = $rootScope.backupGraphScope.sqlTables;
+		$scope.sqlText         = $rootScope.backupGraphScope.sqlText;
+
+		$scope.afterTableUpdateFullRefresh();
+	}
+	
+	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+	    if(fromState.name == "workbench.graph") {
+	    	$scope.resetTimeoutPromises();
+	    	$scope.hideProximityGraph();
+	    	$scope.backupScope();
+	    }
+	    
+	});
+
 	
 	$scope.initGraphDisplay = function() {
 		$scope.removeAllTables();
@@ -347,6 +385,19 @@ angular.module('mitsiApp')
 			}
 		}, 0);
 	}
+	
+	$scope.afterTableUpdateFullRefresh = function() {
+		var fkList = [];
+
+		for(var tableName in $scope.tables) {
+			var newFks = $scope.getTableFkList(tableName);
+			fkList = fkList.concat(newFks);
+		}
+		
+		// no posses in this special case
+		$scope.afterTableUpdate(fkList, {});
+	}
+
 
 	
 	$scope.getTableBestPlace = function(left, top) {
@@ -1238,12 +1289,14 @@ angular.module('mitsiApp')
 	
 	$scope.jsplumbInit();
 	$scope.tablesInit();
+	$scope.restoreScope();
 	
-	if($rootScope.currentSource 
+	/* if($rootScope.currentSource 
 			&& $rootScope.currentSource.currentObject 
 			&& $rootScope.currentSource.currentObject.id) {
 		tableName = $rootScope.currentSource.currentObject.id.schema+"."+$rootScope.currentSource.currentObject.id.name;
 		$scope.displayProximityGraph(tableName);
-	}
+	} */
+	
 	
 });
