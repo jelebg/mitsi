@@ -66,16 +66,8 @@ angular.module('mitsiApp')
 	$scope.graphUrl = null;
 
 	$scope.backupScope = function() {
-		// get the actual position of the tables in the graph
-		for(var tableName in $scope.tables) {
-			var tableDiv = document.getElementById($scope.divPrefix+tableName);
-			if(tableDiv) {
-				var t = $scope.tables[tableName];
-				t.x = tableDiv.offsetLeft;
-				t.y = tableDiv.offsetTop;
-			}
-		}
-
+		$scope.updateTablesActualPosition();
+		
     	$rootScope.backupGraphScope = {
     			tables          : $scope.tables,
     			sqlTables       : $scope.sqlTables,
@@ -317,7 +309,7 @@ angular.module('mitsiApp')
 		
 		var fkList = $scope.getTableFkList(tableName);
 		
-		$scope.afterTableUpdate(fkList, {});
+		$scope.afterTableUpdate(fkList, null);
 
 	}
 	
@@ -364,25 +356,38 @@ angular.module('mitsiApp')
 					var mafk = fklist[i];
 					$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
 				}
-			}				
+			}			
 			
+			for(var tableName in $scope.tables) {
+				var telt = document.getElementById($scope.divPrefix+tableName);
+				if(telt != null) {
+					$scope.jsplumb.revalidate(telt);
+				}
+			}
 			$scope.jsplumb.draggable(document.querySelectorAll(".linksTable"), {});
-			
+
 			if(posses) {
 				for(var posse in posses) {
 					var tables = posses[posse];
 					
 					if(tables.length > 0) {
-						$scope.jsplumb.addToPosse($scope.divPrefix+posse, posse);					
+						var tableElt = document.getElementById($scope.divPrefix+posse);
+						if(tableElt) {
+							$scope.jsplumb.addToPosse(tableElt, posse);
+						}
 					}
 					
 					for(var i=0; i!=tables.length; i++) {
 						var tableName = tables[i];
-						$scope.jsplumb.addToPosse($scope.divPrefix+tableName, posse);					
+						var tableElt = document.getElementById($scope.divPrefix+tableName);
+						if(tableElt) {
+							$scope.jsplumb.addToPosse(tableElt, posse);
+						}
 					}
 					
 				}
 			}
+			
 		}, 0);
 	}
 	
@@ -395,7 +400,7 @@ angular.module('mitsiApp')
 		}
 		
 		// no posses in this special case
-		$scope.afterTableUpdate(fkList, {});
+		$scope.afterTableUpdate(fkList, null);
 	}
 
 
@@ -722,6 +727,8 @@ angular.module('mitsiApp')
 
 		if(!(tableName in $scope.tables)) {
 			$scope.tables[tableName] = {name:tableName, x:left, y:top };
+			
+			$scope.resizeJsPlumbContainerIfNecessary(left, top);
 		}
 	}
 	
@@ -732,9 +739,13 @@ angular.module('mitsiApp')
 
 	
 	$scope.removeTable = function(tableName, withTemporary) {
-		$scope.jsplumb.detachAllConnections($scope.divPrefix + tableName);
-		$scope.jsplumb.removeAllEndpoints($scope.divPrefix + tableName);
-		$scope.jsplumb.remove($scope.divPrefix + tableName);
+		var tableElt = document.getElementById($scope.divPrefix+tableName);
+		if(tableElt) {
+			$scope.jsplumb.removeFromAllPosses(tableElt);
+			$scope.jsplumb.detachAllConnections(tableElt);
+			$scope.jsplumb.removeAllEndpoints(tableElt);
+			$scope.jsplumb.remove(tableElt);
+		}
 		delete $scope.tables[tableName];	
 		
 		if(withTemporary===true) {
@@ -749,9 +760,13 @@ angular.module('mitsiApp')
 	
 	$scope.removeAllTables = function() {
 		for(var t in $scope.tables) {
-			$scope.jsplumb.detachAllConnections($scope.divPrefix + t);
-			$scope.jsplumb.removeAllEndpoints($scope.divPrefix + t);
-			$scope.jsplumb.remove($scope.divPrefix + t);
+			var tableElt = document.getElementById($scope.divPrefix + t);
+			if(tableElt) {
+				$scope.jsplumb.removeFromAllPosses(tableElt);
+				$scope.jsplumb.detachAllConnections(tableElt);
+				$scope.jsplumb.removeAllEndpoints(tableElt);
+				$scope.jsplumb.remove(tableElt);
+			}
 		}
 		$scope.tables = {};
 		$scope.tablesTemporary = [];
@@ -765,7 +780,10 @@ angular.module('mitsiApp')
 			$scope.tablesTemporary.splice(i, 1);
 		}
 		
-		$scope.jsplumb.removeFromAllPosses(document.getElementById($scope.divPrefix+tableName));
+		var tableElt = document.getElementById($scope.divPrefix+tableName);
+		if(tableElt) {
+			$scope.jsplumb.removeFromAllPosses(tableElt);
+		}
 
 	}
 
@@ -864,8 +882,8 @@ angular.module('mitsiApp')
 				}
 				else {
 					$scope.appendTable( 
-							Math.max(0, x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
-							Math.max(0, y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3))), 
+							Math.floor(x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3))),
+							Math.floor(y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3))),
 							vertexName);
 					if(temporary===true) {
 						$scope.tablesTemporary.push(vertexName);
@@ -911,20 +929,52 @@ angular.module('mitsiApp')
 			}
 		}
 		
+		$scope.checkTablesWithNegativePostion();
 		$scope.afterTableUpdate(fklist, posses);
+	}
+
+	$scope.checkTablesWithNegativePostion = function() {
+		$scope.updateTablesActualPosition();
+		
+		var minNegativeX = 0;
+		var minNegativeY = 0;
+		for(var tableName in $scope.tables) {
+			var t = $scope.tables[tableName];
+			if(t.x < minNegativeX) {
+				minNegativeX = t.x;
+			}
+			if(t.y < minNegativeY) {
+				minNegativeY = t.y;
+			}
+		}
+		if(minNegativeX < 0) {
+			for(var tableName in $scope.tables) {
+				$scope.tables[tableName].x = $scope.tables[tableName].x-minNegativeX+60;
+			}
+			
+			var scroll = document.getElementById("graphScroll");
+			var newScrollLeft = graphParent.scrollLeft - minNegativeX + 60;
+			scroll.scrollLeft = newScrollLeft;
+			
+		}
+
+		if(minNegativeY < 0) {
+			for(var tableName in $scope.tables) {
+				$scope.tables[tableName].y = $scope.tables[tableName].y-minNegativeY+60;
+			}
+			
+			var scroll = document.getElementById("graphScroll");
+			var newScrollTop = graphParent.scrollTop - minNegativeY + 60;
+			scroll.scrollTop = newScrollTop;
+
+		}
 	}
 	
 	$scope.appendVertexLinks = function(graph, fklist, vertex, existingTables) {
-		//var missingLinks = []; // TODO : lue seulement. a supprimer ?
-		
 		for(var i=0; i!=vertex.links.length; i++) {
 			var l = vertex.links[i];
 			var targetVertexName = graph.getVertexName(l.target);
 			
-			//if($scope.existsTable(targetVertexName)==null) {
-			//	missingLinks.push(targetVertexName);
-			//}
-			//else {
 			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
 				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
 					fklist.push({
@@ -940,10 +990,6 @@ angular.module('mitsiApp')
 			var l = vertex.reverseLinks[i];
 			var targetVertexName = graph.getVertexName(l.target);
 			
-			//if($scope.existsTable(targetVertexName)==null) {
-			//	missingLinks.push(targetVertexName);
-			//}
-			//else {
 			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
 				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
 					fklist.push({
@@ -1256,7 +1302,7 @@ angular.module('mitsiApp')
 				$scope.appendTable(parseInt(tableX), parseInt(tableY), tableName);
 				fklist = fklist.concat($scope.getTableFkList(tableName));
 			}
-			$scope.afterTableUpdate(fklist, {});
+			$scope.afterTableUpdate(fklist, null);
 		}
 	}); 
 	
@@ -1287,16 +1333,33 @@ angular.module('mitsiApp')
 		$scope.showGraphUrlDialog();
 	}
 	
+	$scope.resizeJsPlumbContainerIfNecessary = function(width, height) {
+		var targetWidth  = width + 200;
+		var targetHeight = height + 150;
+		
+		if($scope.jsplumbContainer.offsetWidth < targetWidth) {
+			$scope.jsplumbContainer.style.width = targetWidth+"px";
+		} 
+		if($scope.jsplumbContainer.offsetHeight < targetHeight) {
+			$scope.jsplumbContainer.style.height = targetHeight+"px";
+		} 
+	}
+	
+	$scope.updateTablesActualPosition = function() {
+		// get the actual position of the tables in the graph
+		for(var tableName in $scope.tables) {
+			var tableDiv = document.getElementById($scope.divPrefix+tableName);
+			if(tableDiv) {
+				var t = $scope.tables[tableName];
+				t.x = tableDiv.offsetLeft;
+				t.y = tableDiv.offsetTop;
+			}
+		}
+	}
+
+	
 	$scope.jsplumbInit();
 	$scope.tablesInit();
 	$scope.restoreScope();
-	
-	/* if($rootScope.currentSource 
-			&& $rootScope.currentSource.currentObject 
-			&& $rootScope.currentSource.currentObject.id) {
-		tableName = $rootScope.currentSource.currentObject.id.schema+"."+$rootScope.currentSource.currentObject.id.name;
-		$scope.displayProximityGraph(tableName);
-	} */
-	
 	
 });

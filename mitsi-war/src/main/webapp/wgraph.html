@@ -109,8 +109,125 @@
     </div>
 </script>
 
- <div style="position:absolute">
-  <div style="z-index:10;">
+<div id="graphScroll" 
+     style="position:absolute;top:50px;bottom:0;height:auto;width:100%;overflow:auto;"
+ 	 >
+  <div id="jsPlumbContainer"
+     style="opacity:{{graphOpacity}};position:absolute;top:0px;left:0px;width:1500px;height:1500px;transform:scale({{ zoomSlider.value/100  }});"
+     >
+     
+    	 <div ng-repeat="(tableName, t) in tables track by tableName"
+		     id="{{divPrefix+t.name}}"
+		     ng-class="{'linksTableSelected':isTableSelected(t.name), 'linksTableInPath':isTableInPath(t.name), 'linksTableTemporary':isTableTemporary(t.name)}"
+			 class="linksTable"
+			 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:130px;cursor:default;"
+			 draggable="true"
+			 ng-mouseover="mouseOverTableName(t)"
+			 ng-mouseleave="mouseLeaveTableName()"
+			 >
+			 {{ getTableDisplayName(t.name) }}
+			 <a href=""
+			    ng-show="showIcons" 
+			    ng-click="removeTable(t.name, true)">
+				 <i class="glyphicon glyphicon-remove-circle" 
+				    style="position:absolute;top:-8px;right:-8px;"></i>
+			 </a>
+			 <table 
+			 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
+				 <td style="padding-right:5px;">
+				     <a href="" 
+				        ng-show="isTableTemporary(t.name)"
+				        ng-click="pinTemporaryTable(t.name)"
+						popover-template="'popover.pin.action.html'"
+						popover-trigger="mouseenter"
+						popover-placement="bottom"
+						>
+					 	<i class="glyphicon glyphicon-pushpin"></i>
+					 </a>
+				 </td>
+		
+				 <td style="padding-right:5px;position:relative;"
+				 >
+				 	<a href="" 
+				 	    style="position:relative;top:-3px;"
+				        ng-show="! isTableTemporary(t.name)"
+						ng-mouseover="mouseOverAsterisk(t)"
+						ng-mouseleave="mouseLeaveAsterisk()"
+		 		        ng-click="pinTemporaryLinkedTables(t.name)"
+		 		        >
+				        <img src="img/suncat_20px_grey.png" style="height:16px;"/>
+				     </a>
+				 </td>
+				 <td style="padding-right:5px;"
+				     ng-class="{ 'mitsiHidden' : showIcons!==true}"
+				 >
+				 	<a href="" 
+				        ng-show="! isTableTemporary(t.name)"
+		 		        ng-click="requestInfo(t)"
+		 		        popover-template="'popover.info.action.html'"
+						popover-trigger="mouseenter"
+						popover-placement="bottom"
+		 		        >
+				        <i class="glyphicon glyphicon-info-sign"></i>
+				     </a>
+				 </td>
+				 <td style="padding-right:5px;position:relative;"
+				     ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
+				 >
+				   <span 
+				        ng-show="! isTableTemporary(t.name)"
+				   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
+				   		>
+				  	<a href=""  
+				  	    style="color:white;font-size:65%;position:relative;top:-3px;"
+				  	    ng-click="toggleTableInSQL(t)"
+		 		        popover-template="'popover.sql.action.html'"
+						popover-trigger="mouseenter"
+						popover-placement="bottom"
+				  	   >SQL</a>
+				  	</span>
+				 </td>		 
+				 <td style="padding-right:5px;position:relative;"
+				 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathStart(t)}"
+				 >
+				 	<span 
+				 	    style="position:relative;top:-2px;"
+				 		ng-show="! isTableTemporary(t.name)"
+				 		ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
+				 	  <a href="" ng-click="setTablePathStart(t)"
+		 		        popover-template="'popover.startpath.action.html'"
+						popover-trigger="mouseenter"
+						popover-placement="bottom"
+				 	  >
+				 	    <img style="transform: scale(-1, 1);" src="img/flag_path.png"/>
+				 	  </a>
+				   </span>
+				 </td>
+				 <td style="padding-right:5px;position:relative;"
+				 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathEnd(t)}"
+				 >
+				   <span 
+				 	    style="position:relative;top:-2px;"
+				   		ng-show="! isTableTemporary(t.name)"
+				   		ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
+				 	  <a href="" ng-click="setTablePathEnd(t)"
+				 	    popover-template="'popover.finishpath.action.html'"
+						popover-trigger="mouseenter"
+						popover-placement="bottom"
+				 	  >
+				 	    <img src="img/flag_path.png"/>
+				 	  </a>
+				   </span>
+				 </td>
+			 </tr></table>
+			 
+		</div>
+     
+    </div>
+</div>
+<div id="graphParent" style="position:fixed;top:100px;right:5px;">
+     
+  <div style="z-index:10;width:110px;">
   	<table class="verticalMenuTable">
   	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd">
   		<a href="" ng-click="displayGraph()"
@@ -199,116 +316,6 @@
    </div>
   </div>
 
-<div id="jsPlumbContainer"
-     style="opacity:{{graphOpacity}};position:absolute;top:0px;left:0px;width:5px;height:5px;transform:scale({{ zoomSlider.value/100  }});"
-     >
-     
 
-<div ng-repeat="(tableName, t) in tables"
-     id="{{divPrefix+t.name}}"
-     ng-class="{'linksTableSelected':isTableSelected(t.name), 'linksTableInPath':isTableInPath(t.name), 'linksTableTemporary':isTableTemporary(t.name)}"
-	 class="linksTable"
-	 style="position:absolute;left:{{t.x}}px;top:{{t.y}}px;min-width:130px;cursor:default;"
-	 draggable="true"
-	 ng-mouseover="mouseOverTableName(t)"
-	 ng-mouseleave="mouseLeaveTableName()"
-	 >
-	 {{ getTableDisplayName(t.name) }}
-	 <a href=""
-	    ng-show="showIcons" 
-	    ng-click="removeTable(t.name, true)">
-		 <i class="glyphicon glyphicon-remove-circle" 
-		    style="position:absolute;top:-8px;right:-8px;"></i>
-	 </a>
-	 <table 
-	 		 style="position:absolute;bottom:-16px;left:0px;"><tr>
-		 <td style="padding-right:5px;">
-		     <a href="" 
-		        ng-show="isTableTemporary(t.name)"
-		        ng-click="pinTemporaryTable(t.name)"
-				popover-template="'popover.pin.action.html'"
-				popover-trigger="mouseenter"
-				popover-placement="bottom"
-				>
-			 	<i class="glyphicon glyphicon-pushpin"></i>
-			 </a>
-		 </td>
 
-		 <td style="padding-right:5px;position:relative;"
-		 >
-		 	<a href="" 
-		 	    style="position:relative;top:-3px;"
-		        ng-show="! isTableTemporary(t.name)"
-				ng-mouseover="mouseOverAsterisk(t)"
-				ng-mouseleave="mouseLeaveAsterisk()"
- 		        ng-click="pinTemporaryLinkedTables(t.name)"
- 		        >
-		        <img src="img/suncat_20px_grey.png" style="height:16px;"/>
-		     </a>
-		 </td>
-		 <td style="padding-right:5px;"
-		     ng-class="{ 'mitsiHidden' : showIcons!==true}"
-		 >
-		 	<a href="" 
-		        ng-show="! isTableTemporary(t.name)"
- 		        ng-click="requestInfo(t)"
- 		        popover-template="'popover.info.action.html'"
-				popover-trigger="mouseenter"
-				popover-placement="bottom"
- 		        >
-		        <i class="glyphicon glyphicon-info-sign"></i>
-		     </a>
-		 </td>
-		 <td style="padding-right:5px;position:relative;"
-		     ng-class="{ 'mitsiHidden' : showIcons!==true && !isTableInSQL(t)}"
-		 >
-		   <span 
-		        ng-show="! isTableTemporary(t.name)"
-		   		ng-class="[ 'tableActionLabel', {'tableActionLabelSelected':isTableInSQL(t)} ]"
-		   		>
-		  	<a href=""  
-		  	    style="color:white;font-size:65%;position:relative;top:-3px;"
-		  	    ng-click="toggleTableInSQL(t)"
- 		        popover-template="'popover.sql.action.html'"
-				popover-trigger="mouseenter"
-				popover-placement="bottom"
-		  	   >SQL</a>
-		  	</span>
-		 </td>		 
-		 <td style="padding-right:5px;position:relative;"
-		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathStart(t)}"
-		 >
-		 	<span 
-		 	    style="position:relative;top:-2px;"
-		 		ng-show="! isTableTemporary(t.name)"
-		 		ng-class="[ {'tableActionLabelSelected':isTablePathStart(t)} ]">
-		 	  <a href="" ng-click="setTablePathStart(t)"
- 		        popover-template="'popover.startpath.action.html'"
-				popover-trigger="mouseenter"
-				popover-placement="bottom"
-		 	  >
-		 	    <img style="transform: scale(-1, 1);" src="img/flag_path.png"/>
-		 	  </a>
-		   </span>
-		 </td>
-		 <td style="padding-right:5px;position:relative;"
-		 	 ng-class="{ 'mitsiHidden' : showIcons!==true && !isTablePathEnd(t)}"
-		 >
-		   <span 
-		 	    style="position:relative;top:-2px;"
-		   		ng-show="! isTableTemporary(t.name)"
-		   		ng-class="[ {'tableActionLabelSelected':isTablePathEnd(t)} ]">
-		 	  <a href="" ng-click="setTablePathEnd(t)"
-		 	    popover-template="'popover.finishpath.action.html'"
-				popover-trigger="mouseenter"
-				popover-placement="bottom"
-		 	  >
-		 	    <img src="img/flag_path.png"/>
-		 	  </a>
-		   </span>
-		 </td>
-	 </tr></table>
-	 
-</div>
-</div>
 </div>
