@@ -183,6 +183,21 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.5.3</version>                
 				</plugin>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>sonar-maven-plugin</artifactId>
+				    <version>2.2</version>
+				    <configuration>
+				        <sonar.exclusions>file:**/src/main/webapp/WEB-INF/web.xml</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/angular.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/ui-grid.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/jsPlumb-*.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/ui-bootstrap-*.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/angular-ui-rooter-*.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/bootstrap.js</sonar.exclusions>
+				        <sonar.exclusions>file:**/src/main/webapp/**/ui-layout.js</sonar.exclusions>
+				    </configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
