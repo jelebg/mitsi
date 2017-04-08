@@ -2,9 +2,8 @@ package org.mitsi.datasources;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class DatabaseObject {
 	public static class Id {
 		private String type;

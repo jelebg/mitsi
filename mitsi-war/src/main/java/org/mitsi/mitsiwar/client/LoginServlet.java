@@ -7,29 +7,33 @@ import org.mitsi.mitsiwar.authent.MitsiAuthenticator;
 import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@SuppressWarnings("squid:S1700")
 class Login {
 	String login;
 	String password;
 	
 	public Login() {
+		// nothing
 	}
 }
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 class LoginResponse {
-
-	public LoginResponse() {}
-	
 	public boolean authenticationOK;
+
+	public LoginResponse() {
+		// nothing
+	}
 }
 
-
+@SuppressWarnings("squid:S2226")
 public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 	private static final Logger log = Logger.getLogger(LoginServlet.class);
 	private static final long serialVersionUID = 1L;
 
 
 	@Autowired
-	MitsiAuthenticator mitsiAuthenticator;
+	transient MitsiAuthenticator mitsiAuthenticator;
 	
 	public LoginServlet() {
         super(Login.class);

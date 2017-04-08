@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.DatasourceManager;
 import org.mitsi.core.annotations.DefaultOwner;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -73,11 +71,13 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Schema> getAllSchemas(String owner) {
 		owner = getOwner(owner);
 		return mapper.getAllSchemas(owner);
 	}
 	
+	@SuppressWarnings("squid:S1226") 
 	private void getTablesAndViewsSubObjects(List<DatabaseObject> databaseObjects, String owner) {
 		owner = getOwner(owner);
 		List<Index> indexes = mapper.getSchemaIndexes(owner);
@@ -110,6 +110,8 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 	}
 
+	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
 		owner = getOwner(owner);
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
@@ -143,18 +145,21 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Column> getTableColumnsDetails(String owner, String name) {
 		owner = getOwner(owner);
 		return mapper.getTableColumnsDetails(owner, name);
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Column> getTablePartitioninKeysDetails(String owner, String name) {
 		owner = getOwner(owner);
 		return mapper.getTablePartitioninKeysDetails(owner, name);
 	}
 	
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Index> getTableIndexesDetails(String tableOwner,
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
@@ -162,6 +167,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Partition> getTablePartitionDetails(String tableOwner,
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
@@ -169,6 +175,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Constraint> getTableConstraintsDetails(String tableOwner,
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
@@ -176,6 +183,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public List<Constraint> getTablesWithConstraintsTo(String tableOwner,
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
@@ -183,12 +191,14 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public List<Index> getSchemaIndexes(String schema) {
 		schema = getOwner(schema);
 		return mapper.getSchemaIndexes(schema);
 	}
 
 	@Override
+	@SuppressWarnings("squid:S1226") 
 	public List<Constraint> getSchemaConstraints(String schema) {
 		schema = getOwner(schema);
 		return mapper.getSchemaConstraints(schema);
@@ -206,11 +216,13 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		}
 	}
 	
+	@SuppressWarnings("squid:ClassVariableVisibilityCheck") 
 	public static class GetDataResult {
 		public List<Column> columns;
 		public List<String[]> results;
 	}
 	
+	@SuppressWarnings({"squid:S1226", "squid:S1151", "squid:S134", "squid:S3776", "squid:S1160"}) // this method is complex and SONAR complains about it, but it is OK
 	public GetDataResult getData(String owner, String tableName, long fromRow, long count, OrderByColumn[] orderByColumns, Filter[] filters) throws SQLException, MitsiSecurityException {
 		securityCheckDbObject(tableName);
 		owner = getOwner(owner);
@@ -289,7 +301,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 					"select * from " + owner + ".\"" + tableName + "\" " +
 					whereClause.toString()   +
 					orderByClause.toString() +							
-					//" offset "+fromRow+" rows fetch first "+count+" rows only ";
 					" offset ? limit ?  ";
 					break;
 		}
@@ -326,8 +337,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			
 			// get columns
 			ResultSetMetaData rsmd = resultSet.getMetaData();
-			List<Column> columns = new ArrayList<Column>();
-			//currentResultSetNbColumns = rsmd.getColumnCount();
+			List<Column> columns = new ArrayList<>();
 			int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
 			for(int i=1; i<rsmd.getColumnCount(); i++) {
 				Column column = new Column();

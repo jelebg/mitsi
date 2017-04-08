@@ -2,6 +2,7 @@ package org.mitsi.users;
 
 import java.util.HashMap;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class MitsiDatasourcesF {
 	public HashMap<String, Datasource> datasources;
 
