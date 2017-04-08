@@ -1,7 +1,10 @@
 package org.mitsi.mitsiwar.data;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeSet;
+
+import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 
 import org.apache.log4j.Logger;
@@ -49,7 +52,7 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
     }
  
 	@Override
-	public GetDataResponse proceed(GetData request, Client connectedClient) throws Exception {
+	public GetDataResponse proceed(GetData request, Client connectedClient) throws MitsiException {
 		
 		GetDataResponse response = new GetDataResponse();
 
@@ -68,6 +71,10 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 			response.columns = result.columns;
 			response.results = result.results;
 			response.maxRowsReached = response.results.size()==maxRows;
+		}
+		catch(SQLException e) {
+			log.error("error in GetDataServlet", e);
+			throw new MitsiException("error in GetDataServlet", e);
 		}
 		
 		return response;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
@@ -32,7 +33,7 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 
  
 	@Override
-	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws Exception {
+	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws MitsiException {
 		
 		GetDatasourcesResponse response = new GetDatasourcesResponse();
 		

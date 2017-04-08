@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
@@ -435,7 +436,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 	
  
 	@Override
-	public GetDetailsResponse proceed(GetDetails request, Client connectedClient) throws Exception {
+	public GetDetailsResponse proceed(GetDetails request, Client connectedClient) throws MitsiException {
 		
 		GetDetailsResponse response = new GetDetailsResponse();
 		

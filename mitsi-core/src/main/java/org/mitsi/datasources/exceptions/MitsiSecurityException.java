@@ -1,6 +1,8 @@
 package org.mitsi.datasources.exceptions;
 
-public class MitsiSecurityException extends Exception {
+import org.mitsi.commons.MitsiException;
+
+public class MitsiSecurityException extends MitsiException {
 	public MitsiSecurityException(String string) {
 		super(string);
 	}

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.MitsiConnection;
@@ -41,7 +42,7 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 
  
 	@Override
-	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws Exception {
+	public GetDatabaseObjectsResponse proceed(GetDatabaseObjects request, Client connectedClient) throws MitsiException {
 		GetDatabaseObjectsResponse response = new GetDatabaseObjectsResponse();
 
 		MitsiConnection connection = null;

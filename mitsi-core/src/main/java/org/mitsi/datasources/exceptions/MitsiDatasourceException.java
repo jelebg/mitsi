@@ -1,6 +1,8 @@
 package org.mitsi.datasources.exceptions;
 
-public class MitsiDatasourceException extends Exception {
+import org.mitsi.commons.MitsiException;
+
+public class MitsiDatasourceException extends MitsiException {
 
 	public MitsiDatasourceException(String string) {
 		super(string);

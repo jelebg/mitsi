@@ -10,11 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.mitsiwar.connections.Client;
-import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.mitsi.users.MitsiDatasources;
 import org.mitsi.users.MitsiUsersConfig;
-import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
@@ -33,12 +32,12 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	@Autowired
 	protected transient MitsiUsersConfig mitsiUsersConfig; //NOSONAR should not inject inside a servlet TODO : rework needed
 
-	Class<Request> requestClass;
+	final Class<Request> requestClass;
 	public GsonServlet(Class<Request> requestClass) {
 		this.requestClass = requestClass;
 	}
 	
-	public abstract Response proceed(Request request, Client client) throws Exception;
+	public abstract Response proceed(Request request, Client client) throws MitsiException;
 	
 	@Override
 	public void init() throws ServletException {
@@ -46,18 +45,20 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
 	}
 	
+	@Override
+	@java.lang.SuppressWarnings("squid:S1181") // catching throwable is bas usualy but here I can aford to continue with the old configuration 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			mitsiDatasources.loadIfNeccessary();
 		} 
-		catch(Throwable t) {
+		catch(Throwable t) { 
 			log.error("exception while loading datasources", t);
 		}
 		try {
 			mitsiUsersConfig.loadIfNeccessary();
 		} 
-		catch(Throwable t) {
-			log.error("exception while loading datasources", t);
+		catch(Throwable t) { 
+			log.error("exception while loading users config", t);
 		}
 		
 
@@ -72,13 +73,13 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		response.setContentType("application/json; charset=UTF-8");
 		Gson gson = new Gson();
 		try {
-			
 			Request gsonRequest = gson.fromJson(in, requestClass);
 			Response gsonResponse = proceed(gsonRequest, connectedClient);
 			gson.toJson(gsonResponse, out);
 
 		} 
-		catch(MitsiWarException | MitsiUsersException e){
+		catch(MitsiException e){
+			log.info("generic error handling in GsonServlet", e );
 			GsonResponse gsonResponse = new GsonResponse();
 			gsonResponse.errorMessage = e.getMessage();
 			gson.toJson(gsonResponse, out);

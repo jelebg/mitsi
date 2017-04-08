@@ -1,6 +1,7 @@
 package org.mitsi.mitsiwar.client;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.authent.MitsiAuthenticator;
 import org.mitsi.mitsiwar.connections.Client;
@@ -36,7 +37,7 @@ public class LoginServlet extends GsonServlet<Login, LoginResponse> {
 
  
 	@Override
-	public LoginResponse proceed(Login request, Client connectedClient) throws Exception {
+	public LoginResponse proceed(Login request, Client connectedClient) throws MitsiException {
 		
 		LoginResponse response = new LoginResponse();
 		

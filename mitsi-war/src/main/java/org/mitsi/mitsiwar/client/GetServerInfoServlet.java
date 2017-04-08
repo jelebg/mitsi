@@ -1,6 +1,7 @@
 package org.mitsi.mitsiwar.client;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
@@ -31,7 +32,7 @@ public class GetServerInfoServlet extends GsonServlet<GetServerInfo, GetServerIn
 
  
 	@Override
-	public GetServerInfoResponse proceed(GetServerInfo request, Client connectedClient) throws Exception {
+	public GetServerInfoResponse proceed(GetServerInfo request, Client connectedClient) throws MitsiException {
 	
 		GetServerInfoResponse response = new GetServerInfoResponse();
 

@@ -1,6 +1,8 @@
 package org.mitsi.users;
 
-public class MitsiUsersException extends Exception{
+import org.mitsi.commons.MitsiException;
+
+public class MitsiUsersException extends MitsiException{
 	private static final long serialVersionUID = 1L;
 
 	public MitsiUsersException() {

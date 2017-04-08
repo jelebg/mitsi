@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.common.Datasource;
@@ -37,7 +38,7 @@ public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 
  
 	@Override
-	public Response proceed(Request request, Client connectedClient) throws Exception {
+	public Response proceed(Request request, Client connectedClient) throws MitsiException {
 	
 		Response response = new Response();
 

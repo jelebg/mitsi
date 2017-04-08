@@ -1,6 +1,8 @@
 package org.mitsi.mitsiwar.exception;
 
-public class MitsiWarException extends Exception {
+import org.mitsi.commons.MitsiException;
+
+public class MitsiWarException extends MitsiException {
 	private static final long serialVersionUID = 1L;
 
 	public MitsiWarException() {
