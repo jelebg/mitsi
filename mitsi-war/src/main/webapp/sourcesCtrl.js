@@ -1,5 +1,6 @@
 angular.module('mitsiApp')
-    .controller('sourcesCtrl', function($scope, $rootScope, $state, $timeout, $interval, $location, $q, userService, sourceService, errorService) {
+    .controller('sourcesCtrl', 
+    		function($scope, $rootScope, $state, $timeout, $interval, $location, $q, userService, sourceService, errorService) { // NOSONAR too many parameters
 
 	$scope.datasources = [];
 
@@ -30,7 +31,7 @@ angular.module('mitsiApp')
 		      }
 
 			  if(userHasChanged) {
-				  console.log("connected user has changed : "+response.data.connectedUsername+" (was: "+$rootScope.loggedUser.username+")");
+				  console.log("connected user has changed : "+response.data.connectedUsername+" (was: "+$rootScope.loggedUser.username+")"); // NOSONAR I realy want this log
 				  $scope.globalRefresh();
 			  }
           });
@@ -46,9 +47,9 @@ angular.module('mitsiApp')
 	
 	$scope.globalRefresh = function() {
 		userService.getClientStatus()
-		  .then(function(response) {
+		  .then(function(response) { // NOSONAR
 			  
-			  var responseDatasources = response.data.datasources;
+			  const responseDatasources = response.data.datasources;
 			  if($rootScope.loggedUser) {
 				  if(response.data.connectedUsername == null) {
 					  $rootScope.loggedUser = null;
@@ -66,30 +67,30 @@ angular.module('mitsiApp')
 		      }
 
 			  var scopeDatasourceNames = {};
-			  for(var i=0; i!=$scope.datasources.length; i++) {
+			  for(let i=0; i!=$scope.datasources.length; i++) {
 				  scopeDatasourceNames[$scope.datasources[i].name] = true;
 			  }
 			  var responseDatasourceNames = {};
-			  for(var i=0; i!=responseDatasources.length; i++) {
+			  for(let i=0; i!=responseDatasources.length; i++) {
 				  responseDatasourceNames[responseDatasources[i].name] = i;
 			  }
 
 			  // add datasources that do exist yet
-			  for(var i=0; i!=responseDatasources.length; i++) {
+			  for(let i=0; i!=responseDatasources.length; i++) {
 				  if(!(responseDatasources[i].name in scopeDatasourceNames)) {
 					  $scope.datasources.push(responseDatasources[i]);
 				  }
 			  }
-			  for(var i=0; i!=$scope.datasources.length; i++) {
+			  for(let i=0; i!=$scope.datasources.length; i++) {
 				  // remove datasources that whe do not have right to access anymore
 				  if(!($scope.datasources[i].name in responseDatasourceNames)) {
 					  $scope.datasources.splice(i);
-					  i--;
+					  i--; // NOSONAR
 				  }
 				  // update the others
 				  else {
-					  var newDatasourceIndex = responseDatasourceNames[$scope.datasources[i].name];
-					  var newDatasource = responseDatasources[newDatasourceIndex];
+					  const newDatasourceIndex = responseDatasourceNames[$scope.datasources[i].name];
+					  const newDatasource = responseDatasources[newDatasourceIndex];
 					  $scope.datasources[i].description = newDatasource.description;
 					  $scope.datasources[i].tags = newDatasource.tags;
 				  }
@@ -114,7 +115,7 @@ angular.module('mitsiApp')
 		   $scope.initSource(source, response)
 		   $timeout(function() {
 				   var end = new Date().getTime();
-				   console.log("source refresh global time:"+(end-startLoad)+"ms display time:"+(end-startDisplay)+"ms - "+source.name)
+				   console.log("source refresh global time:"+(end-startLoad)+"ms display time:"+(end-startDisplay)+"ms - "+source.name); // NOSONAR I want this log
 		   }, 0);
 		   deferred.resolve(null);	  
 	   })
@@ -154,7 +155,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.initGraph = function(datasource) {
-		datasource.mitsiGraph = new MitsiGraph(null);
+		datasource.mitsiGraph = new MitsiGraph(null); // NOSONAR MitsiGraph does realy exist but sonar doesn't see it
 		if(!datasource.objects) {
 			return;
 		}
@@ -175,7 +176,7 @@ angular.module('mitsiApp')
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	
-	$scope.isObjectExcludedByFilter = function(object, source) {
+	$scope.isObjectExcludedByFilter = function(object, source) { // NOSONAR
 		var objectType = object.id.type; 
 		
 		if(source.filter.hideTables===true && objectType=="table") {
@@ -214,15 +215,13 @@ angular.module('mitsiApp')
 			return false;
 		}
 		
-		if(source.filter.tableName!== false) {
-			if(objectNameLC.indexOf( filter ) !== -1) {
-				return false
-			}
+		if(source.filter.tableName !== false && objectNameLC.indexOf( filter ) !== -1) {
+			return false
 		}
 		
 		if(object.columns && source.filter.columnName!== false) {
-			for(var i=0; i!=object.columns.length; i++) {
-				var columnName=object.columns[i].name;
+			for(let i=0; i!=object.columns.length; i++) {
+				const columnName=object.columns[i].name;
 				if(columnName.toLowerCase().indexOf( filter ) !== -1) {
 					return false;
 				}
@@ -230,8 +229,8 @@ angular.module('mitsiApp')
 		}
 				
 		if(object.constraints && source.filter.constraintName!== false) {
-			for(var i=0; i!=object.constraints.length; i++) {
-				var constraintName=object.constraints[i].name;
+			for(let i=0; i!=object.constraints.length; i++) {
+				const constraintName=object.constraints[i].name;
 				if(constraintName.toLowerCase().indexOf( filter ) !== -1) {
 					return false;
 				}
@@ -239,8 +238,8 @@ angular.module('mitsiApp')
 		}
 				
 		if(object.indexes && source.filter.indexName!== false) {
-			for(var i=0; i!=object.indexes.length; i++) {
-				var indexName=object.indexes[i].name;
+			for(let i=0; i!=object.indexes.length; i++) {
+				const indexName=object.indexes[i].name;
 				if(indexName.toLowerCase().indexOf( filter ) !== -1) {
 					return false;
 				}
@@ -259,7 +258,7 @@ angular.module('mitsiApp')
 			$scope.refresh(source, null);
 		}
 		
-        $rootScope.$broadcast(EVENT_DATABASE_SELECTED, source);
+        $rootScope.$broadcast(EVENT_DATABASE_SELECTED, source); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
 	}
 	
 	$scope.selectObject = function(source, object) {
@@ -268,7 +267,7 @@ angular.module('mitsiApp')
 		$rootScope.currentSource = source;
 		source.currentObject = object;
 		
-        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, source, object);
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, source, object); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
 
 	}
 	
@@ -279,7 +278,7 @@ angular.module('mitsiApp')
 		source.currentObject = object;
 		
 		$state.go("workbench.graph");
-        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, source, object);
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, source, object); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
 	}
 	
 	$scope.displaySourceInfos = function(source) {
@@ -289,21 +288,22 @@ angular.module('mitsiApp')
 		source.currentObject = null;
 		
 		$state.go("workbench.details");
-        $rootScope.$broadcast(EVENT_DATABASE_SELECTED_FOR_DETAILS, source);
+        $rootScope.$broadcast(EVENT_DATABASE_SELECTED_FOR_DETAILS, source); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
 	}
 	
-	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) {
+	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) { // NOSONAR
 		$scope.globalRefresh();
 	});
 
 	
-	$scope.$on(EVENT_DATABASE_OBJECT_INFO_REQUESTED, function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_INFO_REQUESTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
 		if(!source.objects) {
 			return;
 		}
 		
-		for(var i=0; i!=source.objects.length; i++) {
-			var o = source.objects[i];
+		let o = null;
+		for(let i=0; i!=source.objects.length; i++) {
+			o = source.objects[i];
 			if(o.id.schema+"."+o.id.name == databaseObject.name) {
 				if(source.searchObject && !source.searchObject=="") {
 					o.filterPined = true;
@@ -313,6 +313,10 @@ angular.module('mitsiApp')
 				}
 				break;
 			}
+		}
+		
+		if(!o || !o.id) {
+			return;
 		}
 		
 		source.selectedId = {schema:o.id.schema, name:o.id.name, type:o.id.type};
@@ -326,7 +330,7 @@ angular.module('mitsiApp')
 	$scope.scrollToSource = function(sourceName) {
 		document.getElementById("source_"+sourceName).scrollIntoView(true);
 		
-        id="source_{{s.name}}" 
+        // id="source_{{s.name}}" TODO : remove this line 
 
 	}
 	
@@ -337,12 +341,12 @@ angular.module('mitsiApp')
 		}
 	}
 	
-    $rootScope.$on('$locationChangeSuccess', function (event) {
+    $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument
     	$scope.initFromLocation();
     });
     
     $scope.initFromLocation = function() {
-		var s = $location.search();
+		const s = $location.search();
 		if(!s.source) {
 			return;
 		}
@@ -350,14 +354,14 @@ angular.module('mitsiApp')
 		if(!$rootScope.currentSource ||
 			s.source!==$rootScope.currentSource.name) {
 			
-			var ds = null;
-			for(var i=0; i!=$scope.datasources.length; i++) {
+			let ds = null;
+			for(let i=0; i!=$scope.datasources.length; i++) {
 				if($scope.datasources[i].name == s.source) {
 					ds = $scope.datasources[i];
 					break;
 				}
 			}
-			if(ds == null) {
+			if(!ds) {
 				errorService.showGeneralError("Source "+s.source+" does not exist (or you have insuffucient privilleges).");
 				return;
 			}
@@ -367,12 +371,12 @@ angular.module('mitsiApp')
 			$scope.refresh(ds, null)
 			.then(function() {
 				$scope.scrollToSource(ds.name);
-				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, s.x, s.y);
+				$rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, s.x, s.y); // NOSONAR EVENT_DISPLAY_GRAPH does exist but sonar does not see it
 			});
 		}
 		else {
-			$scope.scrollToSource(ds.name);
-	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, sx, s.y);
+			$scope.scrollToSource($rootScope.currentSource.name);
+	        $rootScope.$broadcast(EVENT_DISPLAY_GRAPH, s.table, sx, s.y); // NOSONAR EVENT_DISPLAY_GRAPH does exist but sonar does not see it
 		}
 		
 	}
