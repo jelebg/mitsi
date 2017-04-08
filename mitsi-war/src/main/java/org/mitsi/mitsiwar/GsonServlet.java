@@ -46,7 +46,9 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	}
 	
 	@Override
-	@java.lang.SuppressWarnings("squid:S1181") // catching throwable is bas usualy but here I can aford to continue with the old configuration 
+	@SuppressWarnings(
+			{"squid:S1181",  // catching throwable is bas usualy but here I can aford to continue with the old configuration
+			 "squid:S1989"}) // TODO : better unexpted error management 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			mitsiDatasources.loadIfNeccessary();
@@ -62,17 +64,18 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		}
 		
 
-		BufferedReader in = request.getReader();
-		PrintWriter out = response.getWriter();
-		Client connectedClient = (Client) request.getSession().getAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE);
-		if(connectedClient == null) {
-			connectedClient = new Client(); 
-			request.getSession().setAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE, connectedClient);
-		}
-		
-		response.setContentType("application/json; charset=UTF-8");
 		Gson gson = new Gson();
+		PrintWriter out = null;
 		try {
+			BufferedReader in = request.getReader();
+			out = response.getWriter();
+			Client connectedClient = (Client) request.getSession().getAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE);
+			if(connectedClient == null) {
+				connectedClient = new Client(); 
+				request.getSession().setAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE, connectedClient);
+			}
+			
+			response.setContentType("application/json; charset=UTF-8");
 			Request gsonRequest = gson.fromJson(in, requestClass);
 			Response gsonResponse = proceed(gsonRequest, connectedClient);
 			gson.toJson(gsonResponse, out);
@@ -80,14 +83,21 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 		} 
 		catch(MitsiException e){
 			log.info("generic error handling in GsonServlet", e );
-			GsonResponse gsonResponse = new GsonResponse();
-			gsonResponse.errorMessage = e.getMessage();
-			gson.toJson(gsonResponse, out);
+			if(out != null) {
+				GsonResponse gsonResponse = new GsonResponse();
+				gsonResponse.errorMessage = e.getMessage();
+				try {
+					gson.toJson(gsonResponse, out);
+				}
+				catch(JsonIOException e2) {
+					log.error("error handling impossible because of error", e2);
+				}
+			}
 		} 
-		catch(JsonSyntaxException|JsonIOException e){
+		catch(JsonSyntaxException|JsonIOException e) {
 			throw new ServletException("JSON decoding error", e);
 		} 
-		catch(Exception e){
+		catch(Exception e) {
 			throw new ServletException("Unexpected Exception", e);
 		}
 

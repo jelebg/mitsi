@@ -1,5 +1,6 @@
 package org.mitsi.datasources;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class Column {
 	public String name;
 	public String type;

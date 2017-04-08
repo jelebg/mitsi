@@ -2,6 +2,7 @@ package org.mitsi.datasources;
 
 import java.util.List;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class Relation {
 	String tableName;
 	String tableOwner;

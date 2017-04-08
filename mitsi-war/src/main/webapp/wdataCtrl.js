@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService, errorService) {
+    .controller('wdataCtrl', function($scope, $rootScope, $timeout, $q, uiGridConstants, sqlService, errorService) { // NOSONAR
 
 	$scope.alreadyFetched = 0;
 	$scope.nbRowToFetch = 100; 
@@ -66,9 +66,6 @@ angular.module('mitsiApp')
 			            	if(!grid.columns[i].filters) {
 			            		continue;
 			            	}
-			            	for(var j=0; j!=grid.columns[i].filters.length; j++) {
-			            		console.log("filter "+i+":"+j+" -> "+grid.columns[i].filters[j].term);
-			            	}
 			            }
 			            
 			          });
@@ -99,17 +96,17 @@ angular.module('mitsiApp')
 	}
 
 
+	/* TODO : unused, delete ? 
+	  
 	$scope.gridFit = function() {
 		var eltList = document.getElementsByClassName("mitsi-fit-viewport-height");
-		for(var i=0; i!=eltList.length; i++) {
-			var element = eltList[i];
-			
-			var windowHW = getWindowHW();
-			
-			var elementXY = getAbsoluteXY(element);
+		for(let i=0; i!=eltList.length; i++) {
+			const element = eltList[i];
+			const windowHW = getWindowHW();
+			const elementXY = getAbsoluteXY(element);
 			
 	        $scope.currentGridHeight = ((windowHW.h-elementXY.y)-3)+"px";
-			break;
+			bug ?? break;
 		}
 
 	    $scope.gridRefresh = true;
@@ -123,19 +120,17 @@ angular.module('mitsiApp')
      
 	    }, 0);
 
-	}
+	} */
 	
-	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR
 		$scope.dataGrid.exporterCsvFilename = databaseObject.id.name+".csv";
 		$scope.beginData(source, databaseObject, null, null, false, false, null);
 	});
 	
 	$scope.updateClearAllFiltersVisibility = function(filters) {
 		var visib = false;
-		if(filters) {
-			if(filters.length > 0) {
-				visib = true;
-			}
+		if(filters && filters.length > 0) {
+			visib = true;
 		}
 		var elt = document.getElementById("clearAllfiltersButton");
 		if(!elt) {
@@ -203,9 +198,9 @@ angular.module('mitsiApp')
 				  }
 			  }
 			  
-			  var t = response.data.results;
-			  for(var i=0; i!=t.length; i++) {
-				  var r = {};
+			  const t = response.data.results;
+			  for(let i=0; i!=t.length; i++) {
+				  const r = {};
 				  r["num"] = $scope.dataGrid.data.length+1;
 				  for(var j=0; j!=t[i].length; j++) {
 					  r["col"+j] = t[i][j];
@@ -249,11 +244,10 @@ angular.module('mitsiApp')
 			return;
 		}
 		
-		if(filterFormat === "integer") {
-			if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		if(filterFormat === "integer" &&
+			(charCode > 31 && (charCode < 48 || charCode > 57))) {
 				event.preventDefault();
-				return;
-			}
+			return;
 		}
 	}
 	
@@ -303,7 +297,7 @@ angular.module('mitsiApp')
 		  }
 	      $scope.alreadyFetched = $scope.alreadyFetched+t.length;
 	    })
-	    .finally(function(error) {
+	    .finally(function(error) { // NOSONAR
 	      $scope.dataGridApi.infiniteScroll.dataLoaded(false, !noMoreData);
 	    });
 	    return promise.promise;
@@ -321,7 +315,6 @@ angular.module('mitsiApp')
     $timeout(function() {
     	// TODO : reste un bug : si on agrandit la fenetre, le nombre de lignes affichées n'évolue pas tant qu'on ne scrolle pas
         $scope.dataGridApi.grid.queueGridRefresh();
-  	  //$scope.dataGridApi.grid.refreshRows();
     }, 0);
 });
 

@@ -1,5 +1,6 @@
 package org.mitsi.datasources;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class Partition {
 	public String name;
 	public String tablespaceName;

@@ -1,5 +1,6 @@
 package org.mitsi.datasources;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class Constraint {
 	public String owner;
 	public String name;
