@@ -2,20 +2,18 @@ package org.mitsi.mitsiwar.data;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.GsonResponse;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class GetData {
 	String datasourceName;
@@ -28,6 +26,7 @@ class GetData {
 	Filter[] filters;
 	
 	public GetData() {
+		// nothing
 	}
 }
 
@@ -36,7 +35,9 @@ class GetDataResponse extends GsonResponse {
 	List<String[]> results;
 	boolean maxRowsReached;
 	
-	public GetDataResponse() {}
+	public GetDataResponse() {
+		// nothing
+	}
 }
 
 
@@ -44,9 +45,6 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 	private static final Logger log = Logger.getLogger(GetDataServlet.class);
 	private static final long serialVersionUID = 1L;
 	
-	@Autowired
-	private DatasourceManager datasourceManager;
-
 	public GetDataServlet() {
         super(GetData.class);
     }
@@ -57,7 +55,7 @@ public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
 		GetDataResponse response = new GetDataResponse();
 
 		String connectedUsername = connectedClient.getConnectedUsername();
-		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
 		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
 			long maxRows = connection.getMaxExportRows();

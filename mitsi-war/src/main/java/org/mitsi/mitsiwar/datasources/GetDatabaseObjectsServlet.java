@@ -1,18 +1,16 @@
 package org.mitsi.mitsiwar.datasources;
 
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class GetDatabaseObjects {
 	String datasourceName;
@@ -33,9 +31,6 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(GetDatabaseObjectsServlet.class);
 
-	@Autowired
-	private DatasourceManager datasourceManager;
-	
 	public GetDatabaseObjectsServlet() {
         super(GetDatabaseObjects.class);
     }
@@ -49,7 +44,7 @@ public class GetDatabaseObjectsServlet extends GsonServlet<GetDatabaseObjects, G
 		try  {
 			try {
 				String connectedUsername = connectedClient.getConnectedUsername();
-				TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+				SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 				connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName);
 			}
 			catch(Exception e) {

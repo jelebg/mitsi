@@ -85,7 +85,7 @@ angular.module('mitsiApp')
 		$scope.afterTableUpdateFullRefresh();
 	}
 	
-	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) { // NOSONAR keep the parameters
 	    if(fromState.name == "workbench.graph") {
 	    	$scope.resetTimeoutPromises();
 	    	$scope.hideProximityGraph();
@@ -143,7 +143,7 @@ angular.module('mitsiApp')
 			    showTicksValues: false,
 			    boundPointerLabels: false
 			    ,vertical: true
-			    ,getPointerColor: function(value) {
+			    ,getPointerColor: function(value) { // NOSONAR keep the parameters
 		            return 'grey';
 		        }
 			    ,translate: function(value) {
@@ -155,7 +155,7 @@ angular.module('mitsiApp')
 	
 	$scope.jsplumbInit = function() {
 		$scope.jsplumbContainer = document.getElementById("jsPlumbContainer");
-		$scope.jsplumb = jsPlumb.getInstance();
+		$scope.jsplumb = jsPlumb.getInstance(); // NOSONAR jsPlumb does exist
 		
 		$scope.jsplumb.setContainer($scope.jsplumbContainer);
 		jsPlumb.importDefaults({
@@ -236,19 +236,23 @@ angular.module('mitsiApp')
 		if(!connectionList) { 
 			return; 
 		}
-		for(key in connectionList) { 
-			var connection = connectionList[key];
+		for(const key in connectionList) {
+			if(!connectionList.hasOwnProperty(key)) {
+				continue;
+			}
+			
+			const connection = connectionList[key];
 			connection.setPaintStyle ({ strokeStyle:"lightgrey", lineWidth:3 });
 		}
 	}
 	
-	$scope.highlightPathsConnections = function(paths) {
-		for(var iPath=0; iPath!=paths.length; iPath++) {
-			var path=paths[iPath];
+	$scope.highlightPathsConnections = function(paths) { // NOSONAR complexity is OK
+		for(let iPath=0; iPath!=paths.length; iPath++) {
+			const path=paths[iPath];
 			
-			for(var iTable=0; iTable<path.length-1; iTable++) {
-				var tableFrom = $scope.getPathIndexName(path[iTable]);
-				var tableTo = $scope.getPathIndexName(path[iTable+1]);
+			for(let iTable=0; iTable<path.length-1; iTable++) { // NOSONAR complexity is OK
+				const tableFrom = $scope.getPathIndexName(path[iTable]);
+				const tableTo = $scope.getPathIndexName(path[iTable+1]);
 				if(!tableFrom) {
 					continue;
 				}
@@ -256,12 +260,16 @@ angular.module('mitsiApp')
 					continue;
 				}
 				
-				var connectionList = $scope.jsplumb.getConnections({ source:$scope.divPrefix+tableFrom, target:$scope.divPrefix+tableTo }); 
+				const connectionList = $scope.jsplumb.getConnections({ source:$scope.divPrefix+tableFrom, target:$scope.divPrefix+tableTo }); 
 				if(!connectionList) { 
 					continue; 
 				}
-				for(key in connectionList) { 
-					var connection = connectionList[key];
+				for(const key in connectionList) { 
+					if(!connectionList.hasOwnProperty(key)) { // NOSONAR complexity is OK
+						continue;
+					}
+					
+					const connection = connectionList[key];
 					connection.setPaintStyle ({ strokeStyle:"#00ffff", lineWidth:3 });
 				}
 			}
@@ -280,15 +288,15 @@ angular.module('mitsiApp')
 		
 		var index = graph.getIndex(tableName);
 		
-		for(var i=0; i!=$scope.paths.length; i++) {
-			var path = $scope.paths[i];
+		for(let i=0; i!=$scope.paths.length; i++) {
+			const path = $scope.paths[i];
 			
 			if(path.indexOf(index) >= 0) {
 				return true;
 			}
 		}
-		for(var i=0; i!=$scope.rpaths.length; i++) {
-			var path = $scope.rpaths[i];
+		for(let i=0; i!=$scope.rpaths.length; i++) {
+			const path = $scope.rpaths[i];
 			
 			if(path.indexOf(index) >= 0) {
 				return true;
@@ -314,13 +322,13 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getTableFkList = function(tableName) {
-		var fkList = [];
+		const fkList = [];
 		
-		var links = $rootScope.currentSource.mitsiGraph.getLinksByName(tableName);
+		const links = $rootScope.currentSource.mitsiGraph.getLinksByName(tableName);
 		if(links) {
-			for(var i=0; i!=links.length; i++) {
-				var link = links[i];
-				rtable = link.targetName;
+			for(let i=0; i!=links.length; i++) {
+				const link = links[i];
+				// remove ? const rtable = link.targetName;
 				if(link.targetName in $scope.tables && tableName in $scope.tables) {
 					fkList.push({
 						fromTable:tableName,
@@ -331,11 +339,11 @@ angular.module('mitsiApp')
 			}
 		}
 		
-		var rlinks = $rootScope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
+		const rlinks = $rootScope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
 		if(rlinks) {
-			for(var i=0; i!=rlinks.length; i++) {
-				var link = rlinks[i];
-				rtable2 = $rootScope.currentSource.mitsiGraph.getVertexName(link.target);
+			for(let i=0; i!=rlinks.length; i++) {
+				const link = rlinks[i];
+				const rtable2 = $rootScope.currentSource.mitsiGraph.getVertexName(link.target);
 				if(rtable2 in $scope.tables && tableName in $scope.tables) {
 					fkList.push({
 						fromTable:rtable2,
@@ -350,7 +358,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.afterTableUpdate = function(fklist, posses) {
-		$timeout(function() {
+		$timeout(function() { // NOSONAR complexity is OK
 			if(fklist) {
 				for(var i=0; i!=fklist.length; i++) {
 					var mafk = fklist[i];
@@ -359,6 +367,10 @@ angular.module('mitsiApp')
 			}			
 			
 			for(var tableName in $scope.tables) {
+				if(!$scope.tables.hasOwnProperty(tableName)) { // NOSONAR complexity is OK
+					continue;
+				}
+				
 				var telt = document.getElementById($scope.divPrefix+tableName);
 				if(telt != null) {
 					$scope.jsplumb.revalidate(telt);
@@ -368,19 +380,22 @@ angular.module('mitsiApp')
 
 			if(posses) {
 				for(var posse in posses) {
-					var tables = posses[posse];
+					if(!posses.hasOwnProperty(posse)) { 
+						continue;
+					}
+					const tables = posses[posse];
 					
-					if(tables.length > 0) {
-						var tableElt = document.getElementById($scope.divPrefix+posse);
-						if(tableElt) {
+					if(tables.length > 0) { // NOSONAR complexity is OK
+						const tableElt = document.getElementById($scope.divPrefix+posse);
+						if(tableElt) { // NOSONAR complexity is OK
 							$scope.jsplumb.addToPosse(tableElt, posse);
 						}
 					}
 					
-					for(var i=0; i!=tables.length; i++) {
-						var tableName = tables[i];
-						var tableElt = document.getElementById($scope.divPrefix+tableName);
-						if(tableElt) {
+					for(let i=0; i!=tables.length; i++) {
+						const tableName = tables[i];
+						const tableElt = document.getElementById($scope.divPrefix+tableName);
+						if(tableElt) { // NOSONAR complexity is OK
 							$scope.jsplumb.addToPosse(tableElt, posse);
 						}
 					}
@@ -395,6 +410,10 @@ angular.module('mitsiApp')
 		var fkList = [];
 
 		for(var tableName in $scope.tables) {
+			if(!$scope.tables.hasOwnProperty(tableName)) { // NOSONAR complexity is OK
+				continue;
+			}
+			
 			var newFks = $scope.getTableFkList(tableName);
 			fkList = fkList.concat(newFks);
 		}
@@ -406,18 +425,18 @@ angular.module('mitsiApp')
 
 	
 	$scope.getTableBestPlace = function(left, top) {
-		var dx = 40;
-		var dy = 40;
-		var maxIJ = 10;
-		var newLeft = left;
-		var maxLeft = 500;
-		var newTop = top
-		for(var i=0; i<maxIJ; i++) {
+		const dx = 40;
+		const dy = 40;
+		const maxIJ = 10;
+		let newLeft;
+		const maxLeft = 500;
+		let newTop;
+		for(let i=0; i<maxIJ; i++) {
 			newLeft = left;
-			newTop  = top+(i)*dx;
+			newTop  = top+(i)*dy;
 
 			while(newLeft < maxLeft) {
-				var elt = $scope.getTableAtXY(newLeft, newTop);
+				const elt = $scope.getTableAtXY(newLeft, newTop);
 				if(elt == null) {
 					return {x:newLeft, y:newTop};
 				}
@@ -428,8 +447,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getTableAtXY = function(left, top) {
-		var elts = $scope.jsplumbContainer.childNodes;
-		var myMargin = 10;
+		const elts = $scope.jsplumbContainer.childNodes;
+		const myMargin = 10;
 		for(var i=0; i!=elts.length; i++) {
 			var elt = elts[i];
 			if(elt.nodeName != "DIV") {
@@ -484,19 +503,18 @@ angular.module('mitsiApp')
 		return result;
 	}
 	
-	$scope.hasTableMissingLinks = function(tableName, checkFrom, checkTo) {
+	$scope.hasTableMissingLinks = function(tableName, checkFrom, checkTo) { // NOSONAR complexity is OK
 		if(! $scope.currentSource||
 				! $scope.currentSource.mitsiGraph) {
 			return false;
 		}
 		
-		var linkedTables = null;
 		if(checkTo) {
-			linkedTables = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
+			const linkedTables = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
 			if(linkedTables != null) {
-				for(var i=0; i!=linkedTables.length; i++) {
-					var t = linkedTables[i];
-					if(! (t.targetName in $scope.tables)) {
+				for(let i=0; i!=linkedTables.length; i++) {
+					const t = linkedTables[i];
+					if(! (t.targetName in $scope.tables)) { // NOSONAR complexity is OK
 						return true;
 					}
 				}
@@ -504,11 +522,11 @@ angular.module('mitsiApp')
 		}
 		
 		if(checkFrom) {		
-			linkedTables = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
+			const linkedTables = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
 			if(linkedTables != null) {
-				for(var i=0; i!=linkedTables.length; i++) {
-					var t = linkedTables[i];
-					if(! (t.targetName in $scope.tables)) {
+				for(let i=0; i!=linkedTables.length; i++) {
+					const t = linkedTables[i];
+					if(! (t.targetName in $scope.tables)) { // NOSONAR complexity is OK
 						return true;
 					}
 				}
@@ -523,10 +541,10 @@ angular.module('mitsiApp')
 		
 		if($scope.jsplumb.select({source:$scope.divPrefix+from, target:$scope.divPrefix+to}).length > 0) {
 			// TODO : checker qu'on est bien sur les meme champs en récupérant les labels
-			//console.log("allready connected : "+from+" to "+to);
 			return;
-		};
+		}
 		
+		let connection;
 		if(autoCycle) {
 			try {
 				$scope.jsplumb.addEndpoint($scope.divPrefix+from, 
@@ -555,7 +573,7 @@ angular.module('mitsiApp')
 					);
 		
 				
-				var connection = $scope.jsplumb.connect({
+				connection = $scope.jsplumb.connect({
 					uuids : [ $scope.divPrefix+to+"ToUUID", $scope.divPrefix+from+"FromUUID" ]
 				    ,paintStyle:{ 
 				    	strokeStyle:"lightgrey", 
@@ -578,12 +596,12 @@ angular.module('mitsiApp')
 				});
 			}
 			catch(e) {
-				console.log(e);
+				console.log(e); // NOSONAR I want this log
 				throw e;
 			}
 		}
 		else {
-			var connection = $scope.jsplumb.connect({
+			connection = $scope.jsplumb.connect({
 				source:$scope.divPrefix+from,
 				target:$scope.divPrefix+to
 			    ,paintStyle:{ 
@@ -627,12 +645,16 @@ angular.module('mitsiApp')
 		if(!connection || !connection.getOverlays) {
 			return;
 		}
-		var overlays = connection.getOverlays();
+		const overlays = connection.getOverlays();
 		if(!overlays) {
 			return;
 		}
-		for(var overlayId in overlays) {
-			var overlay = overlays[overlayId];
+		for(const overlayId in overlays) {
+			if(!overlays.hasOwnProperty(overlayId)) {
+				continue;
+			}
+
+			const overlay = overlays[overlayId];
 			if(overlay.label) {
 				if(display) {
 					connection.showOverlay(overlayId) ;
@@ -645,11 +667,11 @@ angular.module('mitsiApp')
 
 	}
 	
-	$scope.$on(EVENT_DATABASE_SELECTED, function (event, source) {
+	$scope.$on(EVENT_DATABASE_SELECTED, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED does exist
 		$scope.initGraphDisplay();	
 	});
 	
-	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_OBJECT_SELECTED does exist
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
@@ -657,7 +679,7 @@ angular.module('mitsiApp')
 		}
 		
 	});
-	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH does exist
 		
 		if(databaseObject && databaseObject.id) {
 			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
@@ -674,7 +696,7 @@ angular.module('mitsiApp')
 		}
 	}
 	
-	$scope.mouseOverTableName = function(table) {
+	$scope.mouseOverTableName = function(table) { // NOSONAR keep parameter table
 		this.showIcons = true;
 		
 		$scope.resetTimeoutPromises();
@@ -710,11 +732,15 @@ angular.module('mitsiApp')
 	
 	$scope.tablesInit = function() {
 		
-		//$scope.jsplumb.deleteEveryEndpoint();;
+		// keep ? $scope.jsplumb.deleteEveryEndpoint();;
 		// TODO : hum ca ne sert surement à rien tout ça
 		if($scope.jsplumb) {
 			$scope.jsplumb.detachEveryConnection();
-			for(var t in $scope.tables) {
+			for(const t in $scope.tables) {
+				if(!$scope.tables.hasOwnProperty(t)) {
+					continue;
+				}
+				
 				$scope.jsplumb.remove($scope.divPrefix + t.name);
 			}
 		}
@@ -759,8 +785,12 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.removeAllTables = function() {
-		for(var t in $scope.tables) {
-			var tableElt = document.getElementById($scope.divPrefix + t);
+		for(const t in $scope.tables) {
+			if(!$scope.tables.hasOwnProperty(t)) {
+				continue;
+			}
+			
+			const tableElt = document.getElementById($scope.divPrefix + t);
 			if(tableElt) {
 				$scope.jsplumb.removeFromAllPosses(tableElt);
 				$scope.jsplumb.detachAllConnections(tableElt);
@@ -790,15 +820,15 @@ angular.module('mitsiApp')
 	$scope.pinTemporaryLinkedTables = function(tableName) {
 		var linkedTablesTo = $scope.currentSource.mitsiGraph.getReverseLinksByName(tableName);
 		if(linkedTablesTo != null) {
-			for(var i=0; i!=linkedTablesTo.length; i++) {
-				var t=linkedTablesTo[i];
+			for(let i=0; i!=linkedTablesTo.length; i++) {
+				const t=linkedTablesTo[i];
 				$scope.pinTemporaryTable(t.targetName);
 			}
 		}
 		var linkedTablesFrom = $scope.currentSource.mitsiGraph.getLinksByName(tableName);
 		if(linkedTablesFrom != null) {
-			for(var i=0; i!=linkedTablesFrom.length; i++) {
-				var t=linkedTablesFrom[i];
+			for(let i=0; i!=linkedTablesFrom.length; i++) {
+				const t=linkedTablesFrom[i];
 				$scope.pinTemporaryTable(t.targetName);
 			}
 		}
@@ -833,7 +863,7 @@ angular.module('mitsiApp')
 
 	}
 	
-	$scope.displayProximityGraph = function(currentVertexName, temporary) {
+	$scope.displayProximityGraph = function(currentVertexName, temporary) { // NOSONAR complexity is OK
 		var depth = 1;
 		var name = currentVertexName;
 		var existingTables = [];
@@ -873,10 +903,10 @@ angular.module('mitsiApp')
 		}
 		
 		// append tables
-		for(var i=0; i!=depth; i++) {
-			for(var j=0; j!=proximityGraph.before[i].length; j++) {
-				var index = proximityGraph.before[i][j];
-				var vertexName = graph.getVertexName(index);
+		for(let i=0; i!=depth; i++) {
+			for(let j=0; j!=proximityGraph.before[i].length; j++) {
+				const index = proximityGraph.before[i][j];
+				const vertexName = graph.getVertexName(index);
 				if(vertexName in $scope.tables) {
 					existingTables.push(vertexName);
 				}
@@ -885,16 +915,16 @@ angular.module('mitsiApp')
 							Math.floor(x0-radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.before[i].length+3))),
 							Math.floor(y0-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.before[i].length+3))),
 							vertexName);
-					if(temporary===true) {
+					if(temporary===true) { // NOSONAR complexity is OK
 						$scope.tablesTemporary.push(vertexName);
 						posses[currentVertexName].push(vertexName);
 					}
 					appendedTables.push(vertexName);
 				}
 			}
-			for(var j=0; j!=proximityGraph.after[i].length; j++) {
-				var index = proximityGraph.after[i][j];
-				var vertexName = graph.getVertexName(index);
+			for(let j=0; j!=proximityGraph.after[i].length; j++) {
+				const index = proximityGraph.after[i][j];
+				const vertexName = graph.getVertexName(index);
 				if(vertexName in $scope.tables) {
 					existingTables.push(vertexName);
 				}
@@ -903,7 +933,7 @@ angular.module('mitsiApp')
 							Math.max(0, x0+80+radiu[i]*Math.sin(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
 							Math.max(0, y0+40-radiu[i]*Math.cos(Math.PI*(j+2)/(proximityGraph.after[i].length+3))), 
 							vertexName);
-					if(temporary===true) {
+					if(temporary===true) { // NOSONAR complexity is OK
 						$scope.tablesTemporary.push(vertexName);
 						posses[currentVertexName].push(vertexName);
 					}
@@ -916,15 +946,15 @@ angular.module('mitsiApp')
 		// TODO : verifier qu'on n'ajoute pas deux fois la même FK
 		var fklist = [];
 		$scope.appendVertexLinks(graph, fklist, graph.getVertex(currentVertexIndex), existingTables);
-		for(var i=0; i!=depth; i++) {
-			for(var j=0; j!=proximityGraph.before[i].length; j++) {
-				var index = proximityGraph.before[i][j];
-				var vertex = graph.getVertex(index);
+		for(let i=0; i!=depth; i++) {
+			for(let j=0; j!=proximityGraph.before[i].length; j++) {
+				const index = proximityGraph.before[i][j];
+				const vertex = graph.getVertex(index);
 				$scope.appendVertexLinks(graph, fklist, vertex, existingTables);
 			}
-			for(var j=0; j!=proximityGraph.after[i].length; j++) {
-				var index = proximityGraph.after[i][j];
-				var vertex = graph.getVertex(index);
+			for(let j=0; j!=proximityGraph.after[i].length; j++) {
+				const index = proximityGraph.after[i][j];
+				const vertex = graph.getVertex(index);
 				$scope.appendVertexLinks(graph, fklist, vertex, existingTables);
 			}
 		}
@@ -933,13 +963,22 @@ angular.module('mitsiApp')
 		$scope.afterTableUpdate(fklist, posses);
 	}
 
-	$scope.checkTablesWithNegativePostion = function() {
+	$scope.checkTablesWithNegativePostion = function() { // NOSONAR complexity is OK
 		$scope.updateTablesActualPosition();
+		
+		const graphParent = document.getElementById("graphParent");
+		if(!graphParent) {
+			return;
+		}
 		
 		var minNegativeX = 0;
 		var minNegativeY = 0;
-		for(var tableName in $scope.tables) {
-			var t = $scope.tables[tableName];
+		for(const tableName in $scope.tables) {
+			if(!$scope.tables.hasOwnProperty(tableName)) {
+				continue;
+			}
+			
+			const t = $scope.tables[tableName];
 			if(t.x < minNegativeX) {
 				minNegativeX = t.x;
 			}
@@ -948,56 +987,64 @@ angular.module('mitsiApp')
 			}
 		}
 		if(minNegativeX < 0) {
-			for(var tableName in $scope.tables) {
+			for(const tableName in $scope.tables) {
+				if(!$scope.tables.hasOwnProperty(tableName)) {
+					continue;
+				}
+				
 				$scope.tables[tableName].x = $scope.tables[tableName].x-minNegativeX+60;
 			}
 			
-			var scroll = document.getElementById("graphScroll");
-			var newScrollLeft = graphParent.scrollLeft - minNegativeX + 60;
+			const scroll = document.getElementById("graphScroll");
+			const newScrollLeft = graphParent.scrollLeft - minNegativeX + 60;
 			scroll.scrollLeft = newScrollLeft;
 			
 		}
 
 		if(minNegativeY < 0) {
-			for(var tableName in $scope.tables) {
+			for(const tableName in $scope.tables) {
+				if(!$scope.tables.hasOwnProperty(tableName)) {
+					continue;
+				}
+				
 				$scope.tables[tableName].y = $scope.tables[tableName].y-minNegativeY+60;
 			}
 			
-			var scroll = document.getElementById("graphScroll");
-			var newScrollTop = graphParent.scrollTop - minNegativeY + 60;
+			const scroll = document.getElementById("graphScroll");
+			const newScrollTop = graphParent.scrollTop - minNegativeY + 60;
 			scroll.scrollTop = newScrollTop;
 
 		}
 	}
 	
 	$scope.appendVertexLinks = function(graph, fklist, vertex, existingTables) {
-		for(var i=0; i!=vertex.links.length; i++) {
-			var l = vertex.links[i];
-			var targetVertexName = graph.getVertexName(l.target);
+		for(let i=0; i!=vertex.links.length; i++) {
+			const l = vertex.links[i];
+			const targetVertexName = graph.getVertexName(l.target);
 			
-			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
-				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
+			if((existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) &&
+				vertex.name in $scope.tables && 
+				targetVertexName in $scope.tables) {
 					fklist.push({
 						fromTable:vertex.name,
 						fromColumns:l.properties.keyColumns,
 						toTable:targetVertexName,
 						toColumns:l.properties.rKeyColumns});
-				}
 			}
 		}
 
-		for(var i=0; i!=vertex.reverseLinks.length; i++) {
-			var l = vertex.reverseLinks[i];
-			var targetVertexName = graph.getVertexName(l.target);
+		for(let i=0; i!=vertex.reverseLinks.length; i++) {
+			const l = vertex.reverseLinks[i];
+			const targetVertexName = graph.getVertexName(l.target);
 			
-			if(existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) {
-				if(vertex.name in $scope.tables && targetVertexName in $scope.tables) {
+			if((existingTables.indexOf(vertex.name) == -1 || existingTables.indexOf(targetVertexName) == -1) &&
+				vertex.name in $scope.tables && 
+				targetVertexName in $scope.tables) {
 					fklist.push({
 						fromTable:targetVertexName,
 						fromColumns:l.properties.keyColumns,
 						toTable:vertex.name,
 						toColumns:l.properties.rKeyColumns});
-				}
 			}
 		}
 	}
@@ -1008,7 +1055,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.toggleTableInSQL = function(table) {
-		var i = $scope.sqlTables.indexOf(table.name);
+		let i = $scope.sqlTables.indexOf(table.name);
 		if(i == -1) {
 			$scope.sqlTables.push(table.name);
 			
@@ -1029,30 +1076,30 @@ angular.module('mitsiApp')
 		return $scope.sqlTables.indexOf(table.name) != -1;
 	}
 	
-	$scope.updateSQLText = function() {
+	$scope.updateSQLText = function() { // NOSONAR complexity is OK
 		$scope.sqlText = "";
 		if($scope.sqlTables.length == 0) {
 			return;
 		}
 		
-		var connectedSubGroups = $scope.getConnectedSubGroups($scope.sqlTables);
+		const connectedSubGroups = $scope.getConnectedSubGroups($scope.sqlTables);
 		$scope.sqlText = [];
 		
 		if(connectedSubGroups.length > 1) {
 			$scope.sqlText.push("/!\\ not all tables are connected together /!\\");
 		}
-		for(var i=0; i!=connectedSubGroups.length; i++) {
-			var subGroup = connectedSubGroups[i];
+		for(let i=0; i!=connectedSubGroups.length; i++) {
+			const subGroup = connectedSubGroups[i];
 			
-			for(var j=0; j!=subGroup.length; j++) {
-				var link=subGroup[j];
+			for(let j=0; j!=subGroup.length; j++) {
+				const link=subGroup[j];
 				if(link.found=="none_first" || link.found=="isolate") {
-					var tableName = $scope.getTableNameForSql(link.fromName);
+					const tableName = $scope.getTableNameForSql(link.fromName);
 					$scope.sqlText.push((i==0 ? "FROM" : ",")+" "+tableName);
 				}
 				if(link.found!="isolate") {
-					var fromTableName = $scope.getTableNameForSql(link.fromName);
-					var toTableName   = $scope.getTableNameForSql(link.toName);
+					const fromTableName = $scope.getTableNameForSql(link.fromName);
+					const toTableName   = $scope.getTableNameForSql(link.toName);
 					$scope.sqlText.push(
 							  "join "+(link.found=="to"?fromTableName:toTableName)
 							+ " on "
@@ -1064,16 +1111,16 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getJoinConditionFromFKs = function(fromName, toName, fromKeyColumns, toKeyColumns) {
-		var froms = fromKeyColumns.split("\n");
-		var tos = toKeyColumns.split("\n");
+		const froms = fromKeyColumns.split("\n");
+		const tos = toKeyColumns.split("\n");
 		
-		var condition = "";
+		let condition = "";
 
 		if(froms.length > 1) {
-			var first = true;
-			for(var i=0; i!=froms.length; i++) {
+			let first = true;
+			for(let i=0; i!=froms.length; i++) {
 				condition = condition 
-						+ (first==false ? " or " : "")
+						+ (first ? "" : " or ")
 						+ "(" 
 						+ $scope.getJoinConditionFromColumns(fromName, toName, froms[0], tos[0])
 						+ ")"
@@ -1088,13 +1135,13 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getJoinConditionFromColumns = function(fromName, toName, fromKeyColumns, toKeyColumns) {
-		var froms = fromKeyColumns.split(",");
-		var tos = toKeyColumns.split(",");
+		const froms = fromKeyColumns.split(",");
+		const tos = toKeyColumns.split(",");
 		
-		var condition = "";
-		var first = true;
-		for(var i=0; i!=froms.length; i++) {
-			if(first == true) {
+		let condition = "";
+		let first = true;
+		for(let i=0; i!=froms.length; i++) {
+			if(first) {
 				first = false;
 			}
 			else {
@@ -1106,27 +1153,27 @@ angular.module('mitsiApp')
 		return condition;
 	}
 	
-	$scope.getConnectedSubGroups = function(tableNames) {
-		var graph = $scope.currentSource.mitsiGraph;
-		var links = [];
-		var currentSubGroup = [];
-		var subGroups = [];
-		var tablesWithLinks = {};
+	$scope.getConnectedSubGroups = function(tableNames) { // NOSONAR complexity is OK
+		const graph = $scope.currentSource.mitsiGraph;
+		const links = [];
+		let currentSubGroup = [];
+		const subGroups = [];
+		const tablesWithLinks = {};
 		
-		for(var i=0; i!=tableNames.length; i++) {
-			var tableName = tableNames[i];
-			var vertexConnections = graph.getLinksByName(tableName);
-			for(var j=0; j!=vertexConnections.length; j++) {
-				var vertexConnection = vertexConnections[j];
-				var targetName = vertexConnection.targetName;
+		for(let i=0; i!=tableNames.length; i++) {
+			const tableName = tableNames[i];
+			const vertexConnections = graph.getLinksByName(tableName);
+			for(let j=0; j!=vertexConnections.length; j++) { // NOSONAR complexity is OK
+				const vertexConnection = vertexConnections[j];
+				const targetName = vertexConnection.targetName;
 				
 				// ignore auto-loop 
-				if(targetName==tableName) {
+				if(targetName==tableName) { // NOSONAR complexity is OK
 					continue;
 				}
 				
 				// ignore where link does not concern one of the selected tables
-				if(tableNames.indexOf(targetName) == -1) {
+				if(tableNames.indexOf(targetName) == -1) { // NOSONAR complexity is OK
 					continue;
 				}
 				
@@ -1142,15 +1189,15 @@ angular.module('mitsiApp')
 			
 		}
 		
-		var allDone = false;
-		var nothingFoundThisLoop = false;
-		var currentSubGroupTables = [];
-		while(allDone == false) {
+		let allDone = false;
+		let nothingFoundThisLoop;
+		const currentSubGroupTables = [];
+		while(!allDone) {
 			allDone = true;
 			nothingFoundThisLoop = true;
-			for(var i=0; i!=links.length; i++) {
-				var link = links[i]
-				if(link.done == true) {
+			for(let i=0; i!=links.length; i++) { // NOSONAR complexity is OK
+				const link = links[i]
+				if(link.done) {
 					continue;
 				}
 				allDone = false;
@@ -1163,7 +1210,6 @@ angular.module('mitsiApp')
 					currentSubGroup.push(link);
 					currentSubGroupTables.push(link.fromName);
 					currentSubGroupTables.push(link.toName);
-					nothingFoundThisLoop = false;
 					continue;
 				}
 				
@@ -1189,7 +1235,7 @@ angular.module('mitsiApp')
 		
 			}
 			
-			if(nothingFoundThisLoop == true && allDone==false) {
+			if(nothingFoundThisLoop && !allDone) {
 				// subGroup finished, let's create a new subGroup
 				subGroups.push(currentSubGroup);
 				currentSubGroup = [];
@@ -1202,8 +1248,8 @@ angular.module('mitsiApp')
 		}
 		
 		// we should not forget the tables with no link at all
-		for(var i=0; i!=tableNames.length; i++) {
-			var tableName = tableNames[i];
+		for(let i=0; i!=tableNames.length; i++) {
+			const tableName = tableNames[i];
 			if( ! (tableName in tablesWithLinks)) {
 				subGroups.push( [ { fromName:tableName, toName:null, found:"isolate" } ] );
 			}
@@ -1214,12 +1260,12 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.requestInfo = function(object) {
-        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_INFO_REQUESTED, $rootScope.currentSource, object);
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_INFO_REQUESTED, $rootScope.currentSource, object); // NOSONAR EVENT_DATABASE_OBJECT_INFO_REQUESTED does exist
 	}
 	
 	$scope.showGraphUrlDialog = function() {
 
-		modalInstance = $modal.open({
+		$modal.open({
 		      animation: true,
 		      ariaLabelledBy: 'modal-title',
 		      ariaDescribedBy: 'modal-body',
@@ -1236,7 +1282,7 @@ angular.module('mitsiApp')
 	
 	$scope.showOptionsDialog = function() {
 
-		modalInstance = $modal.open({
+		const modalInstance = $modal.open({
 		      animation: true,
 		      ariaLabelledBy: 'modal-title',
 		      ariaDescribedBy: 'modal-body',
@@ -1265,7 +1311,7 @@ angular.module('mitsiApp')
 			return name;
 		}
 		
-		var i = name.indexOf(".");
+		const i = name.indexOf(".");
 		if(i<0 || name.substring(0, i)!==$rootScope.currentSource.currentSchemaName) {
 			return name;
 		}
@@ -1278,7 +1324,7 @@ angular.module('mitsiApp')
 			return name;
 		}
 		
-		var i = name.indexOf(".");
+		const i = name.indexOf(".");
 		if(i<0 || name.substring(0, i)!==$rootScope.currentSource.currentSchemaName) {
 			return name;
 		}
@@ -1286,18 +1332,17 @@ angular.module('mitsiApp')
 		return name.substring(i+1);
 	}
 	
-	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tableList, xList, yList) {
+	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tableList, xList, yList) { // NOSONAR EVENT_DISPLAY_GRAPH does exist
 		
 		if(tableList && xList && yList) {
 			$scope.removeAllTables();
 			
-			var fklist = [];
-			var nbTables = Math.min(tableList.length, xList.length, yList.length);
-			for(var i=0; i!=nbTables; i++) {
-				var table = tableList[i];
-				var tableName = tableList[i];
-				var tableX    = xList[i];
-				var tableY    = yList[i]; 
+			let fklist = [];
+			const nbTables = Math.min(tableList.length, xList.length, yList.length);
+			for(let i=0; i!=nbTables; i++) {
+				const tableName = tableList[i];
+				const tableX    = xList[i];
+				const tableY    = yList[i]; 
 				
 				$scope.appendTable(parseInt(tableX), parseInt(tableY), tableName);
 				fklist = fklist.concat($scope.getTableFkList(tableName));
@@ -1314,16 +1359,20 @@ angular.module('mitsiApp')
 			return;
 		}
 		
-		var baseUrl = $location.absUrl();
-		var i = baseUrl.indexOf("?");
+		let baseUrl = $location.absUrl();
+		const i = baseUrl.indexOf("?");
 		if(i > 0) {
 			baseUrl = baseUrl.substring(0, i);
 		}
 		
-		url = baseUrl + "?source=" + $rootScope.currentSource.name;
+		let url = baseUrl + "?source=" + $rootScope.currentSource.name;
 		
-		for(var tableName in $scope.tables) {
-			var tableDiv = document.getElementById($scope.divPrefix+tableName);
+		for(const tableName in $scope.tables) {
+			if(!$scope.tables.hasOwnProperty(tableName)) {
+				continue;
+			}
+			
+			const tableDiv = document.getElementById($scope.divPrefix+tableName);
 			if(tableDiv) {
 				url = url + "&table=" + tableName + "&x="+tableDiv.offsetLeft+"&y="+tableDiv.offsetTop;
 			}
@@ -1334,8 +1383,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.resizeJsPlumbContainerIfNecessary = function(width, height) {
-		var targetWidth  = width + 200;
-		var targetHeight = height + 150;
+		const targetWidth  = width + 200;
+		const targetHeight = height + 150;
 		
 		if($scope.jsplumbContainer.offsetWidth < targetWidth) {
 			$scope.jsplumbContainer.style.width = targetWidth+"px";
@@ -1347,10 +1396,14 @@ angular.module('mitsiApp')
 	
 	$scope.updateTablesActualPosition = function() {
 		// get the actual position of the tables in the graph
-		for(var tableName in $scope.tables) {
-			var tableDiv = document.getElementById($scope.divPrefix+tableName);
+		for(const tableName in $scope.tables) {
+			if(!$scope.tables.hasOwnProperty(tableName)) {
+				continue;
+			}
+			
+			const tableDiv = document.getElementById($scope.divPrefix+tableName);
 			if(tableDiv) {
-				var t = $scope.tables[tableName];
+				const t = $scope.tables[tableName];
 				t.x = tableDiv.offsetLeft;
 				t.y = tableDiv.offsetTop;
 			}

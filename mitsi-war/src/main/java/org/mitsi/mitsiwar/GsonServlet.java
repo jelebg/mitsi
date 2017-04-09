@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
+import org.mitsi.core.DatasourceManager;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.MitsiDatasources;
 import org.mitsi.users.MitsiUsersConfig;
@@ -31,6 +32,9 @@ public abstract class GsonServlet<Request, Response> extends HttpServlet {
 	protected transient MitsiDatasources mitsiDatasources; //NOSONAR should not inject inside a servlet TODO : rework needed 
 	@Autowired
 	protected transient MitsiUsersConfig mitsiUsersConfig; //NOSONAR should not inject inside a servlet TODO : rework needed
+	@Autowired
+	protected transient DatasourceManager datasourceManager;
+
 
 	final Class<Request> requestClass;
 	public GsonServlet(Class<Request> requestClass) {

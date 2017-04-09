@@ -1,7 +1,7 @@
 package org.mitsi.users;
 
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.SortedSet;
 import java.lang.SuppressWarnings;
 
 @SuppressWarnings("squid:S2068") // here, constants with the prefix PASSWORD are not passwords
@@ -24,5 +24,5 @@ public interface MitsiUsersConfig {
 	String getLdapGroupRoleAttribute();
 	String getLdapMandatoryRole();
 	Map<String, String[]> getGroups();
-	TreeSet<String> getUserGrantedGroups(String username);
+	SortedSet<String> getUserGrantedGroups(String username);
 }

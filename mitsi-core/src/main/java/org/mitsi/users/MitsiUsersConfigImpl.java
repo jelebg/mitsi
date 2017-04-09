@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -28,15 +29,17 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 
 	private MitsiUsersFile usersFileLoaded;
 
+	@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 	class User {
+		public String username;
+		public String encodedPassword;
 		
 		public User(String username, String encodedPassword) {
 			this.username = username;
 			this.encodedPassword = encodedPassword;
 		}
-		public String username;
-		public String encodedPassword;
 	}
+	
 	// map of users configured in file
 	Map<String, User> users = null;
 	// maps of user groups, for users configured in file OR in ldap
@@ -49,7 +52,7 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 			l = usersFile.getFile().lastModified();
 		}
 		catch(Exception e) {
-			//nothing
+			log.debug("error in getResourceTimestamp", e);
 		}
 		if(l>0) {
 			return new Date(l);
@@ -58,6 +61,7 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 	}
 	
 	@Override
+	@SuppressWarnings({"squid:S3776","squid:S134"})
 	public void load() {
 
 		try {
@@ -118,13 +122,15 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 
 	@Override
 	public boolean authenticate(String username, String password) throws MitsiUsersException {
+		final String wrongPMessage = "wrong password format for user "; 
+				
 		User user = users.get(username);
 		if(user == null) {
 			return false;
 		}
 		
 		String encodedPassword = user.encodedPassword;
-		String checkPassword = null;
+		String checkPassword;
 		if(encodedPassword.toLowerCase().startsWith(PASSWORD_PREFIX_CLEAR)) {
 			checkPassword = PASSWORD_PREFIX_CLEAR+password;
 			return encodedPassword.equals(checkPassword);
@@ -132,8 +138,8 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 		else if(encodedPassword.toLowerCase().startsWith(PASSWORD_PREFIX_SSHA256)) {
 			int i = encodedPassword.indexOf(PASSWORD_SALT_SEP);
 			if(i <= 0) {
-				log.error("wrong password format for user "+username);
-				throw new MitsiUsersException("wrong password format for user "+username);
+				log.error(wrongPMessage+username);
+				throw new MitsiUsersException(wrongPMessage+username);
 			}
 			
 			String saltHexa = encodedPassword.substring(PASSWORD_PREFIX_SSHA256.length(), i);
@@ -150,8 +156,8 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 			}
 		}
 
-		log.error("wrong password format for user "+username);
-		throw new MitsiUsersException("wrong password format for user "+username);
+		log.error(wrongPMessage+username);
+		throw new MitsiUsersException(wrongPMessage+username);
 		
 	}
 	
@@ -222,9 +228,9 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 	}
 	
 	@Override
-	public TreeSet<String> getUserGrantedGroups(String username) {
+	public SortedSet<String> getUserGrantedGroups(String username) {
 		if(username == null) {
-			return null;
+			return new TreeSet<>();
 		}
 		return userGroups.get(username);
 	}

@@ -2,6 +2,7 @@ package org.mitsi.mitsiwar.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -44,7 +45,7 @@ public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 
 		response.connectedUsername = connectedClient.getConnectedUsername();
 		response.datasources = null;
-		TreeSet<String> groups = null;
+		SortedSet<String> groups = null;
 		if(response.connectedUsername != null) {
 			groups = mitsiUsersConfig.getUserGrantedGroups(response.connectedUsername);
 		}

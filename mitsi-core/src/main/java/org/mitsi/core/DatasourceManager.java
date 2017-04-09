@@ -3,7 +3,7 @@ package org.mitsi.core;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -103,7 +103,7 @@ public class DatasourceManager {
 		mitsiDatasources.loadIfNeccessary();
 	}
 	
-	public MitsiConnection getConnection(TreeSet<String> userGrantedGroups, boolean isUserConnected, String datasourceName) throws MitsiUsersException {
+	public MitsiConnection getConnection(SortedSet<String> userGrantedGroups, boolean isUserConnected, String datasourceName) throws MitsiUsersException {
 		MitsiDatasource datasource = mitsiDatasources.getDatasource(userGrantedGroups, isUserConnected, datasourceName);
 		if(datasource == null) {
 			throw new MitsiUsersException("cannot find datasource "+datasourceName);

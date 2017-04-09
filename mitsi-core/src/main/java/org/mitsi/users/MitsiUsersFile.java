@@ -1,11 +1,12 @@
 package org.mitsi.users;
 
-import java.util.HashMap;
+import java.util.Map;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class MitsiUsersFile {
-	public HashMap<String, String> users;
+	public Map<String, String> users;
 	public LdapAuthent ldapAuthent;
-	public HashMap<String, String[]> groups;
+	public Map<String, String[]> groups;
 	
 	
 	class 	LdapAuthent {

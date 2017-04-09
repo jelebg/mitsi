@@ -2,7 +2,7 @@ package org.mitsi.mitsiwar.datasources;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.MitsiDatasource;
@@ -38,7 +38,7 @@ public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDataso
 		GetDatasourcesResponse response = new GetDatasourcesResponse();
 		
 		String connectedUsername = connectedClient.getConnectedUsername();
-		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		
 		response.datasources = new ArrayList<>();
 		List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, connectedUsername!=null);

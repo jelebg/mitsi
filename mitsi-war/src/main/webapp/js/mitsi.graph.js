@@ -1,6 +1,6 @@
 // TODO : supprimer les références à Eppstein et remplacer par du BFS, valable ici pour un K-shortest
 
-function MitsiGraph(relations) {
+function MitsiGraph() {
 	this.nameTable = {};	
 	this.vertexes = []; // BTW, should be vertices not vertexes
 	
@@ -17,10 +17,10 @@ function MitsiGraph(relations) {
 		}
 	}
 	
-	this.initWithDatabaseObjects = function(databaseObjects) {
+	this.initWithDatabaseObjects = function(databaseObjects) { // NOSONAR indeed this function is too complex but it is OK 
 		// create vertices
-		for(var i=0; i!=databaseObjects.length; i++) {
-			var dobj = databaseObjects[i];
+		for(let i=0; i!=databaseObjects.length; i++) {
+			const dobj = databaseObjects[i];
 			
 			if(dobj.id.type != "table" && dobj.id.type != "matview") {
 				continue;
@@ -31,28 +31,29 @@ function MitsiGraph(relations) {
 		}
 		
 		// create links
-		for(var i=0; i!=databaseObjects.length; i++) {
-			var dobj = databaseObjects[i];
+		for(let i=0; i!=databaseObjects.length; i++) {
+			const dobj = databaseObjects[i];
 			
 			if(dobj.id.type != "table" && dobj.id.type != "matview") {
 				continue;
 			}
 			
-			var pos = this.nameTable[dobj.id.schema+"."+dobj.id.name];
-			var v = this.vertexes[pos];
-			for(var k=0; k!=dobj.constraints.length; k++) {
-				var constraint = dobj.constraints[k];
+			const pos = this.nameTable[dobj.id.schema+"."+dobj.id.name];
+			const v = this.vertexes[pos];
+			for(let k=0; k!=dobj.constraints.length; k++) {
+				const constraint = dobj.constraints[k];
 				
 				if(constraint.type != 'R') {
 					continue;
 				}
 				
-				var rpos = this.nameTable[constraint.fkConstraintOwner+"."+constraint.fkTable];
-				var rv = this.vertexes[rpos];
-				var linkAlreadyExists = false;
-				for(var j=0; j!=v.links.length; j++) {
-					var l = v.links[j];
-					if(l.target == rpos) {
+				const rpos = this.nameTable[constraint.fkConstraintOwner+"."+constraint.fkTable];
+				const rv = this.vertexes[rpos];
+				let linkAlreadyExists = false;
+				let l = null;
+				for(let j=0; j!=v.links.length; j++) {
+					l = v.links[j];
+					if(l.target == rpos) { // NOSONAR complexity is OK
 						linkAlreadyExists = true;
 						break;
 					}
@@ -61,11 +62,13 @@ function MitsiGraph(relations) {
 				if(linkAlreadyExists) {
 					// if a link already exists in the same direction between the 2 tables, 
 					// do not create a new link but put new properties in existing link and reverse link
-					l.properties.keyColumns  +=  "\n"+constraint.columns;
-					l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
+					if(l) { // NOSONAR complexity is OK
+						l.properties.keyColumns  +=  "\n"+constraint.columns;
+						l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
+					}
 					
-					for(var j=0; j!=rv.reverseLinks.length; j++) {
-						var l = rv.reverseLinks[j];
+					for(let j=0; j!=rv.reverseLinks.length; j++) { // NOSONAR complexity is OK
+						l = rv.reverseLinks[j];
 						if(l.target == rpos) {
 							break;
 						}
@@ -77,7 +80,7 @@ function MitsiGraph(relations) {
 				}
 				else {
 					// if no link exists in the same direction between the 2 tables, create a new link 
-					var newLink = {
+					const newLink = {
 						"target"     : rpos,
 						"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
 						"properties" : {
@@ -88,7 +91,7 @@ function MitsiGraph(relations) {
 					
 					v.links.push(newLink);
 					
-					var newReverseLink = {
+					const newReverseLink = {
 						"target"     : pos,
 						// TODO : BUG ? : ne devrait pas plutot etre la table dobj.id.schema+dobj.id.name ??? bon je corrige
 						"targetName" : dobj.id.schema+"."+dobj.id.name, //constraint.fkConstraintOwner+"."+constraint.fkTable,
@@ -105,26 +108,36 @@ function MitsiGraph(relations) {
 		}
 	}
 	
-	this.initWithRelations = function(relations) {
+	this.initWithRelations = function(relations) { // NOSONAR copmplexity is OK
 		// order relations by tableOwner/tableName/keyColumnsStr/rTableOwner/rTableName/rKeyColumnsStr
 		relations.sort(function(a, b) {
-			var lc = a.tableOwner.localeCompare(b.tableOwner);
-			if(lc != 0) return lc;
+			let lc = a.tableOwner.localeCompare(b.tableOwner);
+			if(lc != 0) {
+				return lc;
+			}
 			lc = a.tableName.localeCompare(b.tableName);
-			if(lc != 0) return lc;
+			if(lc != 0) {
+				return lc;
+			}
 			lc = a.keyColumnsStr.localeCompare(b.keyColumnsStr);
-			if(lc != 0) return lc;
+			if(lc != 0) {
+				return lc;
+			}
 			lc = a.rTableOwner.localeCompare(b.rTableOwner);
-			if(lc != 0) return lc;
+			if(lc != 0) {
+				return lc;
+			}
 			lc = a.rTableName.localeCompare(b.rTableName);
-			if(lc != 0) return lc;
+			if(lc != 0) {
+				return lc;
+			}
 			lc = a.rKeyColumnsStr.localeCompare(b.rKeyColumnsStr);
 			return lc;
 		});
 		
 		// d'abord on crée une entrée pour chaque sommet
-		for(var i=0; i!=relations.length; i++) {
-			var relation = relations[i];
+		for(let i=0; i!=relations.length; i++) {
+			const relation = relations[i];
 			
 			this.createVertexIfNecessary(relation.tableOwner+"."+relation.tableName);
 			this.createVertexIfNecessary(relation.rTableOwner+"."+relation.rTableName);
@@ -132,16 +145,16 @@ function MitsiGraph(relations) {
 		}
 		
 		// ensuite on popule les relations de chaque sommet
-		for(var i=0; i!=relations.length; i++) {
-			var relation = relations[i];
+		for(let i=0; i!=relations.length; i++) {
+			const relation = relations[i];
 			
-			var pos  = this.nameTable[relation.tableOwner+"."+relation.tableName];
-			var rpos = this.nameTable[relation.rTableOwner+"."+relation.rTableName];
-			var v = this.vertexes[pos];
-			var rv = this.vertexes[rpos];
-			var linkAlreadyExists = false;
-			for(var j=0; j!=v.links.length; j++) {
-				var l = v.links[j];
+			const pos  = this.nameTable[relation.tableOwner+"."+relation.tableName];
+			const rpos = this.nameTable[relation.rTableOwner+"."+relation.rTableName];
+			const v = this.vertexes[pos];
+			const rv = this.vertexes[rpos];
+			let linkAlreadyExists = false;
+			for(let j=0; j!=v.links.length; j++) {
+				const l = v.links[j];
 				if(l.target == rpos) {
 					linkAlreadyExists = true;
 					break;
@@ -151,23 +164,26 @@ function MitsiGraph(relations) {
 			if(linkAlreadyExists) {
 				// if a link already exists in the same direction between the 2 tables, 
 				// do not create a new link but put new properties in existing link and reverse link
-				l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
-				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+				/* TODO remove ? l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(","); */
 				
-				for(var j=0; j!=rv.reverseLinks.length; j++) {
-					var l = rv.reverseLinks[j];
-					if(l.target == rpos) {
+				let l = null;
+				for(let j=0; j!=rv.reverseLinks.length; j++) {
+					l = rv.reverseLinks[j];
+					if(l.target == rpos) { // NOSONAR complexity is OK
 						break;
 					}
 				}
 				
-				l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
-				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+				if(l) {
+					l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+					l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(",");
+				}
 				
 			}
 			else {
 				// if no link exists in the same direction between the 2 tables, create a new link 
-				var newLink = {
+				const newLink = {
 					"target"     : rpos,
 					"targetName" : relation.rTableOwner+"."+relation.rTableName,
 					"properties" : {
@@ -178,7 +194,7 @@ function MitsiGraph(relations) {
 				
 				v.links.push(newLink);
 				
-				var newReverseLink = {
+				const newReverseLink = {
 					"target"     : pos,
 					"targetName" : relation.tableOwner+"."+relation.tableName,
 					"properties" : {
@@ -197,7 +213,7 @@ function MitsiGraph(relations) {
 	
 
 	this.getLinksByName = function(tableOwner, tableName) {
-		var pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
+		const pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
 		if(pos == undefined) {
 			return null;
 		}
@@ -209,7 +225,7 @@ function MitsiGraph(relations) {
 	}
 	
 	this.getReverseLinksByName = function(tableOwner, tableName) {
-		var pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
+		const pos = this.nameTable[tableOwner+(tableName?"."+tableName:"")];
 		if(pos == undefined) {
 			return null;
 		}
@@ -231,36 +247,36 @@ function MitsiGraph(relations) {
 		return this.vertexes[index];
 	}
 	
-	this.getProximityGraph = function(index, depth) {
-		var toexplore = [ index ];
-		var explored = [];
-		var before = [];
-		var after = [];
+	this.getProximityGraph = function(index, depth) { // NOSONAR complexity is OK
+		let toexplore = [ index ];
+		const explored = [];
+		const before = [];
+		const after = [];
 		
-		for(var i=0; i!=depth; i++) {
-			var newBefore = [];
-			var newAfter = [];
-			var toexplorenext = [];
+		for(let i=0; i!=depth; i++) {
+			const newBefore = [];
+			const newAfter = [];
+			const toexplorenext = [];
 
-			for(var j=0; j!=toexplore.length; j++) {
-				var exploreIndex = toexplore[j];
+			for(let j=0; j!=toexplore.length; j++) {
+				const exploreIndex = toexplore[j];
 				explored.push(exploreIndex);
-				var links = this.getLinks(exploreIndex);
-				var reverseLinks = this.getReverseLinks(exploreIndex);
+				const links = this.getLinks(exploreIndex);
+				const reverseLinks = this.getReverseLinks(exploreIndex);
 				
-				for(var k=0; k!=links.length; k++) {
-					var index = links[k].target;
+				for(let k=0; k!=links.length; k++) { // NOSONAR complexity is OK
+					const index = links[k].target;
 
-					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
+					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) { // NOSONAR complexity is OK
 						newAfter.push(index);
 						toexplorenext.push(index);
 					}
 				}
 				
-				for(var k=0; k!=reverseLinks.length; k++) {
-					var index = reverseLinks[k].target;
+				for(let k=0; k!=reverseLinks.length; k++) { // NOSONAR complexity is OK
+					const index = reverseLinks[k].target;
 					
-					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) {
+					if(explored.indexOf(index) < 0 && toexplorenext.indexOf(index) < 0 && toexplore.indexOf(index) < 0) { // NOSONAR complexity is OK
 						newBefore.push(index);
 						toexplorenext.push(index);
 					}
@@ -280,9 +296,8 @@ function MitsiGraph(relations) {
 	}
 
 	this.getAllPaths = function(startIndex, endIndex, reverse) {
-		var path = [ startIndex ];
-		var paths = this.getAllPathsDFS(endIndex, path, reverse) ;
-		return paths;
+		const path = [ startIndex ];
+		return this.getAllPathsDFS(endIndex, path, reverse);
 	}
 
 	
@@ -296,13 +311,13 @@ function MitsiGraph(relations) {
 		return 0;
 	}
 	
-	this.getKShortestPathBFSTreePush = function(tree, sidetrackpath, stDistance) {
-		var removeone = false;
-		var current = tree;
-		var topmost = true;
-		for(var i=0; i!=sidetrackpath.length; i++) {
-			var st = sidetrackpath[i];
-			var c = current.childs[st];
+	this.getKShortestPathBFSTreePush = function(tree, sidetrackpath, stDistance) { // NOSONAR complexity is OK
+		let removeone = false;
+		let current = tree;
+		let topmost = true;
+		for(let i=0; i!=sidetrackpath.length; i++) { // NOSONAR complexity is OK
+			const st = sidetrackpath[i];
+			let c = current.childs[st];
 			if(c) {
 				if(current.sortedChilds.length>0 &&
 						current.sortedChilds[current.sortedChilds.length-1] != st) {
@@ -334,7 +349,7 @@ function MitsiGraph(relations) {
 			
 			if(i != sidetrackpath.length-1) {
 				// normally, nodes should be added only at the tip of the tree
-				console.log("ERROR !!! when build Eppstein side tracks tree");
+				console.log("ERROR !!! when build Eppstein side tracks tree"); // NOSONAR : this code will be deleted
 			}
 
 			if(tree.nbChilds < tree.maxChilds) {
@@ -346,25 +361,25 @@ function MitsiGraph(relations) {
 		}
 
 		if(removeone) {
-			var current = tree;
+			let current = tree;
 			while(current.sortedChilds.length > 0) {
 				current = current.sortedChilds[current.sortedChilds.length-1];
 			}
 			
-			var toremove = current.sortedChilds.pop();
+			const toremove = current.sortedChilds.pop();
 			delete current.childs[toremove];
 		}
 
 	}
 	
-	this.getKShortestPathBFS = function(tEppstein, tree, visited, tovisit) {
-		var newtovisit = [];
+	this.getKShortestPathBFS = function(tEppstein, tree, visited, tovisit) { // NOSONAR complexity is OK
+		const newtovisit = [];
 		
-		for(var i=0; i!=tovisit.length; i++) {
-			var visiting = tovisit[i];
+		for(let i=0; i!=tovisit.length; i++) {
+			const visiting = tovisit[i];
 			
 			// add in tree only if not shortest path
-			var sidetrackpath = visiting.prevpath;
+			let sidetrackpath = visiting.prevpath;
 			if(visiting.dt > 0) {
 				sidetrackpath = copyArrayPlusValue(visiting.prevpath, visiting.i);
 				// todo : add distance information somewhere
@@ -380,12 +395,12 @@ function MitsiGraph(relations) {
 			//if(visited.indexOf(visiting.i) >= 0) {
 			//	continue;
 			//}
-			var tEppsteinEntry = tEppstein[visiting.i];
+			const tEppsteinEntry = tEppstein[visiting.i];
 			//  if tEppsteinEntry does exist, either there is no path via this target or it is the endIndex
 			if(tEppsteinEntry) {
-				var ls = tEppsteinEntry.ls; 
-				for(var j=0; j!=ls.length; j++) {
-					if(ls[j]) {
+				const ls = tEppsteinEntry.ls; 
+				for(let j=0; j!=ls.length; j++) {
+					if(ls[j]) { // NOSONAR complexity is OK
 						// protection against cycles
 						// TODO : check if it works
 						if(visited.indexOf(ls[j].t) >= 0) {
@@ -406,7 +421,7 @@ function MitsiGraph(relations) {
 	this.getKShortestSliceTree = function(tree, k) {
 		// TODO : use precomputed order
 		var cnt = 1;
-		for(var i=0; i!=tree.sortedChilds.length; i++) {
+		for(let i=0; i!=tree.sortedChilds.length; i++) {
 			cnt += this.getKShortestSliceTree(tree.sortedChilds[i]);
 			if(cnt > k) {
 				tree.sortedChilds = tree.sortedChilds.slice(0, i+1);
@@ -418,35 +433,35 @@ function MitsiGraph(relations) {
 	}
 	
 	this.getKShortestPathFromTreeDFS = function(tEppstein, tree, path, endIndex) {
-		var index = path[path.length-1];
+		const index = path[path.length-1];
 		
 		if(index == endIndex) {
 			return [ path ];
 		}
 
-		var retPaths = [];
-		var tEppsteinIndex = tEppstein[index];
+		const retPaths = [];
+		const tEppsteinIndex = tEppstein[index];
 		if(!tEppsteinIndex) {
 			return retPaths;
 		}
-		for(var i=0; i!=tEppsteinIndex.ls.length; i++) {
-			var l = tEppsteinIndex.ls[i];
+		for(let i=0; i!=tEppsteinIndex.ls.length; i++) { // NOSONAR complexity is OK
+			const l = tEppsteinIndex.ls[i];
 			if(!l) {
 				continue;
 			}
 
 			// TODO BUG TODOBUG : bug car actuellement tree commence par vide puis startIndex avant d'attaquer les éventuels target 
-			var treeChild = tree ? tree.childs[l.t] : tree;
+			const treeChild = tree ? tree.childs[l.t] : tree;
 			if(l.dt>0 && !treeChild) {
 				continue;
 			} 
 			
 			// TODO : protection against cycles
-			var tPath = copyArrayPlusValue(path, l.t);
+			const tPath = copyArrayPlusValue(path, l.t);
 			
-			var nextPaths = this.getKShortestPathFromTreeDFS(tEppstein, treeChild, tPath, endIndex);
+			const nextPaths = this.getKShortestPathFromTreeDFS(tEppstein, treeChild, tPath, endIndex);
 
-			for(var j=0; j!=nextPaths.length; j++) {
+			for(let j=0; j!=nextPaths.length; j++) {
 				retPaths.push(nextPaths[j]);
 			}
 		}
@@ -458,8 +473,8 @@ function MitsiGraph(relations) {
 		// TODO optimize by removing nodes during insertion in tree when more than k nodes ?
 		//this.getKShortestSliceTree(tree, k);
 		
-		var path = [startIndex];
-		var paths = [];
+		const path = [startIndex];
+		// let paths = [];
 		/*for(var i=0; i!=tree.sortedChilds.length; i++) {
 			var subtree = tree.sortedChilds[i];
 			var pathsSub = this.getKShortestPathFromTreeDFS(tEppstein, subtree, path, endIndex);
@@ -468,18 +483,16 @@ function MitsiGraph(relations) {
 				paths.push(pathsSub[j]);
 			}
 		}*/
-		paths = this.getKShortestPathFromTreeDFS(tEppstein, tree, path, endIndex);
-		
-		return paths;
+		return this.getKShortestPathFromTreeDFS(tEppstein, tree, path, endIndex);
 	}
 	
 	this.getKShortestPath = function(tEppstein, startIndex, endIndex, k) {
 		
 		// build tree
 		// firs node is an empty array of side tracks
-		var visited = [];
-		var tovisit = [ {i:startIndex, prevpath:[], dt:0} ]; 
-		var tree = {
+		const visited = [];
+		let tovisit = [ {i:startIndex, prevpath:[], dt:0} ]; 
+		const tree = {
 			arr : [],
 			dt : 0,
 			childs : {},
@@ -498,30 +511,30 @@ function MitsiGraph(relations) {
 	}
 	
 	this.getAllPathsDFS = function(endIndex, path, reverse) {
-		var index = path[path.length-1];
+		const index = path[path.length-1];
 		
 		if(index == endIndex) {
 			return [ path ];
 		}
 
-		var retPaths = [];
-		var links = reverse ? this.vertexes[index].reverseLinks : this.vertexes[index].links;
-		for(var l=0; l!=links.length; l++) {
-			var target = links[l].target;
+		const retPaths = [];
+		const links = reverse ? this.vertexes[index].reverseLinks : this.vertexes[index].links;
+		for(let l=0; l!=links.length; l++) {
+			const target = links[l].target;
 			
 			// protection against cycles
 			if(path.indexOf(target) >= 0) {
 				continue;
 			}
 			
-			var linkPath = [];
-			for(var i=0; i!=path.length; i++) {
+			const linkPath = [];
+			for(let i=0; i!=path.length; i++) {
 				linkPath[i] = path[i];
 			}
-			linkPath[i] = target;
-			var linkPaths = this.getAllPathsDFS(endIndex, linkPath, reverse);
+			linkPath[path.length] = target;
+			const linkPaths = this.getAllPathsDFS(endIndex, linkPath, reverse);
 			
-			for(var i=0; i!=linkPaths.length; i++) {
+			for(let i=0; i!=linkPaths.length; i++) {
 				retPaths.push(linkPaths[i]);
 			}
 		}
@@ -532,8 +545,8 @@ function MitsiGraph(relations) {
 }
 
 function copyArrayPlusValue(arr, val) {
-	var newarr = [];
-	for(var i=0; i!=arr.length; i++) {
+	const newarr = [];
+	for(let i=0; i!=arr.length; i++) {
 		newarr[i] = arr[i];
 	}
 	newarr[i] = val;
@@ -541,11 +554,11 @@ function copyArrayPlusValue(arr, val) {
 }
 
 function copyArrayPlusArray(arr1, arr2) {
-	var newarr = [];
-	for(var i=0; i!=arr1.length; i++) {
+	const newarr = [];
+	for(let i=0; i!=arr1.length; i++) {
 		newarr[i] = arr1[i];
 	}
-	for(var j=0; j!=arr2.length; j++) {
+	for(let j=0; j!=arr2.length; j++) {
 		newarr[i+j] = arr2[j];
 	}
 	return newarr;

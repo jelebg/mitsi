@@ -2,11 +2,10 @@ package org.mitsi.mitsiwar.details;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
@@ -17,7 +16,6 @@ import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.mitsiwar.GsonServlet;
 import org.mitsi.mitsiwar.connections.Client;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 class GetDetails {
@@ -52,9 +50,6 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 	private static final Logger log = Logger.getLogger(GetDetailsServlet.class);
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	private DatasourceManager datasourceManager;
-	
 	public GetDetailsServlet() {
         super(GetDetails.class);
     }
@@ -441,7 +436,7 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		GetDetailsResponse response = new GetDetailsResponse();
 		
 		String connectedUsername = connectedClient.getConnectedUsername();
-		TreeSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
+		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 
 		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) { 
 			if(StringUtils.isEmpty(request.objectName) || StringUtils.isEmpty(request.objectType) || StringUtils.isEmpty(request.owner)) {

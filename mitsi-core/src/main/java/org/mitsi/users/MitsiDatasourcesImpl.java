@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -88,7 +89,7 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 	}
 
 
-	private static boolean isDatasourceGranted(TreeSet<String> userGrantedGroups, boolean isUserConnected, MitsiDatasource mitsiDatasource) {
+	private static boolean isDatasourceGranted(SortedSet<String> userGrantedGroups, boolean isUserConnected, MitsiDatasource mitsiDatasource) {
 		if(mitsiDatasource.getUserGroups() == null) {
 			return false;
 		}
@@ -109,7 +110,7 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 	}
 	
 	@Override
-	public MitsiDatasource getDatasource(TreeSet<String> userGrantedGroups, boolean isUserConnected, String datasource) {
+	public MitsiDatasource getDatasource(SortedSet<String> userGrantedGroups, boolean isUserConnected, String datasource) {
 		MitsiDatasource ds = datasources.get(datasource);
 		
 		if(!isDatasourceGranted(userGrantedGroups, isUserConnected, ds)) {
@@ -120,7 +121,7 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 	}
 	
 	@Override
-	public 	List<MitsiDatasource> getDatasources(TreeSet<String> userGrantedGroups, boolean isUserConnected) {
+	public 	List<MitsiDatasource> getDatasources(SortedSet<String> userGrantedGroups, boolean isUserConnected) {
 		List<MitsiDatasource> groupsDataSources = new ArrayList<>();
 		
 		for(MitsiDatasource mitsiDatasource : datasources.values()) {
