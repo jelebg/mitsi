@@ -52,7 +52,12 @@
 				<include>org.apache.tomcat:tomcat</include>
 			</includes>
 			<unpack>true</unpack>
-		</dependencySet>
+		    <unpackOptions>
+		        <excludes>
+		            <exclude>**/webapps/examples/**</exclude>
+		        </excludes>
+		    </unpackOptions>
+    	</dependencySet>
 		<!--dependencySet>
 			<outputDirectory>apache-tomcat-8.0.20/lib</outputDirectory>
 			<includes>
