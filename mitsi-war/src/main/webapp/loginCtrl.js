@@ -44,8 +44,8 @@ angular.module('mitsiApp')
 						$rootScope.loggedUser = { 
 							username: $scope.loginUser.trim()
 						}
-				        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT);
-					};
+				        $rootScope.$broadcast(EVENT_LOGIN_LOGOUT); // NOSONAR EVENT_LOGIN_LOGOUT does exist
+					}
 			    }
 			);
 		}

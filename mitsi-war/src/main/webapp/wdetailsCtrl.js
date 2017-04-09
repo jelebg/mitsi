@@ -68,11 +68,11 @@ angular.module('mitsiApp')
     	}
     }
     
-	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) {
+	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
 		$scope.getTableDetails(source, databaseObject);
 	});
 	
-	$scope.$on(EVENT_DATABASE_SELECTED_FOR_DETAILS, function (event, source) {
+	$scope.$on(EVENT_DATABASE_SELECTED_FOR_DETAILS, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
 		$scope.getTableDetails(source, null);
 	});
     

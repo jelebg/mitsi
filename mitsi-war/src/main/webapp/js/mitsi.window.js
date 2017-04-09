@@ -27,9 +27,9 @@ function getWindowHW() {
 
 /* recupérer la position absolue d'un div */
 function getAbsoluteXY(element) {
-	var lx = 0, ly = 0;
-	for (; element != null; lx += element.offsetLeft, ly += element.offsetTop, element = element.offsetParent) {
-	}
+	let lx = 0;
+	let ly = 0;
+	for (; element != null; lx += element.offsetLeft, ly += element.offsetTop, element = element.offsetParent);
 	return {
 		x : lx,
 		y : ly
@@ -136,7 +136,7 @@ function vSeparatorFor(separator, lefts, rights)  {
 		ghost.style.width = "5px";
 		ghost.style.height = separator.style.height;
 		ghost.style.position = "absolute";
-		var separatorXY = getAbsoluteXY(separator);
+		const separatorXY = getAbsoluteXY(separator);
 		ghost.style.top = separatorXY.y;
 		ghost.style.left = (separatorStartX)+"px";
 		ghost.style.backgroundColor = "black";
@@ -145,21 +145,21 @@ function vSeparatorFor(separator, lefts, rights)  {
 		ghostParent = separator.offsetParent;
 		ghostParent.appendChild(ghost);
 
-		document.onmouseup = function(event) {
+		document.onmouseup = function(event) { // NOSONAR complexity is OK
 			if(draggingX) {
-				var dx = event.screenX - pointerStartX;
+				const dx = event.screenX - pointerStartX;
 				separator.style.left = (separatorStartX + dx)+"px";
 				if(lefts) {
-					for(var i=0; i!=lefts.length; i++) {
-						var left = lefts[i];
+					for(let i=0; i!=lefts.length; i++) {
+						const left = lefts[i];
 						left.style.width = (left.offsetWidth + dx)+"px";
 					}
 				}
 				if(rights) {
-					for(var i=0; i!=rights.length; i++) {
-						var right = rights[i];
+					for(let i=0; i!=rights.length; i++) {
+						const right = rights[i];
 						right.style.width = (right.offsetWidth - dx)+"px";
-						if(i==0) {
+						if(i==0) { // NOSONAR complexity is OK
 							right.style.left = (right.offsetLeft + dx)+"px";
 						}
 					}
@@ -209,21 +209,21 @@ function hSeparatorFor(separator, ups, downs)  {
 		ghostParent = separator.offsetParent;
 		ghostParent.appendChild(ghost);
 
-		document.onmouseup = function(event) {
+		document.onmouseup = function(event) { // NOSONAR complexity is OK
 			if(draggingY) {
-				var dy = event.screenY - pointerStartY;
+				const dy = event.screenY - pointerStartY;
 				separator.style.top = (separatorStartY + dy)+"px";
 				if(ups) {
-					for(var i=0; i!=ups.length; i++) {
-						var up = ups[i];
+					for(let i=0; i!=ups.length; i++) {
+						const up = ups[i];
 						up.style.height = (up.offsetHeight + dy)+"px";
 					}
 				}
 				if(downs) {
-					for(var i=0; i!=downs.length; i++) {
-						var down = downs[i];
+					for(let i=0; i!=downs.length; i++) {
+						const down = downs[i];
 						down.style.height = (down.offsetHeight - dy)+"px";
-						if(i==0) {
+						if(i==0) { // NOSONAR complexity is OK
 							down.style.top = (down.offsetTop + dy)+"px";
 						}
 					}

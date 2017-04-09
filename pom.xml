@@ -25,7 +25,7 @@
 		
 		<spring.version>4.3.5.RELEASE</spring.version>
 		<spring.security.version>4.2.1.RELEASE</spring.security.version>
-        <sonar.exclusions>**/src/main/webapp/WEB-INF/web.xml,**/src/main/webapp/angularjs-*/*.js,**/src/main/webapp/jsplumb-*/*.js,**/src/main/webapp/ui-bootstrap*/*.js,**/src/main/webapp/ui-grid-*/*.js,**/src/main/webapp/ui-layout-*/*.js,**/src/main/webapp/bootstrap-*/*.js,**/src/main/webapp/ui-router-*/*.js,**/src/main/webapp/rzslider*/*.js</sonar.exclusions>
+        <sonar.exclusions>**/src/main/webapp/WEB-INF/web.xml,**/src/main/webapp/angularjs-*/*.js,**/src/main/webapp/jsplumb-*/*.js,**/src/main/webapp/ui-bootstrap*/*.js,**/src/main/webapp/ui-grid-*/*.js,**/src/main/webapp/ui-layout-*/*.js,**/src/main/webapp/bootstrap-*/js/*.js,**/src/main/webapp/ui-router-*/*.js,**/src/main/webapp/rzslider*/*.js</sonar.exclusions>
 	</properties>
 
     <dependencyManagement>

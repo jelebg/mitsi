@@ -41,7 +41,7 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 			l = mitsiDatasourcesFile.getFile().lastModified();
 		}
 		catch(Exception e) {
-			//nothing
+			log.error("exception while get file date", e);
 		}
 		if(l>0) {
 			return new Date(l);

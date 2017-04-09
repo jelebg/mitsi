@@ -549,7 +549,7 @@ function copyArrayPlusValue(arr, val) {
 	for(let i=0; i!=arr.length; i++) {
 		newarr[i] = arr[i];
 	}
-	newarr[i] = val;
+	newarr[arr.length] = val;
 	return newarr;
 }
 
@@ -559,7 +559,7 @@ function copyArrayPlusArray(arr1, arr2) {
 		newarr[i] = arr1[i];
 	}
 	for(let j=0; j!=arr2.length; j++) {
-		newarr[i+j] = arr2[j];
+		newarr[arr1.length+j] = arr2[j];
 	}
 	return newarr;
 }

@@ -73,6 +73,7 @@ public class DatasourceManager {
 				}
 			} catch (ClassNotFoundException e) {
 				// never happens (really)
+				log.warn("unexpected (really) exception", e);
 			}
 		}
 		

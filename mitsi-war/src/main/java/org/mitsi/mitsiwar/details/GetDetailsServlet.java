@@ -25,6 +25,7 @@ class GetDetails {
 	String owner;
 	
 	public GetDetails() {
+		// nothing
 	}
 }
 
@@ -43,7 +44,9 @@ class GetDetailsResponse {
 	String message;
 	List<Accordion> accordions;
 	
-	public GetDetailsResponse() {}
+	public GetDetailsResponse() {
+		// nothing
+	}
 }
 
 public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsResponse> {
@@ -130,17 +133,17 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		return links;
 	}
 
-	
+	@SuppressWarnings("squid:S1166")
 	private void getDatasource(GetDetailsResponse response, MitsiConnection connection, String datasourceName) {
-		response.accordions = new ArrayList<GetDetailsResponse.Accordion>();
+		response.accordions = new ArrayList<>();
 		
 		GetDetailsResponse.Accordion tables = response.new Accordion();
 		response.accordions.add(tables);
 		tables.title = "Tables";
 		try {
 			List<DatabaseObject> objectList = connection.getTablesDetails();
-			tables.data = new ArrayList<String[]>();
-			tables.columns = new ArrayList<String>();
+			tables.data = new ArrayList<>();
+			tables.columns = new ArrayList<>();
 			fromObjectList(objectList,  tables.data, tables.columns);
 			tables.links = getObjectLinks(objectList, datasourceName, "table");
 		}
@@ -153,8 +156,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		views.title = "Views";
 		try {
 			List<DatabaseObject> objectList = connection.getViewsDetails();
-			views.data = new ArrayList<String[]>();
-			views.columns = new ArrayList<String>();
+			views.data = new ArrayList<>();
+			views.columns = new ArrayList<>();
 			fromObjectList(objectList,  views.data, views.columns);
 			views.links = getObjectLinks(objectList, datasourceName, "view");
 		}
@@ -167,8 +170,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		matviews.title = "Materialized Views";
 		try {
 			List<DatabaseObject> objectList = connection.getMatViewsDetails();
-			matviews.data = new ArrayList<String[]>();
-			matviews.columns = new ArrayList<String>();
+			matviews.data = new ArrayList<>();
+			matviews.columns = new ArrayList<>();
 			fromObjectList(objectList,  matviews.data, matviews.columns);
 			matviews.links = getObjectLinks(objectList, datasourceName, "matview");
 		}
@@ -181,8 +184,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		schemas.title = "Users / schemas";
 		try {
 			List<Schema> schemaList = connection.getSchemasDetails();
-			schemas.data = new ArrayList<String[]>();
-			schemas.columns = new ArrayList<String>();
+			schemas.data = new ArrayList<>();
+			schemas.columns = new ArrayList<>();
 			fromSchemaList(schemaList,  schemas.data, schemas.columns);
 		}
 		catch(Exception e) {
@@ -194,8 +197,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		tablespaces.title = "Tablespaces";
 		try {
 			List<Tablespace> tablespaceList = connection.getTablespaceDetails();
-			tablespaces.data = new ArrayList<String[]>();
-			tablespaces.columns = new ArrayList<String>();
+			tablespaces.data = new ArrayList<>();
+			tablespaces.columns = new ArrayList<>();
 			fromTablespaceList(tablespaceList,  tablespaces.data, tablespaces.columns);
 		}
 		catch(Exception e) {
@@ -332,9 +335,10 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		}
 	}
 
+	@SuppressWarnings("squid:S1166")
 	private void getTable(GetDetailsResponse response, MitsiConnection connection,
 			String datasourceName, String owner, String tableName) {
-		response.accordions = new ArrayList<GetDetailsResponse.Accordion>();
+		response.accordions = new ArrayList<>();
 		
 		//response.message = "details for table "+owner+"."+tableName;
 		
@@ -344,8 +348,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		columns.title = "Columns";
 		try {
 			List<Column> columnList = connection.getTableColumnsDetails(owner, tableName);
-			columns.data = new ArrayList<String[]>();
-			columns.columns = new ArrayList<String>();
+			columns.data = new ArrayList<>();
+			columns.columns = new ArrayList<>();
 			fromColumnsList(columnList,  columns.data, columns.columns);
 		}
 		catch(Exception e) {
@@ -358,8 +362,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		indexes.title = "Indexes";
 		try {
 			List<Index> indexList = connection.getTableIndexesDetails(owner, tableName);
-			indexes.data = new ArrayList<String[]>();
-			indexes.columns = new ArrayList<String>();
+			indexes.data = new ArrayList<>();
+			indexes.columns = new ArrayList<>();
 			fromIndexList(indexList,  indexes.data, indexes.columns);
 		}
 		catch(Exception e) {
@@ -372,8 +376,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		constraints.title = "Constraints";
 		try {
 			List<Constraint> constraintList = connection.getTableConstraintsDetails(owner, tableName);
-			constraints.data = new ArrayList<String[]>();
-			constraints.columns = new ArrayList<String>();
+			constraints.data = new ArrayList<>();
+			constraints.columns = new ArrayList<>();
 			fromConstraintList(constraintList,  constraints.data, constraints.columns);
 			constraints.links = getConstraintLinks(constraintList, datasourceName);
 
@@ -388,8 +392,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		fkto.title = "FK to this table";
 		try {
 			List<Constraint> fktoList = connection.getTablesWithConstraintsTo(owner, tableName);
-			fkto.data = new ArrayList<String[]>();
-			fkto.columns = new ArrayList<String>();
+			fkto.data = new ArrayList<>();
+			fkto.columns = new ArrayList<>();
 			fromFktoList(fktoList,  fkto.data, fkto.columns);
 			fkto.links = getConstraintLinks(fktoList, datasourceName);
 
@@ -404,8 +408,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		partitioningKeys.title = "Partitioning keys";
 		try {
 			List<Column> partitioningKeysList = connection.getTablePartitioninKeysDetails(owner, tableName);
-			partitioningKeys.data = new ArrayList<String[]>();
-			partitioningKeys.columns = new ArrayList<String>();
+			partitioningKeys.data = new ArrayList<>();
+			partitioningKeys.columns = new ArrayList<>();
 			fromPartitioningKeyList(partitioningKeysList,  partitioningKeys.data, partitioningKeys.columns);
 		}
 		catch(Exception e) {
@@ -418,8 +422,8 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		partitions.title = "Partitions";
 		try {
 			List<Partition> partitionList = connection.getTablePartitionDetails(owner, tableName);
-			partitions.data = new ArrayList<String[]>();
-			partitions.columns = new ArrayList<String>();
+			partitions.data = new ArrayList<>();
+			partitions.columns = new ArrayList<>();
 			fromPartitionList(partitionList,  partitions.data, partitions.columns);
 		}
 		catch(Exception e) {

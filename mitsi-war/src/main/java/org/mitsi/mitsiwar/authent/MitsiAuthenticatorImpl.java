@@ -60,6 +60,7 @@ public class MitsiAuthenticatorImpl implements MitsiAuthenticator {
 		return mitsiUsersConfig.authenticate(username, password);
 	}
 	
+	@SuppressWarnings("squid:S1166")
 	public boolean authenticateLDAP(String username, String password) {
 		Authentication authentication = null;
 		try {

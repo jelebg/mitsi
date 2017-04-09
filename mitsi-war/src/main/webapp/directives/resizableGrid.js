@@ -49,7 +49,7 @@ angular.module('mitsiApp')
         });
         
         scope.getTableStyle = function() {
-        	var xy = getAbsoluteXY(elt);
+        	var xy = getAbsoluteXY(elt); // NOSONAR getAbsoluteXY does exist
             return {
                 height: (scope.windowHeight-xy.y-2)+"px",
                 width: (scope.windowWidth-xy.x-2)+"px"
