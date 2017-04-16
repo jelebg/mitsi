@@ -60,6 +60,27 @@ angular.module('mitsiApp')
 		    errorService.getGenericHttpErrorCallback());
     	}
     }
+    
+    $scope.isRowExcludedByFilter = function(accordion, row) {
+    	let filter = accordion.filter;
+    	if(!filter) {
+    		return false;
+    	}
+    	
+		let filterSring = filter.trim().toLowerCase();
+
+    	for(let i=0; i!=row.length; i++) {
+    		let str = row[i];
+    		if(!str) {
+    			continue;
+    		}
+    		if(str.toLowerCase().indexOf(filter) !== -1) {
+    			return false;
+    		}
+    	}
+    	
+    	return true;
+    }
     	
     $scope.init = function() {
     	if($rootScope.currentSource && 

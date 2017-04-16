@@ -35,9 +35,6 @@ class GetDetailsResponse {
 		String title;
 		List<String> columns;
 		List<String[]> data;
-		List<DatabaseObject> databaseObjects;
-		List<Schema> schemas;
-		List<Tablespace> tablespaces;
 		String[] links;
 	}
 

@@ -155,6 +155,39 @@
 	border-bottom-right-radius:8px;
 }
 
+.mitsiDetailsQuickFindTable {
+	margin-left:80px;
+	margin-bottom:20px;	
+}
+
+.mitsiDetailsTableHeader {
+	text-align:center;
+	border-left:1px solid #eee;
+}
+.mitsiDetailsTableTd {
+	border-left:1px solid #eee;
+	border-right:1px solid #eee;
+	padding:3px;	
+}
+
+.mitsiDetailsQuickFindLabel {
+	font-style: italic;
+	padding-right:10px;
+}
+.mitsiDetailsQuickFindInput {
+	width:400px;
+	border:0px;
+	border-bottom:1px solid #aaa;
+	background-color:#f8f8f8;
+}
+.mitsiDetailsQuickFindReset {
+	pointer-events: all;
+	position:absolute !important;
+	right:5px !important;
+	top:5px !important;
+}
+
+
 .detailIcon {
 	margin-top:15px;
 }

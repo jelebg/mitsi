@@ -9,13 +9,31 @@
 			    {{ accordion.title }}
 			</accordion-heading>
 			
+			<table class="mitsiDetailsQuickFindTable"><tr>
+				<td class="mitsiDetailsQuickFindLabel">quick find : </td>
+				<td style="position:absolute">
+					<a href="" 
+						class="glyphicon glyphicon-remove mitsiDetailsQuickFindReset" 
+						ng-click="accordion.filter=null; $event.stopPropagation();"></a>
+					<input type="text" class="mitsiDetailsQuickFindInput" ng-model="accordion.filter"/>
+				</td>
+			</tr></table>
 			<table class="table-striped" style="width:100%;">
 			<thead>
-				<tr><th ng-repeat="column in accordion.columns">{{ column }}</th></tr>
+				<tr>
+					<th ng-repeat="column in accordion.columns"
+					    class="mitsiDetailsTableHeader">
+						{{ column }}
+					</th>
+				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="myrow in accordion.data">
-			 	  <td ng-repeat="d in myrow track by $index">{{ d }}</td>
+				<tr ng-repeat="myrow in accordion.data"
+					ng-hide="isRowExcludedByFilter(accordion, myrow)"
+				>
+			 	  <td ng-repeat="d in myrow track by $index" 
+			 	  	  class="mitsiDetailsTableTd"
+			 	  >{{ d }}</td>
 				</tr>
 			</tbody>
 			</table>
