@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
@@ -14,9 +15,14 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.Tablespace;
-import org.mitsi.mitsiwar.GsonServlet;
-import org.mitsi.mitsiwar.connections.Client;
+import org.mitsi.mitsiwar.MitsiRestController;
+import org.mitsi.users.MitsiUsersException;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 class GetDetails {
 	String datasourceName;
@@ -46,13 +52,11 @@ class GetDetailsResponse {
 	}
 }
 
-public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsResponse> {
-	private static final Logger log = Logger.getLogger(GetDetailsServlet.class);
-	private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/getDetails")
+public class GetDetailsController extends MitsiRestController {
+	private static final Logger log = Logger.getLogger(GetDetailsController.class);
 
-	public GetDetailsServlet() {
-        super(GetDetails.class);
-    }
 	
 	
 	//// datasource details
@@ -414,16 +418,11 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		
 	}
 	
- 
-	@Override
-	public GetDetailsResponse proceed(GetDetails request, Client connectedClient) throws MitsiException {
-		
+	@RequestMapping(value="", method = RequestMethod.POST)
+	public @ResponseBody GetDetailsResponse getMontTestInJSON(@RequestBody GetDetails request, HttpSession httpSession) throws MitsiUsersException {
 		GetDetailsResponse response = new GetDetailsResponse();
 		
-		String connectedUsername = connectedClient.getConnectedUsername();
-		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
-
-		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) { 
+		try (MitsiConnection connection = getConnection(httpSession, request.datasourceName)) { // 
 			if(StringUtils.isEmpty(request.objectName) || StringUtils.isEmpty(request.objectType) || StringUtils.isEmpty(request.owner)) {
 				getDatasource(response, connection, request.datasourceName);
 			}
@@ -441,8 +440,6 @@ public class GetDetailsServlet extends GsonServlet<GetDetails, GetDetailsRespons
 		
 		return response;
 	}
-
-
-
+	
 
 }

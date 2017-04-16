@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.servlet.http.HttpSession;
+
 import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.MitsiDatasource;
-import org.mitsi.mitsiwar.GsonServlet;
+import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.common.Datasource;
-import org.mitsi.mitsiwar.connections.Client;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 class GetDatasources {
 	String datasource; // maybe null
@@ -24,26 +30,18 @@ class GetDatasourcesResponse {
 	public GetDatasourcesResponse() {}
 }
 
-public class GetDatasourcesServlet extends GsonServlet<GetDatasources, GetDatasourcesResponse> {
-	private static final long serialVersionUID = 1L;
-
-	public GetDatasourcesServlet() {
-        super(GetDatasources.class);
-    }
+// TODO : unused, delete the controller ?
+@Controller
+@RequestMapping("/getDatasources") 
+public class GetDatasourcesController extends MitsiRestController {
 
  
-	@Override
-	public GetDatasourcesResponse proceed(GetDatasources request, Client connectedClient) throws MitsiException {
+	@RequestMapping(value="", method = RequestMethod.POST)
+	public @ResponseBody GetDatasourcesResponse proceed(@RequestBody GetDatasources request, HttpSession httpSession) throws MitsiException {
 		
 		GetDatasourcesResponse response = new GetDatasourcesResponse();
 		
-		String connectedUsername = connectedClient.getConnectedUsername();
-		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
-		
-		response.datasources = new ArrayList<>();
-		List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, connectedUsername!=null);
-
-		for(MitsiDatasource mitsiDatasources : mitsiDatasourceList) {
+		for(MitsiDatasource mitsiDatasources : getDatasources(httpSession)) {
 			Datasource datasource = new Datasource();
 			datasource.name = mitsiDatasources.getName();
 			datasource.description = mitsiDatasources.getDescription();

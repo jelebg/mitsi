@@ -2,15 +2,18 @@ package org.mitsi.mitsiwar.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.MitsiDatasource;
-import org.mitsi.mitsiwar.GsonServlet;
+import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.common.Datasource;
-import org.mitsi.mitsiwar.connections.Client;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 class Request {
 	boolean btwGetDatasources;
@@ -29,30 +32,21 @@ class Response {
 }
 
 
-public class GetClientStatusServlet extends GsonServlet<Request, Response> {
-	private static final Logger log = Logger.getLogger(GetClientStatusServlet.class);
-	private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/getClientStatus")
+public class GetClientStatusController extends MitsiRestController {
+	private static final Logger log = Logger.getLogger(GetClientStatusController.class);
 	
-	public GetClientStatusServlet() {
-        super(Request.class);
-    }
-
- 
-	@Override
-	public Response proceed(Request request, Client connectedClient) throws MitsiException {
+	@RequestMapping(value="", method = RequestMethod.POST)
+	public @ResponseBody Response proceed(@RequestBody Request request, HttpSession httpSession) throws Exception {
 	
 		Response response = new Response();
 
-		response.connectedUsername = connectedClient.getConnectedUsername();
+		response.connectedUsername = getConnectedUsername(httpSession);
 		response.datasources = null;
-		SortedSet<String> groups = null;
-		if(response.connectedUsername != null) {
-			groups = mitsiUsersConfig.getUserGrantedGroups(response.connectedUsername);
-		}
-		
 		if(request.btwGetDatasources) {
 			response.datasources = new ArrayList<>();
-			List<MitsiDatasource> mitsiDatasourceList = mitsiDatasources.getDatasources(groups, response.connectedUsername!=null);
+			List<MitsiDatasource> mitsiDatasourceList = getDatasources(httpSession);
 			
 			for(MitsiDatasource mitsiDatasource : mitsiDatasourceList) {
 				
@@ -66,5 +60,6 @@ public class GetClientStatusServlet extends GsonServlet<Request, Response> {
 		
 		return response;
 	}
+	
 
 }

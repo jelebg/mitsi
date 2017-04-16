@@ -144,10 +144,15 @@ public class DatasourceManager {
 			}
 		}
 		
-		SqlSession sqlSession = sqlSessionFactory.openSession();
-		IMitsiMapper mapper = (IMitsiMapper) sqlSession.getMapper(getMapper(datasource.getProvider()));
+		try {
+			SqlSession sqlSession = sqlSessionFactory.openSession();
+			IMitsiMapper mapper = (IMitsiMapper) sqlSession.getMapper(getMapper(datasource.getProvider()));
+			return new MitsiConnection(sqlSession, mapper, datasource);
+		}
+		catch(Exception e) {
+			throw new MitsiUsersException("could not connect to database : "+datasourceName); // TODO : rajouter un message plus détaillé 
+		}
 
-		return new MitsiConnection(sqlSession, mapper, datasource);
 	}
 	
 }

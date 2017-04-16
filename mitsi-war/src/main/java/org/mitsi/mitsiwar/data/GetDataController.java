@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.servlet.http.HttpSession;
+
 import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 
@@ -12,8 +14,12 @@ import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.GsonResponse;
-import org.mitsi.mitsiwar.GsonServlet;
-import org.mitsi.mitsiwar.connections.Client;
+import org.mitsi.mitsiwar.MitsiRestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 class GetData {
 	String datasourceName;
@@ -41,23 +47,16 @@ class GetDataResponse extends GsonResponse {
 }
 
 
-public class GetDataServlet extends GsonServlet<GetData, GetDataResponse> {
-	private static final Logger log = Logger.getLogger(GetDataServlet.class);
-	private static final long serialVersionUID = 1L;
-	
-	public GetDataServlet() {
-        super(GetData.class);
-    }
+@Controller
+@RequestMapping("/getData")
+public class GetDataController extends MitsiRestController {
+	private static final Logger log = Logger.getLogger(GetDataController.class);
  
-	@Override
-	public GetDataResponse proceed(GetData request, Client connectedClient) throws MitsiException {
-		
+	@RequestMapping(value="", method = RequestMethod.POST)
+	public @ResponseBody GetDataResponse proceed(@RequestBody GetData request, HttpSession httpSession) throws MitsiException {
 		GetDataResponse response = new GetDataResponse();
 
-		String connectedUsername = connectedClient.getConnectedUsername();
-		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
-		
-		try (MitsiConnection connection = datasourceManager.getConnection(groups, connectedUsername!=null, request.datasourceName)) {
+		try (MitsiConnection connection = getConnection(httpSession, request.datasourceName)) {
 			long maxRows = connection.getMaxExportRows();
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			

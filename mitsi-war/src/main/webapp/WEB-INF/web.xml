@@ -14,79 +14,23 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  <servlet>
-    <description></description>
-    <display-name>GetDatasourcesServlet</display-name>
-    <servlet-name>GetDatasourcesServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.datasources.GetDatasourcesServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetDatasourcesServlet</servlet-name>
-    <url-pattern>/GetDatasourcesServlet</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>mvc-dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	    <init-param>
+	        <param-name>contextConfigLocation</param-name>
+	        <param-value>classpath:spring/mvc-dispatcher-servlet.xml</param-value>
+	    </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+<servlet-mapping>
+<servlet-name>mvc-dispatcher</servlet-name>
+<url-pattern>/rest/*</url-pattern>
+</servlet-mapping>
   <session-config>
     <session-timeout>720</session-timeout>
   </session-config>
   <!--  enforce session persistence -->
   <distributable/>
-  <servlet>
-    <description></description>
-    <display-name>GetDatabaseObjectsServlet</display-name>
-    <servlet-name>GetDatabaseObjectsServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.datasources.GetDatabaseObjectsServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetDatabaseObjectsServlet</servlet-name>
-    <url-pattern>/GetDatabaseObjectsServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>GetClientStatusServlet</display-name>
-    <servlet-name>GetClientStatusServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.client.GetClientStatusServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetClientStatusServlet</servlet-name>
-    <url-pattern>/GetClientStatusServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>GetServerInfoServlet</display-name>
-    <servlet-name>GetServerInfoServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.client.GetServerInfoServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetServerInfoServlet</servlet-name>
-    <url-pattern>/GetServerInfoServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>GetDataServlet</display-name>
-    <servlet-name>GetDataServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.data.GetDataServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetDataServlet</servlet-name>
-    <url-pattern>/GetDataServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>GetDetailsServlet</display-name>
-    <servlet-name>GetDetailsServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.details.GetDetailsServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GetDetailsServlet</servlet-name>
-    <url-pattern>/GetDetailsServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>LoginServlet</display-name>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>org.mitsi.mitsiwar.client.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/LoginServlet</url-pattern>
-  </servlet-mapping>
+
 </web-app>
