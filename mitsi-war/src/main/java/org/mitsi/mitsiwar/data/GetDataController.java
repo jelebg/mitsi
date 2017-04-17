@@ -2,7 +2,6 @@ package org.mitsi.mitsiwar.data;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.SortedSet;
 
 import javax.servlet.http.HttpSession;
 
@@ -13,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.mitsiwar.GsonResponse;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +34,7 @@ class GetData {
 	}
 }
 
-class GetDataResponse extends GsonResponse {
+class GetDataResponse {
 	List<Column> columns;
 	List<String[]> results;
 	boolean maxRowsReached;
@@ -76,8 +74,5 @@ public class GetDataController extends MitsiRestController {
 		
 		return response;
 	}
-
-
-
 
 }

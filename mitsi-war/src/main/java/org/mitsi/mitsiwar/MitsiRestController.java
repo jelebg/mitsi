@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 
+class ErrorResponse {
+	public String errorMessage;
+}
+
 public abstract class MitsiRestController {
 	private static final Logger log = Logger.getLogger(MitsiRestController.class);
 	public static final String CONNECTED_CLIENTSESSION_ATTRIBUTE = "MITSI_CONNECTED_CLIENT";
@@ -72,11 +76,11 @@ public abstract class MitsiRestController {
 	        Writer writer) {
 		log.debug("generic error handling in GsonServlet", e );
 		
-		GsonResponse gsonResponse = new GsonResponse();
-		gsonResponse.errorMessage = e.getMessage();
+		ErrorResponse response = new ErrorResponse();
+		response.errorMessage = e.getMessage();
 		try {
 			Gson gson = new Gson();
-			gson.toJson(gsonResponse, writer);
+			gson.toJson(response, writer);
 		}
 		catch(JsonIOException e2) {
 			log.error("error handling impossible because of error", e2);
