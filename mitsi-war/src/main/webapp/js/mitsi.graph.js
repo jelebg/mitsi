@@ -22,7 +22,7 @@ function MitsiGraph() {
 		for(let i=0; i!=databaseObjects.length; i++) {
 			const dobj = databaseObjects[i];
 			
-			if(dobj.id.type != "table" && dobj.id.type != "matview") {
+			if(dobj.id.type != "table" && dobj.id.type != "matview"  && dobj.id.type != "view") {
 				continue;
 			}
 			
