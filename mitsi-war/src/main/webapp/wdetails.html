@@ -6,6 +6,9 @@
 			is-open="accordion.isOpen"
 			 >
 		    <accordion-heading>
+	        	<i class="glyphicon " 
+	        	   ng-class="{'glyphicon-chevron-down': accordion.isOpen, 'glyphicon-chevron-right': !accordion.isOpen}">
+	        	   </i>
 			    {{ accordion.title }}
 			</accordion-heading>
 			
