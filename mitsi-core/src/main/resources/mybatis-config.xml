@@ -9,6 +9,7 @@
 	<typeAlias type="org.mitsi.datasources.DatabaseObject" alias="DatabaseObject"/>
  </typeAliases>
  
+ <!-- TODO : supprimer ? -->
 	<mappers>
 		<mapper resource="mapper/oracle.xml" />
 	</mappers>

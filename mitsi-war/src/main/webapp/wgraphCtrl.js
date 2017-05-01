@@ -59,12 +59,61 @@ angular.module('mitsiApp')
 
 	$scope.TEMPORARY_TABLE_HIDE_TIMEOUT = 600;
 	
-	$scope.graphOpacity = true;
-	$scope.showSQL = false;
-	$scope.showPaths = false;
-	
 	$scope.graphUrl = null;
+	
+	$scope.panelDisplayed = "";
 
+	$scope.sidePanelHide = function() {
+		$scope.panelDisplayed = "";
+	}
+		
+	$scope.sidePanelToggle = function(name) {
+		if($scope.panelDisplayed == name) {
+			$scope.panelDisplayed = "";
+		}
+		else {
+			$scope.panelDisplayed = name;
+		}
+	}
+	
+	$scope.sidePanelShow = function(name) {
+		$scope.panelDisplayed = name;
+	}
+	
+	$scope.sidePanelShouldShow = function() {
+		return $scope.panelDisplayed != null && $scope.panelDisplayed != "" && (
+			($scope.panelDisplayed == 'details' && $scope.sidePanelShouldShowDetails()) 
+			||
+			($scope.panelDisplayed == 'sql'     && $scope.sidePanelShouldShowSql()) 
+			||
+			($scope.panelDisplayed == 'filters'     && $scope.sidePanelShouldShowFilters()) 
+			||
+			($scope.panelDisplayed == 'paths'     && $scope.sidePanelShouldShowPaths()) 
+			||
+			($scope.panelDisplayed == 'data'     && $scope.sidePanelShouldShowData()) 
+		);
+	}
+	
+	$scope.sidePanelShouldShowDetails = function() {
+		return $rootScope.currentSource != null && $rootScope.currentSource.currentObject != null;
+	}
+	
+	$scope.sidePanelShouldShowSql = function() {
+		return $scope.sqlTables != null && $scope.sqlTables.length > 0;
+	}
+	
+	$scope.sidePanelShouldShowFilters = function() {
+		return false;
+	}
+	
+	$scope.sidePanelShouldShowPaths = function() {
+		return $scope.paths != null && $scope.paths.length > 0;
+	}
+	
+	$scope.sidePanelShouldShowData = function() {
+		return $rootScope.currentSource != null && $rootScope.currentSource.currentObject != null;
+	}
+	
 	$scope.backupScope = function() {
 		$scope.updateTablesActualPosition();
 		
@@ -105,22 +154,6 @@ angular.module('mitsiApp')
 		$scope.rpaths = [];		
 	}	
 	
-	$scope.displayGraph = function() {
-		$scope.graphOpacity = "1.0";
-		$scope.showSQL = false;
-		$scope.showPaths = false;
-	}
-
-	$scope.displaySQL = function() {
-		$scope.graphOpacity = "0.3";
-		$scope.showSQL = true;
-		$scope.showPaths = false;
-	}
-	$scope.displayPaths = function() {
-		$scope.graphOpacity = "0.3";
-		$scope.showSQL = false;
-		$scope.showPaths = true;
-	}
 	$scope.getPathIndexName = function(index) {
 		if(!$rootScope.currentSource) {
 			return;
@@ -227,8 +260,9 @@ angular.module('mitsiApp')
 		$scope.rpaths = graph.getAllPaths(endIndex, startIndex, false);
 		
 		$scope.unhighlightAllConnections();
-		$scope.highlightPathsConnections($scope.paths)
-		$scope.highlightPathsConnections($scope.rpaths)
+		$scope.highlightPathsConnections($scope.paths);
+		$scope.highlightPathsConnections($scope.rpaths);
+		$scope.sidePanelShow('paths');
 	}
 	
 	$scope.unhighlightAllConnections = function() {
@@ -889,8 +923,8 @@ angular.module('mitsiApp')
 			var r = (i+1)*Math.max(200, maxmax * 30);
 			radiu[i] = r;
 		}
-		var x0 = radiu[depth-1]+200;
-		var y0 = radiu[depth-1]+50;
+		var x0 = radiu[depth-1]+100;
+		var y0 = radiu[depth-1]+10;
 		if(name in $scope.tables) {
 			var tdiv = document.getElementById($scope.divPrefix+name);
 			x0 = tdiv.offsetLeft;
@@ -1070,6 +1104,7 @@ angular.module('mitsiApp')
 
 		
 		$scope.updateSQLText();
+		$scope.sidePanelShow("sql");
 	}
 	
 	$scope.isTableInSQL = function(table) {

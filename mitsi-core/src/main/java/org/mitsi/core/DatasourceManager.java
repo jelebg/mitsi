@@ -127,7 +127,7 @@ public class DatasourceManager {
 				if(sqlSessionFactory==null) {
 					DataSource jdbcDataSource = new PooledDataSource(datasource.getDriver(), 
 							datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
-					
+
 					TransactionFactory transactionFactory = new JdbcTransactionFactory();
 					/* TODO : vérifier à quoi sert le nom de l'environment */
 					Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);
@@ -135,6 +135,7 @@ public class DatasourceManager {
 					configuration.setCacheEnabled(false);
 					
 					sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+					
 					pools.put(datasourceName, sqlSessionFactory);
 					sqlSessionFactory.getConfiguration().addMapper(getMapper(datasource.getProvider()));
 				}

@@ -469,8 +469,53 @@
 	width:100%; 
 }
 
+.mitsiSidePanelLabel {
+	background-color:#eee;
+	font-family: Arial;
+	font-weight:bold;
+	text-align:center;
+	padding-left:5px;
+	padding-right:5px;
+	border-top-right-radius:5px;
+	border-top-left-radius:5px;
+	border-right:1px solid black;
+	width:80px;
+}
+.mitsiSidePanelLabelSelected {
+	background-color:#fff;
+	text-align:center;
+	border-top-right-radius:0px;
+	border-top-left-radius:0px;
+}
 
+.mitsiSidePanelLabelDisabled {
+	color:#7f7f7f;
+	pointer-events:none;
+}
 
+.mitsiSidePanel {
+	background-color:#fff;
+	border-top-right-radius:7px;
+	border-top-left-radius:7px;
+	border-bottom-right-radius:7px;
+	border:1px solid #ddd;
+	border:1px solid #ddd;
+	border:1px solid #ddd;
+	padding : 5px;
+}
 
+.mitsiSidePanelContent {
+	overflow:auto;
+}
 
+.mitsiSidePanelTitleBackground {
+	background-color:#eee;
+	padding:1px;
+	margin-bottom : 2px;
+}
 
+.mitsiSidePanelTitle {
+	font-size:80%;
+	font-weight:bold;
+	font-style:italic;
+}

@@ -113,7 +113,7 @@
      style="position:absolute;top:50px;bottom:0;height:auto;width:100%;overflow:auto;"
  	 >
   <div id="jsPlumbContainer"
-     style="opacity:{{graphOpacity}};position:absolute;top:0px;left:0px;width:1500px;height:1500px;transform:scale({{ zoomSlider.value/100  }});"
+     style="position:absolute;top:0px;left:0px;width:1500px;height:1500px;transform:scale({{ zoomSlider.value/100  }});"
      >
      
     	 <div ng-repeat="(tableName, t) in tables track by tableName"
@@ -227,80 +227,81 @@
     
 </div>
 
-        
-<div
-  	ng-show="showSQL==true" 
-  	style="z-index:2;font-familly:Monospace;color:#707070;font-weight: bold;position:absolute;top:50px;left:10px;">
-  <span ng-repeat="text in sqlText">{{ text }}<br/></span>
-  <span style="background-color:grey;font-weight:bold;font-size:80%;padding-left:2px;padding-right:2px;border-radius:2px;"
-  	    ng-show="sqlText.length > 0"
-  		ng-click="removeAllTablesInSQL();">
-  	<a href=""  
-  	   style="color:white;"
-  	   >clear</a>
-  </span>
-  </div>
-  <div
-  	ng-show="showPaths==true" 
-  	style="z-index:3;font-familly:Monospace;color:#707070;font-weight: bold;position:absolute;top:50px;left:20px;width:1200px;">
-   <div ng-repeat="path in paths" style="margin-bottom:10px">
-       <svg ng-repeat-start="pt in path" height="24px" width="12px" style="vertical-align:bottom;">
-      	  <polygon style="fill:lightgreen;" points="0,0 12,12 0,24 12,24 12,0"/>
-        </svg><span
-         style="vertical-align:bottom;display:inline-block;background-color:lightgreen;height:24px;">
-         <a href="" 
-            ng-click="appendTableNoStacking(80, 100, getPathIndexName(pt))"
-            ng-class="{ anchorDisabled : existsTable(getPathIndexName(pt)) }">
-           {{ getPathIndexName(pt) }}
-         </a>
-         </span><svg ng-repeat-end height="24px" width="12px" style="vertical-align:bottom;">
-          <polygon style="fill:lightgreen;" points="0,0 0,24 12,12"/>
-       </svg>
-   </div>
-   <div ng-repeat="path in rpaths" style="margin-bottom:10px">
-       <svg ng-repeat-start="pt in path" height="24px" width="12px" style="vertical-align:bottom;">
-      	  <polygon style="fill:lightgreen;" points="0,0 12,12 0,24 12,24 12,0"/>
-        </svg><span
-         style="vertical-align:bottom;display:inline-block;background-color:lightgreen;height:24px;">{{ getPathIndexName(pt) }}
-         </span><svg ng-repeat-end height="24px" width="12px" style="vertical-align:bottom;">
-          <polygon style="fill:lightgreen;" points="0,0 0,24 12,12"/>
-       </svg>
-   </div>
+<table style="position:absolute;bottom:18px;left:2px;height:22px;"><tr>
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='details'}" class="mitsiSidePanelLabel">
+		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowDetails()}" ng-click="sidePanelToggle('details');">
+			Details</a></div></td>
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='sql'}" class="mitsiSidePanelLabel">
+		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowSql()}" ng-click="sidePanelToggle('sql');">
+			SQL</a></div></td>
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='filters'}" class="mitsiSidePanelLabel">
+		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowFilters()}" ng-click="sidePanelToggle('filters');">
+			Filters</a></div></td>
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='paths'}" class="mitsiSidePanelLabel">
+		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowPaths()}" ng-click="sidePanelToggle('paths');">
+			Paths</a></div></td>
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='data'}" class="mitsiSidePanelLabel">
+		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowData()}" ng-click="sidePanelToggle('data');">
+			Data</a></div></td>
+</tr></table>
+<div class="mitsiSidePanel"
+	 ng-show="sidePanelShouldShow()"
+     style="position:absolute;bottom:39px;left:2px;right:110px;width:auto;">
+     <div class="mitsiSidePanelTitleBackground">
+     	<div class="mitsiSidePanelTitle">
+  		{{ currentSource ? 
+		   currentSource.name +
+		   		(currentSource.currentObject ? 
+		   			" : " + currentSource.currentObject.id.schema + "." + currentSource.currentObject.id.name + " (" + currentSource.currentObject.id.type + ")"
+		   			: "" ) 
+		   : "" }}
+	     </div>
+	     <i style="position:absolute;left:50%;cursor:ns-resize;top:6px;" class="glyphicon glyphicon-minus"></i>
+	     <a href="" ng-click="sidePanelHide();"><i class="glyphicon glyphicon-remove" style="position:absolute;right:5px;top:6px;"></i></a>
+	     <i class="glyphicon glyphicon-refresh" style="position:absolute;right:22px;top:6px;"></i>
+	     <i class="glyphicon glyphicon-fullscreen" style="position:absolute;right:39px;top:6px;"></i>
+     </div>
+     <div class="mitsiSidePanelContent" style="max-height:300px;">
+        <div ng-controller="wdetailsCtrl" 
+        	 style="position:relative;"
+        	 ng-show="panelDisplayed=='details'" 
+        	 >
+     		<ng-include src="'wdetails.html'" ></ng-include>
+     	</div>
+        <div  
+        	 style="position:relative;"
+        	 ng-show="panelDisplayed=='paths'" 
+        	 >
+     		<ng-include src="'wpaths.html'" ></ng-include>
+     	</div>
+        <div  
+        	 style="position:relative;"
+        	 ng-show="panelDisplayed=='sql'" 
+        	 >
+     		<ng-include src="'wgensql.html'" ></ng-include>
+     	</div>
+     </div>
+     <div> <!--  no overflow here / taken into acount by ui-grid -->
+        <div ng-controller="wdataCtrl"   
+        	 style="position:relative;"
+        	 ng-show="panelDisplayed=='data'" 
+        	 >
+     		<ng-include src="'wdata2.html'" ></ng-include>
+     	</div>
+     </div>
 </div>
-	  
-
+        
 <div id="graphParent" style="position:fixed;top:100px;right:5px;">
      
   <div style="z-index:10;width:110px;">
   	<table class="verticalMenuTable">
-  	<tr><td ng-class="{'verticalMenuTdSelected':graphOpacity=='1.0'}"  class="verticalMenuTd">
-  		<a href="" ng-click="displayGraph()"
-			popover-template="'popover.graphdisplay.html'"
-			popover-class="verticalMenuPopover"
-			popover-trigger="mouseenter"
-			popover-placement="left"
-		>Graph</a></td></tr>
-  	<tr><td ng-class="{'verticalMenuTdSelected':showSQL}"  class="verticalMenuTd">
-  		<a href="" ng-click="displaySQL()"
-			popover-template="'popover.sqldisplay.html'"
-			popover-class="verticalMenuPopover"
-			popover-trigger="mouseenter"
-			popover-placement="left"
-  		>SQL</a></td></tr>
-  	<tr><td ng-class="{'verticalMenuTdSelected':showPaths}"  class="verticalMenuTd">
-  		<a href="" ng-click="displayPaths()"
-			popover-template="'popover.pathsdisplay.html'"
-			popover-class="verticalMenuPopover"
-			popover-trigger="mouseenter"
-			popover-placement="left"
-  		>Paths</a></td></tr>
   	<tr><td class="verticalMenuTd">
   		<a href="" ng-click="showOptionsDialog()"
  			popover-template="'popover.optionsdisplay.html'"
 			popover-class="verticalMenuPopover"
 			popover-trigger="mouseenter"
 			popover-placement="left"
-  		><i class="glyphicon glyphicon-option-horizontal" style="font-size:120%;"></i></a></td></tr>
+  		>Options</i></a></td></tr>
   	<tr><td style="height:150px">
   	  <rzslider rz-slider-model="zoomSlider.value" rz-slider-options="zoomSlider.options"></rzslider>
     </td></tr>

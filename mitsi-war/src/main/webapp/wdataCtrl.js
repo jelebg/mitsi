@@ -314,7 +314,9 @@ angular.module('mitsiApp')
 	$scope.currentGridHeight = "300px";
     $timeout(function() {
     	// TODO : reste un bug : si on agrandit la fenetre, le nombre de lignes affichées n'évolue pas tant qu'on ne scrolle pas
-        $scope.dataGridApi.grid.queueGridRefresh();
+    	if($scope.dataGridApi && $scope.dataGridApi.grid) {
+    		$scope.dataGridApi.grid.queueGridRefresh();
+    	}
     }, 0);
 });
 

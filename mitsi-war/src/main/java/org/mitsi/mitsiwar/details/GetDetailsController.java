@@ -419,7 +419,7 @@ public class GetDetailsController extends MitsiRestController {
 	}
 	
 	@RequestMapping(value="", method = RequestMethod.POST)
-	public @ResponseBody GetDetailsResponse getMontTestInJSON(@RequestBody GetDetails request, HttpSession httpSession) throws MitsiUsersException {
+	public @ResponseBody GetDetailsResponse proceed(@RequestBody GetDetails request, HttpSession httpSession) throws MitsiUsersException {
 		GetDetailsResponse response = new GetDetailsResponse();
 		
 		try (MitsiConnection connection = getConnection(httpSession, request.datasourceName)) { // 

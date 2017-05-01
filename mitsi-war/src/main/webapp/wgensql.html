@@ -1,0 +1,12 @@
+<div
+  	style="font-familly:Monospace;color:#707070;font-weight: bold;">
+  <span ng-repeat="text in sqlText">{{ text }}<br/></span>
+  <span style="background-color:grey;font-weight:bold;font-size:80%;padding-left:2px;padding-right:2px;border-radius:2px;"
+  	    ng-show="sqlText.length > 0"
+  		ng-click="removeAllTablesInSQL();">
+  	<a href=""  
+  	   style="color:white;"
+  	   >clear</a>
+  </span>
+  </div>
+
