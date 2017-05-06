@@ -921,11 +921,27 @@ angular.module('mitsiApp')
 		
 	}
 
+	$scope.selectTable = function(table) {
+		let source = $rootScope.currentSource;
+		if(!source) {
+			return ;
+		}
+		
+		for(let i=0; i!=source.length; i++) {
+			let o = source.objects[i];
+			if((o.id.schema+"."+o.id.name) == table.name) {
+				$rootScope.currentSource.currentObject = o;
+		        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, source, o); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
+				break;
+			}
+		}
+	}
+	
 	$scope.isTableSelected = function(tableName) {
 		if(!$rootScope.currentSource) {
 			return false;
 		}
-		var currentObject = $rootScope.currentSource.currentObject
+		var currentObject = $rootScope.currentSource.currentObject;
 		if(!currentObject) {
 			return false;
 		}

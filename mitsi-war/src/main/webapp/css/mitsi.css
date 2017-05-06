@@ -51,6 +51,12 @@
 	outline-style: none;
 }
 
+.graphTableLabel {
+	color : #333;
+} 
+.graphTableLabel:hover {
+	text-decoration : none;
+} 
 
 .mitsi-grey {
 	color : grey !important;

@@ -125,7 +125,10 @@
 			 ng-mouseover="mouseOverTableName(t)"
 			 ng-mouseleave="mouseLeaveTableName()"
 			 >
-			 {{ getTableDisplayName(t.name) }}
+			 <a href="#" class="graphTableLabel"
+			 	ng-click="selectTable(t);">
+			 	{{ getTableDisplayName(t.name) }}
+			 </a>
 			 <a href=""
 			    ng-show="showIcons" 
 			    ng-click="removeTable(t.name, true)">
