@@ -166,6 +166,36 @@ angular.module('mitsiApp')
 		return $rootScope.currentSource != null && $rootScope.currentSource.currentObject != null;
 	}
 	
+	$scope.getSidePanelTitle = function() {
+		if($scope.panelDisplayed == null || $scope.panelDisplayed == "") {
+			return "";
+		}
+		
+		let fullTableName =
+			$rootScope.currentSource ? 
+		   		($rootScope.currentSource.currentObject ? 
+		   			$rootScope.currentSource.currentObject.id.schema + "." + $rootScope.currentSource.currentObject.id.name + " (" + $rootScope.currentSource.currentObject.id.type + ")"
+		   			: "" ) 
+		   	: "";
+		   		
+		switch($scope.panelDisplayed) {
+		case "details" :
+			return fullTableName=="" ? "" : "details of "+fullTableName;
+			
+		case "sql" :
+			return "SQL generated for "+$scope.sqlTables.length+" tables";
+			
+		case "filters" :
+			// TODO
+			
+		case "paths" :
+			return ($scope.paths.length+$scope.rpaths.length)+" path(s) found";
+			
+		case "data" :
+			return fullTableName=="" ? "" : "data of "+fullTableName;
+		}
+	}
+	
 	$scope.backupScope = function() {
 		$scope.updateTablesActualPosition();
 		
