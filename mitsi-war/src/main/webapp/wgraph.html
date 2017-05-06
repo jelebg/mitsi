@@ -246,7 +246,8 @@
 </tr></table>
 <div class="mitsiSidePanel"
 	 ng-show="sidePanelShouldShow()"
-     style="position:absolute;bottom:39px;left:2px;right:110px;width:auto;">
+     style="position:absolute;bottom:39px;left:2px;right:110px;width:auto;"
+     >
      <div class="mitsiSidePanelTitleBackground">
      	<div class="mitsiSidePanelTitle">
   		{{ currentSource ? 
@@ -256,12 +257,17 @@
 		   			: "" ) 
 		   : "" }}
 	     </div>
-	     <i style="position:absolute;left:50%;cursor:ns-resize;top:6px;" class="glyphicon glyphicon-minus"></i>
+	     <div style="position:absolute;left:50%;cursor:ns-resize;top:6px;font-weight:bold;user-select: none;-moz-user-select: none;-ms-user-select: none;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;" 
+	     	  onmousedown="angular.element(this).scope().onSidePanelResizeBegin(event)"
+	     	  draggable="false"
+	     	  >
+	     	= 
+	     </div>
 	     <a href="" ng-click="sidePanelHide();"><i class="glyphicon glyphicon-remove" style="position:absolute;right:5px;top:6px;"></i></a>
 	     <i class="glyphicon glyphicon-refresh" style="position:absolute;right:22px;top:6px;"></i>
 	     <i class="glyphicon glyphicon-fullscreen" style="position:absolute;right:39px;top:6px;"></i>
      </div>
-     <div class="mitsiSidePanelContent" style="max-height:300px;">
+     <div class="mitsiSidePanelContent sidePanelResizeMaxHeightControl sidePanelResizeOriginControl" style="max-height:300px;">
         <div ng-controller="wdetailsCtrl" 
         	 style="position:relative;"
         	 ng-show="panelDisplayed=='details'" 
@@ -281,19 +287,19 @@
      		<ng-include src="'wgensql.html'" ></ng-include>
      	</div>
      </div>
-     <div> <!--  no overflow here / taken into acount by ui-grid -->
+     <div class="sidePanelResizeMaxHeightControl" style="max-height:300px;"> <!--  no overflow here / taken into acount by ui-grid -->
         <div ng-controller="wdataCtrl"   
         	 style="position:relative;"
         	 ng-show="panelDisplayed=='data'" 
         	 >
-     		<ng-include src="'wdata2.html'" ></ng-include>
+     		<ng-include src="'wdata2.html'" style="height:100%;"></ng-include>
      	</div>
      </div>
 </div>
         
-<div id="graphParent" style="position:fixed;top:100px;right:5px;">
+<div id="graphParent" style="position:fixed;top:100px;right:23px;">
      
-  <div style="z-index:10;width:110px;">
+  <div style="z-index:10;">
   	<table class="verticalMenuTable">
   	<tr><td class="verticalMenuTd">
   		<a href="" ng-click="showOptionsDialog()"

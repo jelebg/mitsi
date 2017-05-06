@@ -1,9 +1,12 @@
 	 
-  <div  ng-if="!gridRefresh" 
+  <div  
+  		class="sidePanelResizeHeightControl"
+  		ng-if="!gridRefresh" 
   		ui-grid-exporter 
   		ui-grid-selection
   		ui-grid-resize-columns
   		ui-grid-infinite-scroll
   		ui-grid-exporter
   		ui-grid="dataGrid"  
-  		ng-style="getTableStyle();" ></div>
+  		style="height:300px;"
+  		></div>

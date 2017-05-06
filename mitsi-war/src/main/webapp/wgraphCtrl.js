@@ -62,6 +62,56 @@ angular.module('mitsiApp')
 	$scope.graphUrl = null;
 	
 	$scope.panelDisplayed = "";
+	$scope.panelResizing  = false;
+	$scope.panelResizeFromMaxHeight = 0;
+	$scope.panelResizeFromPosition = 0;
+	
+	document.documentElement.addEventListener('mouseup', function(e){
+		$scope.onSidePanelResizeEnd();
+	});
+	document.documentElement.addEventListener('mouseleave', function(e){
+		$scope.onSidePanelResizeEnd();
+	});
+
+	document.documentElement.addEventListener('mousemove', function(e){
+		$scope.onSidePanelResize(e);
+	});
+
+	
+	$scope.onSidePanelResizeBegin = function(event) {
+		$scope.panelResizing = true;
+		$scope.panelResizeFromPosition = event.clientY;
+		let d = document.getElementsByClassName("sidePanelResizeOriginControl")[0];
+		$scope.panelResizeFromMaxHeight = parseInt(d.style.maxHeight.replace("px", ""));
+	}
+	
+	$scope.onSidePanelResize = function(event) {
+		if(!$scope.panelResizing) {
+			return;
+		}
+		let panelHeight = $scope.panelResizeFromMaxHeight+$scope.panelResizeFromPosition-event.clientY;
+		let maxHeightControls= document.getElementsByClassName("sidePanelResizeMaxHeightControl");
+		let heightControls= document.getElementsByClassName("sidePanelResizeHeightControl");
+		
+		for(let i=0; i!=maxHeightControls.length; i++) {
+			maxHeightControls[i].style.maxHeight = panelHeight+"px";
+		}
+		for(let i=0; i!=heightControls.length; i++) {
+			heightControls[i].style.height = panelHeight+"px";
+		}
+		
+		$scope.resizeSidePanelGrid();
+	}
+	
+	$scope.resizeSidePanelGrid = function() {
+		if($scope.panelDisplayed == 'data') {
+			$scope.$broadcast(EVENT_DATA_GRID_REFRESH, null);
+		}
+	}
+	
+	$scope.onSidePanelResizeEnd = function(event) {
+		$scope.panelResizing = false;
+	}
 
 	$scope.sidePanelHide = function() {
 		$scope.panelDisplayed = "";
@@ -74,10 +124,12 @@ angular.module('mitsiApp')
 		else {
 			$scope.panelDisplayed = name;
 		}
+		$scope.resizeSidePanelGrid();
 	}
 	
 	$scope.sidePanelShow = function(name) {
 		$scope.panelDisplayed = name;
+		$scope.resizeSidePanelGrid();
 	}
 	
 	$scope.sidePanelShouldShow = function() {

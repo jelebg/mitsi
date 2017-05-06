@@ -7,3 +7,4 @@ var EVENT_DATABASE_OBJECT_SELECTED = "DabaseObjectSelected";
 var EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH = "DabaseObjectSelectedForProximityGraph";
 var EVENT_DATABASE_OBJECT_INFO_REQUESTED = "DabaseObjectInfoRequested";
 var EVENT_DISPLAY_GRAPH = "eventDisplayGraph";
+var EVENT_DATA_GRID_REFRESH = "dataGridRefresh";
