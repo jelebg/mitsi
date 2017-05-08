@@ -36,7 +36,7 @@ angular.module('mitsiApp')
 });
 
 angular.module('mitsiApp')
-    .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal, $location) {
+    .controller('wgraphCtrl', function($scope, $rootScope, $timeout, $modal, $location, $state) {
 
 	$scope.jsplumb = null;
 	$scope.jsplumbContainer = null;
@@ -195,7 +195,19 @@ angular.module('mitsiApp')
 			return fullTableName=="" ? "" : "data of "+fullTableName;
 		}
 	}
-	
+
+	$scope.sidePanelExtendOnTab = function() {
+		switch($scope.panelDisplayed) {
+		case "details":
+			$state.go("workbench.details");
+			return;
+			
+		case "data":
+			$state.go("workbench.data");
+			return;
+		}
+	}
+
 	$scope.backupScope = function() {
 		$scope.updateTablesActualPosition();
 		
