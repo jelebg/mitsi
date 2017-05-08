@@ -107,6 +107,49 @@ public class DatasourceManager {
 		mitsiDatasources.loadIfNeccessary();
 	}
 	
+	private SqlSessionFactory buildConnectionFactory(String datasourceName, MitsiDatasource datasource) throws MitsiUsersException {
+		SqlSessionFactory sqlSessionFactory = null;
+		
+		try {
+			poolsLock.writeLock().lock();
+		
+			sqlSessionFactory = pools.get(datasourceName);
+			if(sqlSessionFactory==null) {
+				ComboPooledDataSource cpds= new ComboPooledDataSource();
+				DataSource jdbcDataSource = cpds;
+				try {
+					cpds.setDriverClass(datasource.getDriver());
+				} catch (PropertyVetoException e) {
+					throw new MitsiUsersException("exception while setDriverClass for ComboPooledDataSource", e);
+				}
+				cpds.setJdbcUrl(datasource.getJdbcUrl());
+				cpds.setUser(datasource.getUser());
+				cpds.setPassword(datasource.getPassword());
+				cpds.setInitialPoolSize((int) datasource.getPoolInitialSize());
+				cpds.setMinPoolSize((int) datasource.getPoolMinSize());
+				cpds.setMaxPoolSize((int) datasource.getPoolMaxSize());
+				cpds.setMaxIdleTime((int) datasource.getPoolMaxIdleTimeSec());
+				cpds.setAcquireIncrement((int) datasource.getPoolAcquireIncrement());
+				
+				TransactionFactory transactionFactory = new JdbcTransactionFactory();
+				/* TODO : vérifier à quoi sert le nom de l'environment */
+				Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);
+				Configuration configuration = new Configuration(environment);
+				configuration.setCacheEnabled(false);
+				
+				sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+				
+				pools.put(datasourceName, sqlSessionFactory);
+				sqlSessionFactory.getConfiguration().addMapper(getMapper(datasource.getProvider()));
+			}
+		}
+		finally {
+			poolsLock.writeLock().unlock();
+		}
+		
+		return sqlSessionFactory;
+	}
+	
 	public MitsiConnection getConnection(SortedSet<String> userGrantedGroups, boolean isUserConnected, String datasourceName) throws MitsiUsersException {
 		MitsiDatasource datasource = mitsiDatasources.getDatasource(userGrantedGroups, isUserConnected, datasourceName);
 		if(datasource == null) {
@@ -123,43 +166,7 @@ public class DatasourceManager {
 		}
 		
 		if(sqlSessionFactory==null) {
-			try {
-				poolsLock.writeLock().lock();
-			
-				sqlSessionFactory = pools.get(datasourceName);
-				if(sqlSessionFactory==null) {
-					ComboPooledDataSource cpds= new ComboPooledDataSource();
-					DataSource jdbcDataSource = cpds;
-					try {
-						cpds.setDriverClass(datasource.getDriver());
-					} catch (PropertyVetoException e) {
-						throw new MitsiUsersException("exception while setDriverClass for ComboPooledDataSource", e);
-					}
-					cpds.setJdbcUrl(datasource.getJdbcUrl());
-					cpds.setUser(datasource.getUser());
-					cpds.setPassword(datasource.getPassword());
-					cpds.setInitialPoolSize((int) datasource.getPoolInitialSize());
-					cpds.setMinPoolSize((int) datasource.getPoolMinSize());
-					cpds.setMaxPoolSize((int) datasource.getPoolMaxSize());
-					cpds.setMaxIdleTime((int) datasource.getPoolMaxIdleTimeSec());
-					cpds.setAcquireIncrement((int) datasource.getPoolAcquireIncrement());
-
-					
-					TransactionFactory transactionFactory = new JdbcTransactionFactory();
-					/* TODO : vérifier à quoi sert le nom de l'environment */
-					Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);
-					Configuration configuration = new Configuration(environment);
-					configuration.setCacheEnabled(false);
-					
-					sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-					
-					pools.put(datasourceName, sqlSessionFactory);
-					sqlSessionFactory.getConfiguration().addMapper(getMapper(datasource.getProvider()));
-				}
-			}
-			finally {
-				poolsLock.writeLock().unlock();
-			}
+			sqlSessionFactory = buildConnectionFactory(datasourceName, datasource);
 		}
 		
 		try {
