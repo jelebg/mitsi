@@ -270,19 +270,19 @@
         	 style="position:relative;"
         	 ng-if="panelDisplayed=='details'" 
         	 >
-     		<ng-include src="'wdetails.html'" ></ng-include>
+     		<ng-include src="'views/wdetails.html'" ></ng-include>
      	</div>
         <div  
         	 style="position:relative;"
         	 ng-show="panelDisplayed=='paths'" 
         	 >
-     		<ng-include src="'wpaths.html'" ></ng-include>
+     		<ng-include src="'views/wpaths.html'" ></ng-include>
      	</div>
         <div  
         	 style="position:relative;"
         	 ng-show="panelDisplayed=='sql'" 
         	 >
-     		<ng-include src="'wgensql.html'" ></ng-include>
+     		<ng-include src="'views/wgensql.html'" ></ng-include>
      	</div>
      </div>
      <div class="sidePanelResizeMaxHeightControl" style="max-height:300px;"> <!--  no overflow here / taken into acount by ui-grid -->
@@ -290,7 +290,7 @@
         	 style="position:relative;"
         	 ng-if="panelDisplayed=='data'" 
         	 >
-     		<ng-include src="'wdata2.html'" style="height:100%;"></ng-include>
+     		<ng-include src="'views/wdata2.html'" style="height:100%;"></ng-include>
      	</div>
      </div>
 </div>

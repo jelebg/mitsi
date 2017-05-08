@@ -6,32 +6,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/png" href="img/favicon.png" />
 
-<link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
-<link rel="stylesheet" href="ui-layout-0.0.0/ui-layout.css"/>
-<link rel="styleSheet" href="ui-grid-4.0.4/ui-grid.css"/>
-<link rel="stylesheet" type="text/css" href="rzslider/rzslider-5.4.3.min.css"/>
+<link rel="stylesheet" href="js/lib/bootstrap-3.3.5-dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="js/lib/ui-layout-0.0.0/ui-layout.css"/>
+<link rel="styleSheet" href="js/lib/ui-grid-4.0.4/ui-grid.css"/>
+<link rel="stylesheet" type="text/css" href="js/lib/rzslider/rzslider-5.4.3.min.css"/>
 <link rel="styleSheet" href="css/mitsi.css"/>
 
-<script src="angularjs-1.4.8/angular.min.js"></script>
-<script src="ui-router-0.4.2/angular-ui-router.min.js"></script>
-<script src="ui-bootstrap-0.13.3/ui-bootstrap-tpls-0.13.3.min.js"></script>
-<script src="ui-layout-master/ui-layout.js"></script>
-<script src="ui-grid-4.0.4/ui-grid.min.js"></script>
-<script src="rzslider/rzslider-5.4.3.min.js"></script>
-<script src="jsplumb-2.1.5/jsPlumb-2.1.5-min.js"></script>
+<script src="js/lib/angularjs-1.4.8/angular.min.js"></script>
+<script src="js/lib/ui-router-0.4.2/angular-ui-router.min.js"></script>
+<script src="js/lib/ui-bootstrap-0.13.3/ui-bootstrap-tpls-0.13.3.min.js"></script>
+<script src="js/lib/ui-layout-master/ui-layout.js"></script>
+<script src="js/lib/ui-grid-4.0.4/ui-grid.min.js"></script>
+<script src="js/lib/rzslider/rzslider-5.4.3.min.js"></script>
+<script src="js/lib/jsplumb-2.1.5/jsPlumb-2.1.5-min.js"></script>
 
 <script src="js/mitsi.utils.js"></script>
 <script src="js/workbench.event.js"></script>
 <script src="mitsiApp.js"></script>
 <script src="directives/resizableGrid.js"></script>
-<script src="workbenchtabsCtrl.js"></script>
-<script src="wdetailsCtrl.js"></script>
-<script src="wdataCtrl.js"></script>
-<script src="wgraphCtrl.js"></script>
-<script src="wsqlCtrl.js"></script>
-<script src="sourcesCtrl.js"></script>
-<script src="loginCtrl.js"></script>
-<script src="menuCtrl.js"></script>
+<script src="views/workbenchtabsCtrl.js"></script>
+<script src="views/wdetailsCtrl.js"></script>
+<script src="views/wdataCtrl.js"></script>
+<script src="views/wgraphCtrl.js"></script>
+<script src="views/wsqlCtrl.js"></script>
+<script src="views/sourcesCtrl.js"></script>
+<script src="views/loginCtrl.js"></script>
+<script src="views/menuCtrl.js"></script>
 <script src="services/mitsiHttpService.js"></script>
 <script src="services/errorService.js"></script>
 <script src="services/userService.js"></script>
@@ -100,7 +100,7 @@
    <div ui-layout style="top:35px">
        <ui-layout options="{ flow : 'column' }">
         <sidebar ui-layout-container size="500px" style="overflow-y: scroll">
-        	<ng-include src="'sources.html'" ></ng-include>
+        	<ng-include src="'views/sources.html'" ></ng-include>
         </sidebar>
         
         <div ui-layout-container >

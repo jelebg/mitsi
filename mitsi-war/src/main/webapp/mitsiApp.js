@@ -11,28 +11,28 @@ angular
 	   $stateProvider
 		   .state("workbench", 
 				   { url: "/workbench",
-			   		 templateUrl: "workbenchtabs.html", 
+			   		 templateUrl: "views/workbenchtabs.html", 
 			   		 controller:'workbenchtabsCtrl' 
 			   		})
 			   //controller:angular.module("mitsiApp").controller('workbenchtabsCtrl') })
 		   .state("workbench.details", 
 				   { url: "/wdetails", 
-			   		 templateUrl: "wdetails.html",
+			   		 templateUrl: "views/wdetails.html",
 			   		 controller:'wdetailsCtrl' 
 			   	   })
 	       .state("workbench.graph", 
 	    		   { url: "/wgraph", 
-	    	         templateUrl: "wgraph.html",
+	    	         templateUrl: "views/wgraph.html",
 			   		 controller:'wgraphCtrl' 
 	    	       })
            .state("workbench.sql", 
         		   { url: "/wsql", 
-        	         templateUrl: "wsql.html",
+        	         templateUrl: "views/wsql.html",
 			   		 controller:'wsqlCtrl' 
         	       })
            .state("workbench.data", 
         		   { url: "/wdata", 
-        	   		 templateUrl: "wdata.html",
+        	   		 templateUrl: "views/wdata.html",
 			   		 controller:'wdataCtrl' 
         	   	   });
 
