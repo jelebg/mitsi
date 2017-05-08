@@ -6,7 +6,12 @@ import java.util.TreeSet;
 
 public class MitsiDatasource {
 	
-	private static final int DEFAULT_MAX_EXPORT_ROWS = 1000000;
+	private static final int DEFAULT_MAX_EXPORT_ROWS        = 1000000;
+	private static final int DEFAULT_POOL_INITIAL_SIZE      = 0;
+	private static final int DEFAULT_POOL_MIN_SIZE          = 0;
+	private static final int DEFAULT_POOL_MAX_SIZE          = 5;
+	private static final int DEFAULT_POOL_MAX_IDLE_TIME_SEC = 3600;
+	private static final int DEFAULT_POOL_ACQUIRE_INCREMENT = 1;
 	
 	private String name;
 	private String description;
@@ -18,7 +23,12 @@ public class MitsiDatasource {
 	private String connectSchema;
 	private List<String> tags;
 	private TreeSet<String> userGroups;
-	private Long maxExportRows;
+	private long maxExportRows        = DEFAULT_MAX_EXPORT_ROWS;
+	private long poolInitialSize      = DEFAULT_POOL_INITIAL_SIZE;
+	private long poolMinSize          = DEFAULT_POOL_MIN_SIZE;
+	private long poolMaxSize          = DEFAULT_POOL_MAX_SIZE;
+	private long poolMaxIdleTimeSec   = DEFAULT_POOL_MAX_IDLE_TIME_SEC;
+	private long poolAcquireIncrement = DEFAULT_POOL_ACQUIRE_INCREMENT;
 	
 	public class Cache 	{
 		List<DatabaseObject> databaseObjects;
@@ -37,7 +47,9 @@ public class MitsiDatasource {
 		this.password = password;
 		this.tags = tags;
 		this.userGroups = userGroups;
-		this.maxExportRows = maxExportRows;
+		if(maxExportRows != null) {
+			this.maxExportRows = maxExportRows;
+		}
 	}
 
 	public String getName() {
@@ -120,13 +132,54 @@ public class MitsiDatasource {
 		this.userGroups = userGroups;
 	}
 
-	public Long getMaxExportRows() {
-		return maxExportRows==null ? DEFAULT_MAX_EXPORT_ROWS : maxExportRows;
+	public long getMaxExportRows() {
+		return maxExportRows;
 	}
 
 	public void setMaxExportRows(Long maxExportRows) {
 		this.maxExportRows = maxExportRows;
 	}
+
+	public long getPoolInitialSize() {
+		return poolInitialSize;
+	}
+
+	public void setPoolInitialSize(long poolInitialSize) {
+		this.poolInitialSize = poolInitialSize;
+	}
+
+	public long getPoolMinSize() {
+		return poolMinSize;
+	}
+
+	public void setPoolMinSize(long poolMinSize) {
+		this.poolMinSize = poolMinSize;
+	}
+
+	public long getPoolMaxSize() {
+		return poolMaxSize;
+	}
+
+	public void setPoolMaxSize(long poolMaxSize) {
+		this.poolMaxSize = poolMaxSize;
+	}
+
+	public long getPoolMaxIdleTimeSec() {
+		return poolMaxIdleTimeSec;
+	}
+
+	public void setPoolMaxIdleTimeSec(long poolMaxIdleTimeSec) {
+		this.poolMaxIdleTimeSec = poolMaxIdleTimeSec;
+	}
+
+	public long getPoolAcquireIncrement() {
+		return poolAcquireIncrement;
+	}
+
+	public void setPoolAcquireIncrement(Long poolAcquireIncrement) {
+		this.poolAcquireIncrement = poolAcquireIncrement;
+	}
+
 
 	@Override
 	public String toString() {

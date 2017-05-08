@@ -9,7 +9,14 @@
 		"user" : "test",
 		"password" : "test",
 		"connect.schema" : "TEST",
-		"tags" : [ "tag4", "tag5", "tag3" ]
+		"tags" : [ "tag4", "tag5", "tag3" ],
+		"pool" : {
+			"initialSize"      : 3,
+			"minSize"          : 0,
+			"maxSize"          : 10,
+			"maxIdleTimeSec"   : 10,
+			"acquireIncrement" : 1
+		}
 	  },
 	  "LOCALHOST-XE2": {
 	    "userGroups" : [ "xe2", "guest" ],

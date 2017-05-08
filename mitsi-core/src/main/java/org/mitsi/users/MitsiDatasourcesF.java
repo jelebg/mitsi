@@ -17,6 +17,15 @@ public class MitsiDatasourcesF {
 		String [] tags;
 		String connectSchema;
 		Long maxExportRows;
+		Pool pool;
+	}
+	
+	public class Pool {
+		Long initialSize;
+		Long minSize;
+		Long maxSize;
+		Long maxIdleTimeSec;
+		Long acquireIncrement;
 	}
 
 }

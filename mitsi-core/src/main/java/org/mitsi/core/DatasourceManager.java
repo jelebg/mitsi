@@ -1,5 +1,6 @@
 package org.mitsi.core;
 
+import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -125,9 +128,23 @@ public class DatasourceManager {
 			
 				sqlSessionFactory = pools.get(datasourceName);
 				if(sqlSessionFactory==null) {
-					DataSource jdbcDataSource = new PooledDataSource(datasource.getDriver(), 
-							datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
+					ComboPooledDataSource cpds= new ComboPooledDataSource();
+					DataSource jdbcDataSource = cpds;
+					try {
+						cpds.setDriverClass(datasource.getDriver());
+					} catch (PropertyVetoException e) {
+						throw new MitsiUsersException("exception while setDriverClass for ComboPooledDataSource", e);
+					}
+					cpds.setJdbcUrl(datasource.getJdbcUrl());
+					cpds.setUser(datasource.getUser());
+					cpds.setPassword(datasource.getPassword());
+					cpds.setInitialPoolSize((int) datasource.getPoolInitialSize());
+					cpds.setMinPoolSize((int) datasource.getPoolMinSize());
+					cpds.setMaxPoolSize((int) datasource.getPoolMaxSize());
+					cpds.setMaxIdleTime((int) datasource.getPoolMaxIdleTimeSec());
+					cpds.setAcquireIncrement((int) datasource.getPoolAcquireIncrement());
 
+					
 					TransactionFactory transactionFactory = new JdbcTransactionFactory();
 					/* TODO : vérifier à quoi sert le nom de l'environment */
 					Environment environment = new Environment(datasource.getName(), transactionFactory, jdbcDataSource);

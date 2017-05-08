@@ -9,7 +9,14 @@
 		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"connectSchema" : "TEST"
+		"connectSchema" : "TEST",
+		"pool" : {
+			initialSize      : 3,
+			minSize          : 0,
+			maxSize          : 10,
+			maxIdleTimeSec   : 10,
+			acquireIncrement : 1
+		}
 	  },
 	  "POSTGRE-TEST" :  {
 	    "userGroups" : [ "_public" ],

@@ -77,7 +77,27 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 							entry.getValue().tags == null ? null : Arrays.asList(entry.getValue().tags),
 							userGroups,
 							entry.getValue().maxExportRows);
+					
 					datasource.setConnectSchema(entry.getValue().connectSchema);
+					
+					if(entry.getValue().pool != null) {
+						if(entry.getValue().pool.initialSize != null) {
+							datasource.setPoolInitialSize(entry.getValue().pool.initialSize);
+						}
+						if(entry.getValue().pool.minSize != null) {
+							datasource.setPoolMinSize(entry.getValue().pool.minSize);
+						}
+						if(entry.getValue().pool.maxSize != null) {
+							datasource.setPoolMaxSize(entry.getValue().pool.maxSize);
+						}
+						if(entry.getValue().pool.maxIdleTimeSec != null) {
+							datasource.setPoolMaxIdleTimeSec(entry.getValue().pool.maxIdleTimeSec);
+						}
+						if(entry.getValue().pool.acquireIncrement != null) {
+							datasource.setPoolAcquireIncrement(entry.getValue().pool.acquireIncrement);
+						}
+					}
+					
 					datasources.put(entry.getKey(), datasource);
 				}
 			}

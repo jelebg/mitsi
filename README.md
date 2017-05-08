@@ -44,6 +44,13 @@ Others datasource attributes will be used by mitsi :
 	* _public : the datasource can be accessed by anybody, even if no login has been provided
 	* _connected : any connected user will be able to access the datasource
 
+* **pool** : connection pool parameters. for example : "pool" : { maxIdleTimeSec : 600,  maxSize : 5}
+	* initialSize : pool size when connecting for the first time (default : 0)
+	* minSize : minimum pool size (default : 0)
+	* maxSize : maximum pool size (default : 5)
+	* maxIdleTimeSec : maximum time, in seconds, a connecting will be kept while being idle
+	* acquireIncrement : number of connections acquired at once
+
 #### conf/mitsi-users.json
 
 This file is used to configure user management. There is three section in it :
