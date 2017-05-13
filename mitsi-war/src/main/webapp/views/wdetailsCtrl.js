@@ -5,6 +5,7 @@ angular.module('mitsiApp')
     
     $scope.lastObjectType = null;
     $scope.accordionsOpeningSave = {};
+    $scope.loading = false;
     
     $scope.saveAccordionsOpening = function() {
     	var objectType = $scope.lastObjectType;
@@ -13,7 +14,7 @@ angular.module('mitsiApp')
     		return;
     	}
     	if($scope.detailsAccordions.length == 0) {
-    		return
+    		return;
     	}
     	
     	var save = [];
@@ -41,6 +42,7 @@ angular.module('mitsiApp')
     }
 
     $scope.getTableDetails = function(source, databaseObject) {
+    	$scope.loading = true;
     	if(databaseObject) {
 	    	detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
 		    .then(function(response) {
@@ -48,7 +50,10 @@ angular.module('mitsiApp')
 		    	  $scope.detailsAccordions = response.data.accordions;
 		    	  $scope.restoreAccordionsOpening("table");
 		    },
-		    errorService.getGenericHttpErrorCallback());
+		    errorService.getGenericHttpErrorCallback())
+		    .finally(function() {
+	    	   $scope.loading = false;
+			});
     	}
     	else {
 	    	detailsService.getDetails(source, null, null, null)
@@ -57,7 +62,10 @@ angular.module('mitsiApp')
 		    	  $scope.detailsAccordions = response.data.accordions;
 		    	  $scope.restoreAccordionsOpening("source");
 		    },
-		    errorService.getGenericHttpErrorCallback());
+		    errorService.getGenericHttpErrorCallback())
+		    .finally(function() {
+	    	   $scope.loading = false;
+		    });
     	}
     }
     
@@ -80,6 +88,10 @@ angular.module('mitsiApp')
     	}
     	
     	return true;
+    }
+    
+    $scope.refresh = function() {
+    	$scope.init();
     }
     	
     $scope.init = function() {

@@ -10,6 +10,12 @@
 	        	   ng-class="{'glyphicon-chevron-down': accordion.isOpen, 'glyphicon-chevron-right': !accordion.isOpen}">
 	        	   </i>
 			    {{ accordion.title }}
+			    
+			    <a href="" ng-click="refresh();$event.stopPropagation();">
+			    	<i class="pull-right glyphicon glyphicon-refresh"
+			    	   ng-class="{'fast-right-spinner':loading}" 
+			    	></i>
+			    </a>
 			</accordion-heading>
 			
 			<table class="mitsiDetailsQuickFindTable"><tr>
