@@ -36,6 +36,16 @@
   </collection>
 </resultMap>
 
+<resultMap id="SequenceResultMap" type="org.mitsi.datasources.Sequence">
+  <result property="owner"        column="sequence_owner"/>
+  <result property="name"         column="sequence_name"/>
+  <result property="minValue"     column="min_value"/>
+  <result property="maxValue"     column="max_value"/>
+  <result property="currentValue" column="current_value"/>
+  <result property="incrementBy"  column="increment_by"/>
+  <result property="jsonDetails"  column="json_details"/>
+</resultMap>
+
 <select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
 	
 	SELECT 
@@ -120,6 +130,21 @@
 	WHERE all_mviews.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
 	AND all_mviews.owner NOT LIKE 'APEX_%'
 	ORDER BY all_mviews.owner, all_mviews.mview_name
+</select>
+
+<select id="getSequencesDetails" resultMap="SequenceResultMap" fetchSize="2000">
+	SELECT 
+		sequence_owner sequence_owner,
+		sequence_name sequence_name,
+		min_value min_value,
+		max_value max_value,
+		last_number current_value,
+		increment_by increment_by,
+		'{ "cycleFlag":"'            || cycle_flag ||'", '||
+				  '"orderFlag":"'            || order_flag||'", '||
+				  '"cacheSize":"'              || cache_size    ||'" } ' json_details
+	from all_sequences
+	order by sequence_owner, sequence_name
 </select>
 
 <select id="getSchemasDetails" resultMap="SchemaResultMap" fetchSize="2000">

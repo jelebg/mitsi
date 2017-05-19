@@ -14,6 +14,7 @@ import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
+import org.mitsi.datasources.Sequence;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.users.MitsiUsersException;
@@ -78,6 +79,37 @@ public class GetDetailsController extends MitsiRestController {
 						object.getId().getName(),
 						object.getId().getType(),
 						object.getJsonDetails()
+				});
+			}
+		}
+		catch(Exception e) {
+			accordion.message = e.getMessage();
+		}
+	}
+	
+	private void fromSequence(List<Sequence> sequencesList, GetDetailsResponse.Accordion accordion, String title) {
+		accordion.columns = new ArrayList<>();
+		accordion.data = new ArrayList<>();
+
+		try {
+			accordion.title = title;
+			accordion.columns.add("owner");
+			accordion.columns.add("name");
+			accordion.columns.add("minValue");
+			accordion.columns.add("maxValue");
+			accordion.columns.add("currentValue");
+			accordion.columns.add("incrementBy");
+			accordion.columns.add("jsonDetails");
+		
+			for(Sequence sequence : sequencesList) {
+				accordion.data.add(new String[] {
+						sequence.owner,
+						sequence.name,
+						Long.toString(sequence.minValue),
+						sequence.maxValue,
+						sequence.currentValue,
+						Long.toString(sequence.incrementBy),
+						sequence.jsonDetails
 				});
 			}
 		}
@@ -165,15 +197,17 @@ public class GetDetailsController extends MitsiRestController {
 	private void getDatasource(GetDetailsResponse response, MitsiConnection connection, String datasourceName) {
 		response.accordions = new ArrayList<>();
 		
-		GetDetailsResponse.Accordion tables = response.new Accordion();
-		GetDetailsResponse.Accordion views = response.new Accordion();
-		GetDetailsResponse.Accordion matviews = response.new Accordion();
-		GetDetailsResponse.Accordion schemas = response.new Accordion();
+		GetDetailsResponse.Accordion tables      = response.new Accordion();
+		GetDetailsResponse.Accordion views       = response.new Accordion();
+		GetDetailsResponse.Accordion matviews    = response.new Accordion();
+		GetDetailsResponse.Accordion sequences   = response.new Accordion();
+		GetDetailsResponse.Accordion schemas     = response.new Accordion();
 		GetDetailsResponse.Accordion tablespaces = response.new Accordion();
 
 		response.accordions.add(tables);
 		response.accordions.add(views);
 		response.accordions.add(matviews);
+		response.accordions.add(sequences);
 		response.accordions.add(schemas);
 		response.accordions.add(tablespaces);
 
@@ -188,6 +222,9 @@ public class GetDetailsController extends MitsiRestController {
 		List<DatabaseObject> objectListMatViews = connection.getMatViewsDetails();
 		fromObjectList(objectListMatViews,  matviews, "Materialized Views");
 		matviews.links = getObjectLinks(objectListMatViews, datasourceName, "matview");
+
+		List<Sequence> sequencesList = connection.getSequencesDetails();
+		fromSequence(sequencesList,  sequences, "Sequences");
 
 		List<Schema> schemaList = connection.getSchemasDetails();
 		fromSchemaList(schemaList,  schemas);

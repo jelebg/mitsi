@@ -20,6 +20,7 @@ import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
+import org.mitsi.datasources.Sequence;
 import org.mitsi.datasources.Tablespace;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -155,6 +156,10 @@ public class MitsiCoreOracleTest {
 			List<Tablespace> lt = connection.getTablespaceDetails();
 			assertTrue(lt != null);
 			assertTrue(lt==null || lt.size() > 0);
+			
+			List<Sequence> lsq = connection.getSequencesDetails();
+			assertTrue(lsq != null);
+			assertTrue(lsq==null || lsq.size() > 0);
 		}
 	}
 	

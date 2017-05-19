@@ -18,8 +18,9 @@ public interface IMitsiMapper {
 	List<DatabaseObject> getTablesDetails();
 	List<DatabaseObject> getViewsDetails();
 	List<DatabaseObject> getMatViewsDetails();
-	List<Schema> getSchemasDetails();
-	List<Tablespace> getTablespaceDetails();
+	List<Schema>         getSchemasDetails();
+	List<Tablespace>     getTablespaceDetails();
+	List<Sequence>       getSequencesDetails();
 	
 	List<Column> getTableColumnsDetails(@Param("owner") String owner, @Param("name") String name);
 	List<Column> getTablePartitioninKeysDetails(@Param("owner") String owner, @Param("name") String name);

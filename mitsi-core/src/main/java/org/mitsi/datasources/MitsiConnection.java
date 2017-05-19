@@ -143,6 +143,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public synchronized List<Tablespace> getTablespaceDetails() {
 		return mapper.getTablespaceDetails();
 	}
+	
+	@Override
+	public synchronized List<Sequence> getSequencesDetails() {
+		return mapper.getSequencesDetails();
+	}
 
 	@Override
 	@SuppressWarnings("squid:S1226") 

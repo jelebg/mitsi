@@ -35,6 +35,16 @@
   </collection>
 </resultMap>
 
+<resultMap id="SequenceResultMap" type="org.mitsi.datasources.Sequence">
+  <result property="owner"        column="sequence_owner"/>
+  <result property="name"         column="sequence_name"/>
+  <result property="minValue"     column="min_value"/>
+  <result property="maxValue"     column="max_value"/>
+  <result property="currentValue" column="current_value"/>
+  <result property="incrementBy"  column="increment_by"/>
+  <result property="jsonDetails"  column="json_details"/>
+</resultMap>
+
 <!--  TODO : supprimer pg_attrdef ? -->
 <select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
 	
@@ -123,6 +133,22 @@
    WHERE NOT pg_is_other_temp_schema(nc.oid) 
      AND c.relkind = ANY (ARRAY['m'::"char"])
 	ORDER BY nc.nspname, c.relname
+</select>
+
+<select id="getSequencesDetails" resultMap="SequenceResultMap" fetchSize="2000">
+	SELECT 
+		sequence_schema sequence_owner,
+		sequence_name sequence_name,
+		minimum_value min_value,
+		maximum_value max_value,
+		'not available' current_value,
+		increment increment_by,
+		'{ "dataType":"'            || data_type ||'", '||
+		  '"numericPrecision":"'    || numeric_precision||'", '||
+		  '"sequenceCatalog":"'     || sequence_catalog||'", '||
+		  '"cycleOption":"'         || cycle_option    ||'" } ' json_details
+	from information_schema.sequences
+	order by sequence_schema, sequence_name;
 </select>
 
 <select id="getSchemasDetails" resultMap="SchemaResultMap" fetchSize="2000">
