@@ -126,7 +126,7 @@ public class MitsiCorePostgreTest {
 			assertTrue(lct != null);
 			assertTrue(lct==null || lct.size() > 0);
 			
-			List<Constraint> lct2 = connection.getTablesWithConstraintsTo("PUBLIC", "MATABLE_DE_TEST");
+			List<Constraint> lct2 = connection.getTableFks("PUBLIC", "MATABLE_DE_TEST");
 			assertTrue(lct2 != null);
 			assertTrue(lct2==null || lct2.size() > 0);
 		}

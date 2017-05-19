@@ -385,25 +385,23 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromFktoList(List<Constraint> constraintList, GetDetailsResponse.Accordion accordion) {
+	private void fromFkList(List<Constraint> constraintList, GetDetailsResponse.Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
-			accordion.title = "FK to this table";
+			accordion.title = "FK from/to this table";
+			accordion.columns.add("direction");
 			accordion.columns.add("name");
 			accordion.columns.add("columns");
-			accordion.columns.add("FK constraint owner");
-			accordion.columns.add("FK constraint name");
 			accordion.columns.add("FK table");
 			accordion.columns.add("FK columns");
 			
 			for(Constraint constraint : constraintList) {
 				accordion.data.add(new String[] {
+					constraint.fkDirection,
 					constraint.name,
 					constraint.columns,
-					constraint.fkConstraintOwner,
-					constraint.fkConstraintName,
 					constraint.fkTable,
 					constraint.fkColumns
 				});
@@ -419,17 +417,17 @@ public class GetDetailsController extends MitsiRestController {
 			String datasourceName, String owner, String tableName) {
 		response.accordions = new ArrayList<>();
 		
-		GetDetailsResponse.Accordion columns = response.new Accordion();
-		GetDetailsResponse.Accordion indexes = response.new Accordion();
-		GetDetailsResponse.Accordion constraints = response.new Accordion();
-		GetDetailsResponse.Accordion fkto = response.new Accordion();
+		GetDetailsResponse.Accordion columns          = response.new Accordion();
+		GetDetailsResponse.Accordion indexes          = response.new Accordion();
+		GetDetailsResponse.Accordion constraints      = response.new Accordion();
+		GetDetailsResponse.Accordion fks              = response.new Accordion();
 		GetDetailsResponse.Accordion partitioningKeys = response.new Accordion();
-		GetDetailsResponse.Accordion partitions = response.new Accordion();
+		GetDetailsResponse.Accordion partitions       = response.new Accordion();
 
 		response.accordions.add(columns);
 		response.accordions.add(indexes);
 		response.accordions.add(constraints);
-		response.accordions.add(fkto);
+		response.accordions.add(fks);
 		response.accordions.add(partitioningKeys);
 		response.accordions.add(partitions);
 		
@@ -443,9 +441,9 @@ public class GetDetailsController extends MitsiRestController {
 		fromConstraintList(constraintList,  constraints);
 		constraints.links = getConstraintLinks(constraintList, datasourceName);
 		
-		List<Constraint> fktoList = connection.getTablesWithConstraintsTo(owner, tableName);
-		fromFktoList(fktoList,  fkto);
-		fkto.links = getConstraintLinks(fktoList, datasourceName);
+		List<Constraint> fkList = connection.getTableFks(owner, tableName);
+		fromFkList(fkList,  fks);
+		fks.links = getConstraintLinks(fkList, datasourceName);
 
 		List<Column> partitioningKeysList = connection.getTablePartitioninKeysDetails(owner, tableName);
 		fromPartitioningKeyList(partitioningKeysList,  partitioningKeys);

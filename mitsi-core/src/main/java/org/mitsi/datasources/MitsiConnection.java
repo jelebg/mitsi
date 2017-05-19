@@ -189,10 +189,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	@SuppressWarnings("squid:S1226") 
-	public List<Constraint> getTablesWithConstraintsTo(String tableOwner,
+	public List<Constraint> getTableFks(String tableOwner,
 			String tableName) {
 		tableOwner = getOwner(tableOwner);
-		return mapper.getTablesWithConstraintsTo(tableOwner, tableName);
+		return mapper.getTableFks(tableOwner, tableName);
 	}
 
 	@Override

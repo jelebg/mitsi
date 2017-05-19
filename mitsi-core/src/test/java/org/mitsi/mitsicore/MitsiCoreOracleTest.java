@@ -127,7 +127,7 @@ public class MitsiCoreOracleTest {
 			assertTrue(lct != null);
 			assertTrue(lct==null || lct.size() > 0);
 			
-			List<Constraint> lct2 = connection.getTablesWithConstraintsTo("TEST", "TOUTOU_1");
+			List<Constraint> lct2 = connection.getTableFks("TEST", "TOUTOU_1");
 			assertTrue(lct2 != null);
 			assertTrue(lct2==null || lct2.size() > 0);
 		}

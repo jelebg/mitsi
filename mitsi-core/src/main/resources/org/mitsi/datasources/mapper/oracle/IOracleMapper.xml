@@ -241,34 +241,59 @@
 	where owner=#{tableOwner} and table_name=#{tableName}
 </select>
 
-<select id="getTablesWithConstraintsTo" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
-SELECT r_constraint_name name,
-  'R' type,
-  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
-  ORDER BY position)
-  FROM all_cons_columns
-  WHERE all_cons_columns.constraint_name=all_constraints.constraint_name
-  AND all_cons_columns.owner            =all_constraints.owner
-  ) columns,
-  owner fkConstraintOwner,
-  table_name fkTable,
-  constraint_name fkConstraintName,
-  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
-  ORDER BY position)
-  FROM all_cons_columns
-  WHERE all_cons_columns.constraint_name=all_constraints.r_constraint_name
-  AND all_cons_columns.owner            =all_constraints.r_owner
-  ) fkColumns
-
-FROM all_constraints 
-WHERE exists (
-  select 1 
-  from all_constraints ac3
-  where ac3.owner = #{tableOwner}
-  and ac3.table_name = #{tableName}
-  and ac3.owner = all_constraints.r_owner
-  and ac3.constraint_name = all_constraints.r_constraint_name
-)
+<select id="getTableFks" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT * FROM (
+		SELECT
+		   'toTheTable' fkDirection, 
+			r_constraint_name name,
+		  'R' type,
+		  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
+		  ORDER BY position)
+		  FROM all_cons_columns
+		  WHERE all_cons_columns.constraint_name=all_constraints.constraint_name
+		  AND all_cons_columns.owner            =all_constraints.owner
+		  ) columns,
+		  owner fkConstraintOwner,
+		  table_name fkTable,
+		  constraint_name fkConstraintName,
+		  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
+		  ORDER BY position)
+		  FROM all_cons_columns
+		  WHERE all_cons_columns.constraint_name=all_constraints.r_constraint_name
+		  AND all_cons_columns.owner            =all_constraints.r_owner
+		  ) fkColumns
+		
+		FROM all_constraints 
+		WHERE exists (
+		  select 1 
+		  from all_constraints ac3
+		  where ac3.owner = #{tableOwner}
+		  and ac3.table_name = #{tableName}
+		  and ac3.owner = all_constraints.r_owner
+		  and ac3.constraint_name = all_constraints.r_constraint_name
+		)
+	UNION ALL
+		select 
+		   'fromTheTable' fkDirection, 
+		  constraint_name name,
+		  constraint_type type,
+		  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+		    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.constraint_name and all_cons_columns.owner=all_constraints.owner
+		  ) columns,
+		  r_owner fkConstraintOwner,
+		  (  select table_name 
+		      from all_constraints ac2 
+		      where ac2.owner=all_constraints.r_owner and ac2.constraint_name=all_constraints.r_constraint_name
+		  ) fkTable,
+		  r_constraint_name fkConstraintName,
+		  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+		    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.r_constraint_name and all_cons_columns.owner=all_constraints.r_owner
+		  ) fkColumns
+		from all_constraints 
+		where owner=#{tableOwner} and table_name=#{tableName}
+		AND constraint_type = 'R'
+	)
+	ORDER BY fkDirection, name
 </select>
 
 <select id="getTablePartitionDetails" resultType="org.mitsi.datasources.Partition" fetchSize="2000">

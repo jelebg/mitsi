@@ -228,9 +228,9 @@
 	    c.conname::information_schema.sql_identifier AS name,
 	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
 	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
-	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS fkConstraintOwner,
+	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS  fkConstraintName,
 	    fr.relname::information_schema.sql_identifier AS fkTable,
-	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
 	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns,
 		'{}' jsonDetails	
 	FROM pg_namespace nr
@@ -249,30 +249,57 @@
 	group by c.conname, c.contype, c.conkey, fnr.nspname, fr.relname, c.confkey
 </select>
 
-<select id="getTablesWithConstraintsTo" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
-	SELECT 
-	    c.conname::information_schema.sql_identifier AS name,
-	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
-	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
-	    nc.nspname::information_schema.sql_identifier AS fkConstraintOwner,
-	    r.relname::information_schema.sql_identifier AS fkTable,
-	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
-	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns,
-		'{}' jsonDetails	
-	FROM pg_namespace nr
-	    join pg_class r on nr.oid = r.relnamespace 
-	    join pg_constraint c on r.oid = c.conrelid 
-	    join pg_namespace nc on nc.oid = c.connamespace 
-	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
-	    left join pg_class fr on fr.oid = c.confrelid
-	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
-	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
-	WHERE 
-	    c.contype = 'f'
-	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
-	AND upper(fnr.nspname) = upper(#{tableOwner})
-	AND fr.relname = #{tableName}
-	group by c.conname, c.contype, c.conkey, nc.nspname, fnr.nspname, r.relname, c.confkey
+<select id="getTableFks" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT * FROM (
+		SELECT 
+		   'toTheTable' AS fkDirection, 
+		    c.conname::information_schema.sql_identifier AS name,
+		    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+		    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+		    <!--  TODO : nc.nspname::information_schema.sql_identifier ?? --> null AS fkConstraintOwner,
+		    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS  fkConstraintName,
+		    r.relname::information_schema.sql_identifier AS fkTable,
+		    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
+		FROM pg_namespace nr
+		    join pg_class r on nr.oid = r.relnamespace 
+		    join pg_constraint c on r.oid = c.conrelid 
+		    join pg_namespace nc on nc.oid = c.connamespace 
+		    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+		    left join pg_class fr on fr.oid = c.confrelid
+		    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+		    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+		WHERE 
+		    c.contype = 'f'
+		AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+		AND upper(fnr.nspname) = upper(#{tableOwner})
+		AND fr.relname = #{tableName}
+		group by c.conname, c.contype, c.conkey, nc.nspname, fnr.nspname, r.relname, c.confkey
+	UNION ALL
+		SELECT 
+		   'fromTheTable' AS fkDirection, 
+		    c.conname::information_schema.sql_identifier AS name,
+		    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+		    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+		    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+		    fr.relname::information_schema.sql_identifier AS fkTable,
+		    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
+		    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
+		FROM pg_namespace nr
+		    join pg_class r on nr.oid = r.relnamespace 
+		    join pg_constraint c on r.oid = c.conrelid 
+		    join pg_namespace nc on nc.oid = c.connamespace 
+		    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+		    left join pg_class fr on fr.oid = c.confrelid
+		    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+		    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+		WHERE 
+		    c.contype = 'f'::"char"
+		AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+		AND upper(nc.nspname) = upper(#{tableOwner})
+		AND r.relname = #{tableName}
+		group by c.conname, c.contype, c.conkey, fnr.nspname, fr.relname, c.confkey	
+	) sub
+	ORDER BY fkDirection, name
 </select>
 
 <select id="getTablePartitionDetails" resultType="org.mitsi.datasources.Partition" fetchSize="2000">
