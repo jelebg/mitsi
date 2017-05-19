@@ -1,5 +1,14 @@
 
 <body data-ng-app="mitsiApp" class="container">
+
+    <a href="" ng-click="refresh();$event.stopPropagation();"
+       ng-if="detailsAccordions.length == 0 && loading"
+       style="padding:5px;font-size:120%;"/>
+    	<i class="glyphicon glyphicon-refresh"
+    	   ng-class="{'fast-right-spinner':loading}" 
+    	></i>
+    </a>
+    
 	<accordion close-others="false">
 		<accordion-group 
 			ng-repeat="accordion in detailsAccordions" 
