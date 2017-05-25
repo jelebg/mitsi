@@ -10,7 +10,32 @@ angular.module('mitsiApp')
 			return;
 		}
 		
+		$scope.initSearchFilters();
+		
 		$scope.globalRefresh();
+	}
+	
+	$scope.initSearchFilters = function() {
+		$scope.searchSource = localStorage.getItem("source_searchSource") ? localStorage.getItem("source_searchSource") : "";
+		
+		$scope.$watch("searchSource", function() {
+			localStorage.setItem("source_searchSource", $scope.searchSource);
+		});
+	}
+	
+	$scope.initFilterDs = function(ds) {
+		ds.searchObject          = $scope.getLocalStorageValueDs(ds, "searchObject");
+	}
+
+	
+	$scope.localStorageUpdateForDs = function(s, value, modelName) {
+		let itemName = "source|"+s.name+"|"+modelName;
+		localStorage.setItem(itemName, value);
+	}
+	
+	$scope.getLocalStorageValueDs = function(s, modelName) {
+		let itemName = "source|"+s.name+"|"+modelName;
+		return localStorage.getItem(itemName);
 	}
 	
 	$scope.keepAlive = function() {
@@ -78,6 +103,7 @@ angular.module('mitsiApp')
 			  // add datasources that do exist yet
 			  for(let i=0; i!=responseDatasources.length; i++) {
 				  if(!(responseDatasources[i].name in scopeDatasourceNames)) {
+					  $scope.initFilterDs(responseDatasources[i]);
 					  $scope.datasources.push(responseDatasources[i]);
 				  }
 			  }
@@ -167,12 +193,13 @@ angular.module('mitsiApp')
 			return false;
 		}
 		
-		var filter = $scope.searchSource.trim().toLowerCase();
+		let filter = $scope.searchSource.trim().toLowerCase();
 		if(filter.length == 0) {
 			return false;
 		}
-		var name = source.name.toLowerCase();
-		var tags = source.tags.join(" ");
+		let name = source.name.toLowerCase();
+		
+		let tags = source.tags ? source.tags.join(" ") : "";
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	

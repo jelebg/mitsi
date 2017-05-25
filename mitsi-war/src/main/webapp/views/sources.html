@@ -108,7 +108,12 @@
 							popover-placement="bottom"
 						></a>
 						
-						<input type="text" ng-model="s.searchObject" class="form-control" placeholder="Search tables here..."/>
+						<input type="text" 
+								ng-model="s.searchObject" 
+								class="form-control" 
+								placeholder="Search tables here..."
+								ng-change="localStorageUpdateForDs(s, s.searchObject, 'searchObject');"
+								/>
 					</div>
 				    <ul class="dropdown-menu" >
 				        <li ><a href="" ng-click="s.filter.tableName=!s.filter.tableName; $event.stopPropagation();">
