@@ -36,14 +36,23 @@ class GetDetails {
 	}
 }
 
-class GetDetailsResponse {
-	public class Accordion {
-		String message;
-		String title;
-		List<String> columns;
-		List<String[]> data;
-		String[] links;
+class AccordionColumn {
+	public AccordionColumn(String name, String displayType) {
+		this.name = name;
+		this.displayType = displayType;
 	}
+	String name;
+	String displayType;
+}
+
+class Accordion {
+	String message;
+	String title;
+	List<AccordionColumn> columns;
+	List<String[]> data;
+}
+
+class GetDetailsResponse {
 
 	String message;
 	List<Accordion> accordions;
@@ -62,21 +71,19 @@ public class GetDetailsController extends MitsiRestController {
 	
 	//// datasource details
 
-	private void fromObjectList(List<DatabaseObject> objectList, GetDetailsResponse.Accordion accordion, String title) {
+	private void fromObjectList(List<DatabaseObject> objectList, Accordion accordion, String title) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = title;
-			accordion.columns.add("owner");
-			accordion.columns.add("name");
-			accordion.columns.add("type");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", "tableLink"));
+			accordion.columns.add(new AccordionColumn("type", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 		
 			for(DatabaseObject object : objectList) {
 				accordion.data.add(new String[] {
-						object.getId().getSchema(),
-						object.getId().getName(),
+						object.getId().getSchema()+"."+object.getId().getName(),
 						object.getId().getType(),
 						object.getJsonDetails()
 				});
@@ -87,19 +94,19 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromSequence(List<Sequence> sequencesList, GetDetailsResponse.Accordion accordion, String title) {
+	private void fromSequence(List<Sequence> sequencesList, Accordion accordion, String title) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = title;
-			accordion.columns.add("owner");
-			accordion.columns.add("name");
-			accordion.columns.add("minValue");
-			accordion.columns.add("maxValue");
-			accordion.columns.add("currentValue");
-			accordion.columns.add("incrementBy");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("owner", null));
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("minValue", null));
+			accordion.columns.add(new AccordionColumn("maxValue", null));
+			accordion.columns.add(new AccordionColumn("currentValue", null));
+			accordion.columns.add(new AccordionColumn("incrementBy", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 		
 			for(Sequence sequence : sequencesList) {
 				accordion.data.add(new String[] {
@@ -118,15 +125,15 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromSchemaList(List<Schema> schemaList, GetDetailsResponse.Accordion accordion) {
+	private void fromSchemaList(List<Schema> schemaList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Users / schemas";
-			accordion.columns.add("name");
-			accordion.columns.add("current");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("current", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 			
 			for(Schema schema : schemaList) {
 				accordion.data.add(new String[] {
@@ -141,16 +148,16 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromTablespaceList(List<Tablespace> tablespaceList, GetDetailsResponse.Accordion accordion) {
+	private void fromTablespaceList(List<Tablespace> tablespaceList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Tablespaces";
-			accordion.columns.add("name");
-			accordion.columns.add("status");
-			accordion.columns.add("contents");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("status", null));
+			accordion.columns.add(new AccordionColumn("contents", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 			
 			for(Tablespace tablespace : tablespaceList) {
 				accordion.data.add(new String[] {
@@ -166,43 +173,16 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private String getDetailUrl(String datasourceName, String type, String name, String owner) {
-		return "details?datasource="+datasourceName+"&type="+type+"&name="+name+"&owner="+owner;
-	}
-	
-	private String[] getObjectLinks(List<DatabaseObject> objectList, String datasourceName, String type) {
-		String[] links = new String[objectList.size()];
-		int i =0;
-		for(DatabaseObject object : objectList) {
-			links[i] = 	getDetailUrl(datasourceName, type, object.getName(), object.getSchema());
-			i++;
-		}
-		return links;
-	}
-
-	private String[] getConstraintLinks(List<Constraint> constraintList, String datasourceName) {
-		String[] links = new String[constraintList.size()];
-		int i =0;
-		for(Constraint constraint : constraintList) {
-			if(!"R".equals(constraint.type)) {
-				continue;
-			}
-			links[i] = 	getDetailUrl(datasourceName, "table", constraint.fkTable, constraint.fkConstraintOwner);
-			i++;
-		}
-		return links;
-	}
-
 	@SuppressWarnings("squid:S1166")
 	private void getDatasource(GetDetailsResponse response, MitsiConnection connection, String datasourceName) {
 		response.accordions = new ArrayList<>();
 		
-		GetDetailsResponse.Accordion tables      = response.new Accordion();
-		GetDetailsResponse.Accordion views       = response.new Accordion();
-		GetDetailsResponse.Accordion matviews    = response.new Accordion();
-		GetDetailsResponse.Accordion sequences   = response.new Accordion();
-		GetDetailsResponse.Accordion schemas     = response.new Accordion();
-		GetDetailsResponse.Accordion tablespaces = response.new Accordion();
+		Accordion tables      = new Accordion();
+		Accordion views       = new Accordion();
+		Accordion matviews    = new Accordion();
+		Accordion sequences   = new Accordion();
+		Accordion schemas     = new Accordion();
+		Accordion tablespaces = new Accordion();
 
 		response.accordions.add(tables);
 		response.accordions.add(views);
@@ -213,15 +193,12 @@ public class GetDetailsController extends MitsiRestController {
 
 		List<DatabaseObject> objectList = connection.getTablesDetails();
 		fromObjectList(objectList,  tables, "Tables");
-		tables.links = getObjectLinks(objectList, datasourceName, "table");
 		
 		List<DatabaseObject> objectListViews = connection.getViewsDetails();
 		fromObjectList(objectListViews,  views, "Views");
-		views.links = getObjectLinks(objectListViews, datasourceName, "view");
 
 		List<DatabaseObject> objectListMatViews = connection.getMatViewsDetails();
 		fromObjectList(objectListMatViews,  matviews, "Materialized Views");
-		matviews.links = getObjectLinks(objectListMatViews, datasourceName, "matview");
 
 		List<Sequence> sequencesList = connection.getSequencesDetails();
 		fromSequence(sequencesList,  sequences, "Sequences");
@@ -238,20 +215,20 @@ public class GetDetailsController extends MitsiRestController {
 	//// table details
 
 	
-	private void fromColumnsList(List<Column> columnList, GetDetailsResponse.Accordion accordion) {
+	private void fromColumnsList(List<Column> columnList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Columns";
-			accordion.columns.add("name");
-			accordion.columns.add("type");
-			accordion.columns.add("length");
-			accordion.columns.add("precision");
-			accordion.columns.add("scale");
-			accordion.columns.add("defaultValue");
-			accordion.columns.add("nullable");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("type", null));
+			accordion.columns.add(new AccordionColumn("length", null));
+			accordion.columns.add(new AccordionColumn("precision", null));
+			accordion.columns.add(new AccordionColumn("scale", null));
+			accordion.columns.add(new AccordionColumn("defaultValue", null));
+			accordion.columns.add(new AccordionColumn("nullable", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 			
 			for(Column dbColumn : columnList) {
 				accordion.data.add(new String[] {
@@ -271,13 +248,13 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromPartitioningKeyList(List<Column> columnList, GetDetailsResponse.Accordion accordion) {
+	private void fromPartitioningKeyList(List<Column> columnList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Partitioning keys";
-			accordion.columns.add("name");
+			accordion.columns.add(new AccordionColumn("name", null));
 			
 			for(Column dbColumn : columnList) {
 				accordion.data.add(new String[] {
@@ -290,20 +267,20 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromIndexList(List<Index> indexList, GetDetailsResponse.Accordion accordion) {
+	private void fromIndexList(List<Index> indexList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Indexes";
-			accordion.columns.add("owner");
-			accordion.columns.add("name");
-			accordion.columns.add("type");
-			accordion.columns.add("uniqueness");
-			accordion.columns.add("columns");
-			accordion.columns.add("tablespace");
-			accordion.columns.add("partitioning");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("owner", null));
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("type", null));
+			accordion.columns.add(new AccordionColumn("uniqueness", null));
+			accordion.columns.add(new AccordionColumn("columns", null));
+			accordion.columns.add(new AccordionColumn("tablespace", null));
+			accordion.columns.add(new AccordionColumn("partitioning", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 
 			for(Index index : indexList) {
 				accordion.data.add(new String[] {
@@ -323,18 +300,18 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 
-	private void fromPartitionList(List<Partition> partitionList, GetDetailsResponse.Accordion accordion) {
+	private void fromPartitionList(List<Partition> partitionList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Partitions";
-			accordion.columns.add("name");
-			accordion.columns.add("tablespace name");
-			accordion.columns.add("high value");
-			accordion.columns.add("high value length");
-			accordion.columns.add("interval");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("tablespace name", null));
+			accordion.columns.add(new AccordionColumn("high value", null));
+			accordion.columns.add(new AccordionColumn("high value length", null));
+			accordion.columns.add(new AccordionColumn("interval", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 			
 			for(Partition partition : partitionList) {
 				accordion.data.add(new String[] {
@@ -352,20 +329,20 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromConstraintList(List<Constraint> constraintList, GetDetailsResponse.Accordion accordion) {
+	private void fromConstraintList(List<Constraint> constraintList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "Constraints";
-			accordion.columns.add("name");
-			accordion.columns.add("type");
-			accordion.columns.add("columns");
-			accordion.columns.add("FK constraint owner");
-			accordion.columns.add("FK constraint name");
-			accordion.columns.add("FK table");
-			accordion.columns.add("FK columns");
-			accordion.columns.add("jsonDetails");
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("type", null));
+			accordion.columns.add(new AccordionColumn("columns", null));
+			accordion.columns.add(new AccordionColumn("FK constraint owner", null));
+			accordion.columns.add(new AccordionColumn("FK constraint name", null));
+			accordion.columns.add(new AccordionColumn("FK table", null));
+			accordion.columns.add(new AccordionColumn("FK columns", null));
+			accordion.columns.add(new AccordionColumn("jsonDetails", null));
 			
 			for(Constraint constraint : constraintList) {
 				accordion.data.add(new String[] {
@@ -385,24 +362,24 @@ public class GetDetailsController extends MitsiRestController {
 		}
 	}
 	
-	private void fromFkList(List<Constraint> constraintList, GetDetailsResponse.Accordion accordion) {
+	private void fromFkList(List<Constraint> constraintList, Accordion accordion) {
 		accordion.columns = new ArrayList<>();
 		accordion.data = new ArrayList<>();
 
 		try {
 			accordion.title = "FK from/to this table";
-			accordion.columns.add("direction");
-			accordion.columns.add("name");
-			accordion.columns.add("columns");
-			accordion.columns.add("FK table");
-			accordion.columns.add("FK columns");
+			accordion.columns.add(new AccordionColumn("direction", "fkDirection"));
+			accordion.columns.add(new AccordionColumn("name", null));
+			accordion.columns.add(new AccordionColumn("columns", null));
+			accordion.columns.add(new AccordionColumn("FK table", "tableLink"));
+			accordion.columns.add(new AccordionColumn("FK columns", null));
 			
 			for(Constraint constraint : constraintList) {
 				accordion.data.add(new String[] {
 					constraint.fkDirection,
-					constraint.name,
+					constraint.fkDirection.equals("toTheTable") ? constraint.fkConstraintName : constraint.name,
 					constraint.columns,
-					constraint.fkTable,
+					constraint.fkConstraintOwner+"."+constraint.fkTable,
 					constraint.fkColumns
 				});
 			}
@@ -417,12 +394,12 @@ public class GetDetailsController extends MitsiRestController {
 			String datasourceName, String owner, String tableName) {
 		response.accordions = new ArrayList<>();
 		
-		GetDetailsResponse.Accordion columns          = response.new Accordion();
-		GetDetailsResponse.Accordion indexes          = response.new Accordion();
-		GetDetailsResponse.Accordion constraints      = response.new Accordion();
-		GetDetailsResponse.Accordion fks              = response.new Accordion();
-		GetDetailsResponse.Accordion partitioningKeys = response.new Accordion();
-		GetDetailsResponse.Accordion partitions       = response.new Accordion();
+		Accordion columns          = new Accordion();
+		Accordion indexes          = new Accordion();
+		Accordion constraints      = new Accordion();
+		Accordion fks              = new Accordion();
+		Accordion partitioningKeys = new Accordion();
+		Accordion partitions       = new Accordion();
 
 		response.accordions.add(columns);
 		response.accordions.add(indexes);
@@ -439,11 +416,9 @@ public class GetDetailsController extends MitsiRestController {
 		
 		List<Constraint> constraintList = connection.getTableConstraintsDetails(owner, tableName);
 		fromConstraintList(constraintList,  constraints);
-		constraints.links = getConstraintLinks(constraintList, datasourceName);
 		
 		List<Constraint> fkList = connection.getTableFks(owner, tableName);
 		fromFkList(fkList,  fks);
-		fks.links = getConstraintLinks(fkList, datasourceName);
 
 		List<Column> partitioningKeysList = connection.getTablePartitioninKeysDetails(owner, tableName);
 		fromPartitioningKeyList(partitioningKeysList,  partitioningKeys);

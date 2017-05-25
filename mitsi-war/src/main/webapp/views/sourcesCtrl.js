@@ -289,6 +289,10 @@ angular.module('mitsiApp')
 		
 		$state.go("workbench.details");
         $rootScope.$broadcast(EVENT_DATABASE_SELECTED_FOR_DETAILS, source); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
+	
+        if(!source.objects) {
+        	$scope.refresh(source, null);
+        }
 	}
 	
 	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) { // NOSONAR

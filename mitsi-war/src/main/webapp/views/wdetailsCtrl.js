@@ -90,6 +90,27 @@ angular.module('mitsiApp')
     	return true;
     }
     
+    $scope.selectTable = function(tableName) {
+		let s = $rootScope.currentSource;
+		let o = null;
+		
+		if(!s || !s.objects) {
+			return;
+		}
+		
+		for(let i=0; i!=s.objects.length; i++) {
+			o = s.objects[i];
+			if(o.id.schema+"."+o.id.name == tableName) {
+				break;
+			}
+		}
+		if(o == null) {
+			return;
+		}
+		s.currentObject = o;
+        $rootScope.$broadcast(EVENT_DATABASE_OBJECT_SELECTED, s, o); // NOSONAR EVENT_DATABASE_SELECTED does exist but sonar does not see it
+    }
+    
     $scope.refresh = function() {
     	$scope.init();
     }

@@ -41,7 +41,7 @@
 				<tr>
 					<th ng-repeat="column in accordion.columns"
 					    class="mitsiDetailsTableHeader">
-						{{ column }}
+						{{ column.name }}
 					</th>
 				</tr>
 			</thead>
@@ -51,7 +51,12 @@
 				>
 			 	  <td ng-repeat="d in myrow track by $index" 
 			 	  	  class="mitsiDetailsTableTd"
-			 	  >{{ d }}</td>
+			 	  >
+			 	  <span ng-if="accordion.columns[$index].displayType==null">{{ d }}</span>
+			 	  <i    ng-if="accordion.columns[$index].displayType=='fkDirection' && d=='toTheTable'"   class="glyphicon glyphicon-log-in"></i>
+			 	  <i    ng-if="accordion.columns[$index].displayType=='fkDirection' && d=='fromTheTable'" class="glyphicon glyphicon-log-out"></i>
+			 	  <a    ng-if="accordion.columns[$index].displayType=='tableLink' " href="" ng-click="selectTable(d)">{{ d }}</a>
+			 	  </td>
 				</tr>
 			</tbody>
 			</table>

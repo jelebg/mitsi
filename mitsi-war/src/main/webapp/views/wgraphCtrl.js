@@ -218,13 +218,13 @@ angular.module('mitsiApp')
     	};
 	}
 	$scope.restoreScope = function() {
-		if(!$rootScope.backupGraphScope) {
-			return;
+		if($rootScope.backupGraphScope) {
+			$scope.tables          = $rootScope.backupGraphScope.tables;
+			$scope.sqlTables       = $rootScope.backupGraphScope.sqlTables;
+			$scope.sqlText         = $rootScope.backupGraphScope.sqlText;
 		}
-		$scope.tables          = $rootScope.backupGraphScope.tables;
-		$scope.sqlTables       = $rootScope.backupGraphScope.sqlTables;
-		$scope.sqlText         = $rootScope.backupGraphScope.sqlText;
-
+		
+		$scope.appendSelectedTable();
 		$scope.afterTableUpdateFullRefresh();
 	}
 	
@@ -434,6 +434,16 @@ angular.module('mitsiApp')
 		return false;
 	}
 	
+	$scope.appendSelectedTable = function() {
+		if($rootScope.currentSource && 
+				$rootScope.currentSource.currentObject &&
+				$rootScope.currentSource.currentObject.id) {
+			let table = $rootScope.currentSource.currentObject;
+			let tableName = table.id.schema+"."+table.id.name;
+			$scope.appendTableNoStacking(400, 300, tableName);
+		}
+	}
+
 	$scope.appendTableNoStacking = function(left, top, tableName, horizontalSide) {
 		if($scope.existsTable(tableName)) {
 			return;
@@ -799,12 +809,10 @@ angular.module('mitsiApp')
 		$scope.initGraphDisplay();	
 	});
 	
+	// TODO :  source, databaseObject ne servent plus ?
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_OBJECT_SELECTED does exist
 		
-		if(databaseObject && databaseObject.id) {
-			var tableName = databaseObject.id.schema+"."+databaseObject.id.name;
-			$scope.appendTableNoStacking(400, 300, tableName);
-		}
+		$scope.appendSelectedTable();
 		
 	});
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_OBJECT_SELECTED_FOR_PROXIMITY_GRAPH does exist
