@@ -77,7 +77,7 @@ public abstract class MitsiRestController {
 		log.debug("generic error handling in GsonServlet", e );
 		
 		ErrorResponse response = new ErrorResponse();
-		response.errorMessage = e.getMessage();
+		response.errorMessage = getErrorMessage(e);
 		try {
 			Gson gson = new Gson();
 			gson.toJson(response, writer);
@@ -85,6 +85,25 @@ public abstract class MitsiRestController {
 		catch(JsonIOException e2) {
 			log.error("error handling impossible because of error", e2);
 		}
+	}
+
+	private String getErrorMessage(Throwable t) {
+		
+		StringBuilder message = new StringBuilder(t.getMessage());
+		
+		for(t=t.getCause(); t!=null; t=t.getCause()) {
+			if(t instanceof java.sql.SQLRecoverableException) {
+				java.sql.SQLRecoverableException sqlRecoverableException = (java.sql.SQLRecoverableException) t;
+				message.append(" (")
+					.append(sqlRecoverableException.getErrorCode())
+					.append(" - ")
+					.append(sqlRecoverableException.getMessage())
+					.append(")");
+				break;
+			}
+		}
+		
+		return message.toString();
 	}
 
 }

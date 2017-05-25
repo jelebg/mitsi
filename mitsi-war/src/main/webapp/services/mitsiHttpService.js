@@ -31,6 +31,9 @@ angular.module('mitsiApp')
 				if(response.data.errorMessage) {
 					datasource.errorMessage = response.data.errorMessage;
 					datasource.errorDetails = response.data.errorMessage;
+					if(!datasource.accordionOpened) {
+						datasource.accordionOpened = true;
+					}
 					defer.reject(response.data.errorMessage);
 				}
 				else {

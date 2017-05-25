@@ -57,10 +57,10 @@ public class GetDatabaseObjectsController extends MitsiRestController {
 		} 
 		catch(Exception e) {
 			log.error("could not connect to database : "+request.datasourceName, e);
-			throw new MitsiWarException("could not connect to database : "+request.datasourceName);
+			throw new MitsiWarException("could not connect to database : "+request.datasourceName, e);
 		}
 
 		return response;
 	}
-
+	
 }
