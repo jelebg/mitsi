@@ -18,10 +18,6 @@ angular.module('mitsiApp')
 
     $rootScope.loggedUser = null;
 	
-    $scope.closeGeneralError = function() {
-    	$rootScope.mitsiGeneralError=null;
-    }
-    
     $scope.menuAbout = function() {
 
 		$scope.modalInstance = $modal.open({
