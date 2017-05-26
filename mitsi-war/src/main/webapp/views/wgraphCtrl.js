@@ -472,7 +472,7 @@ angular.module('mitsiApp')
 						fromTable:tableName,
 						fromColumns:link.properties.keyColumns,
 						toTable:link.targetName,
-						toColumns:link.properties.keyColumns});
+						toColumns:link.properties.rKeyColumns});
 				} 
 			}
 		}
@@ -487,7 +487,7 @@ angular.module('mitsiApp')
 						fromTable:rtable2,
 						fromColumns:link.properties.keyColumns,
 						toTable:tableName,
-						toColumns:link.properties.keyColumns});
+						toColumns:link.properties.rKeyColumns});
 				}
 			}
 		}
