@@ -228,7 +228,8 @@
 	    c.conname::information_schema.sql_identifier AS name,
 	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
 	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
-	    c.consrc checkCondition,
+	    case when c.contype='x' then 'exclusion: ' || (select string_agg(pg_proc.proname, ',') from pg_operator join pg_proc on pg_proc.oid=pg_operator.oprcode where pg_operator.oid=any('{1513}'::int[]))
+	    else c.consrc end checkCondition,
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS fkConstraintOwner,
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS  fkConstraintName,
 	    fr.relname::information_schema.sql_identifier AS fkTable,
