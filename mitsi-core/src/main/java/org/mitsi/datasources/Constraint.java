@@ -8,6 +8,7 @@ public class Constraint {
 	public String tableName;
 	public String type;
 	public String columns;
+	public String checkCondition;
 	public String fkConstraintOwner;
 	public String fkConstraintName;
 	public String fkTable;

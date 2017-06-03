@@ -338,6 +338,7 @@ public class GetDetailsController extends MitsiRestController {
 			accordion.columns.add(new AccordionColumn("name", null));
 			accordion.columns.add(new AccordionColumn("type", null));
 			accordion.columns.add(new AccordionColumn("columns", null));
+			accordion.columns.add(new AccordionColumn("check", null));
 			accordion.columns.add(new AccordionColumn("FK constraint owner", null));
 			accordion.columns.add(new AccordionColumn("FK constraint name", null));
 			accordion.columns.add(new AccordionColumn("FK table", null));
@@ -349,6 +350,7 @@ public class GetDetailsController extends MitsiRestController {
 					constraint.name,
 					constraint.type,
 					constraint.columns,
+					constraint.checkCondition,
 					constraint.fkConstraintOwner,
 					constraint.fkConstraintName,
 					constraint.fkTable,

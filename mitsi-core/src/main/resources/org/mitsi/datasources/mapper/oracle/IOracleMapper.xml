@@ -223,6 +223,7 @@
 	  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
 	    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.constraint_name and all_cons_columns.owner=all_constraints.owner
 	  ) columns,
+      search_condition checkCondition,
 	  r_owner fkConstraintOwner,
 	  (  select table_name 
 	      from all_constraints ac2 

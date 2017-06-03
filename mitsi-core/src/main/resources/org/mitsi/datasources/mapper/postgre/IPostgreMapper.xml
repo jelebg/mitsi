@@ -228,6 +228,7 @@
 	    c.conname::information_schema.sql_identifier AS name,
 	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
 	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    c.consrc checkCondition,
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS fkConstraintOwner,
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS  fkConstraintName,
 	    fr.relname::information_schema.sql_identifier AS fkTable,
@@ -246,7 +247,7 @@
 	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
 	AND upper(nc.nspname) = upper(#{tableOwner})
 	AND r.relname = #{tableName}
-	group by c.conname, c.contype, c.conkey, fnr.nspname, fr.relname, c.confkey
+	group by c.conname, c.contype, c.conkey, c.consrc, fnr.nspname, fr.relname, c.confkey
 </select>
 
 <select id="getTableFks" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
