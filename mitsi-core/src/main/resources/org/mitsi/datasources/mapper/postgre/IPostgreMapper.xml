@@ -137,17 +137,31 @@
 
 <select id="getSequencesDetails" resultMap="SequenceResultMap" fetchSize="2000">
 	SELECT 
-		sequence_schema sequence_owner,
-		sequence_name sequence_name,
-		minimum_value min_value,
-		maximum_value max_value,
+		seqs.sequence_schema sequence_owner,
+		seqs.sequence_name sequence_name,
+		seqs.minimum_value min_value,
+		seqs.maximum_value max_value,
 		'not available' current_value,
-		increment increment_by,
-		'{ "dataType":"'            || data_type ||'", '||
-		  '"numericPrecision":"'    || numeric_precision||'", '||
-		  '"sequenceCatalog":"'     || sequence_catalog||'", '||
-		  '"cycleOption":"'         || cycle_option    ||'" } ' json_details
-	from information_schema.sequences
+		seqs.increment increment_by,
+		'{ "serialForColumn":"'     || ts.column_name ||'", '||
+		  '"dataType":"'            || seqs.data_type ||'", '||
+		  '"numericPrecision":"'    || seqs.numeric_precision||'", '||
+		  '"sequenceCatalog":"'     || seqs.sequence_catalog||'", '||
+		  '"cycleOption":"'         || seqs.cycle_option    ||'" } ' json_details
+	from information_schema.sequences seqs
+	left join (
+		select 
+		n.nspname schem,
+		s.relname sequence_name,
+		nt.nspname || '.' || t.relname || '.' || a.attname column_name
+		from pg_class s 
+		JOIN pg_depend d ON d.objid = s.oid 
+		JOIN pg_class t ON d.objid = s.oid AND d.refobjid = t.oid 
+		JOIN pg_attribute a ON (d.refobjid, d.refobjsubid) = (a.attrelid, a.attnum)
+		JOIN pg_namespace n ON n.oid = s.relnamespace 
+		JOIN pg_namespace nt ON nt.oid = t.relnamespace 
+		WHERE s.relkind     = 'S' 
+	) ts on seqs.sequence_schema=ts.schem and seqs.sequence_name=ts.sequence_name
 	order by sequence_schema, sequence_name;
 </select>
 
