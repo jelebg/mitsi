@@ -76,7 +76,7 @@ public class TypeHelper {
 		case Types.TINYINT :
 		case Types.NUMERIC :
 		case Types.INTEGER:
-			return Long.toString(rs.getInt(column));
+			return Long.toString(rs.getLong(column));
 		
 		case Types.NCHAR :
 		case Types.VARCHAR :
