@@ -525,3 +525,7 @@
 	font-weight:bold;
 	font-style:italic;
 }
+
+.columnPk {
+	font-weight:bold;
+}

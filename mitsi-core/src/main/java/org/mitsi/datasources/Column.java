@@ -11,4 +11,5 @@ public class Column {
 	public String nullable;
 	public String jsonDetails;
 	public String description;
+	public Boolean isPk;
 }

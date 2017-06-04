@@ -32,6 +32,7 @@
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
+      <result property="isPk" column="isPk"/>
   </collection>
 </resultMap>
 
@@ -55,6 +56,7 @@
           when c.relkind='m' then 'matview'
           else 'table' end id_type, 
      (a.attname)::information_schema.sql_identifier AS column_name,
+     CASE WHEN pk.conname IS NULL THEN '0' ELSE '1' END isPk,
           (
          CASE
              WHEN (a.attnotnull OR ((t.typtype = 'd'::"char") AND t.typnotnull)) THEN 'NO'::text
@@ -85,6 +87,7 @@
       LEFT JOIN (pg_type bt
       JOIN pg_namespace nbt ON ((bt.typnamespace = nbt.oid))) ON (((t.typtype = 'd'::"char") AND (t.typbasetype = bt.oid))))
       LEFT JOIN pg_description des ON (c.oid=des.objoid AND des.objsubid=0)
+      LEFT JOIN  pg_constraint pk ON (c.oid=pk.conrelid AND a.attnum=ANY(pk.conkey) AND pk.contype='p')
    WHERE ((NOT pg_is_other_temp_schema(nc.oid)) AND (a.attnum > 0) AND (NOT a.attisdropped) AND (c.relkind = ANY (ARRAY['r'::"char", 'v'::"char", 'm'::"char", 'f'::"char"]))
      AND (pg_has_role(c.relowner, 'USAGE'::text) OR has_column_privilege(c.oid, a.attnum, 'SELECT, INSERT, UPDATE, REFERENCES'::text)))
    	AND upper((nc.nspname)::information_schema.sql_identifier) = upper(#{owner})
