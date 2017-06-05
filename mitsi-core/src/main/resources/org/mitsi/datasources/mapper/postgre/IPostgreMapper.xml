@@ -377,4 +377,17 @@
 	group by nc.nspname, c.conname, r.relname, c.contype, c.conkey, fr.relname, fnr.nspname
 </select>
 
+<select id="getData" >
+	SELECT * FROM ${owner}."${tableName}"							
+	<if test="filters!=null and filters.length > 0">
+		WHERE <foreach item="filter" collection="filters" open="" separator=" AND " close="">
+		 ${filter.name} = #{filter.filter} </foreach>
+	</if>
+	<if test="orderByColumns!=null and orderByColumns.length > 0">
+		ORDER BY <foreach item="orderByColumn" collection="orderByColumns" open="" separator=", " close=""
+		> ${orderByColumn.column}<choose><when test="orderByColumn.ascending">ASC</when><otherwise>DESC</otherwise></choose></foreach>
+	</if>
+	OFFSET #{fromRow} LIMIT #{count}
+</select>
+
 </mapper>

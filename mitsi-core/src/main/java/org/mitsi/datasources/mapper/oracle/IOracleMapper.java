@@ -6,6 +6,5 @@ import org.mitsi.datasources.IMitsiMapper;
 @MitsiProviderMapper("oracle_11g")
 public interface IOracleMapper extends IMitsiMapper {
 
-
 	
 }

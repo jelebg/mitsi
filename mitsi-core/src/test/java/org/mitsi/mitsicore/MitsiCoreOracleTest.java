@@ -28,6 +28,7 @@ import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 
 // TODO rajouter des test sur groupes _connected ou user-defined
@@ -164,7 +165,7 @@ public class MitsiCoreOracleTest {
 	}
 	
 	@Test
-	public void getData() throws SQLException, MitsiSecurityException, MitsiUsersException {
+	public void getData() throws SQLException, MitsiException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
 			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "ID");

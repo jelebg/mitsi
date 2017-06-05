@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
@@ -163,7 +164,7 @@ public class MitsiCorePostgreTest {
 	}
 
 	@Test
-	public void getData() throws SQLException, MitsiSecurityException, MitsiUsersException {
+	public void getData() throws SQLException, MitsiException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
 			MitsiConnection.GetDataResult result = connection.getData(null, "tata", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "id");

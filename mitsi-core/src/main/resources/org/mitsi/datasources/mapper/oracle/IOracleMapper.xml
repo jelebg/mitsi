@@ -359,4 +359,26 @@
    	all_constraints.owner = #{owner}
 </select>
 
+<select id="getData" >
+	SELECT * FROM ( SELECT rownum mitsi_hiden_rnum__, t.* FROM ( 
+		SELECT * FROM ${owner}.${tableName}	
+								
+	<if test="filters!=null and filters.length > 0">
+		WHERE <foreach item="filter" collection="filters" open="" separator=" AND " close="">
+		 ${filter.name} = #{filter.filter} <!-- <choose>
+			 	<when test="filter.type=='integer'">#{filter.filterLong}</when>
+			 	<when test="filter.type=='date'">#{filter.filterDate}</when>
+			 	<when test="filter.type=='float'">#{filter.filterDouble}</when>
+			 	<otherwise>#{filter.filter}</otherwise>
+			 </choose>  -->
+		 </foreach>
+	</if>
+	<if test="orderByColumns!=null and orderByColumns.length > 0">
+		ORDER BY <foreach item="orderByColumn" collection="orderByColumns" open="" separator=", " close=""
+		> ${orderByColumn.column}<choose><when test="orderByColumn.ascending">ASC</when><otherwise>DESC</otherwise></choose></foreach>
+	</if>
+	
+	) t WHERE ROWNUM &lt;= #{fromRow} + #{count} ) WHERE mitsi_hiden_rnum__ &gt; #{fromRow}
+</select>
+
 </mapper>
