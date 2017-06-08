@@ -1,43 +1,47 @@
 angular.module('mitsiApp')
     .controller('wdetailsCtrl', function($scope, $rootScope, detailsService, errorService) {
 
-    $scope.detailsAccordions = [];
+    $scope.detailsSections = [];
     
     $scope.lastObjectType = null;
-    $scope.accordionsOpeningSave = {};
+    $scope.sectionsOpeningSave = {};
     $scope.loading = false;
     
-    $scope.saveAccordionsOpening = function() {
+    $scope.capitalizeFirstLetter = function (str) {
+    	return capitalizeFirstLetter(str);
+    }
+    
+    $scope.saveSectionsOpening = function() {
     	var objectType = $scope.lastObjectType;
 
-    	if(!$scope.detailsAccordions) {
+    	if(!$scope.detailsSections) {
     		return;
     	}
-    	if($scope.detailsAccordions.length == 0) {
+    	if($scope.detailsSections.length == 0) {
     		return;
     	}
     	
     	var save = [];
-    	for(var i=0; i!=$scope.detailsAccordions.length; i++) {
-    		save.push($scope.detailsAccordions[i].isOpen);
+    	for(var i=0; i!=$scope.detailsSections.length; i++) {
+    		save.push($scope.detailsSections[i].isOpen);
     	}
-    	$scope.accordionsOpeningSave[objectType] = save;
+    	$scope.sectionsOpeningSave[objectType] = save;
     }
     	
-    $scope.restoreAccordionsOpening = function(objectType) {
+    $scope.restoreSectionsOpening = function(objectType) {
     	$scope.lastObjectType = objectType;
-    	if(!$scope.detailsAccordions) {
+    	if(!$scope.detailsSections) {
     		return;
     	}
 
-    	var save = $scope.accordionsOpeningSave[objectType];
-    	for(var i=0; i!=$scope.detailsAccordions.length; i++) {
+    	var save = $scope.sectionsOpeningSave[objectType];
+    	for(var i=0; i!=$scope.detailsSections.length; i++) {
     		var isOpen = false;
     		if(save && save.length > i) {
     			isOpen = save[i];
     		}
     		
-    		$scope.detailsAccordions[i].isOpen = isOpen;
+    		$scope.detailsSections[i].isOpen = isOpen;
     	}
     }
 
@@ -46,9 +50,9 @@ angular.module('mitsiApp')
     	if(databaseObject) {
 	    	detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
 		    .then(function(response) {
-		    	  $scope.saveAccordionsOpening();
-		    	  $scope.detailsAccordions = response.data.accordions;
-		    	  $scope.restoreAccordionsOpening("table");
+		    	  $scope.saveSectionsOpening();
+		    	  $scope.detailsSections = response.data.sections;
+		    	  $scope.restoreSectionsOpening("table");
 		    },
 		    errorService.getGenericHttpErrorCallback())
 		    .finally(function() {
@@ -58,9 +62,9 @@ angular.module('mitsiApp')
     	else {
 	    	detailsService.getDetails(source, null, null, null)
 		    .then(function(response) {
-		    	  $scope.saveAccordionsOpening();
-		    	  $scope.detailsAccordions = response.data.accordions;
-		    	  $scope.restoreAccordionsOpening("source");
+		    	  $scope.saveSectionsOpening();
+		    	  $scope.detailsSections = response.data.sections;
+		    	  $scope.restoreSectionsOpening("source");
 		    },
 		    errorService.getGenericHttpErrorCallback())
 		    .finally(function() {
@@ -69,8 +73,8 @@ angular.module('mitsiApp')
     	}
     }
     
-    $scope.isRowExcludedByFilter = function(accordion, row) {
-    	let filter = accordion.filter;
+    $scope.isRowExcludedByFilter = function(detailsSection, row) {
+    	let filter = detailsSection.filter;
     	if(!filter) {
     		return false;
     	}

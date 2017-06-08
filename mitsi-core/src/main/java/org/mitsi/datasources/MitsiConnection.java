@@ -1,6 +1,7 @@
 package org.mitsi.datasources;
 
 import java.io.Closeable;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +10,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +27,13 @@ import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
+import org.mitsi.core.annotations.ColumnDisplayType;
 import org.mitsi.core.annotations.DefaultOwner;
+import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
+import org.mitsi.core.annotations.MitsiColumnTitles;
+import org.mitsi.core.annotations.MitsiDatasourceDetail;
+import org.mitsi.core.annotations.MitsiTableDetail;
+import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 
@@ -38,27 +47,87 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	SqlSession sqlSession = null; 
 	IMitsiMapper mapper = null;
-	String mapperInterfaceName;
 	MitsiDatasource datasource = null;
 	
+	Class<IMitsiMapper> mapperInterface;
+	public enum DETAIL_TYPE { TABLE, DATASOURCE };
+	private class DetailMethod {
+		public DetailMethod(DETAIL_TYPE type, String title, Method method, int order, String [] columnTitles, ColumnDisplayType[] columnDisplayTypes) {
+			this.type = type;
+			this.title = title;
+			this.method = method;
+			this.order = order;
+			this.columnTitles = columnTitles;
+			this.columnDisplayTypes = columnDisplayTypes;
+		}
+		DETAIL_TYPE type;
+		String title;
+		Method method;
+		int order;
+		String [] columnTitles;
+		ColumnDisplayType [] columnDisplayTypes;
+	}
+	List<DetailMethod> tableDetailsMethods;
+	List<DetailMethod> datasourceDetailsMethods;
+	
+
 	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper, MitsiDatasource datasource) {
 		this.sqlSession = sqlSession;
 		this.mapper = mapper;
 		this.datasource = datasource;
+		this.tableDetailsMethods = new ArrayList<DetailMethod>();
+		this.datasourceDetailsMethods = new ArrayList<DetailMethod>();
 		
-		Class[] mapperInterfaces = mapper.getClass().getInterfaces();
+		// TODO : remplacer par getAnnotatedInterface ?
+		@SuppressWarnings("unchecked")
+		Class<IMitsiMapper>[] mapperInterfaces = (Class<IMitsiMapper>[]) mapper.getClass().getInterfaces();
 		if(mapperInterfaces.length != 1) {
-			// with java 8, String.join() would be better
-			StringBuilder sb = new StringBuilder();
-			for(Class interfac : mapperInterfaces) {
-				if(sb.length()>0) {
-					sb.append(",");
-				}
-				sb.append(interfac.getName());
-			}
-			log.error("mapper has more or less than one interface : "+mapperInterfaces.length+" ("+sb.toString()+")");
+			log.error("mapper has more or less than one interface : "+mapperInterfaces.length);
 		}
-		mapperInterfaceName = mapperInterfaces[0].getName();
+		mapperInterface = mapperInterfaces[0];
+		
+		Method[] methods = mapperInterface.getMethods();
+		for(Method method : methods) {
+			MitsiTableDetail mitsiTableDetail = method.getAnnotation(MitsiTableDetail.class);
+			MitsiDatasourceDetail mitsiDatasourceDetail = method.getAnnotation(MitsiDatasourceDetail.class);
+			if(mitsiTableDetail == null && mitsiDatasourceDetail == null) {
+				continue;
+			}
+			if(mitsiTableDetail!=null && mitsiDatasourceDetail!=null) {
+				log.error("method "+method.getName()+" cannot be annoted by @MitsiDatasourceDetail and @MitsiTableDetail at the same time");
+				continue;
+			}
+
+			MitsiColumnTitles mitsiColumnTitles = method.getAnnotation(MitsiColumnTitles.class);
+			MitsiColumnDisplayTypes mitsiColumnDisplayTypes = method.getAnnotation(MitsiColumnDisplayTypes.class);
+
+			if(mitsiTableDetail != null) {
+				tableDetailsMethods.add(new DetailMethod(DETAIL_TYPE.TABLE,
+					mitsiTableDetail.value(), 
+					method, mitsiTableDetail.order(), 
+					mitsiColumnTitles==null?null:mitsiColumnTitles.value(),
+					mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value()));
+			}
+			else {
+				datasourceDetailsMethods.add(new DetailMethod(DETAIL_TYPE.DATASOURCE,
+						mitsiDatasourceDetail.value(), 
+						method, mitsiDatasourceDetail.order(), 
+						mitsiColumnTitles==null?null:mitsiColumnTitles.value(),
+						mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value()));
+			}
+		}
+		
+		Comparator<DetailMethod> comparator = new Comparator<DetailMethod>() {
+			@Override
+			public int compare(DetailMethod arg0, DetailMethod arg1) {
+				int compareOrder = Integer.compare(arg0.order, arg1.order);
+				return compareOrder==0 ?
+						arg0.title.compareTo(arg1.title) :
+						compareOrder;
+			}
+		};
+		Collections.sort(tableDetailsMethods, comparator);
+		Collections.sort(datasourceDetailsMethods, comparator);
 	}
 	
 	@Override
@@ -95,6 +164,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	@Override
 	@SuppressWarnings("squid:S1226") 
 	public synchronized List<Schema> getAllSchemas(String owner) {
+		
+		
+		
 		owner = getOwner(owner);
 		return mapper.getAllSchemas(owner);
 	}
@@ -134,6 +206,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	@SuppressWarnings("squid:S1226") 
+	// TODO : supprimer tout ces synchronized ?????
 	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
 		owner = getOwner(owner);
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
@@ -141,80 +214,172 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return databaseObjects;
 	}
 	
-	@Override
-	public synchronized List<DatabaseObject> getTablesDetails() {
-		return mapper.getTablesDetails();
-	}
-
-	@Override
-	public synchronized List<DatabaseObject> getViewsDetails() {
-		return mapper.getViewsDetails();
-	}
-
-	@Override
-	public synchronized List<DatabaseObject> getMatViewsDetails() {
-		return mapper.getMatViewsDetails();
-	}
-
-	@Override
-	public synchronized List<Schema> getSchemasDetails() {
-		return mapper.getSchemasDetails();
-	}
-
-	@Override
-	public synchronized List<Tablespace> getTablespaceDetails() {
-		return mapper.getTablespaceDetails();
+	private interface ExecuteRowSqlCallback {
+		void onNewColumn(String columnName, String type);
+		void onNewRow(String [] row);		
 	}
 	
-	@Override
-	public synchronized List<Sequence> getSequencesDetails() {
-		return mapper.getSequencesDetails();
-	}
+	void executeRawSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+		
+		try(PreparedStatement  statement = sqlSession.getConnection().prepareStatement(boundSql.getSql())) {
+			
+			statement.setFetchSize(2000); // TODO : à rendre parametrable ?
+			int iParam = 0;
+			for(ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
+				iParam++;
+				log.info("parameterMapping #"+iParam+": "+parameterMapping.getExpression()+"/"+parameterMapping.getJdbcTypeName()+"/"+parameterMapping.getProperty()+"/"+parameterMapping.getResultMapId()+"/"+parameterMapping.getNumericScale());
+				
+				// only fromRow, count and filters may be passed as bind variable
+				Object obj = params.get(parameterMapping.getProperty());
+				if(obj == null) {
+					Matcher matcher = forEachFilterPattern.matcher(parameterMapping.getProperty());
+					if(matcher.find()) {
+						int iFilter = Integer.parseInt(matcher.group(1));
+						Filter filter = filters[iFilter];
+						try {
+							setFilterBindVariable(statement, iParam, filter);
+						}
+						catch (ParseException | NumberFormatException  e) {
+							log.error("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
+							throw new MitsiException("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
+						}
+					}
+					else {
+						log.error("unknown parameter : " + parameterMapping.getProperty());
+						throw new MitsiException("unknown parameter : " + parameterMapping.getProperty());
+					}
+				}
+				else {
+					if(obj instanceof Long) {
+						statement.setLong(iParam, (Long) obj);
+					}
+					else if(obj instanceof String) {
+						statement.setString(iParam, (String) obj);
+					}
+					else {
+						log.error("unhandled parameter type : " + obj.getClass().getName());
+						throw new MitsiException("unhandled parameter type : " + obj.getClass().getName());
+					}
+				}
+			}
+			
+			statement.execute();
+			ResultSet resultSet = statement.getResultSet();
+			
+			// get columns
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+			int[] jdbcTypes = new int[rsmd.getColumnCount()];
+			int[] columnPos = new int[rsmd.getColumnCount()];
+			int nbColumns = 0;
+			for(int i=1; i<rsmd.getColumnCount()+1; i++) {
+				String columnName = rsmd.getColumnName(i);
+				if(MITSI_HIDDEN_RNUM_COLUMN.equals(columnName.toLowerCase())) {
+					columnPos[i-1] = -1;
+					continue;
+				}
+				String type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i));
+				callback.onNewColumn(columnName, type);
 
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Column> getTableColumnsDetails(String owner, String name) {
-		owner = getOwner(owner);
-		return mapper.getTableColumnsDetails(owner, name);
-	}
-
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Column> getTablePartitioninKeysDetails(String owner, String name) {
-		owner = getOwner(owner);
-		return mapper.getTablePartitioninKeysDetails(owner, name);
+				jdbcTypes[i-1] =  rsmd.getColumnType(i);
+				columnPos[i-1] = nbColumns;
+				nbColumns ++;
+			}
+			
+			// get data
+			
+			while(resultSet.next() ) {
+				String[] row = new String[nbColumns];
+				for(int i=0; i!=row.length; i++) {
+					if(columnPos[i] >= 0) {
+						//if(jdbcTypes[i]!=-1) {
+							row[columnPos[i]] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+1);
+						//}
+					}
+				}
+				callback.onNewRow(row);
+			}
+		}
 	}
 	
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Index> getTableIndexesDetails(String tableOwner,
-			String tableName) {
-		tableOwner = getOwner(tableOwner);
-		return mapper.getTableIndexesDetails(tableOwner, tableName);
+	public DetailsSection getDetailsOne(Map<String, Object> params, final DetailMethod detailMethod) throws SQLException, MitsiException {
+		log.info("details on : "+detailMethod.method.getName());
+		final DetailsSection detailsSection = new DetailsSection();
+		detailsSection.title = detailMethod.title;
+		detailsSection.columns = new ArrayList<>();
+		detailsSection.data = new ArrayList<>();
+
+		MappedStatement ms = sqlSession.getConfiguration()
+				.getMappedStatement(mapperInterface.getName() + "." + detailMethod.method.getName());
+		BoundSql boundSql = ms.getBoundSql(params);
+		
+		executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
+
+			@Override
+			public void onNewColumn(String columnName, String type) {
+				// TODO : DisplayType => faire une annotation
+				String annotationColumnName = null;
+				if(detailMethod.columnTitles!=null && detailMethod.columnTitles.length > detailsSection.columns.size()) {
+					annotationColumnName = detailMethod.columnTitles[detailsSection.columns.size()];
+					if(annotationColumnName != null && annotationColumnName.length()==0) {
+						annotationColumnName = null;
+					}
+				}
+				
+				String displayType = null;
+				if(detailMethod.columnDisplayTypes!=null && detailMethod.columnDisplayTypes.length > detailsSection.columns.size()) {
+					 ColumnDisplayType columnDisplayType = detailMethod.columnDisplayTypes[detailsSection.columns.size()];
+					 displayType = columnDisplayType.toString();
+				}
+				
+				detailsSection.columns.add(detailsSection.new Column(annotationColumnName==null ? columnName : annotationColumnName, displayType));				
+			}
+
+			@Override
+			public void onNewRow(String[] row) {
+				detailsSection.data.add(row);
+			}
+		});
+		
+		return detailsSection;
+	}
+	
+	public List<DetailsSection> getDetails(Map<String, Object> params, List<DetailMethod> detailMethods) throws MitsiException, SQLException {
+		List<DetailsSection> detailsSections = new ArrayList<DetailsSection>();
+
+		for(DetailMethod detailMethod : detailMethods) {
+			DetailsSection detailsSection = getDetailsOne(params, detailMethod);
+			detailsSections.add(detailsSection);
+		}
+
+		return detailsSections;
 	}
 
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Partition> getTablePartitionDetails(String tableOwner,
-			String tableName) {
-		tableOwner = getOwner(tableOwner);
-		return mapper.getTablePartitionDetails(tableOwner, tableName);
+	
+	public List<DetailsSection> getDetailsForTable(String owner, String name) throws MitsiException {
+		try {
+			owner = getOwner(owner);
+			Map<String, Object> params = new HashMap<>();
+			params.put("owner", owner);    
+			params.put("tableName", name);    
+			
+			return getDetails(params, tableDetailsMethods);
+		}
+		catch(SQLException e) {
+			log.error("error in getDetailsForTable", e);
+			throw new MitsiDatasourceException("error in getDetailsForTable", e);
+		}
 	}
-
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Constraint> getTableConstraintsDetails(String tableOwner,
-			String tableName) {
-		tableOwner = getOwner(tableOwner);
-		return mapper.getTableConstraintsDetails(tableOwner, tableName);
-	}
-
-	@Override
-	@SuppressWarnings("squid:S1226") 
-	public List<Constraint> getTableFks(String tableOwner,
-			String tableName) {
-		tableOwner = getOwner(tableOwner);
-		return mapper.getTableFks(tableOwner, tableName);
+	
+	public List<DetailsSection> getDetailsForDatasource() throws MitsiException {
+		try {
+			Map<String, Object> params = new HashMap<>();
+			
+			return getDetails(params, datasourceDetailsMethods);
+		}
+		catch(SQLException e) {
+			log.error("error in getDetailsForDatasource", e);
+			throw new MitsiDatasourceException("error in getDetailsForDatasource", e);
+		}
 	}
 
 	@Override
@@ -293,14 +458,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 		}
 		
-		GetDataResult result = new GetDataResult();
-		
-		// back to JDBC
-		List<String[]> results = new ArrayList<>();
-		Connection jdbcConnection  = sqlSession.getConnection();
+		final GetDataResult result = new GetDataResult();
+		result.columns = new ArrayList<>();
+		result.results = new ArrayList<>();
 
 		MappedStatement ms = sqlSession.getConfiguration()
-				.getMappedStatement(mapperInterfaceName + ".getData");
+				.getMappedStatement(mapperInterface.getName() + ".getData");
 		Map<String, Object> params = new HashMap<>();
 		params.put("owner", owner);    
 		params.put("tableName", tableName);    
@@ -310,77 +473,22 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		params.put("filters", filters);
 		BoundSql boundSql = ms.getBoundSql(params);
 		
-		try(PreparedStatement  statement = jdbcConnection.prepareStatement(boundSql.getSql())) {
-			statement.setFetchSize(2000); // TODO : à rendre parametrable ?
-			int iParam = 0;
-			for(ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
-				iParam++;
-				log.info("parameterMapping #"+iParam+": "+parameterMapping.getExpression()+"/"+parameterMapping.getJdbcTypeName()+"/"+parameterMapping.getProperty()+"/"+parameterMapping.getResultMapId()+"/"+parameterMapping.getNumericScale());
-				
-				// only fromRow, count and filters may be passed as bind variable
-				if("fromRow".equals(parameterMapping.getProperty())) {
-					statement.setLong(iParam, fromRow);
-				}
-				else if("count".equals(parameterMapping.getProperty())) {
-					statement.setLong(iParam, count);
-				}
-				else {
-					Matcher matcher = forEachFilterPattern.matcher(parameterMapping.getProperty());
-					if(matcher.find()) {
-						int iFilter = Integer.parseInt(matcher.group(1));
-						Filter filter = filters[iFilter];
-						try {
-							setFilterBindVariable(statement, iParam, filter);
-						}
-						catch (ParseException | NumberFormatException  e) {
-							log.error("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
-							throw new MitsiException("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
-						}
-					}
-					else {
-						log.error("impossible to bind parameter for getData() : " + parameterMapping.getProperty());
-						throw new MitsiException("impossible to bind parameter for getData() : " + parameterMapping.getProperty());
-					}
-				}
-			}
-			
-			statement.execute();
-			ResultSet resultSet = statement.getResultSet();
-			
-			// get columns
-			ResultSetMetaData rsmd = resultSet.getMetaData();
-			List<Column> columns = new ArrayList<>();
-			int[] jdbcTypes = new int[rsmd.getColumnCount()-1];
-			int[] columnPos = new int[rsmd.getColumnCount()-1];
-			for(int i=1; i<rsmd.getColumnCount(); i++) {
-				String columnName = rsmd.getColumnName(i);
-				if(MITSI_HIDDEN_RNUM_COLUMN.equals(columnName.toLowerCase())) {
-					columnPos[i-1] = -1;
-					continue;
-				}
+		executeRawSql(boundSql, params, filters, new ExecuteRowSqlCallback() {
+
+			@Override
+			public void onNewColumn(String columnName, String type) {
+				// TODO : DisplayType => faire une annotation
 				Column column = new Column();
-				jdbcTypes[i-1] =  rsmd.getColumnType(i);
-				column.type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i));
+				column.type = type;
 				column.name = columnName;
-				// TODO : précision ? possible ?
-				columnPos[i-1] = columns.size();
-				columns.add(column);
+				result.columns.add(column);				
 			}
-			result.columns = columns;
-			
-			// get data
-			while(resultSet.next() ) {
-				String[] row = new String[columns.size()];
-				for(int i=0; i!=row.length; i++) {
-					if(columnPos[i] >= 0) {
-						row[columnPos[i]] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+1);
-					}
-				}
-				results.add(row);
+
+			@Override
+			public void onNewRow(String[] row) {
+				result.results.add(row);
 			}
-		}
-		
-		result.results = results;
+		});
 		
 		return result;
 	}

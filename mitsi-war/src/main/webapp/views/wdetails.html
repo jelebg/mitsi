@@ -2,7 +2,7 @@
 <body data-ng-app="mitsiApp" class="container">
 
     <a href="" ng-click="refresh();$event.stopPropagation();"
-       ng-if="detailsAccordions.length == 0 && loading"
+       ng-if="detailsSections.length == 0 && loading"
        style="padding:5px;font-size:120%;"/>
     	<i class="glyphicon glyphicon-refresh"
     	   ng-class="{'fast-right-spinner':loading}" 
@@ -11,14 +11,14 @@
     
 	<accordion close-others="false">
 		<accordion-group 
-			ng-repeat="accordion in detailsAccordions" 
-			is-open="accordion.isOpen"
+			ng-repeat="section in detailsSections" 
+			is-open="section.isOpen"
 			 >
 		    <accordion-heading>
 	        	<i class="glyphicon " 
-	        	   ng-class="{'glyphicon-chevron-down': accordion.isOpen, 'glyphicon-chevron-right': !accordion.isOpen}">
+	        	   ng-class="{'glyphicon-chevron-down': section.isOpen, 'glyphicon-chevron-right': !section.isOpen}">
 	        	   </i>
-			    {{ accordion.title }}
+			    {{ section.title }}
 			    
 			    <a href="" ng-click="refresh();$event.stopPropagation();">
 			    	<i class="pull-right glyphicon glyphicon-refresh"
@@ -32,30 +32,30 @@
 				<td style="position:absolute">
 					<a href="" 
 						class="glyphicon glyphicon-remove mitsiDetailsQuickFindReset" 
-						ng-click="accordion.filter=null; $event.stopPropagation();"></a>
-					<input type="text" class="mitsiDetailsQuickFindInput" ng-model="accordion.filter"/>
+						ng-click="section.filter=null; $event.stopPropagation();"></a>
+					<input type="text" class="mitsiDetailsQuickFindInput" ng-model="section.filter"/>
 				</td>
 			</tr></table>
 			<table class="table-striped" style="width:100%;">
 			<thead>
 				<tr>
-					<th ng-repeat="column in accordion.columns"
+					<th ng-repeat="column in section.columns"
 					    class="mitsiDetailsTableHeader">
-						{{ column.name }}
+						{{ capitalizeFirstLetter(column.name) }}
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="myrow in accordion.data"
-					ng-hide="isRowExcludedByFilter(accordion, myrow)"
+				<tr ng-repeat="myrow in section.data"
+					ng-hide="isRowExcludedByFilter(section, myrow)"
 				>
 			 	  <td ng-repeat="d in myrow track by $index" 
 			 	  	  class="mitsiDetailsTableTd"
 			 	  >
-			 	  <span ng-if="accordion.columns[$index].displayType==null">{{ d }}</span>
-			 	  <i    ng-if="accordion.columns[$index].displayType=='fkDirection' && d=='toTheTable'"   class="glyphicon glyphicon-log-in"></i>
-			 	  <i    ng-if="accordion.columns[$index].displayType=='fkDirection' && d=='fromTheTable'" class="glyphicon glyphicon-log-out"></i>
-			 	  <a    ng-if="accordion.columns[$index].displayType=='tableLink' " href="" ng-click="selectTable(d)">{{ d }}</a>
+			 	  <span ng-if="section.columns[$index].displayType==null || section.columns[$index].displayType=='NORMAL'">{{ d }}</span>
+			 	  <i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='toTheTable'"   class="glyphicon glyphicon-log-in"></i>
+			 	  <i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='fromTheTable'" class="glyphicon glyphicon-log-out"></i>
+			 	  <a    ng-if="section.columns[$index].displayType=='TABLE_LINK' " href="" ng-click="selectTable(d)">{{ d }}</a>
 			 	  </td>
 				</tr>
 			</tbody>

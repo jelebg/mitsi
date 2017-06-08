@@ -1,5 +1,10 @@
 package org.mitsi.datasources.helper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -7,12 +12,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
+import org.mitsi.datasources.MitsiConnection;
+
 public class TypeHelper {
+	private static final Logger log = Logger.getLogger(TypeHelper.class);
 	public static final String TYPE_STRING  = "string";
 	public static final String TYPE_INTEGER = "integer";
 	public static final String TYPE_FLOAT = "float";
 	public static final String TYPE_DATE    = "date";
 	// TODO : gérer des types plus compliqués
+	// TODO : gerer les blobs binaires
 	
 	// TODO : use DateTimeFormatter with java 8
 	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
@@ -37,6 +47,7 @@ public class TypeHelper {
 		
 		case Types.NCHAR :
 		case Types.VARCHAR :
+		case Types.LONGVARCHAR :
 		default :
 			return TYPE_STRING;
 		}
@@ -44,9 +55,6 @@ public class TypeHelper {
 
 
 	public static String fromJdbcToString(int jdbcType, ResultSet rs, int column) throws SQLException {
-		if(rs.getObject(column) == null) {
-			return null;
-		}
 		switch(jdbcType) {
 		case Types.TIMESTAMP :
 		//case Types.TIMESTAMP_WITH_TIMEZONE :
@@ -73,18 +81,71 @@ public class TypeHelper {
 		case Types.DECIMAL :
 		case Types.DOUBLE :
 		case Types.FLOAT :
+			if(rs.getObject(column) == null) {
+				return null;
+			}
 			return Double.toString(rs.getDouble(column));
 
 		case Types.TINYINT :
+			if(rs.getObject(column) == null) {
+				return null;
+			}
+			return Long.toString(rs.getLong(column));
+
 		case Types.NUMERIC :
 		case Types.INTEGER:
-			return Long.toString(rs.getLong(column));
-		
+			if(rs.getObject(column) == null) {
+				return null;
+			}
+			BigDecimal bd = rs.getBigDecimal(column);
+			return bd.toString();
+
+		case Types.LONGVARCHAR :
+			return getStringAsStream(rs, column);
+			
 		case Types.NCHAR :
 		case Types.VARCHAR :
 		default :
+			if(rs.getObject(column) == null) {
+				return null;
+			}
 			return rs.getString(column);
 		}
 		
+	}
+	
+	static final long MAX_BLOB_SIZE = 4096; // TODO : rendre configurable
+	public static String getStringAsStream(ResultSet rs, int column)  {
+		// TODO : utiliser IoUtils (apache) 
+		InputStream is;
+		StringBuilder sb=new StringBuilder();
+		try {
+			is = rs.getAsciiStream(column);
+			if(is == null) {
+				return null;
+			}
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			String read;
+	
+			while((read=br.readLine()) != null) {
+			    sb.append(read);   
+			    if(sb.length() >= MAX_BLOB_SIZE) {
+			    	sb.append("...(max blob size reached)");
+			    	break;
+			    }
+			}
+	
+			br.close();
+		} catch (SQLException e) {
+			log.error("impossible to get value from database", e);
+			return "impossible to get value from database : "+e.getClass().getName()+"/"
+					+e.getMessage()+" (code:"+e.getErrorCode()+")";
+		} catch (IOException e) {
+			log.error("impossible to get value from database", e);
+			return "impossible to get value from database : "+e.getClass().getName()+"/"
+					+e.getMessage();
+		}
+
+		return sb.toString();		
 	}
 }

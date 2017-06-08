@@ -1,6 +1,7 @@
 package org.mitsi.mitsicore;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -15,16 +16,12 @@ import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.DatasourceManager;
-import org.mitsi.datasources.Column;
 import org.mitsi.datasources.Constraint;
 import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.datasources.DetailsSection;
 import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.Partition;
 import org.mitsi.datasources.Schema;
-import org.mitsi.datasources.Sequence;
-import org.mitsi.datasources.Tablespace;
-import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,59 +104,38 @@ public class MitsiCorePostgreTest {
 	}
 	
 	@Test
-	public void getDetailsTable() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getDetailsTable() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
-			List<Column> lc = connection.getTableColumnsDetails("PUBLIC", "TUTU_1");
-			assertTrue(lc != null);
-			assertTrue(lc==null || lc.size() > 0);
+			List<DetailsSection> sections = connection.getDetailsForTable("PUBLIC", "TUTU_1");
 			
-			List<Column> lc2 = connection.getTablePartitioninKeysDetails("PUBLIC", "TUTU_1");
-			assertTrue(lc2==null || lc2.size() == 0);
-
-			List<Index> li = connection.getTableIndexesDetails("PUBLIC", "TUTU_1");
-			assertTrue(li != null);
-			assertTrue(li==null || li.size() > 0);
-			
-			List<Partition> lp = connection.getTablePartitionDetails("PUBLIC", "TUTU_1");
-			assertTrue(lp==null || lp.size() == 0);
-			
-			List<Constraint> lct = connection.getTableConstraintsDetails("PUBLIC", "TUTU_1");
-			assertTrue(lct != null);
-			assertTrue(lct==null || lct.size() > 0);
-			
-			List<Constraint> lct2 = connection.getTableFks("PUBLIC", "MATABLE_DE_TEST");
-			assertTrue(lct2 != null);
-			assertTrue(lct2==null || lct2.size() > 0);
+			assertNotNull(sections);
+			assertEquals(sections.size(), 4);
+			for(DetailsSection section : sections) {
+				assertNotNull(section.title); 
+				assertNotNull(section.columns); 
+				assertTrue(section.columns.size() > 0); 
+				assertNotNull(section.data); 
+				assertTrue(section.data.size() > 0); 
+			}
 		}
 	}
 	
 	@Test
-	public void getDetailsSourcePostgre() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException {
+	public void getDetailsSourcePostgre() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "POSTGRE-TEST")) {
-			List<DatabaseObject> ldo = connection.getTablesDetails();
-			assertTrue(ldo != null);
-			assertTrue(ldo==null || ldo.size() > 0);
+			List<DetailsSection> sections = connection.getDetailsForDatasource();
 			
-			ldo = connection.getViewsDetails();
-			assertTrue(ldo != null);
-			assertTrue(ldo==null || ldo.size() > 0);
-			
-			ldo = connection.getMatViewsDetails();
-			assertTrue(ldo != null);
-			assertTrue(ldo==null || ldo.size() > 0);
-			
-			List<Schema> ls = connection.getSchemasDetails();
-			assertTrue(ls != null);
-			assertTrue(ls==null || ls.size() > 0);
-			
-			List<Tablespace> lt = connection.getTablespaceDetails();
-			assertTrue(lt != null);
-			assertTrue(lt==null || lt.size() > 0);
-			
-			List<Sequence> lsq = connection.getSequencesDetails();
-			assertTrue(lsq != null);
-			assertTrue(lsq==null || lsq.size() > 0);
+			assertNotNull(sections);
+			assertEquals(sections.size(), 6);
+			for(DetailsSection section : sections) {
+				assertNotNull(section.title); 
+				assertNotNull(section.columns); 
+				assertTrue(section.columns.size() > 0); 
+				assertNotNull(section.data); 
+				assertTrue(section.data.size() > 0); 
+			}
+
 		}
 	}
 

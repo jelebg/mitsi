@@ -204,14 +204,9 @@
       JOIN pg_attribute a  ON a.attrelid = c.oid
       LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
    WHERE 
-	upper(nc.nspname)=#{owner} and c.relname=#{name} and a.attnum > 0 
+	upper(nc.nspname)=#{owner} and c.relname=#{tableName} and a.attnum > 0 
 	order by a.attnum
 
-</select>
-
-<!--  in postgresql, partionning is not implemented directly -->
-<select id="getTablePartitioninKeysDetails" resultType="org.mitsi.datasources.Column" fetchSize="2000">
-	select null AS name where 1=0
 </select>
 
 <select id="getTableIndexesDetails" resultType="org.mitsi.datasources.Index" fetchSize="2000">
@@ -234,7 +229,7 @@
 	    LEFT JOIN pg_tablespace tbs ON tbs.oid = i.reltablespace
 	WHERE
 	    t.relkind IN ('r', 'm')
-	    AND upper(nc.nspname) = upper(#{tableOwner}) 
+	    AND upper(nc.nspname) = upper(#{owner}) 
 	    AND t.relname = #{tableName}
 	GROUP BY
 		nc.nspname, t.relname, i.relname, am.amname, ix.indisunique, tbs.spcname 
@@ -263,7 +258,7 @@
 	WHERE 
 	    c.contype = ANY (ARRAY['p'::"char", 'u'::"char", 'f'::"char", 'c'::"char", 'x'::"char"])
 	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
-	AND upper(nc.nspname) = upper(#{tableOwner})
+	AND upper(nc.nspname) = upper(#{owner})
 	AND r.relname = #{tableName}
 	group by c.conname, c.contype, c.conkey, c.consrc, fnr.nspname, fr.relname, c.confkey
 </select>
@@ -290,7 +285,7 @@
 		WHERE 
 		    c.contype = 'f'
 		AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
-		AND upper(fnr.nspname) = upper(#{tableOwner})
+		AND upper(fnr.nspname) = upper(#{owner})
 		AND fr.relname = #{tableName}
 		group by c.conname, c.contype, c.conkey, nc.nspname, fnr.nspname, r.relname, c.confkey
 	UNION ALL
@@ -314,22 +309,11 @@
 		WHERE 
 		    c.contype = 'f'::"char"
 		AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
-		AND upper(nc.nspname) = upper(#{tableOwner})
+		AND upper(nc.nspname) = upper(#{owner})
 		AND r.relname = #{tableName}
 		group by c.conname, c.contype, c.conkey, fnr.nspname, fr.relname, c.confkey	
 	) sub
 	ORDER BY fkDirection, name
-</select>
-
-<select id="getTablePartitionDetails" resultType="org.mitsi.datasources.Partition" fetchSize="2000">
-	select 
-	    null AS name, 
-	    null AS tablespace_name,
-	    null AS high_value,
-	    null AS high_value_length, 
-	    null AS interval, 
-	    null AS jsonDetails
-	where 1=0
 </select>
 
 <select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
