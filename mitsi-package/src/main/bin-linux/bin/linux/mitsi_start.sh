@@ -7,6 +7,7 @@ if [[ $MITSI_HOME = "" ]]; then
   popd > /dev/null
   MITSI_HOME=$(dirname $MITSI_HOME)
   MITSI_HOME=$(dirname $MITSI_HOME)
+  export MITSI_HOME=$MITSI_HOME
 fi
 
 echo MITSI_HOME=$MITSI_HOME
