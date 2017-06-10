@@ -7,8 +7,8 @@ angular.module('mitsiApp')
     $scope.sectionsOpeningSave = {};
     $scope.loading = false;
     
-    $scope.capitalizeFirstLetter = function (str) {
-    	return capitalizeFirstLetter(str);
+    $scope.prettyColumnTitle = function (str) {
+    	return capitalizeFirstLetter(str.replace("_", " "));
     }
     
     $scope.saveSectionsOpening = function() {

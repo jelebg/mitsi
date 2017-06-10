@@ -41,7 +41,7 @@
 				<tr>
 					<th ng-repeat="column in section.columns"
 					    class="mitsiDetailsTableHeader">
-						{{ capitalizeFirstLetter(column.name) }}
+						{{ prettyColumnTitle(column.name) }}
 					</th>
 				</tr>
 			</thead>
