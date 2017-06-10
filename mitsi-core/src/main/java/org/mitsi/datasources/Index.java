@@ -11,5 +11,4 @@ public class Index {
 	public String tablespace;
 	public String partitioning;
 	
-	public String jsonDetails;
 }

@@ -4,21 +4,10 @@
 <mapper namespace="org.mitsi.datasources.mapper.postgre.IPostgreMapper">
 
 
-<select id="testOK" resultType="String">
-	SELECT TO_CHAR(current_date, 'YYYYMMDD hh24:mi:ss')
-</select>
-
 <resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
 	<result property="name" column="schema_name"/>
 	<result property="current" column="is_current"/>
-    <result property="jsonDetails" column="jsonDetails"/>
 </resultMap>
-
-<select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
-	SELECT schema_name,
-	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current 
-	FROM information_schema.schemata;
-</select>
 
 <resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
   <constructor>
@@ -26,7 +15,6 @@
     <idArg column="id_schema" javaType="String"/>
     <idArg column="id_name" javaType="String"/>
   </constructor>
-  <result property="jsonDetails" column="jsonDetails"/>
   <result property="description" column="object_comment"/>
   <collection property="columns" ofType="org.mitsi.datasources.Column">
       <result property="name" column="column_name"/>
@@ -35,6 +23,20 @@
       <result property="isPk" column="isPk"/>
   </collection>
 </resultMap>
+
+<!-- 
+			mitsi standard SQL 
+-->
+
+<select id="testOK" resultType="String">
+	SELECT TO_CHAR(current_date, 'YYYYMMDD hh24:mi:ss')
+</select>
+
+<select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
+	SELECT schema_name,
+	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current 
+	FROM information_schema.schemata;
+</select>
 
 <!--  TODO : supprimer pg_attrdef ? -->
 <select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
@@ -82,19 +84,81 @@
      AND (pg_has_role(c.relowner, 'USAGE'::text) OR has_column_privilege(c.oid, a.attnum, 'SELECT, INSERT, UPDATE, REFERENCES'::text)))
    	AND upper((nc.nspname)::information_schema.sql_identifier) = upper(#{owner})
 	ORDER BY nc.nspname, c.relname, c.relkind, a.attnum
-
-
 </select>
 
-<!--  todo : encoder le json autrement ? -->
+<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+	SELECT
+	    nc.nspname      AS owner,
+	    t.relname       AS tableName,
+	    i.relname       AS name,
+	    am.amname       AS type,
+	    ix.indisunique	AS uniqueness
+	FROM
+	    pg_class t
+	    JOIN pg_index ix     ON t.oid = ix.indrelid
+	    JOIN pg_class i      ON i.oid = ix.indexrelid
+	    JOIN pg_namespace nc ON t.relnamespace = nc.oid
+	    JOIN pg_am am        ON     i.relam = am.oid
+	WHERE
+	    t.relkind IN ('r', 'm')
+	    AND upper(nc.nspname) = upper(#{owner}) 
+</select>
+
+<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT 
+	    nc.nspname::information_schema.sql_identifier AS owner,
+	    c.conname::information_schema.sql_identifier AS name,
+	    r.relname::information_schema.sql_identifier AS tableName,
+	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
+	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
+	    fr.relname::information_schema.sql_identifier AS fkTable,
+	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
+	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
+	
+	FROM pg_namespace nr
+	    join pg_class r on nr.oid = r.relnamespace 
+	    join pg_constraint c on r.oid = c.conrelid 
+	    join pg_namespace nc on nc.oid = c.connamespace 
+	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
+	    left join pg_class fr on fr.oid = c.confrelid
+	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
+	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
+	WHERE 
+	   (c.contype = ANY (ARRAY['p'::"char", 'u'::"char", 'f'::"char", 'c'::"char", 'x'::"char"]))
+	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
+	AND upper(nc.nspname) = upper(#{owner})
+	group by nc.nspname, c.conname, r.relname, c.contype, c.conkey, fr.relname, fnr.nspname
+</select>
+
+<select id="getData" >
+	SELECT * FROM ${owner}."${tableName}"							
+	<if test="filters!=null and filters.length > 0">
+		WHERE <foreach item="filter" collection="filters" open="" separator=" AND " close="">
+		 ${filter.name} = #{filter.filter} </foreach>
+	</if>
+	<if test="orderByColumns!=null and orderByColumns.length > 0">
+		ORDER BY <foreach item="orderByColumn" collection="orderByColumns" open="" separator=", " close=""
+		> ${orderByColumn.column}<choose><when test="orderByColumn.ascending">ASC</when><otherwise>DESC</otherwise></choose></foreach>
+	</if>
+	OFFSET #{fromRow} LIMIT #{count}
+</select>
+
+
+
+<!-- 
+			Oracle specific SQL for database details 
+-->
+
+
+
 <select id="getTablesDetails" >
   SELECT 
      (nc.nspname)::information_schema.sql_identifier AS id_schema,
      (c.relname)::information_schema.sql_identifier AS id_name,
      case when c.relkind='v' then 'view'
           when c.relkind='m' then 'matview'
-          else 'table' end id_type, 
-	 '{}' jsonDetails
+          else 'table' end id_type
       FROM pg_class c
       JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
    WHERE NOT pg_is_other_temp_schema(nc.oid) 
@@ -106,8 +170,7 @@
   SELECT 
      (nc.nspname)::information_schema.sql_identifier AS id_schema,
      (c.relname)::information_schema.sql_identifier AS id_name,
-     'view' id_type, 
-	 '{}' jsonDetails
+     'view' id_type
       FROM pg_class c
       JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
    WHERE NOT pg_is_other_temp_schema(nc.oid) 
@@ -119,8 +182,7 @@
   SELECT 
      (nc.nspname)::information_schema.sql_identifier AS id_schema,
      (c.relname)::information_schema.sql_identifier AS id_name,
-     'view' id_type, 
-	 '{}' jsonDetails
+     'view' id_type
       FROM pg_class c
       JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
    WHERE NOT pg_is_other_temp_schema(nc.oid) 
@@ -160,8 +222,7 @@
 
 <select id="getSchemasDetails" >
 	SELECT schema_name,
-	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current,
-	'{}'  jsonDetails
+	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current
 	FROM information_schema.schemata
 </select>
 
@@ -170,12 +231,17 @@
 		t.spcname AS name,
 		null    AS status,
 		null	AS contents,
-		'{ "owner":"'        ||a.rolname||'", ' ||
-		  '"options":'      || (case when t.spcoptions is null then 'null' else '"'||array_to_string(t.spcoptions,',')||'"' end) ||' } ' AS jsonDetails
+		a.rolname AS owner,
+		(case when t.spcoptions is null then 'null' else array_to_string(t.spcoptions,',') end) AS options
 	FROM pg_tablespace t
 	inner join pg_roles a on t.spcowner=a.oid
 	ORDER BY 1
 </select>
+
+
+<!-- 
+		Oracle specific SQL for table details 
+-->
 
 <select id="getTableColumnsDetails" >
 
@@ -187,7 +253,8 @@
      0 AS scale,     <!-- TODO -->
      ad.adsrc AS defaultValue,
 	 not attnotnull AS nullable,
-     '{ "attndims":"'||a.attndims||'", "attisdropped":"'|| a.attisdropped ||'" } ' AS jsonDetails
+     a.attndims,
+     a.attisdropped
    FROM 
            pg_class c
       JOIN pg_namespace nc ON c.relnamespace = nc.oid
@@ -235,8 +302,7 @@
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS fkConstraintOwner,
 	    <!--  TODO : fnr.nspname::information_schema.sql_identifier ?? --> null AS  fkConstraintName,
 	    fr.relname::information_schema.sql_identifier AS fkTable,
-	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns,
-		'{}' jsonDetails	
+	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
 	FROM pg_namespace nr
 	    join pg_class r on nr.oid = r.relnamespace 
 	    join pg_constraint c on r.oid = c.conrelid 
@@ -306,62 +372,5 @@
 	ORDER BY fkDirection, name
 </select>
 
-<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
-	SELECT
-	    nc.nspname      AS owner,
-	    t.relname       AS tableName,
-	    i.relname       AS name,
-	    am.amname       AS type,
-	    ix.indisunique	AS uniqueness
-	FROM
-	    pg_class t
-	    JOIN pg_index ix     ON t.oid = ix.indrelid
-	    JOIN pg_class i      ON i.oid = ix.indexrelid
-	    JOIN pg_namespace nc ON t.relnamespace = nc.oid
-	    JOIN pg_am am        ON     i.relam = am.oid
-	WHERE
-	    t.relkind IN ('r', 'm')
-	    AND upper(nc.nspname) = upper(#{owner}) 
-</select>
-
-<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
-	SELECT 
-	    nc.nspname::information_schema.sql_identifier AS owner,
-	    c.conname::information_schema.sql_identifier AS name,
-	    r.relname::information_schema.sql_identifier AS tableName,
-	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
-	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
-	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
-	    fr.relname::information_schema.sql_identifier AS fkTable,
-	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,
-	    string_agg(fa.attname, ',' order by array_position(c.confkey, fa.attnum)) fkColumns
-	
-	FROM pg_namespace nr
-	    join pg_class r on nr.oid = r.relnamespace 
-	    join pg_constraint c on r.oid = c.conrelid 
-	    join pg_namespace nc on nc.oid = c.connamespace 
-	    join pg_attribute a on r.oid = a.attrelid AND a.attnum = any(c.conkey) AND NOT a.attisdropped
-	    left join pg_class fr on fr.oid = c.confrelid
-	    left join pg_attribute fa on fr.oid = fa.attrelid AND fa.attnum = any(c.confkey) AND NOT fa.attisdropped
-	    left join pg_namespace fnr on fnr.oid = fr.relnamespace 
-	WHERE 
-	   (c.contype = ANY (ARRAY['p'::"char", 'u'::"char", 'f'::"char", 'c'::"char", 'x'::"char"]))
-	AND r.relkind = 'r'::"char" AND NOT pg_is_other_temp_schema(nr.oid) 
-	AND upper(nc.nspname) = upper(#{owner})
-	group by nc.nspname, c.conname, r.relname, c.contype, c.conkey, fr.relname, fnr.nspname
-</select>
-
-<select id="getData" >
-	SELECT * FROM ${owner}."${tableName}"							
-	<if test="filters!=null and filters.length > 0">
-		WHERE <foreach item="filter" collection="filters" open="" separator=" AND " close="">
-		 ${filter.name} = #{filter.filter} </foreach>
-	</if>
-	<if test="orderByColumns!=null and orderByColumns.length > 0">
-		ORDER BY <foreach item="orderByColumn" collection="orderByColumns" open="" separator=", " close=""
-		> ${orderByColumn.column}<choose><when test="orderByColumn.ascending">ASC</when><otherwise>DESC</otherwise></choose></foreach>
-	</if>
-	OFFSET #{fromRow} LIMIT #{count}
-</select>
 
 </mapper>

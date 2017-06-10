@@ -60,39 +60,19 @@ public class DatabaseObject {
 		
 		
 	}
-	public class Partition {
-		public String name;
-	}
-	// TODO : sub-partitions ...
 	
 	private Id id;
 	private String description;
-	private String jsonDetails;
 	private List<Column> columns = new ArrayList<>();
 	private List<Index> indexes = new ArrayList<>();
 	private List<Constraint> constraints = new ArrayList<>();
 	
-	public String getJsonDetails() {
-		return jsonDetails;
-	}
-
-	public void setJsonDetails(String jsonDetails) {
-		this.jsonDetails = jsonDetails;
-	}
 	public List<Column> getColumns() {
 		return columns;
 	}
 
 	public void setColumns(List<Column> columns) {
 		this.columns = columns;
-	}
-
-	public List<Partition> getPartitions() {
-		return partitions;
-	}
-
-	public void setPartitions(List<Partition> partitions) {
-		this.partitions = partitions;
 	}
 
 	public boolean isPartitionned() {
@@ -111,7 +91,6 @@ public class DatabaseObject {
 		this.partitionningBy = partitionningBy;
 	}
 
-	private List<Partition>  partitions= new ArrayList<>();
 	private boolean partitionned = false;
 	private String partitionningBy = null;
 	

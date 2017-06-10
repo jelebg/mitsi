@@ -13,5 +13,4 @@ public class Constraint {
 	public String fkConstraintName;
 	public String fkTable;
 	public String fkColumns;
-	public String jsonDetails;
 }
