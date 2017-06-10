@@ -153,6 +153,10 @@
 		) id_type,
 		last_analyzed,
 		partitioned,
+		( SELECT listagg(column_name, ', ') WITHIN GROUP (ORDER BY column_position)
+		  FROM all_part_key_columns 
+		  WHERE all_part_key_columns.owner=all_tables.owner 
+		  AND all_part_key_columns.name=all_tables.table_name) partitioning_keys,
 		temporary,
 		secondary,
 		nested,
