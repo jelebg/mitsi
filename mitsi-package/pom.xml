@@ -15,6 +15,23 @@
 			<artifactId>mitsi-war</artifactId>
 			<type>war</type>
  		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-oracle</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>oracle-jdbc-driver</artifactId>
+			<version>1.0.0-repo</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
@@ -22,12 +39,6 @@
 			<type>tar.gz</type>
  		</dependency>
 		
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>oracle-jdbc-driver</artifactId>
-			<version>1.0.0-repo</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>

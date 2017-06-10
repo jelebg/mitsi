@@ -136,12 +136,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		sqlSession.close();
 	}
 
-	public synchronized void rollback() {
+	public void rollback() {
 		sqlSession.rollback();
 	}
 
 	@Override
-	public synchronized String testOK() {
+	public String testOK() {
 		return mapper.testOK();
 	}
 	
@@ -163,10 +163,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	@SuppressWarnings("squid:S1226") 
-	public synchronized List<Schema> getAllSchemas(String owner) {
-		
-		
-		
+	public List<Schema> getAllSchemas(String owner) {
 		owner = getOwner(owner);
 		return mapper.getAllSchemas(owner);
 	}
@@ -206,8 +203,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	@Override
 	@SuppressWarnings("squid:S1226") 
-	// TODO : supprimer tout ces synchronized ?????
-	public synchronized List<DatabaseObject> getTablesAndViews(String owner) {
+	public List<DatabaseObject> getTablesAndViews(String owner) {
 		owner = getOwner(owner);
 		List<DatabaseObject> databaseObjects = mapper.getTablesAndViews(owner);
 		getTablesAndViewsSubObjects(databaseObjects, owner);
@@ -227,7 +223,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			int iParam = 0;
 			for(ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
 				iParam++;
-				log.info("parameterMapping #"+iParam+": "+parameterMapping.getExpression()+"/"+parameterMapping.getJdbcTypeName()+"/"+parameterMapping.getProperty()+"/"+parameterMapping.getResultMapId()+"/"+parameterMapping.getNumericScale());
 				
 				// only fromRow, count and filters may be passed as bind variable
 				Object obj = params.get(parameterMapping.getProperty());
@@ -302,7 +297,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 	
 	public DetailsSection getDetailsOne(Map<String, Object> params, final DetailMethod detailMethod) throws SQLException, MitsiException {
-		log.info("details on : "+detailMethod.method.getName());
 		final DetailsSection detailsSection = new DetailsSection();
 		detailsSection.title = detailMethod.title;
 		detailsSection.columns = new ArrayList<>();
@@ -316,7 +310,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 			@Override
 			public void onNewColumn(String columnName, String type) {
-				// TODO : DisplayType => faire une annotation
 				String annotationColumnName = null;
 				if(detailMethod.columnTitles!=null && detailMethod.columnTitles.length > detailsSection.columns.size()) {
 					annotationColumnName = detailMethod.columnTitles[detailsSection.columns.size()];

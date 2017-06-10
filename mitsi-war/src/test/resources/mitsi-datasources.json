@@ -5,39 +5,86 @@
 		"description" : "the test datasource for anything",
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "test",
 		"password" : "test",
-		"connect.schema" : "TEST",
-		"tags" : [ "tag4", "tag5", "tag3" ],
-		"pool" : {
-			"initialSize"      : 3,
-			"minSize"          : 0,
-			"maxSize"          : 10,
-			"maxIdleTimeSec"   : 10,
-			"acquireIncrement" : 1
-		}
+		"connectSchema" : "TEST",
+		"tags" : [ "tag4", "tag5", "tag3" ]
+		,"maxExportRows" : 5000
 	  },
 	  "LOCALHOST-XE2": {
 	    "userGroups" : [ "xe2", "guest" ],
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
 		"tags" : [ "tag4", "tag5", "tag3" ]
+		,"maxExportRows" : 500
 	  },
 	  "LOCALHOST-XE2-ON-TEST": {
 	    "userGroups" : [ "xe2" ],
 		"description" : "another test datasource", 
 		"provider" : "oracle_11g",
 		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
 		"user" : "xe2",
 		"password" : "xe2",
 		"connectSchema" : "TEST",
 		"tags" : [ "bla", "blabla", "blablabla" ]
-	 }
+	 },
+	 "BUBULLE-TEST" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for anything",
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@bubulle:1521:XE",
+		"user" : "test",
+		"password" : "test",
+		"connectSchema" : "TEST",
+		"tags" : [ "tag4", "tag5", "tag3" ]
+		,"maxExportRows" : 5000
+		,"pool" : {
+			initialSize      : 3,
+			minSize          : 0,
+			maxSize          : 10,
+			maxIdleTimeSec   : 10,
+			acquireIncrement : 1
+		}
+		
+	  },
+	  "BUBULLE-XE2": {
+	    "userGroups" : [ "xe2", "guest" ],
+		"description" : "another test datasource", 
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@bubulle:1521:XE",
+		"user" : "xe2",
+		"password" : "xe2",
+		"tags" : [ "tag4", "tag5", "tag3" ]
+		,"maxExportRows" : 500
+	  },
+	  "BUBULLE-XE2-ON-TEST": {
+	    "userGroups" : [ "xe2" ],
+		"description" : "another test datasource", 
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@bubulle:1521:XE",
+		"user" : "xe2",
+		"password" : "xe2",
+		"connectSchema" : "TEST",
+		"tags" : [ "bla", "blabla", "blablabla" ]
+	 },
+	 "POSTGRE-TEST" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for postgre",
+		"provider" : "postgre",
+		"driver" : "org.postgresql.Driver",
+		"jdbcUrl" : "jdbc:postgresql://mitsitestserver:5432/pgsql_test",
+		"user" : "jebtest",
+		"password" : "jebtest"
+	  }
   } 
+
 }

@@ -13,6 +13,7 @@ import org.mitsi.commons.MitsiException;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
+import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.MitsiDatasources;
 import org.mitsi.users.MitsiUsersConfig;
@@ -54,7 +55,7 @@ public abstract class MitsiRestController {
 		return client.getConnectedUsername();
 	}
 
-	protected @NotNull MitsiConnection getConnection(HttpSession httpSession, String datasourceName) throws MitsiUsersException {
+	protected @NotNull MitsiConnection getConnection(HttpSession httpSession, String datasourceName) throws MitsiUsersException, MitsiDatasourceException {
 		String connectedUsername = getClient(httpSession).getConnectedUsername();
 		SortedSet<String> groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 
