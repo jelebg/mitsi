@@ -120,9 +120,13 @@ angular.module('mitsiApp')
     }
     	
     $scope.init = function() {
-    	if($rootScope.currentSource && 
-			$rootScope.currentSource.currentObject ) {
-    		$scope.getTableDetails($rootScope.currentSource, $rootScope.currentSource.currentObject);
+    	if($rootScope.currentSource) {  
+			if($rootScope.currentSource.currentObject ) {
+				$scope.getTableDetails($rootScope.currentSource, $rootScope.currentSource.currentObject);
+			}
+			else {
+				$scope.getTableDetails($rootScope.currentSource, null);
+			}
     	}
     }
     
