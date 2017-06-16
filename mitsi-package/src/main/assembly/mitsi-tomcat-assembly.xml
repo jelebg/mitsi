@@ -5,14 +5,6 @@
 		<format>tar.gz</format>
 		<format>dir</format>
 	</formats>
-	<!--files>
-		<file>
-			<source>target/my-app-1.0.jar</source>
-			<outputDirectory></outputDirectory>
-			<destName>my-app.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
-	</files-->
 	<fileSets>
 			<fileSet>
 				<outputDirectory></outputDirectory>
@@ -25,16 +17,6 @@
 				<filtered>true</filtered>
 			    <lineEnding>unix</lineEnding>
 			    <fileMode>0755</fileMode>
-			</fileSet>
-			<!-- fileSet>
-				<outputDirectory></outputDirectory>
-				<directory>src/main/binary</directory>
-				<filtered>false</filtered>
-			</fileSet -->
-			<fileSet>
-				<outputDirectory>apache-tomcat-8.0.20/lib</outputDirectory>
-				<directory>../lib</directory>
-				<filtered>false</filtered>
 			</fileSet>
 	</fileSets>
 	<dependencySets>
