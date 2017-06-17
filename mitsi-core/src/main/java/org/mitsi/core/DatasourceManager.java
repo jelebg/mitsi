@@ -183,6 +183,8 @@ public class DatasourceManager {
 				ComboPooledDataSource cpds= new ComboPooledDataSource();
 				DataSource jdbcDataSource = cpds;
 				try {
+					cpds.setForceUseNamedDriverClass(true);
+					cpds.setCustomClassLoader(pluginClassLoader);
 					cpds.setDriverClass(datasource.getDriver());
 				} catch (PropertyVetoException e) {
 					throw new MitsiDatasourceException("exception while setDriverClass for ComboPooledDataSource", e);
