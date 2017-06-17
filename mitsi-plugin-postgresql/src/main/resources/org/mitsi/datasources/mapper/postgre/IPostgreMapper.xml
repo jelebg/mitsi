@@ -158,9 +158,11 @@
      (c.relname)::information_schema.sql_identifier AS id_name,
      case when c.relkind='v' then 'view'
           when c.relkind='m' then 'matview'
-          else 'table' end id_type
+          else 'table' end id_type,
+      ts.spcname AS tablespace
       FROM pg_class c
       JOIN pg_namespace nc ON ((c.relnamespace = nc.oid))
+      LEFT JOIN pg_tablespace ts ON (c.reltablespace = ts.oid)
    WHERE NOT pg_is_other_temp_schema(nc.oid) 
      AND c.relkind = ANY (ARRAY['r'::"char", 'm'::"char"])
 	ORDER BY nc.nspname, c.relname

@@ -111,7 +111,7 @@ public class MitsiCoreOracleTest {
 			List<DetailsSection> sections = connection.getDetailsForTable("TEST", "TOUTOU_1");
 			
 			assertNotNull(sections);
-			assertEquals(sections.size(), 6);
+			assertEquals(sections.size(), 7);
 			for(DetailsSection section : sections) {
 				assertNotNull(section.title); 
 				assertNotNull(section.columns); 

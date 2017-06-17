@@ -152,6 +152,7 @@
 			'table'
 		) id_type,
 		last_analyzed,
+		tablespace_name,
 		partitioned,
 		( SELECT listagg(column_name, ', ') WITHIN GROUP (ORDER BY column_position)
 		  FROM all_part_key_columns 
@@ -246,6 +247,9 @@
 		Oracle specific SQL for table details 
 -->
 
+<select id="getTableMiscellaneousDetails" >
+	select * from all_tables where owner=#{owner} and table_name=#{tableName}
+</select>
 
 <select id="getTableColumnsDetails" >
 	select 

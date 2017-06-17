@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.mitsi.core.annotations.ColumnDisplayType;
 import org.mitsi.core.annotations.DefaultOwner;
 import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
 import org.mitsi.core.annotations.MitsiColumnTitles;
+import org.mitsi.core.annotations.MitsiColumnsAsRows;
 import org.mitsi.core.annotations.MitsiDatasourceDetail;
 import org.mitsi.core.annotations.MitsiTableDetail;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
@@ -52,20 +54,30 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	Class<IMitsiMapper> mapperInterface;
 	public enum DETAIL_TYPE { TABLE, DATASOURCE };
 	private class DetailMethod {
-		public DetailMethod(DETAIL_TYPE type, String title, Method method, int order, String [] columnTitles, ColumnDisplayType[] columnDisplayTypes) {
+		public DetailMethod(DETAIL_TYPE type, String title, Method method, int order, String [] columnTitles, ColumnDisplayType[] columnDisplayTypes, String[] columnsAsRowsTitles, String[] columnsAsRowsExclusions) {
 			this.type = type;
 			this.title = title;
 			this.method = method;
 			this.order = order;
 			this.columnTitles = columnTitles;
 			this.columnDisplayTypes = columnDisplayTypes;
+			this.columnsAsRowsTitles = columnsAsRowsTitles;
+			this.columnsAsRowsExclusions = columnsAsRowsExclusions;
+
 		}
+		
 		DETAIL_TYPE type;
 		String title;
 		Method method;
 		int order;
 		String [] columnTitles;
 		ColumnDisplayType [] columnDisplayTypes;
+		String[] columnsAsRowsTitles;
+		String[] columnsAsRowsExclusions;
+		
+		boolean isColumnsAsRows() {
+			return columnsAsRowsTitles != null;
+		}
 	}
 	List<DetailMethod> tableDetailsMethods;
 	List<DetailMethod> datasourceDetailsMethods;
@@ -100,20 +112,25 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 			MitsiColumnTitles mitsiColumnTitles = method.getAnnotation(MitsiColumnTitles.class);
 			MitsiColumnDisplayTypes mitsiColumnDisplayTypes = method.getAnnotation(MitsiColumnDisplayTypes.class);
+			MitsiColumnsAsRows mitsiColumnsAsRows = method.getAnnotation(MitsiColumnsAsRows.class);
 
 			if(mitsiTableDetail != null) {
 				tableDetailsMethods.add(new DetailMethod(DETAIL_TYPE.TABLE,
 					mitsiTableDetail.value(), 
 					method, mitsiTableDetail.order(), 
 					mitsiColumnTitles==null?null:mitsiColumnTitles.value(),
-					mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value()));
+					mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value(),
+					mitsiColumnsAsRows==null?null:mitsiColumnsAsRows.value(),
+					mitsiColumnsAsRows==null?null:mitsiColumnsAsRows.excludeColumns()));
 			}
 			else {
 				datasourceDetailsMethods.add(new DetailMethod(DETAIL_TYPE.DATASOURCE,
-						mitsiDatasourceDetail.value(), 
-						method, mitsiDatasourceDetail.order(), 
-						mitsiColumnTitles==null?null:mitsiColumnTitles.value(),
-						mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value()));
+					mitsiDatasourceDetail.value(), 
+					method, mitsiDatasourceDetail.order(), 
+					mitsiColumnTitles==null?null:mitsiColumnTitles.value(),
+					mitsiColumnDisplayTypes==null?null:mitsiColumnDisplayTypes.value(),
+					mitsiColumnsAsRows==null?null:mitsiColumnsAsRows.value(),
+					mitsiColumnsAsRows==null?null:mitsiColumnsAsRows.excludeColumns()));
 			}
 		}
 		
@@ -212,7 +229,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	private interface ExecuteRowSqlCallback {
 		void onNewColumn(String columnName, String type);
-		void onNewRow(String [] row);		
+		void onNewRow(String [] row) throws MitsiException;		
 	}
 	
 	void executeRawSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
@@ -306,32 +323,83 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				.getMappedStatement(mapperInterface.getName() + "." + detailMethod.method.getName());
 		BoundSql boundSql = ms.getBoundSql(params);
 		
-		executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
-
-			@Override
-			public void onNewColumn(String columnName, String type) {
-				String annotationColumnName = null;
-				if(detailMethod.columnTitles!=null && detailMethod.columnTitles.length > detailsSection.columns.size()) {
-					annotationColumnName = detailMethod.columnTitles[detailsSection.columns.size()];
-					if(annotationColumnName != null && annotationColumnName.length()==0) {
-						annotationColumnName = null;
+		if(detailMethod.isColumnsAsRows()) {
+			String parameterColumnTitle = "Parameter";
+			String valueColumnTitle = "Value";
+			if(detailMethod.columnsAsRowsTitles!=null) {
+				if(detailMethod.columnsAsRowsTitles.length>=1) {
+					parameterColumnTitle = detailMethod.columnsAsRowsTitles[0];
+				}
+				if(detailMethod.columnsAsRowsTitles.length>=2) {
+					valueColumnTitle = detailMethod.columnsAsRowsTitles[1];
+				}
+			}
+			detailsSection.columns.add(detailsSection.new Column(parameterColumnTitle, null)); 
+			detailsSection.columns.add(detailsSection.new Column(valueColumnTitle, null)); 
+			
+			executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
+				boolean firstRow = true;
+				
+				List<String> columnsNames = new ArrayList<>();
+				List<String> hiddenColumnsList = Arrays.asList(detailMethod.columnsAsRowsExclusions==null ? new String[0] : detailMethod.columnsAsRowsExclusions);
+				
+				@Override
+				public void onNewColumn(String columnName, String type) {
+					if(hiddenColumnsList.contains(columnName)) {
+						columnsNames.add(null);
+					}
+					else {
+						columnsNames.add(columnName);
 					}
 				}
-				
-				String displayType = null;
-				if(detailMethod.columnDisplayTypes!=null && detailMethod.columnDisplayTypes.length > detailsSection.columns.size()) {
-					 ColumnDisplayType columnDisplayType = detailMethod.columnDisplayTypes[detailsSection.columns.size()];
-					 displayType = columnDisplayType.toString();
+	
+				@Override
+				public void onNewRow(String[] row) throws MitsiException {
+					if(!firstRow) {
+						throw new MitsiException("impossible to display columns as rows for "+detailMethod.title+" because there are many rows");
+					}
+					firstRow = false;
+					
+					for(int i=0; i!=row.length; i++) {
+						String columnName = columnsNames.get(i);
+						if(columnName != null) {
+							String[] columnRow = new String[2];
+							columnRow[0] = columnName;
+							columnRow[1] = row[i];
+							detailsSection.data.add(columnRow);
+						}
+					}
 				}
-				
-				detailsSection.columns.add(detailsSection.new Column(annotationColumnName==null ? columnName : annotationColumnName, displayType));				
-			}
-
-			@Override
-			public void onNewRow(String[] row) {
-				detailsSection.data.add(row);
-			}
-		});
+			});
+		}
+		else {
+			executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
+	
+				@Override
+				public void onNewColumn(String columnName, String type) {
+					String annotationColumnName = null;
+					if(detailMethod.columnTitles!=null && detailMethod.columnTitles.length > detailsSection.columns.size()) {
+						annotationColumnName = detailMethod.columnTitles[detailsSection.columns.size()];
+						if(annotationColumnName != null && annotationColumnName.length()==0) {
+							annotationColumnName = null;
+						}
+					}
+					
+					String displayType = null;
+					if(detailMethod.columnDisplayTypes!=null && detailMethod.columnDisplayTypes.length > detailsSection.columns.size()) {
+						 ColumnDisplayType columnDisplayType = detailMethod.columnDisplayTypes[detailsSection.columns.size()];
+						 displayType = columnDisplayType.toString();
+					}
+					
+					detailsSection.columns.add(detailsSection.new Column(annotationColumnName==null ? columnName : annotationColumnName, displayType));				
+				}
+	
+				@Override
+				public void onNewRow(String[] row) {
+					detailsSection.data.add(row);
+				}
+			});
+		}
 		
 		return detailsSection;
 	}
