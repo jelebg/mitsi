@@ -20,6 +20,13 @@
     <span>display&nbsp;proximity&nbsp;graph</span>
   </script>
 
+  <script type="text/ng-template" id="popover.columns.description">
+    <div style="font-weight:bold;">{{ c.type }}</div>
+	<div>{{ c.description }}</div>
+	<div ng-repeat="comment in c.labelsComments">{{ comment }}</div>
+  </script>
+
+
 </head>
 
 <body data-ng-app="mitsiApp">
@@ -189,14 +196,26 @@
 				  	</span>
 				  	</div>
 			      </accordion-heading>
+			      <!-- popover="{{ c.type }} / {{ c.description }}" 
+			      popover-template="'popover.columns.description'" 
+			      popover-popup-delay="1000"
+			      popover="{{ c.type }} / {{ c.description }}"
+			      -->
 					<ul class="mitsi-columns-list" >
 						<li ng-repeat="c in o.columnsToDisplay" 
 							ng-class="{'columnPk':c.isPk}"
-						    popover="{{ c.type }} / {{ c.description }}"
+							popover-template="'popover.columns.description'"
 						    popover-placement="bottom"
 							popover-trigger="mouseenter"
-							popover-popup-delay="2000" >
-							{{ c.name }}
+							ng-mouseenter="currentColumn=c"
+							ng-mouseleave="currentColumn=null"
+							 >
+							<table><tr><td style="width:23px">
+								<span ng-if="hasLabelsForColumn(c)" class="columnAttributeLabel" >{{ getLabelsForColumn(c) }}</span>
+							</td><td>
+								&nbsp;{{ c.name }}
+							</td></tr></table>
+							
 						</li>
 					</ul>
 			    </accordion-group>

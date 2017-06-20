@@ -311,21 +311,33 @@
   color : grey;
 }
 
+.columnAttributeLabel {
+	color:white;
+	background-color:#9a9a9a;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	border-radius:2px;
+	font-size:70%;
+	border:solid 1px grey;
+}
+
 .tableActionLabel {
 	background-color:grey;
 	font-weight:bold;
 	padding-left:2px;
 	padding-right:2px;
 	border-radius:2px;
-	vertical-align:top;"	
+	vertical-align:top;	
 }
+
 .tableActionLabelSelected {
 	background-color:#cd48ff;
 	font-weight:bold;
 	padding-left:2px;
 	padding-right:2px;
 	border-radius:2px;
-	vertical-align:top;"	
+	vertical-align:top;	
 }
 
 .objectMenuIcon {

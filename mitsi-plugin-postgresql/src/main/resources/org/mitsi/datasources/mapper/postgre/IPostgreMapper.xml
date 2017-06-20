@@ -92,16 +92,19 @@
 	    t.relname       AS tableName,
 	    i.relname       AS name,
 	    am.amname       AS type,
-	    ix.indisunique	AS uniqueness
+	    ix.indisunique	AS uniqueness,
+	    string_agg(att.attname, ',' order by array_position(ix.indkey, att.attnum)) AS columns
 	FROM
 	    pg_class t
 	    JOIN pg_index ix     ON t.oid = ix.indrelid
 	    JOIN pg_class i      ON i.oid = ix.indexrelid
 	    JOIN pg_namespace nc ON t.relnamespace = nc.oid
 	    JOIN pg_am am        ON     i.relam = am.oid
+	    JOIN pg_attribute att       ON t.oid = att.attrelid AND att.attnum = any(ix.indkey) AND NOT att.attisdropped 
 	WHERE
 	    t.relkind IN ('r', 'm')
 	    AND upper(nc.nspname) = upper(#{owner}) 
+	GROUP BY nc.nspname, t.relname, i.relname, am.amname, ix.indisunique
 </select>
 
 <select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">

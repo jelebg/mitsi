@@ -152,10 +152,88 @@ angular.module('mitsiApp')
 	   return deferred.promise;
 	}
 	
+	$scope.computeColumnLabels = function(source) {
+		
+		for(let iObj=0; iObj!=source.objects.length; iObj++) {
+			let obj = source.objects[iObj];
+			
+			if(!obj.columns) {
+				continue;
+			}
+			
+			let fkColumnNames = {};
+			let indexedColumnNames = {};
+			
+			if(obj.indexes) {
+				for(let i=0; i!=obj.indexes.length; i++) {
+					let index = obj.indexes[i];
+					if(!index.columns || index.columns=="") {
+						continue;
+					}
+					
+					let cols = index.columns.split(",");
+					for(let c=0; c!=cols.length; c++) {
+						indexedColumnNames[cols[c]] = index;
+					}
+				}
+			}
+			
+			if(obj.constraints) {
+				for(let i=0; i!=obj.constraints.length; i++) {
+					let constraint = obj.constraints[i];
+					if(constraint.type !== "R") {
+						continue;
+					}
+					
+					if(!constraint.columns || constraint.columns=="") {
+						continue;
+					}
+					let cols = constraint.columns.split(",");
+					for(let c=0; c!=cols.length; c++) {
+						fkColumnNames[cols[c]] = constraint;
+					} 
+				}
+			}
+			
+			for(let i=0; i!=obj.columns.length; i++) {
+				let column = obj.columns[i];
+				
+				let labels = [];
+				let labelsComments = [ ];
+				if(column.isPk) {
+					labels.push("PK");
+					labelsComments.push("Primary Key");
+				}
+				let index = indexedColumnNames[column.name];
+				if(index) {
+					if(!column.isPk) {
+						labels.push((index.uniqueness=='t' ? "UK" : "I"));
+					}
+					labelsComments.push("Indexed by " + index.name)
+				}
+				
+				fkLabel = fkColumnNames[column.name];
+				if(fkLabel) {
+					labels.push("FK");
+					labelsComments.push("Foreign Key constraint " + fkLabel.name);
+				}
+				
+				column.labels = labels.join(",");
+				column.labelsComments = labelsComments;
+				
+			}
+			
+			
+			
+		}
+	}
+	
 	$scope.initSource = function(source, response) {
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.currentSchemaName = null;
+		  
+		  $scope.computeColumnLabels(source);
 		  
 		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {
@@ -204,6 +282,10 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.isObjectExcludedByFilter = function(object, source) { // NOSONAR
+		if(!source.filter) {
+			return false;
+		}
+		
 		var objectType = object.id.type; 
 		
 		if(source.filter.hideTables===true && objectType=="table") {
@@ -370,6 +452,14 @@ angular.module('mitsiApp')
 		if(!o.columnsToDisplay) {
 			o.columnsToDisplay = o.columns;
 		}
+	}
+	
+	$scope.hasLabelsForColumn = function(c) {
+		return c.labels && c.labels != "";
+	}
+	
+	$scope.getLabelsForColumn = function(c) {
+		return c.labels;
 	}
 	
     $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument
