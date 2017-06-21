@@ -15,12 +15,12 @@
     <idArg column="id_schema" javaType="String"/>
     <idArg column="id_name" javaType="String"/>
   </constructor>
+  <result property="secondaryType" column="secondary_type"/>
   <result property="description" column="object_comment"/>
   <collection property="columns" ofType="org.mitsi.datasources.Column">
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
-      <result property="isPk" column="isPk"/>
   </collection>
 </resultMap>
 
@@ -46,9 +46,9 @@
      (c.relname)::information_schema.sql_identifier AS id_name,
      case when c.relkind='v' then 'view'
           when c.relkind='m' then 'matview'
-          else 'table' end id_type, 
+          else 'table' end id_type,
+     null secondary_type, <!--  TODO : postgresql table types -->
      (a.attname)::information_schema.sql_identifier AS column_name,
-     CASE WHEN pk.conname IS NULL THEN '0' ELSE '1' END isPk,
           (
          CASE
              WHEN (a.attnotnull OR ((t.typtype = 'd'::"char") AND t.typnotnull)) THEN 'NO'::text

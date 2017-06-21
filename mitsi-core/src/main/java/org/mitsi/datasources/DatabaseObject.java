@@ -62,6 +62,7 @@ public class DatabaseObject {
 	}
 	
 	private Id id;
+	private String secondaryType;
 	private String description;
 	private List<Column> columns = new ArrayList<>();
 	private List<Index> indexes = new ArrayList<>();

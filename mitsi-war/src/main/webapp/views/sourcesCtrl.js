@@ -488,6 +488,10 @@ angular.module('mitsiApp')
 		}
 	}
 	
+	$scope.getTablePopover = function(o) {
+		return [ (o.secondaryType==null||o.secondaryType==""?o.id.type:o.secondaryType).toUpperCase(), o.description ].filter(function (val) {return val;}).join(' / ');
+    }
+	
 	$scope.hasLabelsForColumn = function(c) {
 		return c.labels && c.labels != "";
 	}

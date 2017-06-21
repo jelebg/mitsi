@@ -10,5 +10,4 @@ public class Column {
 	public String defaultValue;
 	public String nullable;
 	public String description;
-	public Boolean isPk;
 }
