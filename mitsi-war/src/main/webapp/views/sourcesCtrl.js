@@ -162,6 +162,7 @@ angular.module('mitsiApp')
 			}
 			
 			let fkColumnNames = {};
+			let pkColumnNames = {};
 			let indexedColumnNames = {};
 			
 			if(obj.indexes) {
@@ -173,7 +174,12 @@ angular.module('mitsiApp')
 					
 					let cols = index.columns.split(",");
 					for(let c=0; c!=cols.length; c++) {
-						indexedColumnNames[cols[c]] = index;
+						let current = indexedColumnNames[cols[c]];
+						if(!current) {
+							current = [];
+							indexedColumnNames[cols[c]] = current;
+						}
+						current.push({"index":index, "position":c+1});
 					}
 				}
 			}
@@ -181,17 +187,33 @@ angular.module('mitsiApp')
 			if(obj.constraints) {
 				for(let i=0; i!=obj.constraints.length; i++) {
 					let constraint = obj.constraints[i];
-					if(constraint.type !== "R") {
-						continue;
-					}
-					
 					if(!constraint.columns || constraint.columns=="") {
 						continue;
 					}
+
+					if(constraint.type !== "R" && constraint.type !== "P") {
+						continue;
+					}
+					
 					let cols = constraint.columns.split(",");
 					for(let c=0; c!=cols.length; c++) {
-						fkColumnNames[cols[c]] = constraint;
-					} 
+						let current = null;
+						if(constraint.type == "R") {
+							current = fkColumnNames[cols[c]];
+							if(!current) {
+								current = [];
+								fkColumnNames[cols[c]] = current;
+							}
+						}
+						else {
+							current = pkColumnNames[cols[c]];
+							if(!current) {
+								current = [];
+								pkColumnNames[cols[c]] = current;
+							}
+						}
+						current.push({"constraint":constraint, "position":c+1});
+					}
 				}
 			}
 			
@@ -200,22 +222,34 @@ angular.module('mitsiApp')
 				
 				let labels = [];
 				let labelsComments = [ ];
-				if(column.isPk) {
-					labels.push("PK");
-					labelsComments.push("Primary Key");
-				}
-				let index = indexedColumnNames[column.name];
-				if(index) {
-					if(!column.isPk) {
-						labels.push((index.uniqueness=='t' ? "UK" : "I"));
+				let pkList = pkColumnNames[column.name];
+				if(pkList) {
+					for(let j=0; j!=pkList.length; j++) {
+						let pk = pkList[j];
+						column.isPk = true;
+						labels.push("PK");
+						labelsComments.push("Primary Key (constraint : "+pk.constraint.name+(pk.position<=1?"":", column position in PK : #"+pk.position)+")");
 					}
-					labelsComments.push("Indexed by " + index.name)
 				}
 				
-				fkLabel = fkColumnNames[column.name];
-				if(fkLabel) {
-					labels.push("FK");
-					labelsComments.push("Foreign Key constraint " + fkLabel.name);
+				let indexList = indexedColumnNames[column.name];
+				if(indexList) {
+					for(let j=0; j!=indexList.length; j++) {
+						let index = indexList[j];
+						if(!column.isPk) {
+							labels.push((index.index.uniqueness=='t' ? "UK" : "I"));
+						}
+						labelsComments.push("Indexed by " + index.index.name + (index.position<=1?"":"(position in index : #"+index.position+")"));
+					}
+				}
+				
+				fkList = fkColumnNames[column.name];
+				if(fkList) {
+					for(let j=0; j!=fkList.length; j++) {
+						let fk = fkList[j];
+						labels.push("FK");
+						labelsComments.push("Foreign Key constraint " + fk.constraint.name+(fk.position<=1?"":", column position in FK : #"+fk.position));
+					}
 				}
 				
 				column.labels = labels.join(",");
