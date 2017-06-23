@@ -59,7 +59,15 @@ This file is used to configure user management. There is three section in it :
 * **groups** defines a list of groups. Each group may contain many users or groups. These groups can be used in the datasource configuration, with the userGroups attribute, to restrict access to a datasource to some users.
 
 ## how may I compile it myself
-to compile sources :
+to compile sources, you will have to download oracle's jdbc driver, compile the custom version of c3p0 and compile mitsi :
+
 * download ojdbc7.jar on oracle's website
 * mvn install:install-file -Dfile=ojdbc7.jar -DgroupId=oracle -DartifactId=oracle-jdbc-driver -Dversion=1.0.0-repo -Dpackaging=jar
+
+* git clone https://github.com/jelebg/c3p0_mitsi/tree/mitsi-c3p0-0.9.5.2
+* switch to mitsi's specific branch : git checkout mitsi-c3p0-0.9.5.2
+* place mchange-commons-java-0.2.11.jar and mchange-commons-java-0.2.11-sources.jar in the lib directory of c3p0
+* compile it with ant
+
+* clone mitsi : git clone https://github.com/jelebg/mitsi.git 
 * mvn clean install
