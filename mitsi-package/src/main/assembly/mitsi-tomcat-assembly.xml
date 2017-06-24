@@ -40,34 +40,6 @@
 		        </excludes>
 		    </unpackOptions>
     	</dependencySet>
-		<dependencySet>
-			<outputDirectory>plugins</outputDirectory>
-			<includes>
-				<include>oracle:oracle-jdbc-driver</include>
-			</includes>
-			<unpack>false</unpack>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>plugins</outputDirectory>
-			<includes>
-				<include>org.postgresql:postgresql</include>
-			</includes>
-			<unpack>false</unpack>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>plugins</outputDirectory>
-			<includes>
-				<include>org.mitsi:mitsi-plugin-oracle</include>
-			</includes>
-			<unpack>false</unpack>
-		</dependencySet>
-		<dependencySet>
-			<outputDirectory>plugins</outputDirectory>
-			<includes>
-				<include>org.mitsi:mitsi-plugin-postgresql</include>
-			</includes>
-			<unpack>false</unpack>
-		</dependencySet>
 
 	</dependencySets>
 </assembly>

@@ -18,6 +18,14 @@
 			<groupId>org.mitsi</groupId>
 			<artifactId>commons</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-oracle</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-postgresql</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework</groupId>
