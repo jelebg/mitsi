@@ -31,9 +31,9 @@ Then modify the following files to configure your first database connection :
 In this file you can configure the list of datasource that you will manage with mitsi.
 As an example, two basic datasouces are given but you can configure as many as you want.
 
-* For the time being, the fields **provider** and **driver** may only have the values "oracle_11g" and "oracle.jdbc.driver.OracleDriver".
+* For the time being, the fields **provider** and **driver** may only have the values "oracle_11g" and "oracle.jdbc.driver.OracleDriver", or "postgre" and "org.postgresql.Driver" (but it can be extended by developing a plugin).
 The connection attributes are straightforward :
-* **jdbcUrl** is the jdbc url to connect to the database. For Oracle databses, you may use the models jdbc:oracle:thin:@hostname:port:SID or jdbc:oracle:thin:@//hostname:port/service
+* **jdbcUrl** is the jdbc url to connect to the database. For Oracle databases, you may use the models jdbc:oracle:thin:@hostname:port:SID or jdbc:oracle:thin:@//hostname:port/service
 * **user** : username to connect to the database
 * **password** : password to connect to the database
 
