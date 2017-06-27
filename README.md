@@ -2,16 +2,15 @@
 
 ## What is Mitsi ?
 
-Mitsi is a very simple web application to explore a relational database.
+Mitsi is a very simple web application to explore a relational database. It works for Oracle and PostgreSQL, and can be extended to other RDBMS.
 
-With it you may :
-* explore your physical data model
-* search tables, fields, indexes, etc
-* send links to share your graphs or databases
-
-Unlike other tools, it is quick and cool.
+With it you may explore your physical data model easily. Unlike other tools, it is quick and cool (I swear).
 
 ## Basic functionnalities
+
+* Instant search bar for tables, columns, indexes and constraints 
+* Graph navigation, and graph interactions to display table data and metadata 
+* Pathfinding using the relation graph
 
 ![Screen](/.github/mitsi_screen.png)
 
