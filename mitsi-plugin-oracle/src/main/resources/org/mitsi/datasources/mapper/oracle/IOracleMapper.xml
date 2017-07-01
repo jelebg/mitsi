@@ -56,6 +56,7 @@
 		) id_type,
 	case 
 		when all_tables.table_name is null then null
+		when all_objects.object_type &lt;&gt; 'TABLE' then null
 		when all_tables.iot_type is not null then 'INDEX-ORGANIZED TABLE'
 		when all_tables.temporary='Y' then 'TEMPORARY TABLE'
 		else 'HEAP ORGANIZED TABLE'

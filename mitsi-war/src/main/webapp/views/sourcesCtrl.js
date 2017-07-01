@@ -489,7 +489,17 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getTablePopover = function(o) {
-		return [ (o.secondaryType==null||o.secondaryType==""?o.id.type:o.secondaryType).toUpperCase(), o.description ].filter(function (val) {return val;}).join(' / ');
+		let type = o.id.type;
+		if(o.secondaryType) {
+			type = o.secondaryType;
+		}
+		else {
+			if(type.toUpperCase() == "MATVIEW") {
+				type = "MATERIALIZED VIEW";
+			}
+		}
+		type = type.toUpperCase();
+		return [ type, o.description ].filter(function (val) {return val;}).join(' / ');
     }
 	
 	$scope.hasLabelsForColumn = function(c) {
