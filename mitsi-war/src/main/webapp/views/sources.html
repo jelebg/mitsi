@@ -33,8 +33,7 @@
 <div  ng-controller="sourcesCtrl">
 
 	<div class="form-group has-feedback">
-		<!--i class="glyphicon glyphicon-filter form-control-feedback"></i-->
-		<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="searchSource=null; $event.stopPropagation();"></a>
+		<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="searchSource=''; $event.stopPropagation();"></a>
 		<input type="text" ng-model="searchSource" class="form-control" placeholder="Search datasources here..."/>
 	</div>
 	
@@ -107,7 +106,7 @@
 		    </td><td>
 				<span dropdown on-toggle="toggled(open)" >
 			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
-						<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=null; $event.stopPropagation();"></a>
+						<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=''; localStorageUpdateForDs(s, s.searchObject, 'searchObject'); $event.stopPropagation();"></a>
 						<a href="" dropdown-toggle style="pointer-events: all;margin-right:20px;" 
 							class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon"
 					 	    popover-template="'popover.table.filter.options.html'"

@@ -16,7 +16,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.initSearchFilters = function() {
-		$scope.searchSource = localStorage.getItem("source_searchSource") ? localStorage.getItem("source_searchSource") : "";
+		$scope.searchSource = localStorage.getItem("source_searchSource");
 		
 		$scope.$watch("searchSource", function() {
 			localStorage.setItem("source_searchSource", $scope.searchSource);
