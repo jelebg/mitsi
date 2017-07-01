@@ -227,7 +227,7 @@ angular.module('mitsiApp')
 					for(let j=0; j!=pkList.length; j++) {
 						let pk = pkList[j];
 						column.isPk = true;
-						labels.push("PK");
+						$scope.pushUnique(labels, "PK");
 						labelsComments.push("Primary Key (constraint : "+pk.constraint.name+(pk.position<=1?"":", column position in PK : #"+pk.position)+")");
 					}
 				}
@@ -237,7 +237,7 @@ angular.module('mitsiApp')
 					for(let j=0; j!=indexList.length; j++) {
 						let index = indexList[j];
 						if(!column.isPk) {
-							labels.push((index.index.uniqueness=='t' ? "UK" : "I"));
+							$scope.pushUnique(labels, (index.index.uniqueness=='t' ? "UK" : "I"));
 						}
 						labelsComments.push("Indexed by " + index.index.name + (index.position<=1?"":"(position in index : #"+index.position+")"));
 					}
@@ -247,7 +247,7 @@ angular.module('mitsiApp')
 				if(fkList) {
 					for(let j=0; j!=fkList.length; j++) {
 						let fk = fkList[j];
-						labels.push("FK");
+						$scope.pushUnique(labels, "FK");
 						labelsComments.push("Foreign Key constraint " + fk.constraint.name+(fk.position<=1?"":", column position in FK : #"+fk.position));
 					}
 				}
@@ -259,6 +259,12 @@ angular.module('mitsiApp')
 			
 			
 			
+		}
+	}
+	
+	$scope.pushUnique = function(arr, str) {
+		if(arr.indexOf(str) === -1) {
+			arr.push(str);
 		}
 	}
 	
