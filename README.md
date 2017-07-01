@@ -6,11 +6,13 @@ Mitsi is a very simple web application to explore a relational database. It work
 
 With it you may explore your physical data model easily. Unlike other tools, it is quick and cool (I swear).
 
-## Basic functionnalities
+## Basic functionalities
 
 * Instant search bar for tables, columns, indexes and constraints 
 * Graph navigation, and graph interactions to display table data and metadata 
 * Pathfinding using the relation graph
+
+Watch this silent video to see this functionalities in action : [https://www.youtube.com/watch?v=VqIGvtIy5l0](https://www.youtube.com/watch?v=VqIGvtIy5l0)
 
 ![Screen](/.github/mitsi_screen.png)
 
