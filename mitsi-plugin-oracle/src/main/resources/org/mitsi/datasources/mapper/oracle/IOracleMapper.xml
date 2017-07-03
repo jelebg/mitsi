@@ -87,7 +87,7 @@
 	  all_indexes.table_name tableName,
 	  all_indexes.index_name name,
 	  all_indexes.index_type type,
-	  all_indexes.uniqueness uniqueness,
+  	  CASE all_indexes.uniqueness WHEN 'UNIQUE' THEN 't' ELSE 'f' END uniqueness,
 	  ( select LISTAGG(all_ind_columns.column_name, ',') WITHIN GROUP (ORDER BY column_position)
 	    from all_ind_columns where all_indexes.index_name=all_ind_columns.index_name and all_indexes.owner=all_ind_columns.index_owner
 	  )columns	

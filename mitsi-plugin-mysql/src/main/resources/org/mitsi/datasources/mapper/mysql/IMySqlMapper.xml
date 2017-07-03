@@ -71,6 +71,7 @@
 	  s.table_name tableName,
 	  s.index_name name,
 	  s.index_type type,
+	  CASE s.non_unique WHEN 1 THEN 'f' ELSE 't' END uniqueness,
 	  GROUP_CONCAT(s.column_name ORDER BY seq_in_index SEPARATOR ',') columns	
 	FROM information_schema.statistics s
 	WHERE 
