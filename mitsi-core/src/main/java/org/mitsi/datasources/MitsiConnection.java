@@ -30,6 +30,7 @@ import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
 import org.mitsi.core.annotations.ColumnDisplayType;
 import org.mitsi.core.annotations.DefaultOwner;
+import org.mitsi.core.annotations.DefaultOwnerIsConnectedUser;
 import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
 import org.mitsi.core.annotations.MitsiColumnTitles;
 import org.mitsi.core.annotations.MitsiColumnsAsRows;
@@ -164,17 +165,23 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	private String getOwner(String owner) {
 		if(owner == null) {
+			if(datasource.getConnectSchema() != null) {
+				return datasource.getConnectSchema(); //.toUpperCase();
+			}
+
 			Class<?>[] interfaces = mapper.getClass().getInterfaces();
 			for(Class<?> i : interfaces) {
 				DefaultOwner defaultOwner = i.getAnnotation(DefaultOwner.class);
 				if(defaultOwner != null) {
-					return defaultOwner.value().toUpperCase();
+					return defaultOwner.value(); //.toUpperCase();
+				}
+				DefaultOwnerIsConnectedUser defaultOwnerIsConnectedUser = i.getAnnotation(DefaultOwnerIsConnectedUser.class);
+				if(defaultOwnerIsConnectedUser != null) {
+					return datasource.getUser(); //.toUpperCase();
 				}
 			}
-
-			return datasource.getConnectSchema().toUpperCase();
 		}
-		return owner.toUpperCase();
+		return owner; //.toUpperCase();
 
 	}
 

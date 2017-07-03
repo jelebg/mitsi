@@ -109,7 +109,7 @@ public class MitsiDatasource {
 	}
 
 	public String getConnectSchema() {
-		return connectSchema==null?getUser():connectSchema;
+		return connectSchema;
 	}
 
 	public void setConnectSchema(String connectSchema) {

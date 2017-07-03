@@ -26,6 +26,10 @@
 			<groupId>org.mitsi</groupId>
 			<artifactId>mitsi-plugin-postgresql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-mysql</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework</groupId>

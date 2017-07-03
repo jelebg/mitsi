@@ -1,0 +1,384 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mitsi.datasources.mapper.mysql.IMySqlMapper">
+
+
+<resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
+	<result property="name" column="schema_name"/>
+	<result property="current" column="is_current"/>
+</resultMap>
+
+<resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
+  <constructor>
+    <idArg column="id_type" javaType="String"/>
+    <idArg column="id_schema" javaType="String"/>
+    <idArg column="id_name" javaType="String"/>
+  </constructor>
+  <result property="secondaryType" column="secondary_type"/>
+  <result property="description" column="object_comment"/>
+  <collection property="columns" ofType="org.mitsi.datasources.Column">
+      <result property="name" column="column_name"/>
+      <result property="description" column="column_comment"/>
+      <result property="type" column="column_type"/>
+  </collection>
+</resultMap>
+
+<!-- 
+			mitsi standard SQL 
+-->
+
+<select id="testOK" resultType="String">
+	SELECT DATE_FORMAT(SYSDATE(), '%Y-%m-%d %H:%i:%s');
+</select>
+
+<select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
+<!--  todo : gerer les catalogues -->
+	SELECT schema_name,
+	CASE 
+	WHEN #{owner} IS NOT NULL AND schema_name = #{owner}   THEN '1'
+	WHEN #{owner} IS NULL     AND schema_name = database() THEN '1' 
+	ELSE '0' END is_current <!--  database a verifier -->
+	FROM information_schema.schemata 
+</select>
+
+
+<select id="getTablesAndViews" resultMap="DatabaseObjectResultMap" fetchSize="2000">
+	SELECT 
+		t.table_schema 		id_schema, 
+		t.table_name id_name, 
+		CASE t.table_type 
+		WHEN 'BASE TABLE' THEN 'table'
+		WHEN 'VIEW' THEN 'view' 
+		WHEN 'SYSTEM VIEW' THEN 'view' 
+		<!-- no materialized view in mysql --> 
+		ELSE null 
+		END id_type,
+	CONCAT(t.table_type, ' / ', t.engine) secondary_type, 
+    c.column_name column_name,
+    c.data_type column_type,
+    t.table_comment object_comment,
+    c.column_comment column_comment
+	FROM information_schema.tables t
+	   JOIN information_schema.columns c ON t.table_catalog=c.table_catalog AND t.table_schema=c.table_schema AND t.table_name=c.table_name
+	WHERE t.table_schema = #{owner}
+	ORDER BY t.table_schema, t.table_name, t.table_type, c.ordinal_position
+</select>
+
+<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+	select  
+	  s.table_schema owner,
+	  s.table_name tableName,
+	  s.index_name name,
+	  s.index_type type,
+	  GROUP_CONCAT(s.column_name ORDER BY seq_in_index SEPARATOR ',') columns	
+	FROM information_schema.statistics s
+	WHERE 
+      s.table_schema = #{owner}
+	GROUP BY s.table_schema,
+	  s.table_name,
+	  s.index_name,
+	  s.index_type
+</select>
+
+<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	select 
+	  c.table_schema owner,
+	  c.constraint_name name,
+	  c.table_name tableName,
+	  CASE c.constraint_type
+	  WHEN 'PRIMARY KEY' THEN 'P' 
+	  WHEN 'UNIQUE' THEN 'U' 
+	  WHEN 'FOREIGN KEY' THEN 'R' 
+	  ELSE 'C' END type,
+	  ( SELECT GROUP_CONCAT(cc.column_name ORDER BY cc.ordinal_position SEPARATOR ',')
+	    FROM information_schema.key_column_usage cc
+	    WHERE c.constraint_catalog=cc.constraint_catalog AND 
+			  c.constraint_schema=cc.constraint_schema AND 
+			  c.constraint_name=cc.constraint_name AND
+			  c.table_schema=cc.table_schema AND
+			  c.table_name=cc.table_name
+	  ) columns,
+	  rc.table_schema fkConstraintOwner,
+	  rc.table_name fkTable,
+	  rc.constraint_name fkConstraintName,
+	  ( SELECT GROUP_CONCAT(rcc.column_name ORDER BY rcc.ordinal_position SEPARATOR ',')
+	    FROM information_schema.key_column_usage rcc
+	    WHERE rc.constraint_catalog=rcc.constraint_catalog AND 
+			  rc.constraint_schema=rcc.constraint_schema AND 
+			  rc.constraint_name=rcc.constraint_name AND
+			  rc.table_name=rcc.table_name
+	  )  fkColumns
+	FROM information_schema.table_constraints c
+	LEFT  JOIN information_schema.referential_constraints r ON (
+					c.constraint_catalog=r.constraint_catalog AND 
+					c.constraint_schema=r.constraint_schema AND 
+					c.constraint_name=r.constraint_name)
+	LEFT  JOIN information_schema.table_constraints rc ON (
+					rc.constraint_catalog=r.unique_constraint_catalog AND 
+					rc.constraint_schema=r.unique_constraint_schema AND 
+					rc.constraint_name=r.unique_constraint_name AND
+			  		rc.table_name=r.referenced_table_name)
+	WHERE c.table_schema = #{owner}
+</select>
+
+<select id="getData" >
+	SELECT * FROM ${owner}.${tableName}							
+	<if test="filters!=null and filters.length > 0">
+		WHERE <foreach item="filter" collection="filters" open="" separator=" AND " close="">
+		 ${filter.name} = #{filter.filter} </foreach>
+	</if>
+	<if test="orderByColumns!=null and orderByColumns.length > 0">
+		ORDER BY <foreach item="orderByColumn" collection="orderByColumns" open="" separator=", " close=""
+		> ${orderByColumn.column}<choose><when test="orderByColumn.ascending">ASC</when><otherwise>DESC</otherwise></choose></foreach>
+	</if>
+	LIMIT #{count} OFFSET #{fromRow} 
+</select>
+
+
+<!-- 
+			Oracle specific SQL for database details 
+-->
+
+
+<select id="getTablesDetails" >
+	SELECT 
+		all_tables.owner 		id_schema, 
+		all_tables.table_name   id_name, 
+		decode((SELECT 1 FROM all_objects ao WHERE ao.owner=all_tables.owner AND ao.object_name=all_tables.table_name AND ao.object_type='MATERIALIZED VIEW'),
+			1    ,  'matview',
+			'table'
+		) id_type,
+		last_analyzed,
+		tablespace_name,
+		partitioned,
+		( SELECT listagg(column_name, ', ') WITHIN GROUP (ORDER BY column_position)
+		  FROM all_part_key_columns 
+		  WHERE all_part_key_columns.owner=all_tables.owner 
+		  AND all_part_key_columns.name=all_tables.table_name) partitioning_keys,
+		temporary,
+		secondary,
+		nested,
+		row_movement
+	FROM all_tables
+	WHERE all_tables.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_tables.owner NOT LIKE 'APEX_%'
+	ORDER BY all_tables.owner, all_tables.table_name
+</select>
+
+<select id="getViewsDetails" >
+	SELECT 
+		all_views.owner 		id_schema, 
+		all_views.view_name   id_name, 
+		'view' id_type,
+		view_type,
+		superview_name,
+		editioning_view,
+		read_only
+	FROM all_views
+	WHERE all_views.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_views.owner NOT LIKE 'APEX_%'
+	ORDER BY all_views.owner, all_views.view_name
+</select>
+
+<select id="getMatViewsDetails" >
+	SELECT 
+		all_mviews.owner 		id_schema, 
+		all_mviews.mview_name   id_name, 
+		container_name,
+		updatable,
+		refresh_mode,
+		fast_refreshable,
+		last_refresh_type,
+		last_refresh_date,
+		staleness,
+		compile_state,
+		stale_since
+	FROM all_mviews
+	WHERE all_mviews.owner NOT IN ('SYS', 'SYSTEM', 'OUTLN', 'XDB', 'MDSYS', 'CTXSYS')
+	AND all_mviews.owner NOT LIKE 'APEX_%'
+	ORDER BY all_mviews.owner, all_mviews.mview_name
+</select>
+
+<select id="getSequencesDetails">
+	SELECT 
+		sequence_owner sequence_owner,
+		sequence_name sequence_name,
+		min_value min_value,
+		max_value max_value,
+		last_number current_value,
+		increment_by increment_by,
+		cycle_flag,
+		order_flag,
+		cache_size
+	from all_sequences
+	order by sequence_owner, sequence_name
+</select>
+
+<select id="getSchemasDetails" >
+	SELECT username schema_name,
+		DECODE(username, sys_context( 'userenv', 'current_schema' ), '1', '0') is_current,
+		user_id,
+		created
+	FROM ALL_USERS 
+</select>
+
+<select id="getTablespaceDetails" >
+	SELECT 
+		tablespace_name name,
+		status          status,
+		contents		contents,
+		block_size,
+		initial_extent,
+		next_extent,
+		min_extents,
+		max_extents,
+		max_size,
+		STATUS
+	FROM user_tablespaces 
+	ORDER BY 1
+</select>
+
+
+
+<!-- 
+		Oracle specific SQL for table details 
+-->
+
+<select id="getTableMiscellaneousDetails" >
+	select * from all_tables where owner=#{owner} and table_name=#{tableName}
+</select>
+
+<select id="getTableColumnsDetails" >
+	select 
+	column_name name,
+	data_type type,
+	data_length length,
+	data_precision precision,
+	data_scale scale,
+	data_default defaultValue,
+	nullable,
+	last_analyzed
+	from all_tab_columns where owner=#{owner} and table_name=#{tableName} order by column_id
+</select>
+
+<select id="getTablePartitioninKeysDetails" >
+	select 
+	column_name name
+	from all_part_key_columns where owner=#{owner} and name=#{tableName} 
+	order by column_position
+</select>
+
+<select id="getTableIndexesDetails" >
+	select  
+	  all_indexes.owner owner,
+	  all_indexes.index_name name,
+	  all_indexes.index_type type,
+	  all_indexes.uniqueness uniqueness,
+	  ( select LISTAGG(all_ind_columns.column_name, ',') WITHIN GROUP (ORDER BY column_position)
+	    from all_ind_columns where all_indexes.index_name=all_ind_columns.index_name and all_indexes.owner=all_ind_columns.index_owner
+	  )columns,
+	  all_indexes.tablespace_name tablespace,
+	  all_indexes.partitioned partitioning,
+      all_indexes.last_analyzed,
+	  all_indexes.logging,
+	  all_indexes.temporary,
+	  all_indexes.generated,
+	  all_indexes.secondary,
+	  all_indexes.dropped,
+	  all_indexes.visibility
+	  from all_indexes 
+	where all_indexes.table_name=#{tableName} and all_indexes.table_owner=#{owner}
+</select>
+
+<select id="getTableConstraintsDetails" >
+	select 
+	  constraint_name name,
+	  constraint_type type,
+	  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+	    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.constraint_name and all_cons_columns.owner=all_constraints.owner
+	  ) columns,
+      search_condition checkCondition,
+	  r_owner fkConstraintOwner,
+	  (  select table_name 
+	      from all_constraints ac2 
+	      where ac2.owner=all_constraints.r_owner and ac2.constraint_name=all_constraints.r_constraint_name
+	  ) fkTable,
+	  r_constraint_name fkConstraintName,
+	  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+	    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.r_constraint_name and all_cons_columns.owner=all_constraints.r_owner
+	  ) fkColumns,
+		delete_rule,
+		status,
+		index_owner,
+		index_name,
+		invalid
+	from all_constraints 
+	where owner=#{owner} and table_name=#{tableName}
+</select>
+
+<select id="getTablePartitionDetails" >
+	select 
+	partition_name name,
+	tablespace_name tablespace_name,
+	high_value high_value,
+	high_value_length high_value_length,
+	interval interval,
+	subpartition_count,
+	partition_position,
+	max_size
+	from all_tab_partitions
+	where table_owner=#{owner} and table_name=#{tableName}
+</select>
+
+<select id="getTableFks" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+	SELECT * FROM (
+		SELECT
+		   'toTheTable' fkDirection, 
+			constraint_name name,
+		  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
+		  ORDER BY position)
+		  FROM all_cons_columns
+		  WHERE all_cons_columns.constraint_name=all_constraints.constraint_name
+		  AND all_cons_columns.owner            =all_constraints.owner
+		  ) columns,
+		  owner || '.' || table_name fkTable,
+		  (SELECT LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (
+		  ORDER BY position)
+		  FROM all_cons_columns
+		  WHERE all_cons_columns.constraint_name=all_constraints.r_constraint_name
+		  AND all_cons_columns.owner            =all_constraints.r_owner
+		  ) fkColumns
+		
+		FROM all_constraints 
+		WHERE exists (
+		  select 1 
+		  from all_constraints ac3
+		  where ac3.owner = #{owner}
+		  and ac3.table_name = #{tableName}
+		  and ac3.owner = all_constraints.r_owner
+		  and ac3.constraint_name = all_constraints.r_constraint_name
+		)
+	UNION ALL
+		select 
+		   'fromTheTable' fkDirection, 
+		  constraint_name name,
+		  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+		    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.constraint_name and all_cons_columns.owner=all_constraints.owner
+		  ) columns,
+		  r_owner || '.' ||
+		  (  select table_name 
+		      from all_constraints ac2 
+		      where ac2.owner=all_constraints.r_owner and ac2.constraint_name=all_constraints.r_constraint_name
+		  ) fkTable,
+		  ( select LISTAGG(all_cons_columns.column_name, ',') WITHIN GROUP (ORDER BY position)
+		    from all_cons_columns where all_cons_columns.constraint_name=all_constraints.r_constraint_name and all_cons_columns.owner=all_constraints.r_owner
+		  ) fkColumns
+		from all_constraints 
+		where owner=#{owner} and table_name=#{tableName}
+		AND constraint_type = 'R'
+	)
+	ORDER BY fkDirection, name
+</select>
+
+</mapper>

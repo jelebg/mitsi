@@ -1,0 +1,89 @@
+{ 
+  "datasources" : {
+	  "BUBULLE-MYSQL" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for mysql",
+		"provider" : "mysql",
+		"driver" : "org.mariadb.jdbc.Driver",
+		"jdbcUrl" : "jdbc:mariadb://mitsitestserver:3306/mysql",
+		"user" : "test",
+		"password" : "test"
+	  },
+	  "BUBULLE-MYSQL-ON-TEST2" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for mysql",
+		"provider" : "mysql",
+		"driver" : "org.mariadb.jdbc.Driver",
+		"jdbcUrl" : "jdbc:mariadb://mitsitestserver:3306/mysql",
+		"user" : "test",
+		"password" : "test",
+		"connectSchema" : "test2"
+	  },
+	  "BUBULLE-MYSQL-ON-TEST" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for mysql",
+		"provider" : "mysql",
+		"driver" : "org.mariadb.jdbc.Driver",
+		"jdbcUrl" : "jdbc:mariadb://mitsitestserver:3306/mysql",
+		"user" : "test",
+		"password" : "test",
+		"connectSchema" : "test"
+	  },
+   	// comment test
+	  "LOCALHOST-TEST" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for anything",
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"user" : "test",
+		"password" : "test",
+		"connectSchema" : "TEST",
+		"pool" : {
+			initialSize      : 3,
+			minSize          : 0,
+			maxSize          : 10,
+			maxIdleTimeSec   : 10,
+			acquireIncrement : 1
+		}
+	  },
+	  "POSTGRE-TEST" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for postgre",
+		"provider" : "postgre",
+		"driver" : "org.postgresql.Driver",
+		"jdbcUrl" : "jdbc:postgresql://mitsitestserver:5432/pgsql_test",
+		"user" : "jebtest",
+		"password" : "jebtest"
+	  },
+	  "POSTGRE-TEST-ON-TEST2" :  {
+	    "userGroups" : [ "_public" ],
+		"description" : "the test datasource for postgre",
+		"provider" : "postgre",
+		"driver" : "org.postgresql.Driver",
+		"jdbcUrl" : "jdbc:postgresql://mitsitestserver:5432/pgsql_test",
+		"user" : "jebtest",
+		"password" : "jebtest",
+		"connectSchema" : "TEST2"
+	  },
+	  "LOCALHOST-XE2": {
+	    "userGroups" : [ "xe2", "guest" ],
+		"description" : "another test datasource", 
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"user" : "xe2",
+		"password" : "xe2"
+	  },
+	  "LOCALHOST-XE2-ON-TEST": {
+	    "userGroups" : [ "xe2" ],
+		"description" : "another test datasource", 
+		"provider" : "oracle_11g",
+		"driver" : "oracle.jdbc.driver.OracleDriver",
+		"jdbcUrl" : "jdbc:oracle:thin:@mitsitestserver:1521:XE",
+		"user" : "xe2",
+		"password" : "xe2",
+		"connectSchema" : "TEST"
+	  }
+  } 
+}

@@ -1,11 +1,11 @@
-package org.mitsi.datasources.mapper.oracle;
+package org.mitsi.datasources.mapper.mysql;
 
 import static org.mitsi.core.annotations.ColumnDisplayType.FK_DIRECTION;
 import static org.mitsi.core.annotations.ColumnDisplayType.NORMAL;
 import static org.mitsi.core.annotations.ColumnDisplayType.TABLE_LINK;
 
 import org.apache.ibatis.annotations.Param;
-import org.mitsi.core.annotations.DefaultOwnerIsConnectedUser;
+import org.mitsi.core.annotations.DefaultOwner;
 import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
 import org.mitsi.core.annotations.MitsiColumnTitles;
 import org.mitsi.core.annotations.MitsiColumnsAsRows;
@@ -14,9 +14,9 @@ import org.mitsi.core.annotations.MitsiProviderMapper;
 import org.mitsi.core.annotations.MitsiTableDetail;
 import org.mitsi.datasources.IMitsiMapper;
 
-@MitsiProviderMapper("oracle_11g")
-@DefaultOwnerIsConnectedUser
-public interface IOracleMapper extends IMitsiMapper {
+@MitsiProviderMapper("mysql")
+//@DefaultOwner("mysql")
+public interface IMySqlMapper extends IMitsiMapper {
 
 	// table details
 	@MitsiTableDetail(value="Miscellaneous", order=1)

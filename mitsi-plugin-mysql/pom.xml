@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mitsi</groupId>
+		<artifactId>mitsi</artifactId>
+		<version>0.0.5-SNAPSHOT</version>
+	</parent>
+	<artifactId>mitsi-plugin-mysql</artifactId>
+	<packaging>jar</packaging>
+	<name>Mitsi MySQL Plugin</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-core</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mariadb.jdbc</groupId>
+		    <artifactId>mariadb-java-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+			    <artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+			    <configuration>
+			        <archive>                   
+			            <manifest>
+			                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+			                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+			            </manifest>
+			        </archive>
+			    </configuration>
+			</plugin>
+		</plugins>
+ 	</build>
+</project>

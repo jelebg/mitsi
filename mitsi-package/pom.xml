@@ -24,6 +24,10 @@
 			<artifactId>mitsi-plugin-postgresql</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.mitsi</groupId>
+			<artifactId>mitsi-plugin-mysql</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>oracle-jdbc-driver</artifactId>
 			<version>1.0.0-repo</version>
