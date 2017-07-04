@@ -15,7 +15,6 @@ import org.mitsi.core.annotations.MitsiTableDetail;
 import org.mitsi.datasources.IMitsiMapper;
 
 @MitsiProviderMapper("mysql")
-//@DefaultOwner("mysql")
 public interface IMySqlMapper extends IMitsiMapper {
 
 	// table details
@@ -24,22 +23,18 @@ public interface IMySqlMapper extends IMitsiMapper {
 	void getTableMiscellaneousDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 	
 	@MitsiTableDetail(value="Columns", order=2)
-	@MitsiColumnTitles(value={ "", "", "", "", "", "Default value" })
 	void getTableColumnsDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	@MitsiTableDetail(value="Constraints", order=3)
 	void getTableConstraintsDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 	
 	@MitsiTableDetail(value="FK from/to this table", order=4)
-	@MitsiColumnTitles(value={ "direction", "name", "columns", "FK table", "FK columns" })
-	@MitsiColumnDisplayTypes(value={ FK_DIRECTION, NORMAL, NORMAL, TABLE_LINK })
+	@MitsiColumnTitles(value={ "direction", "name", "linked table", "columns", "FK columns" })
+	@MitsiColumnDisplayTypes(value={ FK_DIRECTION, NORMAL, TABLE_LINK })
 	void getTableFks(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	@MitsiTableDetail(value="Indexs", order=5)
 	void getTableIndexesDetails(@Param("owner") String owner, @Param("tableName") String tableName);
-
-	@MitsiTableDetail(value="Partition Key", order=6)
-	void getTablePartitioninKeysDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	@MitsiTableDetail(value="Partition", order=7)
 	void getTablePartitionDetails(@Param("owner") String owner, @Param("tableName") String tableName);
@@ -53,16 +48,10 @@ public interface IMySqlMapper extends IMitsiMapper {
 	@MitsiDatasourceDetail(value="Views", order=2)
 	void getViewsDetails();
 
-	@MitsiDatasourceDetail(value="Materialized views", order=3)
-	void getMatViewsDetails();
-
 	@MitsiDatasourceDetail(value="Schemas", order=4)
 	void getSchemasDetails();
 
 	@MitsiDatasourceDetail(value="Tablespaces", order=5)
 	void getTablespaceDetails();
-
-	@MitsiDatasourceDetail(value="Sequences", order=6)
-	void getSequencesDetails();
 	
 }

@@ -23,6 +23,7 @@ public interface IPostgreMapper extends IMitsiMapper {
 	void getTableConstraintsDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	@MitsiTableDetail(value="Foreign Keys", order=4)
+	// TODO : link pour la colonne des tables
 	void getTableFks(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	// datasource details

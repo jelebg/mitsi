@@ -31,8 +31,8 @@ public interface IOracleMapper extends IMitsiMapper {
 	void getTableConstraintsDetails(@Param("owner") String owner, @Param("tableName") String tableName);
 	
 	@MitsiTableDetail(value="FK from/to this table", order=4)
-	@MitsiColumnTitles(value={ "direction", "name", "columns", "FK table", "FK columns" })
-	@MitsiColumnDisplayTypes(value={ FK_DIRECTION, NORMAL, NORMAL, TABLE_LINK })
+	@MitsiColumnTitles(value={ "direction", "name", "linked table", "columns", "FK columns" })
+	@MitsiColumnDisplayTypes(value={ FK_DIRECTION, NORMAL, TABLE_LINK })
 	void getTableFks(@Param("owner") String owner, @Param("tableName") String tableName);
 
 	@MitsiTableDetail(value="Indexs", order=5)
