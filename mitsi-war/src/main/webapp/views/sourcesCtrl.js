@@ -152,6 +152,28 @@ angular.module('mitsiApp')
 	   return deferred.promise;
 	}
 	
+	$scope.computeRuleTest = function(rule, column) {
+		
+	}
+	
+	$scope.computeColumnLabelsTest = function(source) {
+		let rule = peg.parse("column.name LIKE '.*_FK AND NOT (column.name IN foreignKeys.columns)");
+		
+		for(let iObj=0; iObj!=source.objects.length; iObj++) {
+			let obj = source.objects[iObj];
+			
+			if(!obj.columns) {
+				continue;
+			}
+		
+			for(let i=0; i!=obj.columns.length; i++) {
+				let column = obj.columns[i];
+				
+				console.log(column.name + ":" + $scope.computeRuleTest(rule, column));
+			}
+		}
+	}
+	
 	$scope.computeColumnLabels = function(source) {
 		
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -221,6 +243,7 @@ angular.module('mitsiApp')
 				let column = obj.columns[i];
 				
 				let labels = [];
+				let labelsWarning = [];
 				let labelsComments = [ ];
 				let pkList = pkColumnNames[column.name];
 				if(pkList) {
@@ -249,10 +272,21 @@ angular.module('mitsiApp')
 						let fk = fkList[j];
 						$scope.pushUnique(labels, "FK");
 						labelsComments.push("Foreign Key constraint " + fk.constraint.name+(fk.position<=1?"":", column position in FK : #"+fk.position));
+						isFk = true;
+					}
+				}
+				else {
+					// TODO : potential FK mechanism to review
+					// TODO : afficher les FKs potentielles sur le graph 
+					// TODO : rendre le "_fk" parametrable
+					if(column.name.toLowerCase().endsWith("_fk")) {  
+						$scope.pushUnique(labelsWarning, "FK?");
+						labelsComments.push("Potential Foreign Key constraint ?");
 					}
 				}
 				
 				column.labels = labels.join(",");
+				column.labelsWarning = labelsWarning.join(",");
 				column.labelsComments = labelsComments;
 				
 			}
@@ -514,6 +548,14 @@ angular.module('mitsiApp')
 	
 	$scope.getLabelsForColumn = function(c) {
 		return c.labels;
+	}
+	
+	$scope.hasLabelsWarningForColumn = function(c) {
+		return c.labelsWarning && c.labelsWarning != "";
+	}
+	
+	$scope.getLabelsWarningForColumn = function(c) {
+		return c.labelsWarning;
 	}
 	
     $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument

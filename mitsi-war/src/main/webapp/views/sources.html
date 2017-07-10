@@ -1,4 +1,3 @@
-<html>
 <head>
 
   <script type="text/ng-template" id="popover.refresh.html">
@@ -211,6 +210,7 @@
 							 >
 							<table><tr><td style="width:23px">
 								<span ng-if="hasLabelsForColumn(c)" class="columnAttributeLabel" >{{ getLabelsForColumn(c) }}</span>
+								<span ng-if="hasLabelsWarningForColumn(c)" class="columnAttributeLabelWarning" >{{ getLabelsWarningForColumn(c) }}</span>
 							</td><td>
 								&nbsp;{{ c.name }}
 							</td></tr></table>

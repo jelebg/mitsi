@@ -321,7 +321,16 @@
 	font-size:70%;
 	border:solid 1px grey;
 }
-
+.columnAttributeLabelWarning {
+	color:white;
+	background-color:#eb9649;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	border-radius:2px;
+	font-size:70%;
+	border:solid 1px grey;
+}
 .tableActionLabel {
 	background-color:grey;
 	font-weight:bold;
