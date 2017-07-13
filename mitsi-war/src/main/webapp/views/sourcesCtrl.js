@@ -152,29 +152,151 @@ angular.module('mitsiApp')
 	   return deferred.promise;
 	}
 	
-	$scope.computeRuleTest = function(rule, column) {
+	$scope.computeRule = function(rule, column, variables, collections) {
+		if(rule.literal || rule.name) {
+			throw "cannot evaluate literal or expression outside of expression";
+		}
+		
+		if(rule.operator == "NOT") {
+			return ! $scope.computeRule(rule.expression, column, variables, collections);
+		}
+		else if(rule.operator == "AND") {
+			let leftResult = $scope.computeRule(rule.left, column, variables, collections);
+			if(leftResult == false) {
+				return leftResult;
+			}
+			let rightResult = $scope.computeRule(rule.right, column, variables, collections);
+			return leftResult && rightResult;
+		}
+		else if(rule.operator == "OR") {
+			let leftResult = $scope.computeRule(rule.left, column, variables, collections);
+			// don't eval the right hand side if not necessary
+			if(leftResult == true) {
+				return leftResult;
+			}
+			let rightResult = $scope.computeRule(rule.right, column, variables, collections);
+			return leftResult || rightResult;
+		}
+		else if(rule.operator == "LIKE") {
+			if(!rule.right.literal) {
+				throw "right-hand side of LIKE is not a litteral"; 
+			}
+			if(!rule.left.name) {
+				throw "left-hand side of LIKE is not a variable name"; 
+			}
+			lhsValue = variables[rule.left.value];
+			if(!lhsValue) {
+				throw rule.left.value+" is undefined"; 
+			}
+			let regex = rule.regex;
+			if(!regex) {
+				regex = new RegExp(rule.right.value);
+				rule.regex = regex;
+			}
+			
+			return regex.test(lhsValue);
+		}
+		else if(rule.operator == "IN") {
+			if(!rule.right.name) {
+				throw "right-hand side of IN is not a collection name"; 
+			}
+			let collection = collections[rule.right.value];
+			if(!collection) {
+				throw "collection "+rule.right.value+" does not exist"; 
+			}
+			let lhsValue = null;
+			if(rule.left.name) {
+				lhsValue = variables[rule.left.value];
+				if(!lhsValue) {
+					throw rule.left.value+" is undefined"; 
+				}
+			}
+			else if(rule.left.literal) {
+				lhsValue = rule.left.value;
+			}
+			else {
+				throw "unknown lhs type";
+			}
+			return collection[lhsValue] != null;
+		}
+		else if(rule.operator == "==") {
+			return $scope.computeRuleEquality(rule, column, variables, collections);
+		}
+		else if(rule.operator == "!=") {
+			return !$scope.computeRuleEquality(rule, column, variables, collections);
+		}
 		
 	}
 	
-	$scope.computeColumnLabelsTest = function(source) {
-		let rule = peg.parse("column.name LIKE '.*_FK AND NOT (column.name IN foreignKeys.columns)");
+	$scope.computeRuleEquality = function(rule, column, variables, collections) {
+		if(!rule.right.literal && !rule.right.name) {
+			throw "right-hand side of LIKE is not a litteral or a variable name"; 
+		}
+		if(!rule.left.literal && !rule.left.name) {
+			throw "left-hand side of LIKE is not a litteral or a variable name"; 
+		}
 		
-		for(let iObj=0; iObj!=source.objects.length; iObj++) {
-			let obj = source.objects[iObj];
-			
-			if(!obj.columns) {
-				continue;
-			}
-		
-			for(let i=0; i!=obj.columns.length; i++) {
-				let column = obj.columns[i];
-				
-				console.log(column.name + ":" + $scope.computeRuleTest(rule, column));
+		let lhsValue = null;
+		if(rule.left.name) {
+			lhsValue = variables[rule.left.value];
+			if(!lhsValue) {
+				throw rule.left.value+" is undefined"; 
 			}
 		}
+		else {
+			lhsValue = rule.left.value;
+		}
+		
+		let rhsValue = null;
+		if(rule.right.name) {
+			rhsValue = variables[rule.right.value];
+			if(!rhsValue) {
+				throw rule.right.value+" is undefined"; 
+			}
+		}
+		else {
+			rhsValue = rule.right.value;
+		}
+
+		return lhsValue.toUpperCase() == rhsValue.toUpperCase();
 	}
 	
 	$scope.computeColumnLabels = function(source) {
+		// TODO : rules a mettre dans un fichier de conf
+		rules = [
+		         { "label":"PK",
+			       "rule": "column.fullName in primaryKeys.columns",
+			       "comment":"Primary Key (constraint : ${pk.constraint.name}(column position in PK : #${pk.position})"
+			     },
+		         { "label":"UK",
+			       "rule": "column.fullName IN uniqueContraints.columns AND NOT column.fullName IN primaryKeys.columns",
+			       "comment":"Unique constraint indexed by ${index.index.name}(position in index : #${index.position})"
+			     },
+		         { "label":"FK", 
+			       "rule": "column.fullName IN foreignKeys.columns",
+			       "comment":"Foreign Key constraint ${fk.constraint.name}(column position in FK : #${fk.position})"
+			     },		         
+		         { "label":"I",
+			       "rule": "column.fullName IN index.columns AND NOT column.fullName IN primaryKeys.columns",
+			       "comment":"Indexed by ${index.index.name}(position in index : #${index.position})"   
+				 },		         
+		         { "labelWarning":"FK?",
+			       "rule": "column.fullName LIKE '.*_FK' AND NOT column.fullName IN foreignKeys.columns",
+			       "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
+			     },		         
+		         { "labelWarning":"I?", // cette règle est peut-être un peu trop stricte
+			       "rule": "column.fullName IN foreignKeys.columns AND NOT column.fullName IN index.columns",
+			       "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
+				 }         
+		        ];
+		
+		let parsedRules = [];
+		let collections = {};
+		$scope.computeColumnCollections(source, collections);
+
+		for(let i=0; i!=rules.length; i++) {
+			parsedRules[i] = peg.parse(rules[i].rule);
+		}
 		
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
 			let obj = source.objects[iObj];
@@ -182,10 +304,65 @@ angular.module('mitsiApp')
 			if(!obj.columns) {
 				continue;
 			}
+
+			for(let i=0; i!=obj.columns.length; i++) {
+				let column = obj.columns[i];
+				
+				// TODO : penser a charger les fk des autres schémas ? est-ce que c'est possible ? est-ce que c'est utile ?
+				
+				let variables = { 
+					"column.fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
+					"column.shortName" : column.name
+				};
+
+				let labels = [];
+				let labelsWarning = [];
+				let labelsComments = [ ];
+				
+				for(let iRule=0; iRule!=rules.length; iRule	++) {
+					let rule = rules[iRule];
+					let parsedRule = parsedRules[iRule];
+
+					let result = $scope.computeRule(parsedRule, column, variables, collections);
+					if(result) { 
+						if(rule.label) { 
+							labels.push(rule.label);
+						}
+						if(rule.labelWarning) {
+							labelsWarning.push(rule.labelWarning);
+						}
+						if(rule.comment) {
+							labelsComments.push(rule.comment);
+						}
+					}
+				}
+				
+				column.labels = labels.join(",");
+				column.labelsWarning = labelsWarning.join(",");
+				column.labelsComments = labelsComments;
+			}
+		}
 			
-			let fkColumnNames = {};
-			let pkColumnNames = {};
-			let indexedColumnNames = {};
+	}
+
+	$scope.computeColumnCollections = function(source, collections) {
+		
+		let fkColumnNames = {};
+		let pkColumnNames = {};
+		let ukColumnNames = {};
+		let indexedColumnNames = {};
+		collections["foreignKeys.columns"] = fkColumnNames;
+		collections["primaryKeys.columns"] = pkColumnNames;
+		collections["uniqueContraints.columns"] = ukColumnNames;
+		collections["index.columns"] = indexedColumnNames;
+
+		for(let iObj=0; iObj!=source.objects.length; iObj++) {
+			let obj = source.objects[iObj];
+			
+			if(!obj.columns) {
+				continue;
+			}
+			
 			
 			if(obj.indexes) {
 				for(let i=0; i!=obj.indexes.length; i++) {
@@ -196,12 +373,22 @@ angular.module('mitsiApp')
 					
 					let cols = index.columns.split(",");
 					for(let c=0; c!=cols.length; c++) {
-						let current = indexedColumnNames[cols[c]];
+						let columnName = cols[c];
+						let columnFullName = source.currentSchemaName+"."+obj.id.name+"."+columnName;
+						let current = indexedColumnNames[columnFullName];
 						if(!current) {
 							current = [];
-							indexedColumnNames[cols[c]] = current;
+							indexedColumnNames[columnFullName] = current;
 						}
 						current.push({"index":index, "position":c+1});
+						if(index.uniqueness == 't') {
+							let ukCurrent = ukColumnNames[columnFullName];
+							if(!ukCurrent) {
+								ukCurrent = [];
+								ukColumnNames[columnFullName] = ukCurrent;
+							}
+							ukCurrent.push({"index":index, "position":c+1});
+						}
 					}
 				}
 			}
@@ -219,80 +406,28 @@ angular.module('mitsiApp')
 					
 					let cols = constraint.columns.split(",");
 					for(let c=0; c!=cols.length; c++) {
+						let columnName = cols[c];
+						let columnFullName = source.currentSchemaName+"."+obj.id.name+"."+columnName;
+
 						let current = null;
 						if(constraint.type == "R") {
-							current = fkColumnNames[cols[c]];
+							current = fkColumnNames[columnFullName];
 							if(!current) {
 								current = [];
-								fkColumnNames[cols[c]] = current;
+								fkColumnNames[columnFullName] = current;
 							}
 						}
 						else {
-							current = pkColumnNames[cols[c]];
+							current = pkColumnNames[columnFullName];
 							if(!current) {
 								current = [];
-								pkColumnNames[cols[c]] = current;
+								pkColumnNames[columnFullName] = current;
 							}
 						}
 						current.push({"constraint":constraint, "position":c+1});
 					}
 				}
 			}
-			
-			for(let i=0; i!=obj.columns.length; i++) {
-				let column = obj.columns[i];
-				
-				let labels = [];
-				let labelsWarning = [];
-				let labelsComments = [ ];
-				let pkList = pkColumnNames[column.name];
-				if(pkList) {
-					for(let j=0; j!=pkList.length; j++) {
-						let pk = pkList[j];
-						column.isPk = true;
-						$scope.pushUnique(labels, "PK");
-						labelsComments.push("Primary Key (constraint : "+pk.constraint.name+(pk.position<=1?"":", column position in PK : #"+pk.position)+")");
-					}
-				}
-				
-				let indexList = indexedColumnNames[column.name];
-				if(indexList) {
-					for(let j=0; j!=indexList.length; j++) {
-						let index = indexList[j];
-						if(!column.isPk) {
-							$scope.pushUnique(labels, (index.index.uniqueness=='t' ? "UK" : "I"));
-						}
-						labelsComments.push("Indexed by " + index.index.name + (index.position<=1?"":"(position in index : #"+index.position+")"));
-					}
-				}
-				
-				fkList = fkColumnNames[column.name];
-				if(fkList) {
-					for(let j=0; j!=fkList.length; j++) {
-						let fk = fkList[j];
-						$scope.pushUnique(labels, "FK");
-						labelsComments.push("Foreign Key constraint " + fk.constraint.name+(fk.position<=1?"":", column position in FK : #"+fk.position));
-						isFk = true;
-					}
-				}
-				else {
-					// TODO : potential FK mechanism to review
-					// TODO : afficher les FKs potentielles sur le graph 
-					// TODO : rendre le "_fk" parametrable
-					if(column.name.toLowerCase().endsWith("_fk")) {  
-						$scope.pushUnique(labelsWarning, "FK?");
-						labelsComments.push("Potential Foreign Key constraint ?");
-					}
-				}
-				
-				column.labels = labels.join(",");
-				column.labelsWarning = labelsWarning.join(",");
-				column.labelsComments = labelsComments;
-				
-			}
-			
-			
-			
 		}
 	}
 	
@@ -306,8 +441,6 @@ angular.module('mitsiApp')
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.currentSchemaName = null;
-		  
-		  $scope.computeColumnLabels(source);
 		  
 		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {
@@ -327,9 +460,14 @@ angular.module('mitsiApp')
 				  constraintName:true,
 				  exclusion:"^(.*\\$|SYS_)"
 		  };
+		  
+		  let startMs = new Date().getTime();
+		  $scope.computeColumnLabels(source);
+		  let endMs = new Date().getTime();
+		  console.log("rule applying time : " + (endMs-startMs)+"ms");
+		  
 		  $scope.initGraph(source);
 		  
-
 	}
 	
 	$scope.initGraph = function(datasource) {

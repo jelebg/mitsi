@@ -208,7 +208,7 @@
 							ng-mouseenter="currentColumn=c"
 							ng-mouseleave="currentColumn=null"
 							 >
-							<table><tr><td style="width:23px">
+							<table><tr><td style="width:23px;white-space:nowrap;">
 								<span ng-if="hasLabelsForColumn(c)" class="columnAttributeLabel" >{{ getLabelsForColumn(c) }}</span>
 								<span ng-if="hasLabelsWarningForColumn(c)" class="columnAttributeLabelWarning" >{{ getLabelsWarningForColumn(c) }}</span>
 							</td><td>
