@@ -294,6 +294,12 @@ angular.module('mitsiApp')
 		let collections = {};
 		$scope.computeColumnCollections(source, collections);
 
+		let variables = {
+				"source.name" : source.name,
+				"source.provider" : source.dbProvider,
+				"source.currentSchema" : source.currentSchemaName
+		};
+		
 		for(let i=0; i!=rules.length; i++) {
 			parsedRules[i] = peg.parse(rules[i].rule);
 		}
@@ -305,21 +311,18 @@ angular.module('mitsiApp')
 				continue;
 			}
 
+			variables["table.type"] = obj.id.type;
+			variables["table.fullName"] = source.currentSchemaName+"."+obj.id.name;
+			variables["table.shortName"] = obj.id.name;
+
+			
 			for(let i=0; i!=obj.columns.length; i++) {
 				let column = obj.columns[i];
 				
 				// TODO : penser a charger les fk des autres schémas ? est-ce que c'est possible ? est-ce que c'est utile ?
 				
-				let variables = { 
-					"source.name" : source.name,
-					"source.provider" : source.dbProvider,
-					"source.currentSchema" : source.currentSchemaName,
-					"table.type" : obj.id.type,
-					"table.fullName" : source.currentSchemaName+"."+obj.id.name,
-					"table.shortName" : obj.id.name,
-					"column.fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
-					"column.shortName" : column.name
-				};
+				variables["column.fullName"] = source.currentSchemaName+"."+obj.id.name+"."+column.name;
+				variables["column.shortName"] = column.name;
 
 				let labels = [];
 				let labelsWarning = [];
