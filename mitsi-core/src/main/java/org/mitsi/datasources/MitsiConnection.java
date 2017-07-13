@@ -163,6 +163,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return mapper.testOK();
 	}
 	
+	public String getProviderName() {
+		return datasource.getProvider();
+	}
+	
 	private String getOwner(String owner) {
 		if(owner == null) {
 			if(datasource.getConnectSchema() != null) {

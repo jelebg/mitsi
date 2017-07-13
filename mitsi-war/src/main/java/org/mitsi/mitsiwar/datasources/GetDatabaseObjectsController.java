@@ -29,6 +29,7 @@ class GetDatabaseObjects {
 class GetDatabaseObjectsResponse {
 	List<DatabaseObject> databaseObjects;
 	List<Schema> schemas;
+	String provider;
 	
 	public GetDatabaseObjectsResponse() {}
 }
@@ -53,7 +54,7 @@ public class GetDatabaseObjectsController extends MitsiRestController {
 			}
 			
 			response.databaseObjects = connection.getTablesAndViews(schema);
-			
+			response.provider = connection.getProviderName();
 		} 
 		catch(Exception e) {
 			log.error("could not connect to database : "+request.datasourceName, e);

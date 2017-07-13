@@ -311,6 +311,12 @@ angular.module('mitsiApp')
 				// TODO : penser a charger les fk des autres schémas ? est-ce que c'est possible ? est-ce que c'est utile ?
 				
 				let variables = { 
+					"source.name" : source.name,
+					"source.provider" : source.dbProvider,
+					"source.currentSchema" : source.currentSchemaName,
+					"table.type" : obj.id.type,
+					"table.fullName" : source.currentSchemaName+"."+obj.id.name,
+					"table.shortName" : obj.id.name,
 					"column.fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
 					"column.shortName" : column.name
 				};
@@ -440,6 +446,7 @@ angular.module('mitsiApp')
 	$scope.initSource = function(source, response) {
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
+		  source.dbProvider = response.data.provider;
 		  source.currentSchemaName = null;
 		  
 		  if(source.schemas) {
