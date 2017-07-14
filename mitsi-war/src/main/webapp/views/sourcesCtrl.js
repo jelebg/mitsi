@@ -152,29 +152,32 @@ angular.module('mitsiApp')
 	   return deferred.promise;
 	}
 	
-	$scope.computeRule = function(rule, column, variables, collections) {
+	$scope.computeRule = function(rule, column, variables, collections, labels) {
 		if(rule.literal || rule.name) {
 			throw "cannot evaluate literal or expression outside of expression";
 		}
 		
+		if(rule.operator == "LABELLED") {
+			return labels.indexOf(rule.label)>=0;
+		}
 		if(rule.operator == "NOT") {
-			return ! $scope.computeRule(rule.expression, column, variables, collections);
+			return ! $scope.computeRule(rule.expression, column, variables, collections, labels);
 		}
 		else if(rule.operator == "AND") {
-			let leftResult = $scope.computeRule(rule.left, column, variables, collections);
+			let leftResult = $scope.computeRule(rule.left, column, variables, collections, labels);
 			if(leftResult == false) {
 				return leftResult;
 			}
-			let rightResult = $scope.computeRule(rule.right, column, variables, collections);
+			let rightResult = $scope.computeRule(rule.right, column, variables, collections, labels);
 			return leftResult && rightResult;
 		}
 		else if(rule.operator == "OR") {
-			let leftResult = $scope.computeRule(rule.left, column, variables, collections);
+			let leftResult = $scope.computeRule(rule.left, column, variables, collections, labels);
 			// don't eval the right hand side if not necessary
 			if(leftResult == true) {
 				return leftResult;
 			}
-			let rightResult = $scope.computeRule(rule.right, column, variables, collections);
+			let rightResult = $scope.computeRule(rule.right, column, variables, collections, labels);
 			return leftResult || rightResult;
 		}
 		else if(rule.operator == "LIKE") {
@@ -220,15 +223,15 @@ angular.module('mitsiApp')
 			return collection[lhsValue] != null;
 		}
 		else if(rule.operator == "==") {
-			return $scope.computeRuleEquality(rule, column, variables, collections);
+			return $scope.computeRuleEquality(rule, column, variables, collections, labels);
 		}
 		else if(rule.operator == "!=") {
-			return !$scope.computeRuleEquality(rule, column, variables, collections);
+			return !$scope.computeRuleEquality(rule, column, variables, collections, labels);
 		}
 		
 	}
 	
-	$scope.computeRuleEquality = function(rule, column, variables, collections) {
+	$scope.computeRuleEquality = function(rule, column, variables, collections, labels) {
 		if(!rule.right.literal && !rule.right.name) {
 			throw "right-hand side of LIKE is not a litteral or a variable name"; 
 		}
@@ -269,7 +272,7 @@ angular.module('mitsiApp')
 			       "comment":"Primary Key (constraint : ${pk.constraint.name}(column position in PK : #${pk.position})"
 			     },
 		         { "label":"UK",
-			       "rule": "column.fullName IN uniqueContraints.columns AND NOT column.fullName IN primaryKeys.columns",
+			       "rule": "column.fullName IN uniqueContraints.columns AND NOT LABELLED 'PK'",
 			       "comment":"Unique constraint indexed by ${index.index.name}(position in index : #${index.position})"
 			     },
 		         { "label":"FK", 
@@ -277,15 +280,15 @@ angular.module('mitsiApp')
 			       "comment":"Foreign Key constraint ${fk.constraint.name}(column position in FK : #${fk.position})"
 			     },		         
 		         { "label":"I",
-			       "rule": "column.fullName IN index.columns AND NOT column.fullName IN primaryKeys.columns",
+			       "rule": "column.fullName IN index.columns AND NOT LABELLED 'PK'",
 			       "comment":"Indexed by ${index.index.name}(position in index : #${index.position})"   
 				 },		         
 		         { "labelWarning":"FK?",
-			       "rule": "column.fullName LIKE '.*_FK' AND NOT column.fullName IN foreignKeys.columns",
+			       "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK'",
 			       "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
 			     },		         
 		         { "labelWarning":"I?", // cette règle est peut-être un peu trop stricte
-			       "rule": "column.fullName IN foreignKeys.columns AND NOT column.fullName IN index.columns",
+			       "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
 			       "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
 				 }         
 		        ];
@@ -332,7 +335,7 @@ angular.module('mitsiApp')
 					let rule = rules[iRule];
 					let parsedRule = parsedRules[iRule];
 
-					let result = $scope.computeRule(parsedRule, column, variables, collections);
+					let result = $scope.computeRule(parsedRule, column, variables, collections, labels);
 					if(result) { 
 						if(rule.label) { 
 							labels.push(rule.label);
