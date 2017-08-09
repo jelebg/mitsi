@@ -34,7 +34,7 @@
 
 <select id="getAllSchemas" resultMap="SchemaResultMap" fetchSize="2000">
 	SELECT schema_name,
-	CASE schema_name WHEN 'public' THEN '1' ELSE '0' END is_current 
+	CASE schema_name WHEN #{owner} THEN '1' ELSE '0' END is_current 
 	FROM information_schema.schemata;
 </select>
 
