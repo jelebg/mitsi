@@ -10,7 +10,7 @@ public class MitsiDatasource {
 	private static final int DEFAULT_POOL_INITIAL_SIZE      = 0;
 	private static final int DEFAULT_POOL_MIN_SIZE          = 0;
 	private static final int DEFAULT_POOL_MAX_SIZE          = 5;
-	private static final int DEFAULT_POOL_MAX_IDLE_TIME_SEC = 3600;
+	private static final int DEFAULT_POOL_MAX_IDLE_TIME_SEC = 600;
 	private static final int DEFAULT_POOL_ACQUIRE_INCREMENT = 1;
 	
 	private String name;
