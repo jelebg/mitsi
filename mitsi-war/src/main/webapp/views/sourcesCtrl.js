@@ -16,10 +16,12 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.initSearchFilters = function() {
-		$scope.searchSource = localStorage.getItem("source_searchSource");
+		let saved = localStorage.getItem("source_searchSource");
+		$scope.searchSource = saved ? saved : "";
 		
 		$scope.$watch("searchSource", function() {
-			localStorage.setItem("source_searchSource", $scope.searchSource);
+			let tosave = $scope.searchSource;
+			localStorage.setItem("source_searchSource", tosave ? tosave : "");
 		});
 	}
 	
