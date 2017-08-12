@@ -156,11 +156,12 @@ angular.module('mitsiApp')
 	
 	$scope.computeColumnLabels = function(source) {
 		// TODO : rules a mettre dans un fichier de conf
+		// TODO : rules a simplifier en mettant des custom variables
 		rules = [
 		         { "label":"PK",
-			       "rule": "column.fullName in primaryKeys.columns",
-			       "comment":"Primary Key (constraint(s) : ${primaryKeys.columns[column.fullName].constraint.name}, column position in PK : ${primaryKeys.columns[column.fullName].position})"
-			     },
+			       "rule": "pkColumn:(column.fullName in primaryKeys.columns)",
+			       "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
+		         },
 		         { "label":"UK",
 			       "rule": "column.fullName IN uniqueContraints.columns AND NOT LABELLED 'PK'",
 			       "comment":"Unique constraint indexed by ${uniqueContraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"
@@ -177,24 +178,24 @@ angular.module('mitsiApp')
 			       "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK'",
 			       "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
 			     },		         
-		         { "labelWarning":"I?", // cette règle est peut-être un peu trop stricte
+		         { "labelWarning":"I?", // TODO cette règle est peut-être un peu trop stricte
 			       "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
 			       "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
-				 }         
+				 } 
 		        ];
 		
-		let collections = {};
-		$scope.computeColumnCollections(source, collections);
-
 		let variables = {
-				"source.name" : source.name,
-				"source.provider" : source.dbProvider,
-				"source.currentSchema" : source.currentSchemaName
+			"source": {
+				"name"          : source.name,
+				"provider"      : source.dbProvider,
+				"currentSchema" : source.currentSchemaName
+			}
 		};
-		
+		$scope.computeColumnCollections(source, variables);
+
 		for(let i=0; i!=rules.length; i++) {
 			rules[i].parsedRule = peg.parse(rules[i].rule);
-			rules[i].commentParts = getVariableStringParts(rules[i].comment);
+			rules[i].commentParts = getVariableStringParts(pegVariables, rules[i].comment);
 		}
 		
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -204,22 +205,26 @@ angular.module('mitsiApp')
 				continue;
 			}
 
-			variables["table.type"] = obj.id.type;
-			variables["table.fullName"] = source.currentSchemaName+"."+obj.id.name;
-			variables["table.shortName"] = obj.id.name;
+			variables["table"] = {
+			        "type"     : obj.id.type,
+					"fullName" : source.currentSchemaName+"."+obj.id.name,
+					"shortName": obj.id.name
+			}
 
 			
 			for(let i=0; i!=obj.columns.length; i++) {
 				let column = obj.columns[i];
 				
-				variables["column.fullName"] = source.currentSchemaName+"."+obj.id.name+"."+column.name;
-				variables["column.shortName"] = column.name;
+				variables["column"] = {
+						"fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
+						"shortName": column.name
+				};
 
 				let labels = [];
 				let labelsWarning = [];
 				let labelsComments = [ ];
 				
-				$scope.computeRules(rules, variables, collections, labels, labelsWarning, labelsComments);
+				$scope.computeRules(rules, variables, labels, labelsWarning, labelsComments);
 				
 				column.labels = labels.join(",");
 				column.labelsWarning = labelsWarning.join(",");
@@ -229,12 +234,13 @@ angular.module('mitsiApp')
 			
 	}
 	
-	$scope.computeRules = function(rules, variables, collections, labels, labelsWarning, labelsComments) {
+	$scope.computeRules = function(rules, variables, labels, labelsWarning, labelsComments) {
 		for(let iRule=0; iRule!=rules.length; iRule	++) {
 			let rule = rules[iRule];
 			let parsedRule = rule.parsedRule;
 
-			let result = ruleCompute(parsedRule, variables, collections, labels);
+			// TODO : cleanup custom variables each time (is it really necessary ?)
+			let result = ruleCompute(parsedRule, variables, labels);
 			if(result) { 
 				if(rule.label) { 
 					labels.push(rule.label);
@@ -243,7 +249,7 @@ angular.module('mitsiApp')
 					labelsWarning.push(rule.labelWarning);
 				}
 				if(rule.comment) {
-					let comment = computeVariableString(rule.commentParts, variables, collections);
+					let comment = computeVariableString(rule.commentParts, variables);
 					labelsComments.push(comment);
 				}
 			}
@@ -257,10 +263,18 @@ angular.module('mitsiApp')
 		let pkColumnNames = {};
 		let ukColumnNames = {};
 		let indexedColumnNames = {};
-		collections["foreignKeys.columns"] = fkColumnNames;
-		collections["primaryKeys.columns"] = pkColumnNames;
-		collections["uniqueContraints.columns"] = ukColumnNames;
-		collections["index.columns"] = indexedColumnNames;
+		collections["foreignKeys"] = {
+				"columns" : fkColumnNames
+		}
+		collections["primaryKeys"] = {
+				"columns" : pkColumnNames
+		}
+		collections["uniqueContraints"] = {
+				"columns" : ukColumnNames
+		}
+		collections["index"] = {
+				"columns" : indexedColumnNames
+		}
 
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
 			let obj = source.objects[iObj];
