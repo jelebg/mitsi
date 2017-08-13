@@ -12,3 +12,15 @@ function getAbsoluteXY(element) {
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
+
+function nullSavePushToArrayInCollection(collection, index, element) {
+	let array = collection[index];
+	if(array == null) {
+		array = [];
+		array.push(element);
+		collection[index] = array;
+	}
+	else {
+		array.push(element);
+	}
+}

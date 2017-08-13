@@ -7,9 +7,19 @@ function ruleCompute(rule, variables, labels) {
 	}
 	
 	if(rule.operator == "LABELLED") {
-		return labels.indexOf(rule.label)>=0;
+	    for (let labelsType in labels) {
+		    if (!labels.hasOwnProperty(labelsType) ) {
+		    	continue;
+		    }
+		    
+		    if (labels[labelsType].indexOf(rule.label)>=0) {
+		    	return true;
+		    }
+		}              
+		
+		return false;
 	}
-	if(rule.operator == "NOT") {
+	else if(rule.operator == "NOT") {
 		return ! ruleCompute(rule.expression, variables, labels);
 	}
 	else if(rule.operator == "AND") {
@@ -46,7 +56,22 @@ function ruleCompute(rule, variables, labels) {
 			rule.regex = regex;
 		}
 		
-		return regex.test(lhsValue);
+		let regexExec = regex.exec(lhsValue);
+		
+		if (rule.storeResultInVariable) {
+			let tostore = null;
+			if (regexExec!=null) {
+				// TODO : eviter d'écraser les variables built-in mitsi
+				// TODO : marquer la variable comme custom pour pouvoir l'écraser ensuite
+				tostore = {};
+				for (let i=0; i!=regexExec.length; i++) {
+					tostore["group"+i] = regexExec[i];
+				}
+			}				
+			variables[rule.storeResultInVariable] = tostore;
+		}
+		
+		return regexExec != null;
 	}
 	else if(rule.operator == "IN") {
 		if(!rule.right.name) {
@@ -74,7 +99,7 @@ function ruleCompute(rule, variables, labels) {
 		if (rule.storeResultInVariable) {
 			// TODO : eviter d'écraser les variables built-in mitsi
 			// TODO : marquer la variable comme custom pour pouvoir l'écraser ensuite
-			variables[rule.storeResultInVariable] = ret;
+			variables[rule.storeResultInVariable] = ret ? ret : null;
 		} 
 		return ret != null;
 	}

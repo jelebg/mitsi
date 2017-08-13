@@ -176,14 +176,19 @@ angular.module('mitsiApp')
 			       "rule": "column.fullName IN index.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
 			       "comment":"Indexed by ${index.columns[column.fullName].index.owner}.${index.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"   
 				 },		         
-		         { "labelWarning":"FK?",
-			       "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK'",
-			       "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
+		         { "labelWarning":"FK??",
+		           "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
+ 	        	   "relationToTable" : "${prefix.group1}",
+			       "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"   
 			     },		         
+		         { "labelWarning":"FK?",
+					"rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK' AND NOT LABELLED 'FK??'",
+				   "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
+				 },		         
 		         { "labelWarning":"I?", // TODO cette règle est peut-être un peu trop stricte
 			       "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
 			       "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
-				 } 
+				 }
 		        ];
 		
 		let variables = {
@@ -222,21 +227,23 @@ angular.module('mitsiApp')
 						"shortName": column.name
 				};
 
-				let labels = [];
-				let labelsWarning = [];
+				let labels = {
+						"normal"   : [],
+						"warning"  : []
+				}
 				let labelsComments = [ ];
+
+				$scope.computeRules(rules, variables, labels, labelsComments);
 				
-				$scope.computeRules(rules, variables, labels, labelsWarning, labelsComments);
-				
-				column.labels = labels.join(",");
-				column.labelsWarning = labelsWarning.join(",");
+				column.labels = labels.normal.join(",");
+				column.labelsWarning = labels.warning.join(",");
 				column.labelsComments = labelsComments;
 			}
 		}
 			
 	}
 	
-	$scope.computeRules = function(rules, variables, labels, labelsWarning, labelsComments) {
+	$scope.computeRules = function(rules, variables, labels, labelsComments) {
 		for(let iRule=0; iRule!=rules.length; iRule	++) {
 			let rule = rules[iRule];
 			let parsedRule = rule.parsedRule;
@@ -245,10 +252,10 @@ angular.module('mitsiApp')
 			let result = ruleCompute(parsedRule, variables, labels);
 			if(result) { 
 				if(rule.label) { 
-					labels.push(rule.label);
+					labels.normal.push(rule.label);
 				}
 				if(rule.labelWarning) {
-					labelsWarning.push(rule.labelWarning);
+					labels.warning.push(rule.labelWarning);
 				}
 				if(rule.comment) {
 					let comment = computeVariableString(rule.commentParts, variables);
@@ -260,11 +267,13 @@ angular.module('mitsiApp')
 	}
 
 	$scope.computeColumnCollections = function(source, collections) {
-		
+		// TODO : gérer la case-insensitivity en ne stockant que des majuscules ?
 		let fkColumnNames = {};
 		let pkColumnNames = {};
 		let ukColumnNames = {};
 		let indexedColumnNames = {};
+		let tablesByShortName  = {};
+		let tablesByFullName   = {};
 		collections["foreignKeys"] = {
 				"columns" : fkColumnNames
 		}
@@ -277,14 +286,24 @@ angular.module('mitsiApp')
 		collections["index"] = {
 				"columns" : indexedColumnNames
 		}
+		collections["tables"] = {
+				"byShortName" : tablesByShortName,
+				"byFullName"  : tablesByFullName
+		}
 
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
 			let obj = source.objects[iObj];
 			
+			let table = {
+				"shortName" : obj.id.name,
+				"fullName"  : obj.id.schema + "." + obj.id.name
+			};
+			nullSavePushToArrayInCollection(tablesByShortName, table.shortName, table);
+			nullSavePushToArrayInCollection(tablesByFullName,  table.fullName,  table);
+			
 			if(!obj.columns) {
 				continue;
-			}
-			
+			}			
 			
 			if(obj.indexes) {
 				for(let i=0; i!=obj.indexes.length; i++) {
