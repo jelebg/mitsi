@@ -8,5 +8,6 @@
 
 	<bean id="mitsiDatasources" class="org.mitsi.users.MitsiDatasourcesImpl" />
 	<bean id="mitsiUsersConfig" class="org.mitsi.users.MitsiUsersConfigImpl" />
+	<bean id="mitsiRulesConfig" class="org.mitsi.users.MitsiRulesConfigImpl" />
 	
 </beans>

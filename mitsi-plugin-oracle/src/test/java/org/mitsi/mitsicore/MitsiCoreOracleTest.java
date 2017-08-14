@@ -40,7 +40,7 @@ public class MitsiCoreOracleTest {
 
 	@Before
 	public void beforeTest() {
-		datasourceManager.loadIfNeccessary();
+		datasourceManager.loadIfNecessary();
 	}
 
 	@Test

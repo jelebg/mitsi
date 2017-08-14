@@ -13,6 +13,9 @@
 <bean id="usersFile" class="org.springframework.core.io.ClassPathResource">
 	<constructor-arg value="mitsi-users.json"/>
 </bean>
+<bean id="rulesFile" class="org.springframework.core.io.ClassPathResource">
+	<constructor-arg value="mitsi-rules.json"/>
+</bean>
 
 <import resource="classpath:spring/application-context-core.xml"/>
 

@@ -124,7 +124,14 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 	public boolean authenticate(String username, String password) throws MitsiUsersException {
 		final String wrongPMessage = "wrong password format for user "; 
 				
-		User user = users.get(username);
+		User user = null;
+		try {
+			readLock();
+			user = users.get(username);
+		}
+		finally {
+			readUnlock();
+		}
 		if(user == null) {
 			return false;
 		}
@@ -162,69 +169,25 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 	}
 	
 	@Override
-	public boolean isLdapEnabled() {
-		return usersFileLoaded.ldapAuthent != null;
-	}
-	
-	@Override
-	public String getLdapUrl() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
+	public MitsiUsersFile.LdapAuthent getLdapAuthent() {
+		try {
+			readLock();
+			return usersFileLoaded== null ? null : usersFileLoaded.ldapAuthent;
 		}
-		return usersFileLoaded.ldapAuthent.url;
-	}
-	
-	@Override
-	public String getLdapApplicationDN() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
+		finally {
+			readUnlock();
 		}
-		return usersFileLoaded.ldapAuthent.applicationDN;
 	}
-	
-	@Override
-	public String getLdapApplicationPassword() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
-		}
-		return usersFileLoaded.ldapAuthent.applicationPassword;
-	}
-	
-	@Override
-	public String getLdapUserDNPattern() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
-		}
-		return usersFileLoaded.ldapAuthent.userDNPattern;
-	}
-	     
-	@Override
-	public String getLdapGroupSearchPattern() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
-		}
-		return usersFileLoaded.ldapAuthent.groupSearchPattern;
-	}
-	
-	@Override
-	public String getLdapGroupRoleAttribute() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
-		}
-		return usersFileLoaded.ldapAuthent.groupRoleAttribute;
-	}
-	
-	@Override
-	public String getLdapMandatoryRole() {
-		if(usersFileLoaded.ldapAuthent == null) {
-			return null;
-		}
-		return usersFileLoaded.ldapAuthent.mandatoryRole;
-	}       
 	
 	@Override
 	public Map<String, String[]> getGroups() {
-		return usersFileLoaded.groups;
+		try {
+			readLock();
+			return usersFileLoaded.groups;
+		}
+		finally {
+			readUnlock();
+		}
 	}
 	
 	@Override
@@ -232,7 +195,13 @@ public class MitsiUsersConfigImpl extends PooledResource implements MitsiUsersCo
 		if(username == null) {
 			return new TreeSet<>();
 		}
-		return userGroups.get(username);
+		try {
+			readLock();
+			return userGroups.get(username);
+		}
+		finally {
+			readUnlock();
+		}
 	}
 
 }

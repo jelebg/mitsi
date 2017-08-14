@@ -1,6 +1,7 @@
 
 // functions for mitsi rules
 
+// TODO : faire une gestion des dependances pour "LABELLED" : si une rule utilise LABELLED, le label indiqué doit etre compute avant + erreur si dependence circulaire
 function ruleCompute(rule, variables, labels) {
 	if(rule.literal || rule.name) {
 		throw "cannot evaluate literal or expression outside of expression";

@@ -3,6 +3,7 @@ package org.mitsi.test.users;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.users.MitsiUsersConfig;
 import org.mitsi.users.MitsiUsersException;
+import org.mitsi.users.MitsiUsersFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,26 +27,28 @@ public class MitsiUsersConfigTest {
 	
 	@Test
 	public void mitsiUsersConfigTest() throws IOException {
-		mitsiUsersConfig.loadIfNeccessary();
+		mitsiUsersConfig.loadIfNecessary();
 	}
 
 	@Test
 	public void test() throws IOException, MitsiUsersException {
 
-		mitsiUsersConfig.loadIfNeccessary();
+		mitsiUsersConfig.loadIfNecessary();
 		assertFalse(mitsiUsersConfig.authenticate("user_wrong", "guestmdp"));
 		assertTrue(mitsiUsersConfig.authenticate("guest", "guestmdp"));
 		assertFalse(mitsiUsersConfig.authenticate("guest", "mdp_wrong"));
 		assertTrue(mitsiUsersConfig.authenticate("test", "testclearpassword"));
 		assertFalse(mitsiUsersConfig.authenticate("test", "mdp_wrong"));
 		
-		assertEquals(mitsiUsersConfig.getLdapUrl()                    , "ldap://localhost:10389/");
-		assertEquals(mitsiUsersConfig.getLdapApplicationDN()      , "sn=mitsi+cn=mitsi,dc=applications");
-		assertEquals(mitsiUsersConfig.getLdapApplicationPassword(), "bonnevaux");
-		assertEquals(mitsiUsersConfig.getLdapUserDNPattern()      , "cn={0}+sn={0},dc=users");
-		assertEquals(mitsiUsersConfig.getLdapGroupSearchPattern() , "ou=groups");
-		assertEquals(mitsiUsersConfig.getLdapGroupRoleAttribute() , "ou");
-		assertEquals(mitsiUsersConfig.getLdapMandatoryRole()      , "ROLE_MITSIGROUP");
+		MitsiUsersFile.LdapAuthent ldapAuthent = mitsiUsersConfig.getLdapAuthent();
+		assertNotNull(ldapAuthent);
+		assertEquals(ldapAuthent.url                , "ldap://localhost:10389/");
+		assertEquals(ldapAuthent.applicationDN      , "sn=mitsi+cn=mitsi,dc=applications");
+		assertEquals(ldapAuthent.applicationPassword, "bonnevaux");
+		assertEquals(ldapAuthent.userDNPattern      , "cn={0}+sn={0},dc=users");
+		assertEquals(ldapAuthent.groupSearchPattern , "ou=groups");
+		assertEquals(ldapAuthent.groupRoleAttribute , "ou");
+		assertEquals(ldapAuthent.mandatoryRole      , "ROLE_MITSIGROUP");
 		
 		assertArrayEquals(mitsiUsersConfig.getGroups().get("xe2") , new String[]{ "test", "guest" });
 		assertNull(mitsiUsersConfig.getGroups().get("_invalidgroup"));

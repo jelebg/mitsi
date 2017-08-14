@@ -23,14 +23,14 @@ public class MitsiDatasourcesTest {
 	
 	@Test
 	public void mitsiDatasourcesTest() throws IOException {
-		mitsiDatasources.loadIfNeccessary();
+		mitsiDatasources.loadIfNecessary();
 	}
 
 	@Test
 	@Ignore // TODO faire un mock pour que ça refonctionne
 	public void test() throws IOException, ClassNotFoundException, SQLException {
 
-		mitsiDatasources.loadIfNeccessary();
+		mitsiDatasources.loadIfNecessary();
 		MitsiDatasource datasource = mitsiDatasources.getDatasource(null, true, "POSTGRE-TEST");
 		assertEquals(datasource.getName(), "POSTGRE-TEST");
 		

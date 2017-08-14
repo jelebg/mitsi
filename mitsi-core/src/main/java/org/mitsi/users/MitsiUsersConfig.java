@@ -13,16 +13,9 @@ public interface MitsiUsersConfig {
 	public static final String GROUP_PUBLIC    = SPECIAL_GROUP_PREFIX+"public"; // all users even if they are not authenticated
 	public static final String GROUP_CONNECTED = SPECIAL_GROUP_PREFIX+"connected"; // all authenticated users
 	
-	void loadIfNeccessary();
+	void loadIfNecessary();
 	boolean authenticate(String username, String password) throws MitsiUsersException;
-	boolean isLdapEnabled();
-	String getLdapUrl();
-	String getLdapApplicationDN();
-	String getLdapApplicationPassword();
-	String getLdapUserDNPattern();
-	String getLdapGroupSearchPattern();
-	String getLdapGroupRoleAttribute();
-	String getLdapMandatoryRole();
+	MitsiUsersFile.LdapAuthent getLdapAuthent();
 	Map<String, String[]> getGroups();
 	SortedSet<String> getUserGrantedGroups(String username);
 }

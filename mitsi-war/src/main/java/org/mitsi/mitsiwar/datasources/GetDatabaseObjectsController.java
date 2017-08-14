@@ -12,6 +12,9 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
+import org.mitsi.rules.Rule;
+import org.mitsi.users.MitsiRulesConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +33,8 @@ class GetDatabaseObjectsResponse {
 	List<DatabaseObject> databaseObjects;
 	List<Schema> schemas;
 	String provider;
-	
+	List<Rule> rules;
+
 	public GetDatabaseObjectsResponse() {}
 }
 
@@ -38,6 +42,9 @@ class GetDatabaseObjectsResponse {
 @RequestMapping("/getDatabaseObjects")
 public class GetDatabaseObjectsController extends MitsiRestController {
 	private static final Logger log = Logger.getLogger(GetDatabaseObjectsController.class);
+
+	@Autowired
+	protected MitsiRulesConfig mitsiRulesConfig; //NOSONAR 
 
 	@RequestMapping(value="", method = RequestMethod.POST)
 	public  @ResponseBody GetDatabaseObjectsResponse proceed(@RequestBody GetDatabaseObjects request, HttpSession httpSession) throws MitsiException {
@@ -55,6 +62,8 @@ public class GetDatabaseObjectsController extends MitsiRestController {
 			
 			response.databaseObjects = connection.getTablesAndViews(schema);
 			response.provider = connection.getProviderName();
+			response.rules = mitsiRulesConfig.getRules();
+
 		} 
 		catch(Exception e) {
 			log.error("could not connect to database : "+request.datasourceName, e);

@@ -7,7 +7,7 @@ import org.mitsi.datasources.MitsiDatasource;
 
 public interface MitsiDatasources {
 
-	void loadIfNeccessary();
+	void loadIfNecessary();
 
 	MitsiDatasource getDatasource(SortedSet<String> userGrantedGroups, boolean isUserConnected, String datasource);
 

@@ -156,40 +156,7 @@ angular.module('mitsiApp')
 	
 
 	
-	$scope.computeColumnLabels = function(source) {
-		// TODO : rules a mettre dans un fichier de conf
-		// TODO : rules a simplifier en mettant des custom variables
-		rules = [
-		         { "label":"PK",
-			       "rule": "pkColumn:(column.fullName in primaryKeys.columns)",
-			       "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
-		         },
-		         { "label":"UK",
-			       "rule": "column.fullName IN uniqueContraints.columns AND NOT LABELLED 'PK'",
-			       "comment":"Unique constraint indexed by ${uniqueContraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"
-			     },
-		         { "label":"FK", 
-			       "rule": "column.fullName IN foreignKeys.columns",
-			       "comment":"Foreign Key constraint ${foreignKeys.columns[column.fullName].constraint.owner}.${foreignKeys.columns[column.fullName].constraint.name} (column position in FK : #${foreignKeys.columns[column.fullName].position})"
-			     },		         
-		         { "label":"I",
-			       "rule": "column.fullName IN index.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
-			       "comment":"Indexed by ${index.columns[column.fullName].index.owner}.${index.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"   
-				 },		         
-		         { "labelWarning":"FK??",
-		           "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
- 	        	   "relationToTable" : "${prefix.group1}",
-			       "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"   
-			     },		         
-		         { "labelWarning":"FK?",
-					"rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK' AND NOT LABELLED 'FK??'",
-				   "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
-				 },		         
-		         { "labelWarning":"I?", // TODO cette règle est peut-être un peu trop stricte
-			       "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
-			       "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
-				 }
-		        ];
+	$scope.computeColumnLabels = function(source, rules) {
 		
 		let variables = {
 			"source": {
@@ -403,10 +370,12 @@ angular.module('mitsiApp')
 				  exclusion:"^(.*\\$|SYS_)"
 		  };
 		  
-		  let startMs = new Date().getTime();
-		  $scope.computeColumnLabels(source);
-		  let endMs = new Date().getTime();
-		  console.log("rule applying time : " + (endMs-startMs)+"ms");
+		  if(response.data.rules) {
+			  let startMs = new Date().getTime();
+			  $scope.computeColumnLabels(source, response.data.rules);
+			  let endMs = new Date().getTime();
+			  console.log("rule applying time : " + (endMs-startMs)+"ms");
+		  }
 		  
 		  $scope.initGraph(source);
 		  

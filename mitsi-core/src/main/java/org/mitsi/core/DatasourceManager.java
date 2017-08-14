@@ -167,8 +167,8 @@ public class DatasourceManager {
 		poolsLock = new ReentrantReadWriteLock();
 	}
 	
-	public void loadIfNeccessary() {
-		mitsiDatasources.loadIfNeccessary();
+	public void loadIfNecessary() {
+		mitsiDatasources.loadIfNecessary();
 	}
 	
 	private SqlSessionFactory buildConnectionFactory(String datasourceName, MitsiDatasource datasource) throws MitsiDatasourceException, MitsiUsersException {
@@ -229,7 +229,7 @@ public class DatasourceManager {
 			sqlSessionFactory = pools.get(datasourceName);
 		}
 		finally {
-				poolsLock.readLock().unlock();
+			poolsLock.readLock().unlock();
 		}
 		
 		if(sqlSessionFactory==null) {

@@ -38,7 +38,7 @@ public class MitsiMySqlTest {
 
 	@Before
 	public void beforeTest() {
-		datasourceManager.loadIfNeccessary();
+		datasourceManager.loadIfNecessary();
 	}
 
 	@Test
@@ -107,15 +107,12 @@ public class MitsiMySqlTest {
 			List<DetailsSection> sections = connection.getDetailsForTable("TEST", "TOUTOU_1");
 			
 			assertNotNull(sections);
-			assertEquals(sections.size(), 7);
+			assertEquals(sections.size(), 6);
 			for(DetailsSection section : sections) {
 				assertNotNull(section.title); 
 				assertNotNull(section.columns); 
 				assertTrue(section.columns.size() > 0); 
 				assertNotNull(section.data); 
-				assertTrue("Partition Key".equals(section.title) || 
-						"Partition".equals(section.title) ||
-						section.data.size() > 0); 
 			}
 			
 		}
@@ -128,13 +125,13 @@ public class MitsiMySqlTest {
 			List<DetailsSection> sections = connection.getDetailsForDatasource();
 			
 			assertNotNull(sections);
-			assertEquals(sections.size(), 6);
+			assertEquals(sections.size(), 4);
 			for(DetailsSection section : sections) {
 				assertNotNull(section.title); 
 				assertNotNull(section.columns); 
 				assertTrue(section.columns.size() > 0); 
 				assertNotNull(section.data); 
-				assertTrue(section.data.size() > 0); 
+				assertTrue(section.title.equals("Tablespaces") || section.data.size() > 0); 
 			}
 			
 		}

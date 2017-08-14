@@ -39,7 +39,6 @@ public abstract class MitsiRestController {
 	protected DatasourceManager datasourceManager; //NOSONAR 
 	@Autowired
 	protected MitsiUsersConfig mitsiUsersConfig; //NOSONAR 
-
 	
 	protected @NotNull Client getClient(HttpSession httpSession) {
 		Client connectedClient = (Client) httpSession.getAttribute(CONNECTED_CLIENTSESSION_ATTRIBUTE);

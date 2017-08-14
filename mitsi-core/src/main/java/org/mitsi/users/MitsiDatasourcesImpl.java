@@ -131,26 +131,37 @@ public class MitsiDatasourcesImpl extends PooledResource implements MitsiDatasou
 	
 	@Override
 	public MitsiDatasource getDatasource(SortedSet<String> userGrantedGroups, boolean isUserConnected, String datasource) {
-		MitsiDatasource ds = datasources.get(datasource);
-		
-		if(!isDatasourceGranted(userGrantedGroups, isUserConnected, ds)) {
-			return null;
+		try {
+			readLock();
+			MitsiDatasource ds = datasources.get(datasource);
+			
+			if(!isDatasourceGranted(userGrantedGroups, isUserConnected, ds)) {
+				return null;
+			}
+			return ds;
 		}
-		
-		return ds;
+		finally {
+			readUnlock();
+		}
 	}
 	
 	@Override
 	public 	List<MitsiDatasource> getDatasources(SortedSet<String> userGrantedGroups, boolean isUserConnected) {
-		List<MitsiDatasource> groupsDataSources = new ArrayList<>();
-		
-		for(MitsiDatasource mitsiDatasource : datasources.values()) {
-			if(!isDatasourceGranted(userGrantedGroups, isUserConnected, mitsiDatasource)) {
-				continue;
+		try {
+			readLock();
+			List<MitsiDatasource> groupsDataSources = new ArrayList<>();
+			
+			for(MitsiDatasource mitsiDatasource : datasources.values()) {
+				if(!isDatasourceGranted(userGrantedGroups, isUserConnected, mitsiDatasource)) {
+					continue;
+				}
+				groupsDataSources.add(mitsiDatasource);
 			}
-			groupsDataSources.add(mitsiDatasource);
+			return groupsDataSources;
 		}
-		return groupsDataSources;
+		finally {
+			readUnlock();
+		}
 	}
 	
 }

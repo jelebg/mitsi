@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.mitsi.users.MitsiUsersConfig;
 import org.mitsi.users.MitsiUsersException;
+import org.mitsi.users.MitsiUsersFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,24 +27,25 @@ public class MitsiAuthenticatorImpl implements MitsiAuthenticator {
 	
 	@PostConstruct
 	public void postConstruct() {
-		mitsiUsersConfig.loadIfNeccessary();
-		if(mitsiUsersConfig.isLdapEnabled()) {
+		mitsiUsersConfig.loadIfNecessary();
+		MitsiUsersFile.LdapAuthent ldapAuthent = mitsiUsersConfig.getLdapAuthent();
+		if (ldapAuthent != null) {
 			
-			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(mitsiUsersConfig.getLdapUrl());
-			contextSource.setUserDn(mitsiUsersConfig.getLdapApplicationDN());
-			contextSource.setPassword(mitsiUsersConfig.getLdapApplicationPassword());
+			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapAuthent.url);
+			contextSource.setUserDn(ldapAuthent.applicationDN);
+			contextSource.setPassword(ldapAuthent.applicationPassword);
 			contextSource.afterPropertiesSet();
 			
 			
 			BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
 			String [] userDnPatterns = new String[1];
-			userDnPatterns[0] = mitsiUsersConfig.getLdapUserDNPattern();
+			userDnPatterns[0] = ldapAuthent.userDNPattern;
 			bindAuthenticator.setUserDnPatterns(userDnPatterns);
 			
 			DefaultLdapAuthoritiesPopulator defaultLdapAuthoritiesPopulator =
 					new DefaultLdapAuthoritiesPopulator(contextSource,
-							mitsiUsersConfig.getLdapGroupSearchPattern());
-			defaultLdapAuthoritiesPopulator.setGroupRoleAttribute(mitsiUsersConfig.getLdapGroupRoleAttribute());
+							ldapAuthent.groupSearchPattern);
+			defaultLdapAuthoritiesPopulator.setGroupRoleAttribute(ldapAuthent.groupRoleAttribute);
 			
 			ldapAuthProvider = new LdapAuthenticationProvider(bindAuthenticator, defaultLdapAuthoritiesPopulator);
 		}
@@ -56,7 +58,7 @@ public class MitsiAuthenticatorImpl implements MitsiAuthenticator {
 				return true;
 			}
 		}
-		mitsiUsersConfig.loadIfNeccessary();
+		mitsiUsersConfig.loadIfNecessary();
 		return mitsiUsersConfig.authenticate(username, password);
 	}
 	

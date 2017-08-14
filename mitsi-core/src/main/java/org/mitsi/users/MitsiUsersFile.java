@@ -9,14 +9,14 @@ public class MitsiUsersFile {
 	public Map<String, String[]> groups;
 	
 	
-	class 	LdapAuthent {
-		String url;
-		String applicationDN;
-		String applicationPassword;
-		String userDNPattern;
-		String groupSearchPattern;
-		String groupRoleAttribute;
-		String mandatoryRole;
+	public class LdapAuthent {
+		public String url;
+		public String applicationDN;
+		public String applicationPassword;
+		public String userDNPattern;
+		public String groupSearchPattern;
+		public String groupRoleAttribute;
+		public String mandatoryRole;
 	}
 
 }

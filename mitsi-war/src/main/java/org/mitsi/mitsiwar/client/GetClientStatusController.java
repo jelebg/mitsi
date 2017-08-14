@@ -45,6 +45,7 @@ public class GetClientStatusController extends MitsiRestController {
 		response.connectedUsername = getConnectedUsername(httpSession);
 		response.datasources = null;
 		if(request.btwGetDatasources) {
+			
 			response.datasources = new ArrayList<>();
 			List<MitsiDatasource> mitsiDatasourceList = getDatasources(httpSession);
 			
