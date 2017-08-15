@@ -38,76 +38,151 @@ function MitsiGraph() {
 				continue;
 			}
 			
+			// iterate constraints to find true forign keys
 			const pos = this.nameTable[dobj.id.schema+"."+dobj.id.name];
 			const v = this.vertexes[pos];
-			for(let k=0; k!=dobj.constraints.length; k++) {
-				const constraint = dobj.constraints[k];
-				
-				if(constraint.type != 'R') {
-					continue;
+			this.createLinksForFks(dobj, v, pos);
+			
+			// iterate columns to find candidate foreign keys
+			for (let k=0; k!=dobj.columns.length; k++) {
+				let column = dobj.columns[k];
+				this.createLinksForCandidateFks(dobj, column);
+			}
+		}
+	}
+	
+	this.createLinksForFks = function(dobj, v, pos) {
+		for(let k=0; k!=dobj.constraints.length; k++) {
+			const constraint = dobj.constraints[k];
+			
+			if(constraint.type != 'R') {
+				continue;
+			}
+			
+			const rpos = this.nameTable[constraint.fkConstraintOwner+"."+constraint.fkTable];
+			const rv = this.vertexes[rpos];
+			let linkAlreadyExists = false;
+			let l = null;
+			for(let j=0; j!=v.links.length; j++) {
+				l = v.links[j];
+				if(l.target == rpos) { // NOSONAR complexity is OK
+					linkAlreadyExists = true;
+					break;
+				}
+			}
+			
+			if(linkAlreadyExists) {
+				// if a link already exists in the same direction between the 2 tables, 
+				// do not create a new link but put new properties in existing link and reverse link
+				if(l) { // NOSONAR complexity is OK
+					l.properties.keyColumns  +=  "\n"+constraint.columns;
+					l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
 				}
 				
-				const rpos = this.nameTable[constraint.fkConstraintOwner+"."+constraint.fkTable];
-				const rv = this.vertexes[rpos];
-				let linkAlreadyExists = false;
-				let l = null;
-				for(let j=0; j!=v.links.length; j++) {
-					l = v.links[j];
-					if(l.target == rpos) { // NOSONAR complexity is OK
-						linkAlreadyExists = true;
+				for(let j=0; j!=rv.reverseLinks.length; j++) { // NOSONAR complexity is OK
+					l = rv.reverseLinks[j];
+					if(l.target == rpos) {
 						break;
 					}
 				}
 				
-				if(linkAlreadyExists) {
-					// if a link already exists in the same direction between the 2 tables, 
-					// do not create a new link but put new properties in existing link and reverse link
-					if(l) { // NOSONAR complexity is OK
-						l.properties.keyColumns  +=  "\n"+constraint.columns;
-						l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
-					}
-					
-					for(let j=0; j!=rv.reverseLinks.length; j++) { // NOSONAR complexity is OK
-						l = rv.reverseLinks[j];
-						if(l.target == rpos) {
-							break;
-						}
-					}
-					
-					l.properties.keyColumns  +=  "\n"+constraint.columns;
-					l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
-					
-				}
-				else {
-					// if no link exists in the same direction between the 2 tables, create a new link 
-					const newLink = {
-						"target"     : rpos,
-						"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
-						"properties" : {
-							"keyColumns"  : constraint.columns,
-							"rKeyColumns" : constraint.fkColumns
-						}
-					};
-					
-					v.links.push(newLink);
-					
-					const newReverseLink = {
-						"target"     : pos,
-						// TODO : BUG ? : ne devrait pas plutot etre la table dobj.id.schema+dobj.id.name ??? bon je corrige
-						"targetName" : dobj.id.schema+"."+dobj.id.name, //constraint.fkConstraintOwner+"."+constraint.fkTable,
-						"properties" : {
-							"keyColumns"  : constraint.columns,
-							"rKeyColumns" : constraint.fkColumns
-						}
-					};
-					
-					rv.reverseLinks.push(newReverseLink);
-				}
+				l.properties.keyColumns  +=  "\n"+constraint.columns;
+				l.properties.rKeyColumns +=  "\n"+constraint.fkColumns;
+				
 			}
-			
+			else {
+				// if no link exists in the same direction between the 2 tables, create a new link 
+				const newLink = {
+					"target"     : rpos,
+					"targetName" : constraint.fkConstraintOwner+"."+constraint.fkTable,
+					"properties" : {
+						"keyColumns"  : constraint.columns,
+						"rKeyColumns" : constraint.fkColumns
+					}
+				};
+				
+				v.links.push(newLink);
+				
+				const newReverseLink = {
+					"target"     : pos,
+					// TODO : BUG ? : ne devrait pas plutot etre la table dobj.id.schema+dobj.id.name ??? bon je corrige
+					"targetName" : dobj.id.schema+"."+dobj.id.name, //constraint.fkConstraintOwner+"."+constraint.fkTable,
+					"properties" : {
+						"keyColumns"  : constraint.columns,
+						"rKeyColumns" : constraint.fkColumns
+					}
+				};
+				
+				rv.reverseLinks.push(newReverseLink);
+			}
 		}
 	}
 	
+	// candidateFk.targetTableName
+	// candidateFk.comment
+	this.createLinksForCandidateFks = function(dobj, column) {
+		if (!column.candidateFks) {
+			return;
+		}
+		
+		let candidateFks = column.candidateFks;
+		for (let i=0; i!=candidateFks.length; i++) {
+			let candidateFk = candidateFks[i];
+			
+			let fromIndex = this.getIndex(dobj.id.schema, dobj.id.name);
+			if (!fromIndex) {
+				continue;
+			}
+			let from = this.getVertex(fromIndex);
+			
+			let toIndex = this.getIndex(candidateFk.targetTableName);
+			if (!toIndex) {
+				continue;
+			}
+			let to = this.getVertex(toIndex);
+
+			let existingLinks = this.getLinks(fromIndex);
+			let linkAlreadyExists = false
+			for (let j = 0; j < existingLinks.length; j++) {
+				if (toIndex == existingLinks.target) {
+					linkAlreadyExists = true;
+					break;
+				}
+			}
+			if (linkAlreadyExists) {
+				continue;
+			}
+
+			// if no link exists in the same direction between the 2 tables, create a new link 
+			const newLink = {
+				"target"     : toIndex,
+				"targetName" : to.name,
+				"properties" : {
+					"keyColumns"         : column.name,
+					"candidateFk"        : true,
+					"candidateFkComment" : candidateFk.comment,
+					"doNotUseForPath"    : true
+				}
+			};
+			from.links.push(newLink);
+					
+			const newReverseLink = {
+				"target"     : fromIndex,
+				"targetName" : from.name,
+				"properties" : {
+					"keyColumns"         : column.name,
+					"candidateFk"        : true,
+					"candidateFkComment" : candidateFk.comment,
+					"doNotUseForPath"    : true
+				}
+			};
+			to.reverseLinks.push(newReverseLink);
+		}
+
+	}
+
+	
+	/*	  
 	this.initWithRelations = function(relations) { // NOSONAR copmplexity is OK
 		// order relations by tableOwner/tableName/keyColumnsStr/rTableOwner/rTableName/rKeyColumnsStr
 		relations.sort(function(a, b) {
@@ -164,8 +239,8 @@ function MitsiGraph() {
 			if(linkAlreadyExists) {
 				// if a link already exists in the same direction between the 2 tables, 
 				// do not create a new link but put new properties in existing link and reverse link
-				/* TODO remove ? l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
-				l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(","); */
+				// TODO remove ? l.properties.keyColumns  +=  "\n"+relation.keyColumns.join(",");
+				// l.properties.rKeyColumns +=  "\n"+relation.rKeyColumns.join(","); 
 				
 				let l = null;
 				for(let j=0; j!=rv.reverseLinks.length; j++) {
@@ -205,11 +280,8 @@ function MitsiGraph() {
 				
 				rv.reverseLinks.push(newReverseLink);
 			}
-			
-
 		}
-				
-	}
+	}*/
 	
 
 	this.getLinksByName = function(tableOwner, tableName) {
@@ -524,6 +596,10 @@ function MitsiGraph() {
 			
 			// protection against cycles
 			if(path.indexOf(target) >= 0) {
+				continue;
+			}
+			
+			if(links[l].properties.doNotUseForPath) {
 				continue;
 			}
 			

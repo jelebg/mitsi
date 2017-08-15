@@ -169,7 +169,12 @@ angular.module('mitsiApp')
 
 		for(let i=0; i!=rules.length; i++) {
 			rules[i].parsedRule = peg.parse(rules[i].rule);
-			rules[i].commentParts = getVariableStringParts(pegVariables, rules[i].comment);
+			if (rules[i].comment) {
+				rules[i].commentParts = getVariableStringParts(pegVariables, rules[i].comment);
+			}
+			if (rules[i].candidateFkToTable) {
+				rules[i].candidateFkToTableParts = getVariableStringParts(pegVariables, rules[i].candidateFkToTable);
+			}
 		}
 		
 		for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -199,18 +204,21 @@ angular.module('mitsiApp')
 						"warning"  : []
 				}
 				let labelsComments = [ ];
+				let candidateFks = [];
 
-				$scope.computeRules(rules, variables, labels, labelsComments);
+				$scope.computeRules(rules, variables, labels, labelsComments, candidateFks);
 				
 				column.labels = labels.normal.join(",");
 				column.labelsWarning = labels.warning.join(",");
 				column.labelsComments = labelsComments;
+				// TODO : rajouter le currentSchema aux tables des candidateDks sauf si deja dans le nom
+				column.candidateFks = candidateFks;
 			}
 		}
 			
 	}
 	
-	$scope.computeRules = function(rules, variables, labels, labelsComments) {
+	$scope.computeRules = function(rules, variables, labels, labelsComments, candidateFks) {
 		for(let iRule=0; iRule!=rules.length; iRule	++) {
 			let rule = rules[iRule];
 			let parsedRule = rule.parsedRule;
@@ -221,16 +229,31 @@ angular.module('mitsiApp')
 				if(rule.label) { 
 					labels.normal.push(rule.label);
 				}
+				
 				if(rule.labelWarning) {
 					labels.warning.push(rule.labelWarning);
 				}
-				if(rule.comment) {
-					let comment = computeVariableString(rule.commentParts, variables);
+				
+				let comment = null;
+				if(rule.commentParts) {
+					comment = computeVariableString(rule.commentParts, variables);
 					labelsComments.push(comment);
+				}
+				
+				let candidateFkElement = null;
+				if(rule.candidateFkToTableParts) {
+					let candidateFk = computeVariableString(rule.candidateFkToTableParts, variables);
+					candidateFkElement = { 
+						"targetTableName" : candidateFk,
+					}
+					candidateFks.push(candidateFkElement);
+				}
+				
+				if (candidateFkElement && comment) {
+					candidateFkElement["comment"] = comment;
 				}
 			}
 		}
-
 	}
 
 	$scope.computeColumnCollections = function(source, collections) {

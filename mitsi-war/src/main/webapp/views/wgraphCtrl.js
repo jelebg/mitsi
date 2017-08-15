@@ -46,6 +46,43 @@ angular.module('mitsiApp')
 	$scope.hideProximityGraphTimeoutPromise = null;
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
+	
+	$scope.endpointStyles= {
+		"paintStyle" :  { 
+	    	"strokeStyle":"lightgrey", 
+    		"fillStyle":"lightgrey", 
+	    	"lineWidth":2,
+	    	"radius":5
+	    },
+		"style" : { 
+	    	"strokeStyle":"lightgrey", 
+    		"fillStyle":"lightgrey", 
+    		"outlineWidth":1 
+    	}
+	}
+
+	$scope.connectionStyles= {
+		"paintStyleForCandidateFk" : { 
+	    	"strokeStyle":"#f9c17c", 
+	    	//"dashstyle": "2 2",
+	    	"stroke-dasharray" : "4 4",
+	    	"lineWidth":3
+	    },
+		"hoverPaintStyleForCandidateFk" : { 
+	    	"strokeStyle":"orange", 
+	    	//"dashstyle": "2 2",
+	    	"stroke-dasharray" : "4 4",
+	    	"lineWidth":4
+	    },
+	    "paintStyle" : { 
+	    	"strokeStyle":"lightgrey", 
+	    	"lineWidth":3
+	    },
+		"hoverPaintStyle" : {
+    		"strokeStyle":"black", 
+    	    "lineWidth":4
+		}
+	}
 
 	$scope.options = {
 		alwaysDisplaySchema : false,
@@ -370,7 +407,15 @@ angular.module('mitsiApp')
 			}
 			
 			const connection = connectionList[key];
-			connection.setPaintStyle ({ strokeStyle:"lightgrey", lineWidth:3 });
+			
+			let fromTable = connection.source.id.substring($scope.divPrefix.length);
+			let toTable = connection.target.id.substring($scope.divPrefix.length);
+			if ($scope.isCandidateFkBetweenTables(fromTable, toTable)) {
+				connection.setPaintStyle ( $scope.connectionStyles.paintStyleForCandidateFk );
+			}
+			else {
+				connection.setPaintStyle ( $scope.connectionStyles.paintStyle );
+			}
 		}
 	}
 	
@@ -404,6 +449,26 @@ angular.module('mitsiApp')
 		}
 	};
 
+	 $scope.isCandidateFkBetweenTables = function(fromTableName, toTableName) {
+		let graph = $rootScope.currentSource.mitsiGraph;
+		if (!graph) {
+			return false;
+		}
+		
+		let links = graph.getLinksByName(fromTableName);
+		if (!links) {
+			return false;
+		}
+		
+		for (l=0; l!=links.length; l++) {
+			let link = links[l];
+			if (link.targetName == toTableName) {
+				return link.properties.candidateFk ? true : false;
+			}
+		}
+		
+		return false;
+	}
 	
 	$scope.isTableInPath= function(tableName) {
 		if($scope.paths.length == 0 && $scope.rpaths.length == 0) {
@@ -472,7 +537,10 @@ angular.module('mitsiApp')
 						fromTable:tableName,
 						fromColumns:link.properties.keyColumns,
 						toTable:link.targetName,
-						toColumns:link.properties.rKeyColumns});
+						toColumns:link.properties.rKeyColumns,
+						candidateFk:link.properties.candidateFk,
+						candidateFkComment:link.properties.candidateFkComment 
+					});
 				} 
 			}
 		}
@@ -487,7 +555,10 @@ angular.module('mitsiApp')
 						fromTable:rtable2,
 						fromColumns:link.properties.keyColumns,
 						toTable:tableName,
-						toColumns:link.properties.rKeyColumns});
+						toColumns:link.properties.rKeyColumns,
+						candidateFk:link.properties.candidateFk,
+						candidateFkComment:link.properties.candidateFkComment 
+					});
 				}
 			}
 		}
@@ -497,10 +568,11 @@ angular.module('mitsiApp')
 	
 	$scope.afterTableUpdate = function(fklist, posses) {
 		$timeout(function() { // NOSONAR complexity is OK
+			
 			if(fklist) {
 				for(var i=0; i!=fklist.length; i++) {
 					var mafk = fklist[i];
-					$scope.fk(mafk.fromTable, mafk.toTable, mafk.fromColumns, mafk.toColumns);
+					$scope.fk(mafk);
 				}
 			}			
 			
@@ -674,63 +746,69 @@ angular.module('mitsiApp')
 		return false;
 	}
 
-	$scope.fk = function(from, to, columnsFrom, columnsTo) {
-		var autoCycle = (from==to);
+	$scope.fk = function(fk) {
+		var autoCycle = (fk.fromTable==fk.toTable);
 		
-		if($scope.jsplumb.select({source:$scope.divPrefix+from, target:$scope.divPrefix+to}).length > 0) {
+		if($scope.jsplumb.select({source:$scope.divPrefix+fk.fromTable, target:$scope.divPrefix+fk.toTable}).length > 0) {
 			// TODO : checker qu'on est bien sur les meme champs en récupérant les labels
 			return;
+		}
+		
+		let connectionPaintStyle = fk.candidateFk 
+			? $scope.connectionStyles.paintStyleForCandidateFk 
+			: $scope.connectionStyles.paintStyle;
+		let connectionHoverPaintStyle = fk.candidateFk 
+			? $scope.connectionStyles.hoverPaintStyleForCandidateFk 
+			: $scope.connectionStyles.hoverPaintStyle;
+
+		let connectionOverlays = [ 
+		     "Arrow", 
+			 [ "Label", { label:fk.fromColumns, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
+		  ];
+		if (fk.columnsTo) {
+			connectionOverlays.push([ "Label", { label:fk.toColumns, location:0.7, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]);
+		}
+		if (fk.candidateFkComment) {
+			connectionOverlays.push([ "Label", { label:fk.candidateFkComment, location:0.6, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]);
 		}
 		
 		let connection;
 		if(autoCycle) {
 			try {
-				$scope.jsplumb.addEndpoint($scope.divPrefix+from, 
-						{
-				            endpoint: "Dot",
-				            paintStyle:{ 
-						    	strokeStyle:"lightgrey", 
-						    	lineWidth:2,
-						    	radius:5
-						    },
-				            isSource: true
-				        }, 
-						{ anchor: "RightMiddle", uuid: $scope.divPrefix+from+"FromUUID" }
-					);
-				$scope.jsplumb.addEndpoint($scope.divPrefix+to, 
-						{
-				            endpoint: "Dot",
-				            paintStyle:{ 
-						    	strokeStyle:"lightgrey", 
-						    	lineWidth:2,
-						    	radius:5
-						    },
-				            isTarget: true
-				        }, 
-						{ anchor: "TopCenter", uuid: $scope.divPrefix+to+"ToUUID" }
-					);
+				$scope.jsplumb.addEndpoint(
+					$scope.divPrefix+fk.fromTable, 
+					{
+			            "endpoint"   : "Dot",
+			            "paintStyle" : $scope.endpointStyles.paintStyle,
+			            "isSource"   : true
+			        },
+			        {
+						"anchor": "RightMiddle", 
+						"uuid": $scope.divPrefix+fk.fromTable+"FromUUID" 
+					}				        
+				);
+				$scope.jsplumb.addEndpoint(
+					$scope.divPrefix+fk.toTable, 
+					{
+			            "endpoint"   : "Dot",
+			            "paintStyle" : $scope.endpointStyles.paintStyle,
+			            "isTarget"   : true
+			        },
+			        {
+			        	"anchor": "TopCenter", 
+			        	"uuid": $scope.divPrefix+fk.toTable+"ToUUID" 
+			        }
+				);
 		
 				
 				connection = $scope.jsplumb.connect({
-					uuids : [ $scope.divPrefix+to+"ToUUID", $scope.divPrefix+from+"FromUUID" ]
-				    ,paintStyle:{ 
-				    	strokeStyle:"lightgrey", 
-				    	lineWidth:3
-				    }
-			    	,hoverPaintStyle:{ 
-			    		strokeStyle:"black", 
-			    	    lineWidth:4
-			    	}
-			    	,endpointStyle:{ 
-			    		fillStyle:"lightgrey", 
-			    		outlineWidth:1 
-			    	}
-			    	,connector: [ "StateMachine" ]
-					,overlays:[ "Arrow", 
-						[ "Label", { label:columnsFrom, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ] 
-						,[ "Label", { label:columnsTo, location:0.7, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
-					  ]
-			    	,detachable:false
+					"uuids" : [ $scope.divPrefix+fk.toTable+"ToUUID", $scope.divPrefix+fk.fromTable+"FromUUID" ],
+				    "paintStyle" : connectionPaintStyle,
+			    	"hoverPaintStyle" : connectionHoverPaintStyle,
+			    	"endpointStyle" : $scope.endpointStyles.paintStyle,
+			    	"connector" : [ "StateMachine" ],
+					"overlays" : connectionOverlays,
+			    	"detachable" : false
 				});
 			}
 			catch(e) {
@@ -740,31 +818,15 @@ angular.module('mitsiApp')
 		}
 		else {
 			connection = $scope.jsplumb.connect({
-				source:$scope.divPrefix+from,
-				target:$scope.divPrefix+to
-			    ,paintStyle:{ 
-			    	strokeStyle:"lightgrey", 
-			    	lineWidth:3
-			    }
-		    	,hoverPaintStyle:{ 
-		    		strokeStyle:"black", 
-		    	    lineWidth:4
-		    	}
-		    	,endpointStyle:{ 
-		    		fillStyle:"lightgrey", 
-		    		outlineWidth:1 
-		    	}
-		    	,anchor: [ "Right", "Left" ]
-		    	,connector: [ "Bezier", { curviness:50 } ]
-				,overlays:[ "Arrow", 
-					[ "Label", { label:columnsFrom, location:0.2,
-						labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}
-					} ] 
-					,[ "Label", { label:columnsTo, location:0.8,
-						labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}
-					} ]
-				  ]
-		    	,detachable:false
+				"source" : $scope.divPrefix+fk.fromTable,
+				"target" : $scope.divPrefix+fk.toTable,
+			    "paintStyle" : connectionPaintStyle,
+		    	"hoverPaintStyle" : connectionHoverPaintStyle,
+		    	"endpointStyle" : $scope.endpointStyles.paintStyle,
+		    	"anchor" : [ "Right", "Left" ],
+		    	"connector" : [ "Bezier", { curviness:50 } ],
+				"overlays" : connectionOverlays,
+		    	"detachable" : false
 			});
 		}
 		if(connection) {
@@ -1019,7 +1081,7 @@ angular.module('mitsiApp')
 		var depth = 1;
 		var name = currentVertexName;
 		var existingTables = [];
-		var appendedTables = [];
+		var appendedTables = []; // TODO : a quoi ça sert appendedTables ?
 		var posses = {};
 		if(temporary) {
 			posses[currentVertexName] = []; 
@@ -1181,7 +1243,10 @@ angular.module('mitsiApp')
 						fromTable:vertex.name,
 						fromColumns:l.properties.keyColumns,
 						toTable:targetVertexName,
-						toColumns:l.properties.rKeyColumns});
+						toColumns:l.properties.rKeyColumns,
+						candidateFk:l.properties.candidateFk,
+						candidateFkComment:l.properties.candidateFkComment
+					});
 			}
 		}
 
@@ -1196,7 +1261,10 @@ angular.module('mitsiApp')
 						fromTable:targetVertexName,
 						fromColumns:l.properties.keyColumns,
 						toTable:vertex.name,
-						toColumns:l.properties.rKeyColumns});
+						toColumns:l.properties.rKeyColumns,
+						candidateFk:l.properties.candidateFk,
+						candidateFkComment:l.properties.candidateFkComment
+					});
 			}
 		}
 	}

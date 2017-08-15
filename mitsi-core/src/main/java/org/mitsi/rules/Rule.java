@@ -5,4 +5,5 @@ public class Rule {
 	public String label;
 	public String labelWarning;
 	public String comment;
+	public String candidateFkToTable;
 }

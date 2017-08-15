@@ -18,7 +18,7 @@
 		 },	         
 		 { "labelWarning":"FK??",
 		   "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
-		   "relationToTable" : "${prefix.group1}",
+		   "candidateFkToTable" : "${source.currentSchema}.${prefix.group1}",
 		   "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"   
 		 },		         
 		 { "labelWarning":"FK?",
