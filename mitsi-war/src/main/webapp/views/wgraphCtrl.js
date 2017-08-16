@@ -1081,7 +1081,6 @@ angular.module('mitsiApp')
 		var depth = 1;
 		var name = currentVertexName;
 		var existingTables = [];
-		var appendedTables = []; // TODO : a quoi ça sert appendedTables ?
 		var posses = {};
 		if(temporary) {
 			posses[currentVertexName] = []; 
@@ -1113,7 +1112,6 @@ angular.module('mitsiApp')
 		}
 		else {
 			$scope.appendTable(x0+40, y0+20, name);
-			appendedTables.push(name);
 		}
 		
 		// append tables
@@ -1133,7 +1131,6 @@ angular.module('mitsiApp')
 						$scope.tablesTemporary.push(vertexName);
 						posses[currentVertexName].push(vertexName);
 					}
-					appendedTables.push(vertexName);
 				}
 			}
 			for(let j=0; j!=proximityGraph.after[i].length; j++) {
@@ -1151,7 +1148,6 @@ angular.module('mitsiApp')
 						$scope.tablesTemporary.push(vertexName);
 						posses[currentVertexName].push(vertexName);
 					}
-					appendedTables.push(vertexName);
 				}
 			}
 		}
