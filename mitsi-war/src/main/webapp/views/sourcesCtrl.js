@@ -157,7 +157,11 @@ angular.module('mitsiApp')
 
 	
 	$scope.computeColumnLabels = function(source, rules) {
-		
+		let labelsFilters = {};
+		source.labelsFilters = labelsFilters;
+		source.labelFilterInclude = {};
+		source.labelFilterExclude = {};
+
 		let variables = {
 			"source": {
 				"name"          : source.name,
@@ -168,12 +172,34 @@ angular.module('mitsiApp')
 		$scope.computeColumnCollections(source, variables);
 
 		for(let i=0; i!=rules.length; i++) {
-			rules[i].parsedRule = peg.parse(rules[i].rule);
-			if (rules[i].comment) {
-				rules[i].commentParts = getVariableStringParts(pegVariables, rules[i].comment);
+			let rule = rules[i];
+			rule.parsedRule = peg.parse(rule.rule);
+			if (rule.comment) {
+				rule.commentParts = getVariableStringParts(pegVariables, rule.comment);
 			}
-			if (rules[i].candidateFkToTable) {
-				rules[i].candidateFkToTableParts = getVariableStringParts(pegVariables, rules[i].candidateFkToTable);
+			if (rule.candidateFkToTable) {
+				rule.candidateFkToTableParts = getVariableStringParts(pegVariables, rule.candidateFkToTable);
+			}
+			
+			if (rule.label) {
+				if (labelsFilters[rule.label]) {
+					if (labelsFilters[rule.label] && rule.labelWarning) {
+						// if a label is defined in two rules as warning and normal, then consider it as warning
+						labelsFilters[rule.label].type = "warning";
+					}
+				}
+				else {
+					labelsFilters[rule.label] = { "label":rule.label, "status":0, "type":"normal", "count":0 };
+				}
+			}
+			if (rule.labelWarning) {
+				if (labelsFilters[rule.labelWarning]) {
+					// if a label is defined in two rules as warning and normal, then consider it as warning
+					// so no need to check here
+				}
+				else {
+					labelsFilters[rule.labelWarning] = { "label":rule.labelWarning, "status":0, "type":"warning", "count":0 };
+				}
 			}
 		}
 		
@@ -190,6 +216,7 @@ angular.module('mitsiApp')
 					"shortName": obj.id.name
 			}
 
+			obj.columnsLabels = {};
 			
 			for(let i=0; i!=obj.columns.length; i++) {
 				let column = obj.columns[i];
@@ -208,14 +235,28 @@ angular.module('mitsiApp')
 
 				$scope.computeRules(rules, variables, labels, labelsComments, candidateFks);
 				
-				column.labels = labels.normal.join(",");
-				column.labelsWarning = labels.warning.join(",");
+				for (let j=0; j!=labels.normal.length; j++) {
+					let label = labels.normal[j];
+					labelsFilters[label].count ++;
+				}
+				for (let j=0; j!=labels.warning.length; j++) {
+					let label = labels.warning[j];
+					labelsFilters[label].count ++;
+				}
+				
+				column.labels = labels.normal.concat(labels.warning);
+				column.labelsString = labels.normal.join(",");
+				column.labelsWarningString = labels.warning.join(",");
 				column.labelsComments = labelsComments;
 				// TODO : rajouter le currentSchema aux tables des candidateDks sauf si deja dans le nom
 				column.candidateFks = candidateFks;
+				
+				for(let j=0; j!=column.labels.length; j++) {
+					let label = column.labels[j];
+					obj.columnsLabels[label] = true;
+				}
 			}
 		}
-			
 	}
 	
 	$scope.computeRules = function(rules, variables, labels, labelsComments, candidateFks) {
@@ -434,6 +475,18 @@ angular.module('mitsiApp')
 		
 		var objectType = object.id.type; 
 		
+		for (let excludeLabel in source.labelFilterExclude) {
+			if ( object.columnsLabels[excludeLabel] ) {
+				return true;
+			}
+		}
+		
+		for (let includeLabel in source.labelFilterInclude) {
+			if ( ! object.columnsLabels[includeLabel] ) {
+				return true;
+			}
+		}
+		
 		if(source.filter.hideTables===true && objectType=="table") {
 			return true;
 		}
@@ -614,20 +667,82 @@ angular.module('mitsiApp')
 		return [ type, o.description ].filter(function (val) {return val;}).join(' / ');
     }
 	
+	$scope.toggleLabel = function(source, label) {
+		if(label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
+			return;
+		}
+
+		if (source.labelFilterInclude[label.label]) {
+			delete source.labelFilterInclude[label.label];
+			source.labelFilterExclude[label.label] = true;
+		}
+		else if (source.labelFilterExclude[label.label]) {
+			delete source.labelFilterExclude[label.label];
+		}
+		else {
+			source.labelFilterInclude[label.label] = true;
+		}
+	}
+	
+	$scope.getLabelClass = function(source, label) {
+		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
+			return "labelFilter filterLabelDisabled";
+		}
+		
+		if (label.type == "warning") {
+			if (source.labelFilterInclude[label.label]) {
+				return "labelFilter filterWarningLabelKeepIfExists";
+			}
+			else if (source.labelFilterExclude[label.label]) {
+				return "labelFilter filterWarningLabelKeepIfNotExists";
+			}
+			else {
+				return "labelFilter filterWarningLabelNotSelected";
+			}
+		}
+		else {
+			if (source.labelFilterInclude[label.label]) {
+				return "labelFilter filterLabelKeepIfExists";
+			}
+			else if (source.labelFilterExclude[label.label]) {
+				return "labelFilter filterLabelKeepIfNotExists";
+			}
+			else {
+				return "labelFilter filterLabelNotSelected";
+			}
+		}
+	}
+	
+	$scope.getLabelPopover = function(source, label) {
+		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
+			return "the is no occurence of label "+label.label+" in this datasource";
+		}
+
+		if (source.labelFilterInclude[label.label]) {
+			return "Tables without label "+label.label+" are hidden";
+		}
+		else if (source.labelFilterExclude[label.label]) {
+			return "Tables with label "+label.label+" are hidden";
+		}
+		else {
+			return "Label "+label.label+" is not filtered";
+		}
+	}
+	
 	$scope.hasLabelsForColumn = function(c) {
-		return c.labels && c.labels != "";
+		return c.labelsString && c.labelsString != "";
 	}
 	
 	$scope.getLabelsForColumn = function(c) {
-		return c.labels;
+		return c.labelsString;
 	}
 	
 	$scope.hasLabelsWarningForColumn = function(c) {
-		return c.labelsWarning && c.labelsWarning != "";
+		return c.labelsWarningString && c.labelsWarningString != "";
 	}
 	
 	$scope.getLabelsWarningForColumn = function(c) {
-		return c.labelsWarning;
+		return c.labelsWarningString;
 	}
 	
     $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument

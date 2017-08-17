@@ -82,29 +82,15 @@
             </alert>
             {{ s.description }}
             <br/>
-	        <table style="width:100%"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
+	        <table style="width:100%;margin-bottom:3px"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
 	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
 					{{ schema.name }}
            	    </option>
               </ul>
 	        </select></td></tr></table>
-            <br/>
-	      	<table style="width:100%;margin-bottom:10px;"><td style="width:150px">
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"
-		           popover="{{ s.filter.hideTables ? 'include tables' : 'exclude tables' }}"  popover-trigger="mouseenter" popover-placement="right-bottom"> 
-		        	<img src="img/table.png"/>
-		        </a>
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideViews=!s.filter.hideViews"   ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"
-		        	popover="{{ s.filter.hideViews ? 'include views' : 'exclude views' }}"  popover-trigger="mouseenter" popover-placement="bottom">
-		        	<img src="img/view.png"/
-				</a>
-		        <a href="" class="btn btn-default" ng-click="s.filter.hideMViews=!s.filter.hideMViews" ng-class="{'mitsiGrayscale':s.filter.hideMViews==true}"
-		        	popover="{{ s.filter.hideMViews ? 'include materialized views' : 'exclude materialized views' }}"  popover-trigger="mouseenter" popover-placement="bottom">
-		        	<img src="img/matview.png"/>
-		        </a>
-		    </td><td>
+	      	<table style="width:100%;"><td>
 				<span dropdown on-toggle="toggled(open)" >
-			      	<div class="form-group has-feedback" style="margin-bottom:0px;margin-left:5px;">
+			      	<div class="form-group has-feedback" style="margin-bottom:2px;">
 						<a href="" style="pointer-events: all;" class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon" ng-click="s.searchObject=''; localStorageUpdateForDs(s, s.searchObject, 'searchObject'); $event.stopPropagation();"></a>
 						<a href="" dropdown-toggle style="pointer-events: all;margin-right:20px;" 
 							class="glyphicon glyphicon-option-horizontal form-control-feedback filter-glyphicon"
@@ -149,7 +135,33 @@
 				        </li>
 				    </ul>
 			   </span>
-			</td></table>
+			</td>
+			<td></table>
+			
+			<div style="margin-bottom:10px;line-height:24px;">
+			    <a href="" class="btn btn-default btn-xs" ng-click="s.filter.hideTables=!s.filter.hideTables" ng-class="{'mitsiGrayscale':s.filter.hideTables==true}"
+		            popover="{{ s.filter.hideTables ? 'tables are excluded' : 'tables are included' }}"  popover-trigger="mouseenter" popover-placement="right-bottom"
+		            style="margin-left:1px"> 
+		        	<img src="img/table.png" style="height:70%;width:70%;"/>
+		        </a><a href="" class="btn btn-default btn-xs" ng-click="s.filter.hideViews=!s.filter.hideViews"   ng-class="{'mitsiGrayscale':s.filter.hideViews==true}"
+		        	popover="{{ s.filter.hideViews ? 'views are excluded' : 'views are included' }}"  popover-trigger="mouseenter" popover-placement="bottom"
+		            style="margin-left:1px">
+		        	<img src="img/view.png" style="height:70%;width:70%;"/>
+				</a><a href="" class="btn btn-default btn-xs" ng-click="s.filter.hideMViews=!s.filter.hideMViews" ng-class="{'mitsiGrayscale':s.filter.hideMViews==true}"
+		        	popover="{{ s.filter.hideMViews ? 'materialized views are excluded' : 'materialized views are included' }}"  popover-trigger="mouseenter" popover-placement="bottom"
+		            style="margin-left:1px">
+		        	<img src="img/matview.png" style="height:70%;width:70%;"/>
+		        </a>
+			
+				<span 
+				   ng-repeat="(labelName, labelFilter) in s.labelsFilters" 
+				   ng-class="getLabelClass(s, labelFilter)"
+				   ng-click="toggleLabel(s, labelFilter)"
+				   popover="{{ getLabelPopover(s, labelFilter) }}" 
+				   popover-trigger="mouseenter" 
+				   popover-placement="bottom"
+				>{{ labelName }}</span>
+			</div>
 			      
 	      	<accordion close-others="false">
 				<accordion-group 
@@ -194,11 +206,6 @@
 				  	</span>
 				  	</div>
 			      </accordion-heading>
-			      <!-- popover="{{ c.type }} / {{ c.description }}" 
-			      popover-template="'popover.columns.description'" 
-			      popover-popup-delay="1000"
-			      popover="{{ c.type }} / {{ c.description }}"
-			      -->
 					<ul class="mitsi-columns-list" >
 						<li ng-repeat="c in o.columnsToDisplay" 
 							ng-class="{'columnPk':c.isPk}"
