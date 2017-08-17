@@ -153,14 +153,15 @@
 		        	<img src="img/matview.png" style="height:70%;width:70%;"/>
 		        </a>
 			
+				<!--  sadly, orderBy does not work for objects here -->
 				<span 
-				   ng-repeat="(labelName, labelFilter) in s.labelsFilters" 
+				   ng-repeat="labelFilter in getOrderedLabelsFilters(s)"
 				   ng-class="getLabelClass(s, labelFilter)"
 				   ng-click="toggleLabel(s, labelFilter)"
 				   popover="{{ getLabelPopover(s, labelFilter) }}" 
 				   popover-trigger="mouseenter" 
 				   popover-placement="bottom"
-				>{{ labelName }}</span>
+				>{{ labelFilter.label }}</span>
 			</div>
 			      
 	      	<accordion close-others="false">

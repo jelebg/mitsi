@@ -684,6 +684,21 @@ angular.module('mitsiApp')
 		}
 	}
 	
+	$scope.getOrderedLabelsFilters = function(source) {
+		if (!source.labelsFilters) {
+			return null;
+		}
+
+		let labelsFilters = Object.values(source.labelsFilters);
+		labelsFilters.sort(function(a, b) {
+			if (a.type != b.type) {
+				return b.type.localeCompare(a.type);
+			}
+			return a.label.localeCompare(b.label);
+		});
+		return labelsFilters;
+	}
+	
 	$scope.getLabelClass = function(source, label) {
 		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
 			return "labelFilter filterLabelDisabled";
