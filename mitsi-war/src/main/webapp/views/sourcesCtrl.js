@@ -559,6 +559,10 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.selectSource = function(source) {
+		if ($rootScope.currentSource && source.name == $rootScope.currentSource.name) {
+			return;
+		}
+		
 		document.title = source.name;
 
 		$rootScope.currentSource = source;
