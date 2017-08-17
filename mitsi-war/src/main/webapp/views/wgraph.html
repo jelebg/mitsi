@@ -50,62 +50,75 @@
 </script>
 
 <script type="text/ng-template" id="popover.pin.action.html">
-    <span>pin&nbsp;table</span>
+    <span class="mitsiInfoPopover">pin table</span>
 </script>
 
 <script type="text/ng-template" id="popover.info.action.html">
-    <span>display&nbsp;details&nbsp;in&nbsp;left&nbsp;panel</span>
+    <span class="mitsiInfoPopover">display details in left panel</span>
 </script>
 
 <script type="text/ng-template" id="popover.sql.action.html">
-    <span>Build&nbsp;SQL&nbsp;FROM&nbsp;clause&nbsp;using&nbsp;foreign&nbsp;keys</span>
+    <span class="mitsiInfoPopover">Build SQL FROM clause<br/>using foreign keys</span>
 </script>
 
 <script type="text/ng-template" id="popover.startpath.action.html">
-    <span>Use&nbsp;table&nbsp;as&nbsp;start&nbsp;to&nbsp;find&nbsp;paths</span>
+    <span class="mitsiInfoPopover">Use table as start to find paths</span>
 </script>
 
 <script type="text/ng-template" id="popover.finishpath.action.html">
-    <span>Use&nbsp;table&nbsp;as&nbsp;finish&nbsp;to&nbsp;find&nbsp;paths</span>
+    <span class="mitsiInfoPopover">Use table as finish to find paths</span>
 </script>
 
-<script type="text/ng-template" id="popover.graphdisplay.html">
-    <span>
-        Display&nbsp;graph&nbsp;only
+<!--  script type="text/ng-template" id="popover.graphdisplay.html">
+    <span class="mitsiInfoPopover">
+        Display graph only
     </span>
-</script>
+</script-->
  
 <script type="text/ng-template" id="popover.sqldisplay.html">
-    <span>
-        Display&nbsp;SQL&nbsp;built&nbsp;using&nbsp;<span class="tableActionLabelSelected"><a href="" style="color:white;font-size:65%;vertical-align:middle;">SQL</a></span>&nbsp;labels
+    <span class="mitsiInfoPopover">
+        Display SQL built using <span class="tableActionLabelSelected"><a href="" style="color:white;font-size:65%;vertical-align:middle;">SQL</a></span> labels
     </span>
 </script>
 
 <script type="text/ng-template" id="popover.pathsdisplay.html">
-    <div style="text-align: center;">
-        Display&nbsp;paths&nbsp;built&nbsp;using&nbsp;<img style="transform: scale(-1, 1);" src="img/flag_path.png"/>&nbsp;and&nbsp;<img src="img/flag_path.png"/>
+    <div class="mitsiInfoPopover">
+        Display paths built using <img style="transform: scale(-1, 1);" src="img/flag_path.png"/> and <img src="img/flag_path.png"/>
     </div>
 </script>
 
+<script type="text/ng-template" id="popover.detailsdisplay.html">
+    <div class="mitsiInfoPopover">
+        display detailled informations<br/>about the selected table
+    </div>
+</script>
+
+<script type="text/ng-template" id="popover.datadisplay.html">
+    <div class="mitsiInfoPopover">
+        display data of the selected table
+    </div>
+</script>
+
+
 <script type="text/ng-template" id="popover.optionsdisplay.html">
-    <div style="text-align: center;">
-        Display&nbsp;options
+    <div class="mitsiInfoPopover">
+        Display options
     </div>
 </script>
 
 <script type="text/ng-template" id="popover.cleargraph.html">
-    <div style="text-align: center;">
-        Clear&nbsp;graphs,&nbsp;paths&nbsp;and&nbsp;SQL
+    <div class="mitsiInfoPopover">
+        Clear graphs, paths and SQL
     </div>
 </script>
 
 <script type="text/ng-template" id="popover.urlgraph.html">
-    <div style="text-align: center;" ng-show="currentSource">
-        share&nbsp;the&nbsp;current&nbsp;graph
+    <div class="mitsiInfoPopover" ng-show="currentSource">
+        share the current graph
     </div>
-    <div style="text-align:center;" ng-show="!currentSource">
-        First&nbsp;select&nbsp;a&nbsp;datasource&nbsp;and<br/>
-		build&nbsp;a&nbsp;graph&nbsp;you&nbsp;want&nbsp;to&nbsp;share
+    <div class="mitsiInfoPopover" ng-show="!currentSource">
+        First select a datasource and<br/>
+		build a graph you want to share
     </div>
 </script>
 
@@ -231,19 +244,35 @@
 </div>
 
 <table style="position:absolute;bottom:18px;left:2px;height:22px;"><tr>
-	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='details'}" class="mitsiSidePanelLabel">
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='details'}" class="mitsiSidePanelLabel"
+			popover-template="'popover.detailsdisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="top-right">
 		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowDetails()}" ng-click="sidePanelToggle('details');">
 			Details</a></div></td>
-	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='sql'}" class="mitsiSidePanelLabel">
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='sql'}" class="mitsiSidePanelLabel"
+	 		popover-template="'popover.sqldisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="top">
 		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowSql()}" ng-click="sidePanelToggle('sql');">
 			SQL</a></div></td>
-	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='filters'}" class="mitsiSidePanelLabel">
+	<!-- td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='filters'}" class="mitsiSidePanelLabel">
 		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowFilters()}" ng-click="sidePanelToggle('filters');">
-			Filters</a></div></td>
-	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='paths'}" class="mitsiSidePanelLabel">
+			Filters</a></div></td -->
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='paths'}" class="mitsiSidePanelLabel"
+ 			popover-template="'popover.pathsdisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="top">
 		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowPaths()}" ng-click="sidePanelToggle('paths');">
 			Paths</a></div></td>
-	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='data'}" class="mitsiSidePanelLabel">
+	<td><div ng-class="{'mitsiSidePanelLabelSelected':panelDisplayed=='data'}" class="mitsiSidePanelLabel"
+ 			popover-template="'popover.datadisplay.html'"
+			popover-class="verticalMenuPopover"
+			popover-trigger="mouseenter"
+			popover-placement="top">
 		<a href="" ng-class="{'mitsiSidePanelLabelDisabled':!sidePanelShouldShowData()}" ng-click="sidePanelToggle('data');">
 			Data</a></div></td>
 </tr></table>

@@ -612,3 +612,8 @@
 .columnPk {
 	font-weight:bold;
 }
+
+.mitsiInfoPopover {
+	text-align: center;
+	white-space: nowrap;
+}
