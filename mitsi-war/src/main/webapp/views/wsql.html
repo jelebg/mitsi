@@ -24,9 +24,15 @@
 		{{ notEmpty(sql.sqlText) }}
 	</div>
 	<div>
-		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-play" ></i></a>
-		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-stop"></i></a>
-		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-trash" ></i></a>
+		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
+			<i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
+		</a>
+		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}">
+			<i class="glyphicon glyphicon-stop"></i>
+		</a>
+		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}">
+			<i class="glyphicon glyphicon-trash" ></i>
+		</a>
 	</div>
 	<div class="sqlError">
 		{{ sql.error }}

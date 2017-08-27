@@ -6,6 +6,8 @@ angular.module('mitsiApp')
     // TODO : bind variables
     // TODO : rajouter les numéros de ligne
     // TODO : resultat pércédents en gris quand sql running 
+   	// TODO : decompte du temps au lancement du sql
+    // TODO : meilleure animation lorsque le sql est running
     	
     const prefix = "sqlText_";
     const UNBREAKABLE_SPACE = "\xa0";
