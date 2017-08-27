@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +20,7 @@ import org.mitsi.datasources.DatabaseObject;
 import org.mitsi.datasources.DetailsSection;
 import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
+import org.mitsi.datasources.MitsiConnection.GetDataResult;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -33,6 +33,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:spring/application-context.xml")
 public class MitsiMySqlTest {
 	
+	public static final String DATASOURCE_NAME = "BUBULLE-MYSQL";
+	public static final String DATASOURCE_NAME_2 = "BUBULLE-MYSQL-ON-TEST";
+	public static final String DATASOURCE_NAME_OTHER_SCHEMA = "BUBULLE-MYSQL-ON-TEST2";
+	
 	@Autowired
 	private DatasourceManager datasourceManager;
 
@@ -43,7 +47,7 @@ public class MitsiMySqlTest {
 
 	@Test
 	public void datasourceManagerTest() throws IOException, MitsiUsersException, MitsiDatasourceException {
-		try (MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			assertTrue(connection.testOK() != null);
 		}
 	}
@@ -51,7 +55,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void getTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DatabaseObject> ldo = connection.getTablesAndViews("test");
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
@@ -63,7 +67,7 @@ public class MitsiMySqlTest {
 	public void getIndexes() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
 		
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<Index> li = connection.getSchemaIndexes("test");
 			assertTrue(li != null);
 			assertTrue(li==null || li.size() > 0);
@@ -74,7 +78,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void getConstraints() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<Constraint> lc = connection.getSchemaConstraints("test");
 			assertTrue(lc != null);
 			assertTrue(lc==null || lc.size() > 0);
@@ -85,7 +89,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void connectOnOtherSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL-ON-TEST2")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME_OTHER_SCHEMA)) {
 			List<Schema> schemas = connection.getAllSchemas(null);
 		}
 	}
@@ -93,7 +97,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void getAllSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			
 			List<Schema> schemas = connection.getAllSchemas(null);
 			assertTrue(schemas.size() > 0);
@@ -103,7 +107,7 @@ public class MitsiMySqlTest {
 	
 	@Test
 	public void getDetailsTable() throws IOException, ClassNotFoundException, SQLException, MitsiException {
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DetailsSection> sections = connection.getDetailsForTable("TEST", "TOUTOU_1");
 			
 			assertNotNull(sections);
@@ -121,7 +125,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void getDetailsSource() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DetailsSection> sections = connection.getDetailsForDatasource();
 			
 			assertNotNull(sections);
@@ -139,7 +143,7 @@ public class MitsiMySqlTest {
 	
 	@Test
 	public void getData() throws SQLException, MitsiException {
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "BUBULLE-MYSQL-ON-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME_2)) {
 			MitsiConnection.GetDataResult result = connection.getData(null, "tata", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "id");
 			assertEquals(result.columns.get(1).name, "str");
@@ -187,6 +191,20 @@ public class MitsiMySqlTest {
 		}
 	}
 	
+	@Test
+	public void runSql() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			GetDataResult result = connection.runSql("select 1 from dual", 1);
+			assertEquals(result.columns.size(), 1);
+			assertEquals(result.results.size(), 1);
+		}
+	}
 	
+	@Test(expected=MitsiException.class)
+	public void runSqlError() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			connection.runSql("my mistake", 1);
+		}
+	}
 		
 }

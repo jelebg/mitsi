@@ -44,6 +44,7 @@ import org.mitsi.datasources.helper.TypeHelper;
 public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
 
+	public static int DEFAULT_FETCH_SIZE = 2000;
 	public static final String MITSI_HIDDEN_RNUM_COLUMN = "mitsi_hiden_rnum__"; 
 
 	private static final Pattern forEachFilterPattern = Pattern.compile("__frch_filter_(\\d+).filter");
@@ -243,45 +244,52 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		void onNewRow(String [] row) throws MitsiException;		
 	}
 	
-	void executeRawSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+	void executeBoundSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, callback);
+	}
+
+	
+	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
 		
-		try(PreparedStatement  statement = sqlSession.getConnection().prepareStatement(boundSql.getSql())) {
+		try(PreparedStatement statement = sqlSession.getConnection().prepareStatement(sqlText)) {
 			
-			statement.setFetchSize(2000); // TODO : à rendre parametrable ?
+			statement.setFetchSize(fetchSize == null ? DEFAULT_FETCH_SIZE : fetchSize); 
 			int iParam = 0;
-			for(ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
-				iParam++;
-				
-				// only fromRow, count and filters may be passed as bind variable
-				Object obj = params.get(parameterMapping.getProperty());
-				if(obj == null) {
-					Matcher matcher = forEachFilterPattern.matcher(parameterMapping.getProperty());
-					if(matcher.find()) {
-						int iFilter = Integer.parseInt(matcher.group(1));
-						Filter filter = filters[iFilter];
-						try {
-							setFilterBindVariable(statement, iParam, filter);
+			if (parameterMappings != null && params != null) {
+				for (ParameterMapping parameterMapping : parameterMappings) {
+					iParam++;
+					
+					// only fromRow, count and filters may be passed as bind variable
+					Object obj = params.get(parameterMapping.getProperty());
+					if(filters != null && obj == null) {
+						Matcher matcher = forEachFilterPattern.matcher(parameterMapping.getProperty());
+						if(matcher.find()) {
+							int iFilter = Integer.parseInt(matcher.group(1));
+							Filter filter = filters[iFilter];
+							try {
+								setFilterBindVariable(statement, iParam, filter);
+							}
+							catch (ParseException | NumberFormatException  e) {
+								log.error("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
+								throw new MitsiException("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
+							}
 						}
-						catch (ParseException | NumberFormatException  e) {
-							log.error("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
-							throw new MitsiException("invalid filter format : "+filter.filter+" ("+filter.type+")", e);
+						else {
+							log.error("unknown parameter : " + parameterMapping.getProperty());
+							throw new MitsiException("unknown parameter : " + parameterMapping.getProperty());
 						}
 					}
 					else {
-						log.error("unknown parameter : " + parameterMapping.getProperty());
-						throw new MitsiException("unknown parameter : " + parameterMapping.getProperty());
-					}
-				}
-				else {
-					if(obj instanceof Long) {
-						statement.setLong(iParam, (Long) obj);
-					}
-					else if(obj instanceof String) {
-						statement.setString(iParam, (String) obj);
-					}
-					else {
-						log.error("unhandled parameter type : " + obj.getClass().getName());
-						throw new MitsiException("unhandled parameter type : " + obj.getClass().getName());
+						if(obj instanceof Long) {
+							statement.setLong(iParam, (Long) obj);
+						}
+						else if(obj instanceof String) {
+							statement.setString(iParam, (String) obj);
+						}
+						else {
+							log.error("unhandled parameter type : " + obj.getClass().getName());
+							throw new MitsiException("unhandled parameter type : " + obj.getClass().getName());
+						}
 					}
 				}
 			}
@@ -348,7 +356,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			detailsSection.columns.add(detailsSection.new Column(parameterColumnTitle, null)); 
 			detailsSection.columns.add(detailsSection.new Column(valueColumnTitle, null)); 
 			
-			executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
+			executeBoundSql(boundSql, params, null, new ExecuteRowSqlCallback() {
 				boolean firstRow = true;
 				
 				List<String> columnsNames = new ArrayList<>();
@@ -384,7 +392,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			});
 		}
 		else {
-			executeRawSql(boundSql, params, null, new ExecuteRowSqlCallback() {
+			executeBoundSql(boundSql, params, null, new ExecuteRowSqlCallback() {
 	
 				@Override
 				public void onNewColumn(String columnName, String type) {
@@ -545,7 +553,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		params.put("filters", filters);
 		BoundSql boundSql = ms.getBoundSql(params);
 		
-		executeRawSql(boundSql, params, filters, new ExecuteRowSqlCallback() {
+		executeBoundSql(boundSql, params, filters, new ExecuteRowSqlCallback() {
 
 			@Override
 			public void onNewColumn(String columnName, String type) {
@@ -563,6 +571,36 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		});
 		
 		return result;
+	}
+	
+	public GetDataResult runSql(String sqlText, Integer fetchSize) throws SQLException, MitsiException {
+		// TODO : bind variables
+		final GetDataResult result = new GetDataResult();
+		result.columns = new ArrayList<>();
+		result.results = new ArrayList<>();
+
+		try {
+			executeRawSql(sqlText, null, null, null, fetchSize, new ExecuteRowSqlCallback() {
+	
+				@Override
+				public void onNewColumn(String columnName, String type) {
+					Column column = new Column();
+					column.type = type;
+					column.name = columnName;
+					result.columns.add(column);				
+				}
+	
+				@Override
+				public void onNewRow(String[] row) {
+					result.results.add(row);
+				}
+			});
+			
+			return result;
+		}
+		catch (SQLException e) {
+			throw new MitsiException(e.getMessage(), e);
+		}
 	}
 	
 	public long getMaxExportRows() {

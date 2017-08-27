@@ -48,6 +48,29 @@ angular.module('mitsiApp')
 		
 		return defer.promise;
 	}
+	
+	this.postForSql = function(sqlEntry, servletName, json) {
+		var defer = $q.defer();
+		
+		$http.post(servletName, json)
+		.then(function(response) {
+				if(response.data.errorMessage) {
+					sqlEntry.error = response.data.errorMessage;
+					defer.reject(response.data.errorMessage);
+				}
+				else {
+					sqlEntry.error = null;
+					defer.resolve(response);
+				}
+			}
+		   , function(error) {
+			  sqlEntry.error = error;
+			  defer.reject(error);
+		   }
+		);
+		
+		return defer.promise;
+	}
 
 
 });

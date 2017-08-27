@@ -24,13 +24,22 @@
 		{{ notEmpty(sql.sqlText) }}
 	</div>
 	<div>
-		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-play" ></i></a>
+		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-play" ></i></a>
 		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-stop"></i></a>
 		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-trash" ></i></a>
 	</div>
-	<table style="border:1px solid lightgrey;border-collapse:collapse;">
-		<tr ng-repeat="r in sql.result track by $index" style="border:1px solid lightgrey;">
-			<td ng-repeat="cell in r  track by $index" style="border:1px solid lightgrey;padding:1px;">
+	<div class="sqlError">
+		{{ sql.error }}
+	</div>
+	<table ng-class="{'sqlTableWhenRunning' : sql.status==SQL_STATUS.RUNNING}" 
+		   class="sqlTable">
+		<tr>
+			<th ng-repeat="col in sql.columns track by $index">
+				{{ col.name }}
+			</th>
+		</tr>
+		<tr ng-repeat="r in sql.result track by $index" >
+			<td ng-repeat="cell in r  track by $index" >
 				{{ cell }}
 			</td>
 		</tr>

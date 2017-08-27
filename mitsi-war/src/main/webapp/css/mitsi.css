@@ -63,7 +63,7 @@
 }
 
 .datasource-error {
-	color : red
+	color : red;
 }
 
 .database-object-unpined {
@@ -626,4 +626,27 @@
 
 .fliVertically {
 	transform: scale(-1, 1);
+}
+
+.sqlTableWhenRunning {
+	opacity: 0.3;
+}
+
+.sqlTable {
+	border:1px solid lightgrey;
+	border-collapse:collapse;	
+}
+
+.sqlTable tr {
+	border:1px solid lightgrey;
+}
+
+.sqlTable td {
+	border:1px solid lightgrey;
+	padding:2px;
+}
+
+.sqlError {
+	color : red;
+	font-weight:bold;
 }

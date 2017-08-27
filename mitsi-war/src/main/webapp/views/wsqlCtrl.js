@@ -1,11 +1,15 @@
 angular.module('mitsiApp')
-    .controller('wsqlCtrl', function($scope) {
+    .controller('wsqlCtrl', function($scope, $rootScope, sqlService) {
 
     // TODO : faire une diretive pour les contenteditable
     // TODO : faire des popovers
+    // TODO : bind variables
+    // TODO : rajouter les numéros de ligne
+    // TODO : resultat pércédents en gris quand sql running 
     	
     const prefix = "sqlText_";
     const UNBREAKABLE_SPACE = "\xa0";
+    const DEFAULT_FETCH_SIZE = 50;
     
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
@@ -13,11 +17,14 @@ angular.module('mitsiApp')
     		RUNNING: 2
     };    
     	
-    $scope.sqlList = [ { "sqlText":"", "result":[], status:$scope.SQL_STATUS.NOTHING } ];
+	$scope.getEmptySqlEntry = function() {
+		return { "sqlText":"", "result":[], "columns":[], status:$scope.SQL_STATUS.NOTHING, "error":null };
+	}
+	
+    $scope.sqlList = [ $scope.getEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
     
-    	
 	$scope.getSqlText = function(i) {
 		return document.getElementById(prefix+i).innerText;
 	}
@@ -48,8 +55,9 @@ angular.module('mitsiApp')
 			
 			let isEqualToPreviousSql = sqlText.trim() == previousSql.sqlText.trim();
 			let sqlResult = isEqualToPreviousSql ? previousSql.result : [];
+			let sqlColumns = isEqualToPreviousSql ? previousSql.columns : [];
 			let status = isEqualToPreviousSql ? $scope.SQL_STATUS.NOTHING : $scope.SQL_STATUS.TO_RUN;
-			insertSqlList.push({ "sqlText":sqlText, "result":sqlResult, "status":status });
+			insertSqlList.push({ "sqlText":sqlText, "result":sqlResult, "columns":sqlColumns, "status":status });
 		}
 		
 		let before = i == 0 ? [] : $scope.sqlList.slice(0, i);
@@ -83,15 +91,32 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTextRun = function(i, sql) {
-		$scope.sqlList[i].sqlText = sql;
-		$scope.setSqlResult(i, [sql.trim().split(',')]); // TODO
-		$scope.sqlList[i].status = $scope.SQL_STATUS.NOTHING;
+		let sqlEntry = $scope.sqlList[i];
+		sqlEntry.sqlText = sql;
+		
+		if (!$rootScope.currentSource) { // TODO : afficher une erreur
+			return;
+		}
+		
+		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, DEFAULT_FETCH_SIZE)
+	    .then(function(response) {
+			$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
+	    },
+	    function(error) {
+	    	$scope.setSqlResult(i, [], []);
+	    })
+	    .finally(function () {
+	    	sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+	    });
+		sqlEntry.status = $scope.SQL_STATUS.RUNNING;
+		
 	}
 	
-	$scope.setSqlResult = function(i, result) {
+	$scope.setSqlResult = function(i, result, columns) {
 		$scope.sqlList[i].result = result;
+		$scope.sqlList[i].columns = columns;
 		if (i == $scope.sqlList.length-1) {
-			$scope.sqlList.push({ "sqlText":"", "result":[] })
+			$scope.sqlList.push($scope.getEmptySqlEntry());
 		}
 	}
 	
@@ -115,7 +140,7 @@ angular.module('mitsiApp')
 	
 	$scope.sqlTrash = function(i) {
 		if (i==$scope.sqlList.length-1) {
-			$scope.sqlList[i] = { "sqlText":"", "result":[], status:$scope.SQL_STATUS.NOTHING };
+			$scope.sqlList[i] = $scope.getEmptySqlEntry();
 			$scope.setSqlText(i, "");
 		}
 		else {
@@ -126,7 +151,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTrashAll = function(i) {
-	    $scope.sqlList = [ { "sqlText":"", "result":[], status:$scope.SQL_STATUS.NOTHING } ];
+	    $scope.sqlList = [ $scope.getEmptySqlEntry() ];
 		$scope.restoreSqlTexts();
 	}
 	

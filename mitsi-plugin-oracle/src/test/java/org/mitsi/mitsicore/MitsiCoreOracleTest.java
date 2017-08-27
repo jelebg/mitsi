@@ -22,6 +22,7 @@ import org.mitsi.datasources.DetailsSection;
 import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
+import org.mitsi.datasources.MitsiConnection.GetDataResult;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
@@ -35,6 +36,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:spring/application-context.xml")
 public class MitsiCoreOracleTest {
 	
+	public static final String DATASOURCE_NAME = "LOCALHOST-TEST";
+	public static final String DATASOURCE_NAME_OTHER_SCHEMA = "LOCALHOST-XE2-ON-TEST";
+
 	@Autowired
 	private DatasourceManager datasourceManager;
 
@@ -45,7 +49,7 @@ public class MitsiCoreOracleTest {
 
 	@Test
 	public void DatasourceManagerTest() throws IOException, MitsiUsersException, MitsiDatasourceException {
-		try (MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			assertTrue(connection.testOK() != null);
 		}
 	}
@@ -53,7 +57,7 @@ public class MitsiCoreOracleTest {
 	@Test
 	public void getTables() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DatabaseObject> ldo = connection.getTablesAndViews(null);
 			assertTrue(ldo != null);
 			assertTrue(ldo==null || ldo.size() > 0);
@@ -65,7 +69,7 @@ public class MitsiCoreOracleTest {
 	public void getIndexes() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
 		
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<Index> li = connection.getSchemaIndexes(null);
 			assertTrue(li != null);
 			assertTrue(li==null || li.size() > 0);
@@ -76,7 +80,7 @@ public class MitsiCoreOracleTest {
 	@Test
 	public void getConstraints() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<Constraint> lc = connection.getSchemaConstraints(null);
 			assertTrue(lc != null);
 			assertTrue(lc==null || lc.size() > 0);
@@ -89,7 +93,7 @@ public class MitsiCoreOracleTest {
 
 		TreeSet<String> groups = new TreeSet<>();
 		groups.add("xe2");
-		try(MitsiConnection connection = datasourceManager.getConnection(groups, true, "LOCALHOST-XE2-ON-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(groups, true, DATASOURCE_NAME_OTHER_SCHEMA)) {
 			List<Schema> schemas = connection.getAllSchemas(null);
 		}
 	}
@@ -97,7 +101,7 @@ public class MitsiCoreOracleTest {
 	@Test
 	public void getAllSchema() throws IOException, ClassNotFoundException, SQLException, MitsiUsersException, MitsiDatasourceException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			
 			List<Schema> schemas = connection.getAllSchemas(null);
 			assertTrue(schemas.size() > 0);
@@ -107,7 +111,7 @@ public class MitsiCoreOracleTest {
 	
 	@Test
 	public void getDetailsTable() throws IOException, ClassNotFoundException, SQLException, MitsiException {
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DetailsSection> sections = connection.getDetailsForTable("TEST", "TOUTOU_1");
 			
 			assertNotNull(sections);
@@ -128,7 +132,7 @@ public class MitsiCoreOracleTest {
 	@Test
 	public void getDetailsSource() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			List<DetailsSection> sections = connection.getDetailsForDatasource();
 			
 			assertNotNull(sections);
@@ -146,7 +150,7 @@ public class MitsiCoreOracleTest {
 	
 	@Test
 	public void getData() throws SQLException, MitsiException {
-		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
+		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
 			MitsiConnection.GetDataResult result = connection.getData(null, "TATA", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "STR");
@@ -195,5 +199,21 @@ public class MitsiCoreOracleTest {
 	}
 	
 	
+	@Test
+	public void runSql() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			GetDataResult result = connection.runSql("select 1 from dual", 1);
+			assertEquals(result.columns.size(), 1);
+			assertEquals(result.results.size(), 1);
+		}
+	}
+	
+	@Test(expected=MitsiException.class)
+	public void runSqlError() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			connection.runSql("my mistake", 1);
+		}
+	}
+
 		
 }
