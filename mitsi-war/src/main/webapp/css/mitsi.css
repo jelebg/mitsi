@@ -303,6 +303,7 @@
 }
 
 .anchorDisabled {
+  pointer-events: none;
   cursor: default;
   color : grey;
 }
@@ -616,4 +617,13 @@
 .mitsiInfoPopover {
 	text-align: center;
 	white-space: nowrap;
+}
+
+.sqlMenuButton {
+	margin-top : 5px;
+	font-size:120%;	
+}
+
+.fliVertically {
+	transform: scale(-1, 1);
 }

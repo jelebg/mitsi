@@ -1,2 +1,38 @@
-THE SQL<br/>
->{{ tutu }}<
+<div>
+	<a href="" ng-click="sqlStopAll()" ng-class="{'anchorDisabled' : !isOneSqlStatus(SQL_STATUS.RUNNING)}">
+		<i class="glyphicon glyphicon-stop sqlMenuButton" ></i>
+	</a>
+	<a href="" ng-click="sqlTrashAll()" ng-class="{'anchorDisabled' : isOneSqlStatus(SQL_STATUS.RUNNING)}">
+		<i class="glyphicon glyphicon-trash sqlMenuButton" ></i>
+	</a>
+	<a href="" ng-click="undo" ng-class="{'anchorDisabled' : undoCommands.length==0}">
+		<i class="glyphicon glyphicon-share-alt sqlMenuButton fliVertically"></i>
+	</a>
+	<a href="" ng-click="redo" ng-class="{'anchorDisabled' : redoCommands.length==0}">
+		<i class="glyphicon glyphicon-share-alt sqlMenuButton"></i>
+	</a>
+</div>
+<div ng-repeat="sql in sqlList  track by $index"
+     style="margin-top:3px;margin-bottom:3px;"
+>
+	<div
+	     id="sqlText_{{ $index }}" 
+	     contenteditable="true" 
+	     style="background-color:lightgrey;"
+	     ng-keypress="sqlTextKeyPress($event, $index)"
+	>	
+		{{ notEmpty(sql.sqlText) }}
+	</div>
+	<div>
+		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-play" ></i></a>
+		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-stop"></i></a>
+		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}"><i class="glyphicon glyphicon-trash" ></i></a>
+	</div>
+	<table style="border:1px solid lightgrey;border-collapse:collapse;">
+		<tr ng-repeat="r in sql.result track by $index" style="border:1px solid lightgrey;">
+			<td ng-repeat="cell in r  track by $index" style="border:1px solid lightgrey;padding:1px;">
+				{{ cell }}
+			</td>
+		</tr>
+	</table>
+</div>
