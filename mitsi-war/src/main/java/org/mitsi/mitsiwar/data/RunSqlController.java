@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 class RunSql {
 	String datasourceName;
 	String sqlText;
-	long count;
+	String cancelSqlId;
+	long   count;
 	
 	public RunSql() {
 		// nothing
@@ -53,7 +54,8 @@ public class RunSqlController extends MitsiRestController {
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			
 			MitsiConnection.GetDataResult result = connection.runSql(
-					request.sqlText, (int) rowCount, connectedClient.getCancelStatementManager());
+					request.sqlText, (int) rowCount, 
+					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			
 			response.columns = result.columns;
 			response.results = result.results;

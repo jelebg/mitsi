@@ -45,47 +45,57 @@ public class Client implements Serializable {
 	public class ClientCancellableStatementsManager implements CancellableStatementsManager, Serializable {
 		private static final long serialVersionUID = -286978823237391934L;
 
-		private Map<String, List<PreparedStatement>> cancellableStatements = new HashMap<>();
+		private Map<String, Map<String, PreparedStatement>> cancellableStatements = new HashMap<>();
 		
 		public synchronized List<String> getAllDatasourcesWithStatements() {
 			List<String> datasources = new ArrayList<>();
 			
-			for (Map.Entry<String, List<PreparedStatement>> cancellableStatement : cancellableStatements.entrySet()) {
-				if (cancellableStatement.getValue() != null && cancellableStatement.getValue().size() > 0) {
-					datasources.add(cancellableStatement.getKey());
+			for (Map.Entry<String, Map<String, PreparedStatement>> cancellableStatements : cancellableStatements.entrySet()) {
+				if (cancellableStatements.getValue() != null && cancellableStatements.getValue().size() > 0) {
+					datasources.add(cancellableStatements.getKey());
 				}
 			}
 			
 			return datasources;
 		}
-
-		@Override
-		public synchronized void addStatement(String datasourceName, PreparedStatement statement) {
-			List<PreparedStatement> statements = cancellableStatements.get(datasourceName);
-			if (statements == null) {
-				statements = new ArrayList<PreparedStatement>();
-				cancellableStatements.put(datasourceName, statements);
+		
+		public synchronized String getDatasourceBySqlId(String cancelSqlId) {
+			// TODO : create another HashMap to avoid the for loop
+			for (Map.Entry<String, Map<String, PreparedStatement>> cancellableStatements : cancellableStatements.entrySet()) {
+				if (cancellableStatements.getValue().containsKey(cancelSqlId)) {
+					return cancellableStatements.getKey();
+				}
 			}
-			statements.add(statement);
+			return null;
 		}
 
 		@Override
-		public synchronized void removeStatement(String datasourceName, PreparedStatement statement) {
-			List<PreparedStatement> statements = cancellableStatements.get(datasourceName);
+		public synchronized void addStatement(String datasourceName, String cancelSqlId, PreparedStatement statement) {
+			Map<String, PreparedStatement> statements = cancellableStatements.get(datasourceName);
+			if (statements == null) {
+				statements = new HashMap<String, PreparedStatement>();
+				cancellableStatements.put(datasourceName, statements);
+			}
+			statements.put(cancelSqlId, statement);
+		}
+
+		@Override
+		public synchronized void removeStatement(String datasourceName, String cancelSqlId) {
+			Map<String, PreparedStatement> statements = cancellableStatements.get(datasourceName);
 			if (statements == null) {
 				return;
 			}
-			statements.remove(statement);
+			statements.remove(cancelSqlId);
 		}
 
 		@Override
 		public synchronized void cancelAllForDatasource(String datasourceName) throws SQLException {
-			List<PreparedStatement> statements = cancellableStatements.get(datasourceName);
+			Map<String, PreparedStatement> statements = cancellableStatements.get(datasourceName);
 			if (statements == null) {
 				return;
 			}
 			
-			for (PreparedStatement statement : statements) {
+			for (PreparedStatement statement : statements.values()) {
 				try {
 					if (!statement.isClosed()) {
 						statement.cancel();
@@ -99,6 +109,26 @@ public class Client implements Serializable {
 			}
 		}
 
+		@Override
+		public void cancel(String datasourceName, String cancelSqlId) throws SQLException {
+			Map<String, PreparedStatement> statements = cancellableStatements.get(datasourceName);
+			if (statements == null) {
+				return;
+			}
+			
+			PreparedStatement statement = statements.get(cancelSqlId);
+			
+			try {
+				if (!statement.isClosed()) {
+					statement.cancel();
+				}
+			}
+			catch (Exception e) {
+				// continue even if shit happens
+				// TODO : not sure if all jdbc drivers implement toString correctly, but it should not be a real problem ...
+				log.warn("cannot cancel statement : "+statement, e);
+			}
+		}
 	}
 	
 	public ClientCancellableStatementsManager getCancelStatementManager() {

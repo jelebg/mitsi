@@ -67,14 +67,24 @@ angular.module('mitsiApp')
 				}
 				else {
 					if (sqlEntry) {
-						sqlEntry.error = null;
+						if (sqlEntry.cancelled) {
+							sqlEntry.error = "Request cancelled"
+						}
+						else {
+							sqlEntry.error = null;
+						}
 					}
 					defer.resolve(response);
 				}
 			}
 		   , function(error) {
 				if (sqlEntry) {
-					sqlEntry.error = "Request cancelled"; // TODO : voir si peut mieux faire .....
+					if (sqlEntry.cancelled) {
+						sqlEntry.error = "Request cancelled";
+					}
+					else {
+						sqlEntry.error = response.data.errorMessage;
+					}
 				}
 			    defer.reject(error);
 		   }

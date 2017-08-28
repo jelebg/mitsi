@@ -14,6 +14,8 @@ angular.module('mitsiApp')
     const UNBREAKABLE_SPACE_REGEX_ALL = /\xa0/g;
     const DEFAULT_FETCH_SIZE = 50;
     
+    $scope.sqlIdSequence = 0;
+    
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
     		TO_RUN: 1,
@@ -69,7 +71,6 @@ angular.module('mitsiApp')
 		$scope.setSqlText(i, sqlParts[0]);
 		$scope.sqlList = before.concat(insertSqlList).concat(after);
 		
-		
 		for (let j=before.length; j<before.length+insertSqlList.length; j++) {
 			let sql = $scope.sqlList[j];
 			if (sql.status == $scope.SQL_STATUS.TO_RUN) {
@@ -102,9 +103,13 @@ angular.module('mitsiApp')
 		}
 		
 		let cleanSql = sql.replace(UNBREAKABLE_SPACE_REGEX_ALL, ' ');
+		$scope.sqlIdSequence ++;
+		sqlEntry.sqlId = "sqlId_" + $scope.sqlIdSequence;
+		
 		
 		sqlEntry.canceler = $q.defer();
-		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, cleanSql, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
+		sqlEntry.cancelled = false;
+		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, cleanSql, sqlEntry.sqlId, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
 	    .then(function(response) {
 				$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
 		    },
@@ -123,22 +128,32 @@ angular.module('mitsiApp')
 	$scope.setSqlResult = function(i, result, columns) {
 		$scope.sqlList[i].result = result;
 		$scope.sqlList[i].columns = columns;
-		if (i == $scope.sqlList.length-1) {
-			$scope.sqlList.push($scope.getEmptySqlEntry());
-		}
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {
 		if (event.key == 'F9') {
 			$scope.sqlRun(i);
 		}
+		
+		if (i == $scope.sqlList.length-1) {
+			$scope.sqlList.push($scope.getEmptySqlEntry());
+		}
+
 	}
 	
 	$scope.sqlStop = function(i) {
 		let sql = $scope.sqlList[i];
+		
+		if (sql.status != $scope.SQL_STATUS.RUNNING) {
+			return; // TODO : message ?
+		}
+		
 		sql.canceler.resolve();
 		sql.canceler = null;
-		sql.error = "cancelled";
+		sql.cancelled = true;
+		
+		sqlService.cancelSql(sql, sql.sqlId);
+
 	}
 	
 	$scope.sqlStopAll = function() {
@@ -149,7 +164,7 @@ angular.module('mitsiApp')
 					sql.canceler.resolve();
 				}
 				sql.canceler = null;
-				sql.error = "cancelled";
+				sql.cancelled = true;
 			}
 		}
 		

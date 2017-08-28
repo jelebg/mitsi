@@ -13,23 +13,24 @@ angular.module('mitsiApp')
 		});
 	}
 
-	this.runSql = function(sqlEntry, datasourceName, sqlText, count, canceler) {
+	this.runSql = function(sqlEntry, datasourceName, sqlText, cancelSqlId, count, canceler) {
 		return mitsiHttpService.postForSql(sqlEntry, 'rest/runSql', canceler, { 
 			"datasourceName" : datasourceName,
 			"sqlText"        : sqlText,
+			"cancelSqlId"    : cancelSqlId,
 			"count"          : count
 		});
 	}
 	
-	this.cancelSql = function(sqlEntry) {
+	this.cancelSql = function(sqlEntry, cancelSqlId) {
 		return mitsiHttpService.postForSql(sqlEntry, 'rest/cancelSql', null, { 
-			runningSqlId : null // TODO : sql id
+			cancelSqlId : cancelSqlId 
 		});
 	}
 
 	this.cancelAllSql = function() {
-		return mitsiHttpService.postForSql(sqlEntry, 'rest/cancelSql', null, { 
-			runningSqlId : null
+		return mitsiHttpService.postForSql(null, 'rest/cancelSql', null, { 
+			cancelSqlId : null
 		});
 	}
 	

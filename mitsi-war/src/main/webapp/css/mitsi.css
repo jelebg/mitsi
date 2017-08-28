@@ -655,3 +655,7 @@
 	background-color:#eeeeee;
 	font-family: monospace;	
 }
+
+.sqlErrorSqlRunning {
+	opacity: 0.3;
+}

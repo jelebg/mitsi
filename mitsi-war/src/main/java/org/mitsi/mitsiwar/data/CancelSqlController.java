@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 class CancelSql {
-	String runningSqlId;
+	String cancelSqlId;
 	// use session Id to identify client
 	
 	public CancelSql() {
@@ -43,7 +43,7 @@ public class CancelSqlController extends MitsiRestController {
 		CancelSqlResponse response = new CancelSqlResponse();
 		Client connectedClient = getClient(httpSession);
 
-		if (request.runningSqlId == null) {
+		if (request.cancelSqlId == null) {
 			// cancel all running sql
 			List<String> datasourcesNames = connectedClient.getCancelStatementManager().getAllDatasourcesWithStatements();
 			for (String datasourceName : datasourcesNames) {
@@ -57,8 +57,15 @@ public class CancelSqlController extends MitsiRestController {
 			}
 		}
 		else {
-			// TODO
-			log.error("TODO : cancel running sql by id");
+			// Cancel only one running sql
+			String datasourceName = connectedClient.getCancelStatementManager().getDatasourceBySqlId(request.cancelSqlId);
+			try (MitsiConnection connection = getConnection(httpSession, datasourceName)) {
+				connection.cancelRunningSql(connectedClient.getCancelStatementManager(), request.cancelSqlId);
+			}
+			catch(SQLException e) {
+				log.error("error in CancelSqlController", e);
+				throw new MitsiException("error in CancelSqlController", e);
+			}
 		}
 		
 		return response;

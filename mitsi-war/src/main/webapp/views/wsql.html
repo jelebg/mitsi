@@ -34,7 +34,7 @@
 			<i class="glyphicon glyphicon-trash" ></i>
 		</a>
 	</div>
-	<div class="sqlError">
+	<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
 		{{ sql.error }}
 	</div>
 	<table ng-class="{'sqlTableWhenRunning' : sql.status==SQL_STATUS.RUNNING}" 

@@ -245,11 +245,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 	
 	void executeBoundSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
-		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, null, callback);
+		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, null, null, callback);
 	}
 
-	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
-		PreparedStatement statementToRemoveFromCancellables = null;
+	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
 		
 		try(PreparedStatement statement = sqlSession.getConnection().prepareStatement(sqlText)) {
 			
@@ -295,8 +294,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 			
 			if (cancellableStatementsManager != null) {
-				cancellableStatementsManager.addStatement(datasource.getName(), statement);
-				statementToRemoveFromCancellables = statement;
+				cancellableStatementsManager.addStatement(datasource.getName(), cancelSqlId, statement);
 			}
 			
 			statement.execute();
@@ -339,12 +337,9 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 		}
 		finally {
-			// TODO : nom des variable à revoir
-			if (cancellableStatementsManager != null && statementToRemoveFromCancellables != null) {
-				log.info("removeCancellableStatement "+statementToRemoveFromCancellables);
-				cancellableStatementsManager.removeStatement(datasource.getName(), statementToRemoveFromCancellables);
+			if (cancellableStatementsManager != null && cancelSqlId != null) {
+				cancellableStatementsManager.removeStatement(datasource.getName(), cancelSqlId);
 			}
-
 		}
 	}
 	
@@ -604,14 +599,14 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return result;
 	}
 	
-	public GetDataResult runSql(String sqlText, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager) throws SQLException, MitsiException {
+	public GetDataResult runSql(String sqlText, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException, MitsiException {
 		// TODO : bind variables
 		final GetDataResult result = new GetDataResult();
 		result.columns = new ArrayList<>();
 		result.results = new ArrayList<>();
 
 		try {
-			executeRawSql(sqlText, null, null, null, maxRows, cancellableStatementsManager, new ExecuteRowSqlCallback() {
+			executeRawSql(sqlText, null, null, null, maxRows, cancellableStatementsManager, cancelSqlId, new ExecuteRowSqlCallback() {
 				int rowCount = 0;
 				
 				@Override
@@ -643,6 +638,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	public void cancelAllRunningSql(CancellableStatementsManager cancellableStatementsManager) throws SQLException {
 		cancellableStatementsManager.cancelAllForDatasource(datasource.getName());
+	}
+	
+	public void cancelRunningSql(CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException {
+		cancellableStatementsManager.cancel(datasource.getName(), cancelSqlId);
 	}
 	
 	public long getMaxExportRows() {

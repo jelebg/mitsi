@@ -194,7 +194,7 @@ public class MitsiCoreMySqlTest {
 	@Test
 	public void runSql() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			GetDataResult result = connection.runSql("select 1 from dual", 1, null);
+			GetDataResult result = connection.runSql("select 1 from dual", 1, null, null);
 			assertEquals(result.columns.size(), 1);
 			assertEquals(result.results.size(), 1);
 		}
@@ -203,7 +203,7 @@ public class MitsiCoreMySqlTest {
 	@Test(expected=MitsiException.class)
 	public void runSqlError() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			connection.runSql("my mistake", 1, null);
+			connection.runSql("my mistake", 1, null, null);
 		}
 	}
 		
