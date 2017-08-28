@@ -10,6 +10,7 @@ import org.mitsi.commons.MitsiException;
 import org.mitsi.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.MitsiRestController;
+import org.mitsi.mitsiwar.connections.Client;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,21 +46,22 @@ public class RunSqlController extends MitsiRestController {
 	@RequestMapping(value="", method = RequestMethod.POST)
 	public @ResponseBody RunSqlResponse proceed(@RequestBody RunSql request, HttpSession httpSession) throws MitsiException {
 		RunSqlResponse response = new RunSqlResponse();
+		Client connectedClient = getClient(httpSession);
 
 		try (MitsiConnection connection = getConnection(httpSession, request.datasourceName)) {
 			long maxRows = connection.getMaxExportRows();
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			
 			MitsiConnection.GetDataResult result = connection.runSql(
-					request.sqlText, (int) rowCount);
+					request.sqlText, (int) rowCount, connectedClient.getCancelStatementManager());
 			
 			response.columns = result.columns;
 			response.results = result.results;
 			response.maxRowsReached = response.results.size()==maxRows;
 		}
 		catch(SQLException e) {
-			log.error("error in GetDataServlet", e);
-			throw new MitsiException("error in GetDataServlet", e);
+			log.error("error in RunSqlController", e);
+			throw new MitsiException("error in RunSqlController", e);
 		}
 		
 		return response;

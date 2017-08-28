@@ -2,7 +2,6 @@ package org.mitsi.datasources;
 
 import java.io.Closeable;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -242,14 +241,15 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	private interface ExecuteRowSqlCallback {
 		void onNewColumn(String columnName, String type);
 		void onNewRow(String [] row) throws MitsiException;		
+		boolean mustStop();
 	}
 	
 	void executeBoundSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
-		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, callback);
+		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, null, callback);
 	}
 
-	
-	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+		PreparedStatement statementToRemoveFromCancellables = null;
 		
 		try(PreparedStatement statement = sqlSession.getConnection().prepareStatement(sqlText)) {
 			
@@ -294,6 +294,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				}
 			}
 			
+			if (cancellableStatementsManager != null) {
+				cancellableStatementsManager.addStatement(datasource.getName(), statement);
+				statementToRemoveFromCancellables = statement;
+			}
+			
 			statement.execute();
 			ResultSet resultSet = statement.getResultSet();
 			
@@ -328,7 +333,18 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 					}
 				}
 				callback.onNewRow(row);
+				if (callback.mustStop()) {
+					break;
+				}
 			}
+		}
+		finally {
+			// TODO : nom des variable à revoir
+			if (cancellableStatementsManager != null && statementToRemoveFromCancellables != null) {
+				log.info("removeCancellableStatement "+statementToRemoveFromCancellables);
+				cancellableStatementsManager.removeStatement(datasource.getName(), statementToRemoveFromCancellables);
+			}
+
 		}
 	}
 	
@@ -389,6 +405,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 						}
 					}
 				}
+
+				@Override
+				public boolean mustStop() {
+					return false;
+				}
 			});
 		}
 		else {
@@ -416,6 +437,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				@Override
 				public void onNewRow(String[] row) {
 					detailsSection.data.add(row);
+				}
+
+				@Override
+				public boolean mustStop() {
+					return false;
 				}
 			});
 		}
@@ -568,20 +594,26 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			public void onNewRow(String[] row) {
 				result.results.add(row);
 			}
+
+			@Override
+			public boolean mustStop() {
+				return false;
+			}
 		});
 		
 		return result;
 	}
 	
-	public GetDataResult runSql(String sqlText, Integer fetchSize) throws SQLException, MitsiException {
+	public GetDataResult runSql(String sqlText, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager) throws SQLException, MitsiException {
 		// TODO : bind variables
 		final GetDataResult result = new GetDataResult();
 		result.columns = new ArrayList<>();
 		result.results = new ArrayList<>();
 
 		try {
-			executeRawSql(sqlText, null, null, null, fetchSize, new ExecuteRowSqlCallback() {
-	
+			executeRawSql(sqlText, null, null, null, maxRows, cancellableStatementsManager, new ExecuteRowSqlCallback() {
+				int rowCount = 0;
+				
 				@Override
 				public void onNewColumn(String columnName, String type) {
 					Column column = new Column();
@@ -593,6 +625,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				@Override
 				public void onNewRow(String[] row) {
 					result.results.add(row);
+					rowCount++;
+				}
+				
+				@Override
+				public boolean mustStop() {
+					return maxRows!=null && rowCount >= maxRows;
 				}
 			});
 			
@@ -601,6 +639,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		catch (SQLException e) {
 			throw new MitsiException(e.getMessage(), e);
 		}
+	}
+	
+	public void cancelAllRunningSql(CancellableStatementsManager cancellableStatementsManager) throws SQLException {
+		cancellableStatementsManager.cancelAllForDatasource(datasource.getName());
 	}
 	
 	public long getMaxExportRows() {

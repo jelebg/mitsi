@@ -199,7 +199,7 @@ public class MitsiCorePostgreTest {
 	@Test
 	public void runSql() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			GetDataResult result = connection.runSql("select 1", 1);
+			GetDataResult result = connection.runSql("select 1", 1, null);
 			assertEquals(result.columns.size(), 1);
 			assertEquals(result.results.size(), 1);
 		}
@@ -208,7 +208,7 @@ public class MitsiCorePostgreTest {
 	@Test(expected=MitsiException.class)
 	public void runSqlError() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			connection.runSql("my mistake", 1);
+			connection.runSql("my mistake", 1, null);
 		}
 	}
 

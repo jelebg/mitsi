@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wsqlCtrl', function($scope, $rootScope, sqlService) {
+    .controller('wsqlCtrl', function($scope, $rootScope, $q, sqlService) {
 
     // TODO : faire une diretive pour les contenteditable
     // TODO : faire des popovers
@@ -11,6 +11,7 @@ angular.module('mitsiApp')
     	
     const prefix = "sqlText_";
     const UNBREAKABLE_SPACE = "\xa0";
+    const UNBREAKABLE_SPACE_REGEX_ALL = /\xa0/g;
     const DEFAULT_FETCH_SIZE = 50;
     
     $scope.SQL_STATUS = { 
@@ -100,16 +101,21 @@ angular.module('mitsiApp')
 			return;
 		}
 		
-		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, DEFAULT_FETCH_SIZE)
+		let cleanSql = sql.replace(UNBREAKABLE_SPACE_REGEX_ALL, ' ');
+		
+		sqlEntry.canceler = $q.defer();
+		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, cleanSql, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
 	    .then(function(response) {
-			$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
-	    },
-	    function(error) {
-	    	$scope.setSqlResult(i, [], []);
-	    })
+				$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
+		    },
+		    function(error) {
+		    	$scope.setSqlResult(i, [], []);
+		    }
+		)
 	    .finally(function () {
-	    	sqlEntry.status = $scope.SQL_STATUS.NOTHING;
-	    });
+	    		sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+	    	}
+	    );
 		sqlEntry.status = $scope.SQL_STATUS.RUNNING;
 		
 	}
@@ -130,14 +136,24 @@ angular.module('mitsiApp')
 	
 	$scope.sqlStop = function(i) {
 		let sql = $scope.sqlList[i];
-		
-		console.log("stop : "+i); // TODO
+		sql.canceler.resolve();
+		sql.canceler = null;
+		sql.error = "cancelled";
 	}
 	
-	$scope.sqlStopAll = function(i) {
-		let sql = $scope.sqlList[i];
+	$scope.sqlStopAll = function() {
+		for (let i=0; i!=$scope.sqlList.length; i++) {
+			let sql = $scope.sqlList[i];
+			if (sql.status == $scope.SQL_STATUS.RUNNING) {
+				if (sql.canceler) {
+					sql.canceler.resolve();
+				}
+				sql.canceler = null;
+				sql.error = "cancelled";
+			}
+		}
 		
-		console.log("stop all"); // TODO
+		sqlService.cancelAllSql();
 	}
 	
 	$scope.sqlTrash = function(i) {

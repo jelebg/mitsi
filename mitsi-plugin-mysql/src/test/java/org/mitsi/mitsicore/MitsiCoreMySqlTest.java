@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/application-context.xml")
-public class MitsiMySqlTest {
+public class MitsiCoreMySqlTest {
 	
 	public static final String DATASOURCE_NAME = "BUBULLE-MYSQL";
 	public static final String DATASOURCE_NAME_2 = "BUBULLE-MYSQL-ON-TEST";
@@ -194,7 +194,7 @@ public class MitsiMySqlTest {
 	@Test
 	public void runSql() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			GetDataResult result = connection.runSql("select 1 from dual", 1);
+			GetDataResult result = connection.runSql("select 1 from dual", 1, null);
 			assertEquals(result.columns.size(), 1);
 			assertEquals(result.results.size(), 1);
 		}
@@ -203,7 +203,7 @@ public class MitsiMySqlTest {
 	@Test(expected=MitsiException.class)
 	public void runSqlError() throws IOException, ClassNotFoundException, SQLException, MitsiException {
 		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
-			connection.runSql("my mistake", 1);
+			connection.runSql("my mistake", 1, null);
 		}
 	}
 		

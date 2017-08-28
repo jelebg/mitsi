@@ -18,7 +18,7 @@
 	<div
 	     id="sqlText_{{ $index }}" 
 	     contenteditable="true" 
-	     style="background-color:lightgrey;"
+	     class="sqlEditor"
 	     ng-keypress="sqlTextKeyPress($event, $index)"
 	>	
 		{{ notEmpty(sql.sqlText) }}

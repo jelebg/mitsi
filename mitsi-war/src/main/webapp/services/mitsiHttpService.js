@@ -49,23 +49,34 @@ angular.module('mitsiApp')
 		return defer.promise;
 	}
 	
-	this.postForSql = function(sqlEntry, servletName, json) {
+	this.postForSql = function(sqlEntry, servletName, canceler, json) {
 		var defer = $q.defer();
 		
-		$http.post(servletName, json)
+		let options = canceler ? {"timeout": canceler.promise} : null;
+		
+		$http.post(servletName, json, options)
 		.then(function(response) {
 				if(response.data.errorMessage) {
-					sqlEntry.error = response.data.errorMessage;
+					if (sqlEntry) {
+						sqlEntry.error = response.data.errorMessage;
+					}
+					else {
+						errorService.showGeneralError(response.data.errorMessage);
+					}
 					defer.reject(response.data.errorMessage);
 				}
 				else {
-					sqlEntry.error = null;
+					if (sqlEntry) {
+						sqlEntry.error = null;
+					}
 					defer.resolve(response);
 				}
 			}
 		   , function(error) {
-			  sqlEntry.error = error;
-			  defer.reject(error);
+				if (sqlEntry) {
+					sqlEntry.error = "Request cancelled"; // TODO : voir si peut mieux faire .....
+				}
+			    defer.reject(error);
 		   }
 		);
 		

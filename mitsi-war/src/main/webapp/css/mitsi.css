@@ -650,3 +650,8 @@
 	color : red;
 	font-weight:bold;
 }
+
+.sqlEditor {
+	background-color:#eeeeee;
+	font-family: monospace;	
+}
