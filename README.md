@@ -67,8 +67,9 @@ to compile sources, you will have to download oracle's jdbc driver, compile the 
 
 * git clone https://github.com/jelebg/c3p0_mitsi/tree/mitsi-c3p0-0.9.5.2
 * switch to mitsi's specific branch : git checkout mitsi-c3p0-0.9.5.2
-* place mchange-commons-java-0.2.11.jar and mchange-commons-java-0.2.11-sources.jar in the lib directory of c3p0
+* create the lib library and place mchange-commons-java-0.2.11.jar and mchange-commons-java-0.2.11-sources.jar in it (you can download here for example : http://repo1.maven.org/maven2/com/mchange/mchange-commons-java/0.2.11/)
 * compile it with ant
+* instal the jar in the maven repo : mvn install:install-file -Dfile=build/c3p0-0.9.5.2.jar -DgroupId=com.mchange -DartifactId=c3p0 -Dversion=0.9.5.2-mitsi -Dpackaging=jar
 
 * clone mitsi : git clone https://github.com/jelebg/mitsi.git 
 * mvn clean install
