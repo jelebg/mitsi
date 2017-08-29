@@ -1,20 +1,15 @@
 angular.module('mitsiApp')
-    .controller('wsqlCtrl', function($scope, $rootScope, $q, sqlService) {
+    .controller('wsqlCtrl', function($scope, $rootScope, $q, $interval, sqlService) {
 
     // TODO : faire une diretive pour les contenteditable
     // TODO : faire des popovers
     // TODO : bind variables
     // TODO : rajouter les numéros de ligne
-    // TODO : resultat pércédents en gris quand sql running 
-   	// TODO : decompte du temps au lancement du sql
-    // TODO : meilleure animation lorsque le sql est running
     	
     const prefix = "sqlText_";
     const UNBREAKABLE_SPACE = "\xa0";
     const UNBREAKABLE_SPACE_REGEX_ALL = /\xa0/g;
     const DEFAULT_FETCH_SIZE = 50;
-    
-    $scope.sqlIdSequence = 0;
     
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
@@ -26,6 +21,9 @@ angular.module('mitsiApp')
 		return { "sqlText":"", "result":[], "columns":[], status:$scope.SQL_STATUS.NOTHING, "error":null };
 	}
 	
+    $scope.timers = {};
+    $scope.sqlIdSequence = 0;
+    
     $scope.sqlList = [ $scope.getEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
@@ -119,12 +117,34 @@ angular.module('mitsiApp')
 		)
 	    .finally(function () {
 	    		sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+	    		$scope.stopTimer(sqlEntry);
 	    	}
 	    );
 		sqlEntry.status = $scope.SQL_STATUS.RUNNING;
-		
+		$scope.startTimer(sqlEntry, sqlEntry.sqlId);
 	}
 	
+	$scope.startTimer = function(sqlEntry, sqlId) {
+		sqlEntry.beginTime = new Date().getTime();
+		sqlEntry.endTime = null;
+		sqlEntry.duration = " ";
+
+		$scope.timers[sqlId] = $interval(function() {
+			if (sqlEntry.endTime) {
+				sqlEntry.duration = ((sqlEntry.endTime - sqlEntry.beginTime) / 1000)+"s";
+				$interval.cancel($scope.timers[sqlId]);
+				delete $scope.timers[sqlId];
+			}
+			else {
+				sqlEntry.duration = Math.floor((new Date().getTime() - sqlEntry.beginTime) / 1000)+"s";
+			}
+		},
+		1000);
+	}
+	$scope.stopTimer = function(sqlEntry) {
+		sqlEntry.endTime = new Date().getTime();
+	}
+
 	$scope.setSqlResult = function(i, result, columns) {
 		$scope.sqlList[i].result = result;
 		$scope.sqlList[i].columns = columns;
@@ -216,4 +236,11 @@ angular.module('mitsiApp')
 	$scope.redo = function() {
 		console.log("redo"); // TODO
 	}
+	
+	$scope.$on('$destroy', function(p1, p2, p3) { // NOSONAR keep the parameters
+		for (let key in $scope.timers) {
+			$interval.cancel($scope.timers[key]);
+		}
+		$scope.timers = {};
+	});
 });

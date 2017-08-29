@@ -33,6 +33,7 @@
 		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}">
 			<i class="glyphicon glyphicon-trash" ></i>
 		</a>
+		<span ng-if="sql.duration">time: {{ sql.duration }}</span>
 	</div>
 	<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
 		{{ sql.error }}
