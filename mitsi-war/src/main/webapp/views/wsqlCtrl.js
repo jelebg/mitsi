@@ -94,7 +94,6 @@ angular.module('mitsiApp')
 	
 	$scope.sqlTextRun = function(i, sql) {
 		let sqlEntry = $scope.sqlList[i];
-		sqlEntry.sqlText = sql;
 		
 		if (!$rootScope.currentSource) { // TODO : afficher une erreur
 			return;
@@ -192,6 +191,10 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTrash = function(i) {
+		if ($scope.sqlList[i].status == $scope.SQL_STATUS.RUNNING) {
+			return;
+		}			
+			
 		if (i==$scope.sqlList.length-1) {
 			$scope.sqlList[i] = $scope.getEmptySqlEntry();
 			$scope.setSqlText(i, "");
@@ -203,9 +206,10 @@ angular.module('mitsiApp')
 		}
 	}
 	
-	$scope.sqlTrashAll = function(i) {
-	    $scope.sqlList = [ $scope.getEmptySqlEntry() ];
-		$scope.restoreSqlTexts();
+	$scope.sqlTrashAll = function() {
+		for (let i=$scope.sqlList.length-2; i>=0; i--) {
+			$scope.sqlTrash(i);
+		}
 	}
 	
 	$scope.isOneSqlStatus = function(status) {

@@ -1,8 +1,8 @@
 <div>
-	<a href="" ng-click="sqlStopAll()" ng-class="{'anchorDisabled' : !isOneSqlStatus(SQL_STATUS.RUNNING)}">
+	<a href="" ng-click="sqlStopAll()" >
 		<i class="glyphicon glyphicon-stop sqlMenuButton" ></i>
 	</a>
-	<a href="" ng-click="sqlTrashAll()" ng-class="{'anchorDisabled' : isOneSqlStatus(SQL_STATUS.RUNNING)}">
+	<a href="" ng-click="sqlTrashAll()" >
 		<i class="glyphicon glyphicon-trash sqlMenuButton" ></i>
 	</a>
 	<a href="" ng-click="undo" ng-class="{'anchorDisabled' : undoCommands.length==0}">
