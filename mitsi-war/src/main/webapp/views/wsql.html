@@ -34,6 +34,12 @@
 			<i class="glyphicon glyphicon-trash" ></i>
 		</a>
 		<span ng-if="sql.duration">time: {{ sql.duration }}</span>
+		timeout :
+		<select ng-model=sql.timeout>
+		  <option value="0">default</option>
+		  <option value="600">10min</option>
+		  <option value="1800">30min</option>
+		<select>
 	</div>
 	<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
 		{{ sql.error }}
