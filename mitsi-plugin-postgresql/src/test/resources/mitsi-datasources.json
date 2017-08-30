@@ -11,11 +11,11 @@
 		"password" : "test",
 		"connectSchema" : "TEST",
 		"pool" : {
-			initialSize      : 3,
-			minSize          : 0,
-			maxSize          : 10,
-			maxIdleTimeSec   : 10,
-			acquireIncrement : 1
+			"initialSize"      : 3,
+			"minSize"          : 0,
+			"maxSize"          : 10,
+			"maxIdleTimeSec"   : 10,
+			"acquireIncrement" : 1
 		}
 	  },
 	  "POSTGRE-TEST" :  {

@@ -46,11 +46,11 @@
 		"tags" : [ "tag4", "tag5", "tag3" ]
 		,"maxExportRows" : 5000
 		,"pool" : {
-			initialSize      : 3,
-			minSize          : 0,
-			maxSize          : 10,
-			maxIdleTimeSec   : 10,
-			acquireIncrement : 1
+			"initialSize"      : 3,
+			"minSize"          : 0,
+			"maxSize"          : 10,
+			"maxIdleTimeSec"   : 10,
+			"acquireIncrement" : 1
 		}
 		
 	  },
