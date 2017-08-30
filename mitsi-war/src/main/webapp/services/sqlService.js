@@ -13,11 +13,12 @@ angular.module('mitsiApp')
 		});
 	}
 
-	this.runSql = function(sqlEntry, datasourceName, sqlText, cancelSqlId, count, canceler) {
+	this.runSql = function(sqlEntry, datasourceName, sqlText, cancelSqlId, timeout, count, canceler) {
 		return mitsiHttpService.postForSql(sqlEntry, 'rest/runSql', canceler, { 
 			"datasourceName" : datasourceName,
 			"sqlText"        : sqlText,
 			"cancelSqlId"    : cancelSqlId,
+			"timeout"        : timeout,
 			"count"          : count
 		});
 	}

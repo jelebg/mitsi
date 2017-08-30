@@ -18,7 +18,7 @@ angular.module('mitsiApp')
     };    
     	
 	$scope.getEmptySqlEntry = function() {
-		return { "sqlText":"", "result":[], "columns":[], status:$scope.SQL_STATUS.NOTHING, "error":null };
+		return { "sqlText":"", "result":[], "columns":[], status:$scope.SQL_STATUS.NOTHING, "error":null, "timeout":"0" };
 	}
 	
     $scope.timers = {};
@@ -106,7 +106,7 @@ angular.module('mitsiApp')
 		
 		sqlEntry.canceler = $q.defer();
 		sqlEntry.cancelled = false;
-		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, cleanSql, sqlEntry.sqlId, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
+		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, cleanSql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
 	    .then(function(response) {
 				$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
 		    },

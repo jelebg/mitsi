@@ -21,6 +21,7 @@ class RunSql {
 	String datasourceName;
 	String sqlText;
 	String cancelSqlId;
+	Integer timeout; // may be null
 	long   count;
 	
 	public RunSql() {
@@ -54,7 +55,7 @@ public class RunSqlController extends MitsiRestController {
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			
 			MitsiConnection.GetDataResult result = connection.runSql(
-					request.sqlText, (int) rowCount, 
+					request.sqlText, request.timeout, (int) rowCount, 
 					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			
 			response.columns = result.columns;

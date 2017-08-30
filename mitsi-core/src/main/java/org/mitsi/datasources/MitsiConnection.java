@@ -44,6 +44,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	private static final Logger log = Logger.getLogger(MitsiConnection.class);
 
 	public static int DEFAULT_FETCH_SIZE = 2000;
+	public static int DEFAULT_SQL_TIMEOUT_SEC = 60;
 	public static final String MITSI_HIDDEN_RNUM_COLUMN = "mitsi_hiden_rnum__"; 
 
 	private static final Pattern forEachFilterPattern = Pattern.compile("__frch_filter_(\\d+).filter");
@@ -245,10 +246,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 	
 	void executeBoundSql(BoundSql boundSql, Map<String, Object> params, Filter[] filters, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
-		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, null, null, callback);
+		executeRawSql(boundSql.getSql(), boundSql.getParameterMappings(), params, filters, null, null, null, null, callback);
 	}
 
-	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
+	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer timeout, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
 		
 		try(PreparedStatement statement = sqlSession.getConnection().prepareStatement(sqlText)) {
 			
@@ -297,6 +298,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				cancellableStatementsManager.addStatement(datasource.getName(), cancelSqlId, statement);
 			}
 			
+			statement.setQueryTimeout(timeout == null || timeout <= 0 ? DEFAULT_SQL_TIMEOUT_SEC : timeout);
 			statement.execute();
 			ResultSet resultSet = statement.getResultSet();
 			
@@ -599,14 +601,14 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		return result;
 	}
 	
-	public GetDataResult runSql(String sqlText, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException, MitsiException {
+	public GetDataResult runSql(String sqlText, Integer timeout, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException, MitsiException {
 		// TODO : bind variables
 		final GetDataResult result = new GetDataResult();
 		result.columns = new ArrayList<>();
 		result.results = new ArrayList<>();
 
 		try {
-			executeRawSql(sqlText, null, null, null, maxRows, cancellableStatementsManager, cancelSqlId, new ExecuteRowSqlCallback() {
+			executeRawSql(sqlText, null, null, null, timeout, maxRows, cancellableStatementsManager, cancelSqlId, new ExecuteRowSqlCallback() {
 				int rowCount = 0;
 				
 				@Override
