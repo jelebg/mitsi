@@ -683,3 +683,15 @@
 .sqlHideButtonI {
     font-size:80%;
 }
+
+.sqlResultTh {
+    background-color:#f0f0f0;
+    padding:3px;
+    border-left: 1px solid #d3d3d3;
+}
+
+.sqlResultLineNumber {
+    background-color:#f0f0f0;
+    font-weight:bold;
+    font-size:90%;
+}

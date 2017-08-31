@@ -34,7 +34,9 @@
 			<i class="glyphicon glyphicon-trash" ></i>
 		</a>
 		<span ng-if="sql.duration">time: {{ sql.duration }}</span>
-
+		<span class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
+			{{ sql.error }}
+		</span>
 	</td><td ng-hide="sql.isHidden">
 		<ui-codemirror
 				ui-codemirror-opts="editorOptions"
@@ -63,13 +65,19 @@
 			{{ sql.error }}
 		</div>
 		<table ng-class="{'sqlTableWhenRunning' : sql.status==SQL_STATUS.RUNNING}"
+			   ng-if="sql.columns && sql.columns.length > 0 && sql.result"
 			   class="sqlTable">
 			<tr>
-				<th ng-repeat="col in sql.columns track by $index">
+				<th ></th>
+				<th ng-repeat="col in sql.columns track by $index"
+					class="sqlResultTh">
 					{{ col.name }}
 				</th>
 			</tr>
 			<tr ng-repeat="r in sql.result track by $index" >
+				<td class="sqlResultLineNumber">
+					{{ $index+1 }}
+				</td>
 				<td ng-repeat="cell in r  track by $index" >
 					{{ cell }}
 				</td>
