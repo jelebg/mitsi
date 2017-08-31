@@ -4,7 +4,7 @@ angular.module('mitsiApp')
 	$scope.editorOptions = {
 		"lineWrapping" : true,
 		"lineNumbers": true,
-		"mode": "xml", // TODO,
+		"mode": "text/x-sql", // TODO : permettre de changer le dialecte ? mariadb, oracle, etc.
 		"placeholder":"write some SQL here ..."
 	};
 
