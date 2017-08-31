@@ -222,4 +222,19 @@ angular.module('mitsiApp')
 		}
 		$scope.timers = {};
 	});
+
+	$scope.getShortSql = function(sqlEntry) {
+	    let sqlText = sqlEntry.sqlText;
+	    if (!sqlText || sqlText.trim() == "") {
+	        return "(empty)";
+	    }
+
+        let short =
+            sqlText.replace(/\s+/g, " ")
+            .trim();
+        if (short.length > 40) {
+            short = short.substring(0, 40)+"...";
+        }
+	    return short;
+	}
 });
