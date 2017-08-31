@@ -654,3 +654,32 @@
 .sqlErrorSqlRunning {
 	opacity: 0.3;
 }
+
+.sqlShortText {
+    font-family:monospace;
+    font-style: italic;
+    color:grey;
+}
+
+.sqlList {
+    margin-top:3px;
+    margin-bottom:3px;
+}
+
+.sqlHideButtonTd {
+    vertical-align:top;
+}
+
+.sqlHideButtonA {
+    margin:3px;
+}
+
+.sqlListHr {
+    margin-top:10px;
+    margin-bottom:5px;
+    margin-left:10px;
+}
+
+.sqlHideButtonI {
+    font-size:80%;
+}

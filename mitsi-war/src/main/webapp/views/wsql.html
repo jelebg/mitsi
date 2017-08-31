@@ -13,16 +13,16 @@
 	</a>
 </div>
 <div ng-repeat="sql in sqlList  track by $index"
-     style="margin-top:3px;margin-bottom:3px;"
+     class="sqlList"
 >
-	<hr>
-	<table><tr><td style="vertical-align:top;">
+	<hr class="sqlListHr">
+	<table><tr><td class="sqlHideButtonTd">
 
-		<a href="" ng-click="sql.isHidden=!sql.isHidden" style="margin:3px;">
-			<i class="glyphicon" ng-class="{'glyphicon-minus':!sql.isHidden, 'glyphicon-plus':sql.isHidden}"></i>
+		<a href="" ng-click="sql.isHidden=!sql.isHidden" class="sqlHideButtonA">
+			<i class="sqlHideButtonI glyphicon" ng-class="{'glyphicon-minus':!sql.isHidden, 'glyphicon-plus':sql.isHidden}"></i>
 		</a>
 
-	</td><td ng-hide="!sql.isHidden" style="font-family:monospace;font-style: italic;color:grey;">
+	</td><td ng-hide="!sql.isHidden" class="sqlShortText">
 		{{ getShortSql(sql) }}
 		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
 			<i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
