@@ -83,5 +83,9 @@
 				</td>
 			</tr>
 		</table>
+		<div ng-hide="!sql.maxRowsReached" class="sqlResultMaxRowsReached">
+			(only {{ sql.result.length }} first rows are displayed)
+		</div>
 	</td></tr></table>
+
 </div>

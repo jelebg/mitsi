@@ -695,3 +695,8 @@
     font-weight:bold;
     font-size:90%;
 }
+
+.sqlResultMaxRowsReached {
+    color:orange;
+    font-style:italic;
+}

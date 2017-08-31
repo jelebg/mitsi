@@ -55,12 +55,12 @@ public class RunSqlController extends MitsiRestController {
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			
 			MitsiConnection.GetDataResult result = connection.runSql(
-					request.sqlText, request.timeout, (int) rowCount, 
+					request.sqlText, request.timeout, (int) rowCount+1,
 					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			
 			response.columns = result.columns;
-			response.results = result.results;
-			response.maxRowsReached = response.results.size()==maxRows;
+			response.results = result.results.subList(0, (int) rowCount);
+			response.maxRowsReached = result.results.size()>rowCount;
 		}
 		catch(SQLException e) {
 			log.error("error in RunSqlController", e);

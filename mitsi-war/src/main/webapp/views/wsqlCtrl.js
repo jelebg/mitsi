@@ -98,10 +98,10 @@ angular.module('mitsiApp')
 		sqlEntry.cancelled = false;
 		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
 	    .then(function(response) {
-				$scope.setSqlResult(i, response.data.results, response.data.columns); // TODO
+				$scope.setSqlResult(i, response.data.results, response.data.columns, response.data.maxRowsReached); // TODO
 		    },
 		    function(error) {
-		    	$scope.setSqlResult(i, [], []);
+		    	$scope.setSqlResult(i, [], [], false);
 		    }
 		)
 	    .finally(function () {
@@ -134,9 +134,10 @@ angular.module('mitsiApp')
 		sqlEntry.endTime = new Date().getTime();
 	}
 
-	$scope.setSqlResult = function(i, result, columns) {
+	$scope.setSqlResult = function(i, result, columns, maxRowsReached) {
 		$scope.sqlList[i].result = result;
 		$scope.sqlList[i].columns = columns;
+		$scope.sqlList[i].maxRowsReached = maxRowsReached;
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {
