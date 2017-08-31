@@ -59,8 +59,13 @@ public class RunSqlController extends MitsiRestController {
 					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			
 			response.columns = result.columns;
-			response.results = result.results.subList(0, (int) rowCount);
 			response.maxRowsReached = result.results.size()>rowCount;
+			if (response.maxRowsReached) {
+				response.results = result.results.subList(0, (int) rowCount);
+			}
+			else {
+				response.results = result.results;
+			}
 		}
 		catch(SQLException e) {
 			log.error("error in RunSqlController", e);

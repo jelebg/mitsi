@@ -31,8 +31,7 @@ angular.module('mitsiApp')
 	}
 	
     $scope.timers = {};
-    $scope.sqlIdSequence = 0;
-    
+
     $scope.sqlList = [ $scope.getEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
@@ -82,7 +81,20 @@ angular.module('mitsiApp')
 			$scope.sqlTextRun(i, sql);
 		}
 	}
-	
+
+    $scope.increaseAndGetSqlId = function() {
+        let sqlId = localStorage.getItem("sqlIdSequence");
+        if (sqlId == null) {
+            localStorage.setItem("sqlIdSequence", "0");
+            return 0;
+        }
+        else {
+            let sqlIdInt = parseInt(sqlId);
+            localStorage.setItem("sqlIdSequence", sqlIdInt+1);
+            return sqlIdInt+1;
+        }
+    }
+
 	$scope.sqlTextRun = function(i, sql) {
 		let sqlEntry = $scope.sqlList[i];
 		
@@ -90,10 +102,8 @@ angular.module('mitsiApp')
 			return;
 		}
 		
-		$scope.sqlIdSequence ++;
-		sqlEntry.sqlId = "sqlId_" + $scope.sqlIdSequence;
-		
-		
+		sqlEntry.sqlId = "sqlId_" + $scope.increaseAndGetSqlId();
+
 		sqlEntry.canceler = $q.defer();
 		sqlEntry.cancelled = false;
 		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)

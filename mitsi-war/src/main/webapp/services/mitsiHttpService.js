@@ -83,7 +83,7 @@ angular.module('mitsiApp')
 						sqlEntry.error = "Request cancelled";
 					}
 					else {
-						sqlEntry.error = response.data.errorMessage;
+						sqlEntry.error = error.statusText;
 					}
 				}
 			    defer.reject(error);
