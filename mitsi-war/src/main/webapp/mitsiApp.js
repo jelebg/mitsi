@@ -3,7 +3,7 @@ angular
 .module("mitsiApp", ["ui.bootstrap", "ui.layout", "ui.router", 
                      'ui.grid', 'ui.grid.resizeColumns', 'ui.grid.exporter', 'ui.grid.selection',
                      'ui.grid.infiniteScroll', 'ui.grid.cellNav'
-                     , 'rzModule'
+                     , 'rzModule', 'ui.codemirror'
                      ])
 
 .config(function($stateProvider, $urlRouterProvider, $locationProvider, $injector){

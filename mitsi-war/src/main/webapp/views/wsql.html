@@ -15,14 +15,12 @@
 <div ng-repeat="sql in sqlList  track by $index"
      style="margin-top:3px;margin-bottom:3px;"
 >
-	<div
-	     id="sqlText_{{ $index }}" 
-	     contenteditable="true" 
-	     class="sqlEditor"
-	     ng-keypress="sqlTextKeyPress($event, $index)"
-	>	
-		{{ notEmpty(sql.sqlText) }}
-	</div>
+	<hr>
+	<ui-codemirror
+			ui-codemirror-opts="editorOptions"
+			ng-model="sql.sqlText"
+			ng-keypress="sqlTextKeyPress($event, $index)"
+	></ui-codemirror>
 	<div>
 		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
 			<i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
@@ -39,7 +37,7 @@
 		  <option value="0">default</option>
 		  <option value="600">10min</option>
 		  <option value="1800">30min</option>
-		<select>
+		</select>
 	</div>
 	<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
 		{{ sql.error }}
