@@ -64,7 +64,7 @@
 		<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
 			{{ sql.error }}
 		</div>
-		<table ng-class="{'sqlTableWhenRunning' : sql.status==SQL_STATUS.RUNNING}"
+		<table ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}"
 			   ng-if="sql.columns && sql.columns.length > 0 && sql.result"
 			   class="sqlTable">
 			<tr>
@@ -83,8 +83,13 @@
 				</td>
 			</tr>
 		</table>
-		<div ng-hide="!sql.maxRowsReached" class="sqlResultMaxRowsReached">
+		<div ng-hide="!sql.maxRowsReached" class="sqlResultMaxRowsReached"
+			 ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}">
 			(only {{ sql.result.length }} first rows are displayed)
+		</div>
+		<div ng-repeat="msg in sql.messages"
+			 ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}">
+			{{ msg }}
 		</div>
 	</td></tr></table>
 

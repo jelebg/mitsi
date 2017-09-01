@@ -33,6 +33,7 @@ class RunSqlResponse {
 	List<Column> columns;
 	List<String[]> results;
 	boolean maxRowsReached;
+	List<String> messages;
 	
 	public RunSqlResponse() {
 		// nothing
@@ -59,13 +60,14 @@ public class RunSqlController extends MitsiRestController {
 					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			
 			response.columns = result.columns;
-			response.maxRowsReached = result.results.size()>rowCount;
+			response.maxRowsReached = result.results == null ? false : result.results.size()>rowCount;
 			if (response.maxRowsReached) {
 				response.results = result.results.subList(0, (int) rowCount);
 			}
 			else {
 				response.results = result.results;
 			}
+			response.messages = result.messages;
 		}
 		catch(SQLException e) {
 			log.error("error in RunSqlController", e);

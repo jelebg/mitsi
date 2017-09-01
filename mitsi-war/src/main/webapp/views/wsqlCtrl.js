@@ -15,8 +15,7 @@ angular.module('mitsiApp')
     
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
-    		TO_RUN: 1,
-    		RUNNING: 2
+    		RUNNING: 1
     };    
     	
 	$scope.getEmptySqlEntry = function() {
@@ -45,12 +44,34 @@ angular.module('mitsiApp')
 		let insertSqlList = [];
 		for (let j=0; j!=sqlParts.length; j++) {
 			let sqlText = sqlParts[j];
+			if (sqlText.trim() == "") {
+			    continue
+			}
 			
 			let isEqualToPreviousSql = sqlText.trim() == previousSql.sqlText.trim();
-			let sqlResult = isEqualToPreviousSql ? previousSql.result : [];
-			let sqlColumns = isEqualToPreviousSql ? previousSql.columns : [];
-			let status = isEqualToPreviousSql ? $scope.SQL_STATUS.NOTHING : $scope.SQL_STATUS.TO_RUN;
-			insertSqlList.push({ "sqlText":sqlText, "result":sqlResult, "columns":sqlColumns, "status":status });
+			//let sqlResult = isEqualToPreviousSql ? previousSql.result : [];
+			//let sqlColumns = isEqualToPreviousSql ? previousSql.columns : [];
+			//let status = isEqualToPreviousSql ? $scope.SQL_STATUS.NOTHING : $scope.SQL_STATUS.TO_RUN;
+			if (isEqualToPreviousSql) {
+			    insertSqlList.push({
+			        "sqlText":sqlText,
+			        "result":previousSql.result,
+			        "columns":previousSql.columns,
+			        "status":$scope.SQL_STATUS.NOTHING,
+			        "messages":previousSql.messages,
+			        "maxRowsReached":previousSql.maxRowsReached
+			    });
+		    }
+		    else {
+			    insertSqlList.push({
+			        "sqlText":sqlText,
+			        "result":[],
+			        "columns":[],
+			        "status":$scope.SQL_STATUS.NOTHING,
+                    "messages":null,
+                    "maxRowsReached":false
+			    });
+		    }
 		}
 		
 		let before = i == 0 ? [] : $scope.sqlList.slice(0, i);
@@ -108,10 +129,10 @@ angular.module('mitsiApp')
 		sqlEntry.cancelled = false;
 		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
 	    .then(function(response) {
-				$scope.setSqlResult(i, response.data.results, response.data.columns, response.data.maxRowsReached); // TODO
+				$scope.setSqlResult(i, response.data.results, response.data.columns, response.data.maxRowsReached, response.data.messages); // TODO
 		    },
 		    function(error) {
-		    	$scope.setSqlResult(i, [], [], false);
+		    	$scope.setSqlResult(i, [], [], false, null);
 		    }
 		)
 	    .finally(function () {
@@ -144,10 +165,11 @@ angular.module('mitsiApp')
 		sqlEntry.endTime = new Date().getTime();
 	}
 
-	$scope.setSqlResult = function(i, result, columns, maxRowsReached) {
+	$scope.setSqlResult = function(i, result, columns, maxRowsReached, messages) {
 		$scope.sqlList[i].result = result;
 		$scope.sqlList[i].columns = columns;
 		$scope.sqlList[i].maxRowsReached = maxRowsReached;
+		$scope.sqlList[i].messages = messages;
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {

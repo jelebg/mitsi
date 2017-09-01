@@ -241,7 +241,8 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	
 	private interface ExecuteRowSqlCallback {
 		void onNewColumn(String columnName, String type);
-		void onNewRow(String [] row) throws MitsiException;		
+		void onNewRow(String [] row) throws MitsiException;
+		void addMessage(String message);
 		boolean mustStop();
 	}
 	
@@ -301,40 +302,45 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			statement.setQueryTimeout(timeout == null || timeout <= 0 ? DEFAULT_SQL_TIMEOUT_SEC : timeout);
 			statement.execute();
 			ResultSet resultSet = statement.getResultSet();
-			
-			// get columns
-			ResultSetMetaData rsmd = resultSet.getMetaData();
-			int[] jdbcTypes = new int[rsmd.getColumnCount()];
-			int[] columnPos = new int[rsmd.getColumnCount()];
-			int nbColumns = 0;
-			for(int i=1; i<rsmd.getColumnCount()+1; i++) {
-				String columnName = rsmd.getColumnName(i);
-				if(MITSI_HIDDEN_RNUM_COLUMN.equals(columnName.toLowerCase())) {
-					columnPos[i-1] = -1;
-					continue;
-				}
-				String type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i));
-				callback.onNewColumn(columnName, type);
 
-				jdbcTypes[i-1] =  rsmd.getColumnType(i);
-				columnPos[i-1] = nbColumns;
-				nbColumns ++;
+			if (resultSet == null) {
+				callback.addMessage("statement executed, " + statement.getUpdateCount() + " rows updated"); // TODO : message a revoir, ne convient pas pour un create table ou un delete
 			}
-			
-			// get data
-			
-			while(resultSet.next() ) {
-				String[] row = new String[nbColumns];
-				for(int i=0; i!=row.length; i++) {
-					if(columnPos[i] >= 0) {
-						//if(jdbcTypes[i]!=-1) {
-							row[columnPos[i]] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i+1);
-						//}
+			else {
+				// get columns
+				ResultSetMetaData rsmd = resultSet.getMetaData();
+				int[] jdbcTypes = new int[rsmd.getColumnCount()];
+				int[] columnPos = new int[rsmd.getColumnCount()];
+				int nbColumns = 0;
+				for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+					String columnName = rsmd.getColumnName(i);
+					if (MITSI_HIDDEN_RNUM_COLUMN.equals(columnName.toLowerCase())) {
+						columnPos[i - 1] = -1;
+						continue;
 					}
+					String type = TypeHelper.getTypeFromJdbc(rsmd.getColumnType(i));
+					callback.onNewColumn(columnName, type);
+
+					jdbcTypes[i - 1] = rsmd.getColumnType(i);
+					columnPos[i - 1] = nbColumns;
+					nbColumns++;
 				}
-				callback.onNewRow(row);
-				if (callback.mustStop()) {
-					break;
+
+				// get data
+
+				while (resultSet.next()) {
+					String[] row = new String[nbColumns];
+					for (int i = 0; i != row.length; i++) {
+						if (columnPos[i] >= 0) {
+							//if(jdbcTypes[i]!=-1) {
+							row[columnPos[i]] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i + 1);
+							//}
+						}
+					}
+					callback.onNewRow(row);
+					if (callback.mustStop()) {
+						break;
+					}
 				}
 			}
 		}
@@ -404,6 +410,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				}
 
 				@Override
+				public void addMessage(String message) {
+					// nothing
+				}
+
+				@Override
 				public boolean mustStop() {
 					return false;
 				}
@@ -434,6 +445,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 				@Override
 				public void onNewRow(String[] row) {
 					detailsSection.data.add(row);
+				}
+
+				@Override
+				public void addMessage(String message) {
+					// nothing
 				}
 
 				@Override
@@ -515,6 +531,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	public static class GetDataResult {
 		public List<Column> columns;
 		public List<String[]> results;
+		public List<String> messages;
 	}
 	
 	private void setFilterBindVariable(PreparedStatement statement, int iParam, Filter filter) throws SQLException, ParseException {
@@ -593,6 +610,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 
 			@Override
+			public void addMessage(String message) {
+				result.messages.add(message);
+			}
+
+			@Override
 			public boolean mustStop() {
 				return false;
 			}
@@ -606,6 +628,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		final GetDataResult result = new GetDataResult();
 		result.columns = new ArrayList<>();
 		result.results = new ArrayList<>();
+		result.messages = new ArrayList<>();
 
 		try {
 			executeRawSql(sqlText, null, null, null, timeout, maxRows, cancellableStatementsManager, cancelSqlId, new ExecuteRowSqlCallback() {
@@ -624,7 +647,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 					result.results.add(row);
 					rowCount++;
 				}
-				
+
+				@Override
+				public void addMessage(String message) {
+					result.messages.add(message);
+				}
+
 				@Override
 				public boolean mustStop() {
 					return maxRows!=null && rowCount >= maxRows;
