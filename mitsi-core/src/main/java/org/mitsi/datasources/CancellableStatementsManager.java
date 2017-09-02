@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public interface CancellableStatementsManager {
+	long getDatasourceStatementsCount(String datasourceName);
 	void addStatement(String datasourceName, String cancelSqlId, PreparedStatement statement);
 	void removeStatement(String datasourceName, String cancelSqlId);
 	void cancelAllForDatasource(String datasourceName) throws SQLException;

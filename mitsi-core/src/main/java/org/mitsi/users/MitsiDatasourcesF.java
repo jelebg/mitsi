@@ -17,6 +17,7 @@ public class MitsiDatasourcesF {
 		String [] tags;
 		String connectSchema;
 		Long maxExportRows;
+		Long maxRunningStatementPerUser;
 		Pool pool;
 	}
 	

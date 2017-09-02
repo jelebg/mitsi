@@ -10,6 +10,8 @@
 		"user" : "test",
 		"password" : "test",
 		"connectSchema" : "TEST",
+		"maxExportRows" : "2000",
+		"maxRunningStatementPerUser" : "5",
 		"pool" : {
 			"initialSize"      : 3,
 			"minSize"          : 0,

@@ -6,12 +6,13 @@ import java.util.TreeSet;
 
 public class MitsiDatasource {
 	
-	private static final int DEFAULT_MAX_EXPORT_ROWS        = 1000000;
-	private static final int DEFAULT_POOL_INITIAL_SIZE      = 0;
-	private static final int DEFAULT_POOL_MIN_SIZE          = 0;
-	private static final int DEFAULT_POOL_MAX_SIZE          = 5;
-	private static final int DEFAULT_POOL_MAX_IDLE_TIME_SEC = 600;
-	private static final int DEFAULT_POOL_ACQUIRE_INCREMENT = 1;
+	private static final int DEFAULT_MAX_EXPORT_ROWS            = 1000000;
+	private static final int DEFAULT_RUNNING_STATEMENT_PER_USER = 3;
+	private static final int DEFAULT_POOL_INITIAL_SIZE          = 0;
+	private static final int DEFAULT_POOL_MIN_SIZE              = 0;
+	private static final int DEFAULT_POOL_MAX_SIZE              = 5;
+	private static final int DEFAULT_POOL_MAX_IDLE_TIME_SEC     = 600;
+	private static final int DEFAULT_POOL_ACQUIRE_INCREMENT     = 1;
 	
 	private String name;
 	private String description;
@@ -23,12 +24,14 @@ public class MitsiDatasource {
 	private String connectSchema;
 	private List<String> tags;
 	private TreeSet<String> userGroups;
-	private long maxExportRows        = DEFAULT_MAX_EXPORT_ROWS;
-	private long poolInitialSize      = DEFAULT_POOL_INITIAL_SIZE;
-	private long poolMinSize          = DEFAULT_POOL_MIN_SIZE;
-	private long poolMaxSize          = DEFAULT_POOL_MAX_SIZE;
-	private long poolMaxIdleTimeSec   = DEFAULT_POOL_MAX_IDLE_TIME_SEC;
-	private long poolAcquireIncrement = DEFAULT_POOL_ACQUIRE_INCREMENT;
+
+	private long maxRunningStatementPerUser = DEFAULT_RUNNING_STATEMENT_PER_USER;
+	private long maxExportRows              = DEFAULT_MAX_EXPORT_ROWS;
+	private long poolInitialSize            = DEFAULT_POOL_INITIAL_SIZE;
+	private long poolMinSize                = DEFAULT_POOL_MIN_SIZE;
+	private long poolMaxSize                = DEFAULT_POOL_MAX_SIZE;
+	private long poolMaxIdleTimeSec         = DEFAULT_POOL_MAX_IDLE_TIME_SEC;
+	private long poolAcquireIncrement       = DEFAULT_POOL_ACQUIRE_INCREMENT;
 	
 	public class Cache 	{
 		List<DatabaseObject> databaseObjects;
@@ -37,7 +40,7 @@ public class MitsiDatasource {
 	
 	public MitsiDatasource(String name, String description, String provider,
 			String driver, String jdbcUrl, String user, String password, List<String> tags,
-			TreeSet<String> userGroups, Long maxExportRows) {
+			TreeSet<String> userGroups, Long maxExportRows, Long maxRunningStatementPerUser) {
 		this.name = name;
 		this.description = description;
 		this.provider = provider;
@@ -47,6 +50,9 @@ public class MitsiDatasource {
 		this.password = password;
 		this.tags = tags;
 		this.userGroups = userGroups;
+		if(maxRunningStatementPerUser != null) {
+			this.maxRunningStatementPerUser = maxRunningStatementPerUser;
+		}
 		if(maxExportRows != null) {
 			this.maxExportRows = maxExportRows;
 		}
@@ -138,6 +144,14 @@ public class MitsiDatasource {
 
 	public void setMaxExportRows(Long maxExportRows) {
 		this.maxExportRows = maxExportRows;
+	}
+
+	public long getMaxRunningStatementPerUser() {
+		return maxRunningStatementPerUser;
+	}
+
+	public void setMaxRunningStatementPerUser(long maxRunningStatementPerUser) {
+		this.maxRunningStatementPerUser = maxRunningStatementPerUser;
 	}
 
 	public long getPoolInitialSize() {

@@ -296,6 +296,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			}
 			
 			if (cancellableStatementsManager != null) {
+				long statementCount = cancellableStatementsManager.getDatasourceStatementsCount(datasource.getName());
+				if (datasource.getMaxRunningStatementPerUser() <= statementCount) {
+					throw new MitsiException("You have already "+statementCount+" statements running for this datasource. Try again later or cancel them.");
+				}
 				cancellableStatementsManager.addStatement(datasource.getName(), cancelSqlId, statement);
 			}
 			

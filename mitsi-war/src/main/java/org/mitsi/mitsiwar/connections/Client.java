@@ -46,7 +46,16 @@ public class Client implements Serializable {
 		private static final long serialVersionUID = -286978823237391934L;
 
 		private Map<String, Map<String, PreparedStatement>> cancellableStatements = new HashMap<>();
-		
+
+		@Override
+		public synchronized long getDatasourceStatementsCount(String datasourceName) {
+			Map<String, PreparedStatement> statements = cancellableStatements.get(datasourceName);
+			if (statements == null) {
+				return 0;
+			}
+			return statements.size();
+		}
+
 		public synchronized List<String> getAllDatasourcesWithStatements() {
 			List<String> datasources = new ArrayList<>();
 			
