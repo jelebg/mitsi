@@ -1,4 +1,4 @@
-<div>
+<div class="sqlMenuBar">
 	<a href="" ng-click="sqlStopAll()" >
 		<i class="glyphicon glyphicon-stop sqlMenuButton" ></i>
 	</a>
@@ -12,10 +12,11 @@
 		<i class="glyphicon glyphicon-share-alt sqlMenuButton"></i>
 	</a>
 </div>
+<div class="sqlScrolldiv">
 <div ng-repeat="sql in sqlList  track by $index"
      class="sqlList"
 >
-	<hr class="sqlListHr">
+	<hr class="sqlListHr" g-if="$index > 0">
 	<table><tr><td class="sqlHideButtonTd">
 
 		<a href="" ng-click="sql.isHidden=!sql.isHidden" class="sqlHideButtonA">
@@ -93,4 +94,5 @@
 		</div>
 	</td></tr></table>
 
+</div>
 </div>

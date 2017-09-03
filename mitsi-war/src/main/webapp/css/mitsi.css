@@ -700,3 +700,18 @@
     color:orange;
     font-style:italic;
 }
+
+.sqlMenuBar {
+    border-bottom:1px solid #ddd;
+}
+
+.sqlScrolldiv {
+    position:absolute;
+    top:70px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    width:auto;
+    height:auto;
+    overflow-y:auto;"
+}
