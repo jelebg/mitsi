@@ -57,9 +57,12 @@
 				ng-keypress="sqlTextKeyPress($event, $index)"
 		></ui-codemirror>
 		<div>
-			<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
-				<i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
-			</a>
+            <a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
+                <i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
+            </a>
+            <a href="" ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
+                <i class="glyphicon glyphicon-time" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
+            </a>
 			<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}">
 				<i class="glyphicon glyphicon-stop"></i>
 			</a>

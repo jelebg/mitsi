@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wsqlCtrl', function($scope, $rootScope, $q, $interval, sqlService) {
+    .controller('wsqlCtrl', function($scope, $rootScope, $q, $interval, $window, sqlService) {
 
 	$scope.editorOptions = {
 		"lineWrapping" : true,
@@ -10,15 +10,18 @@ angular.module('mitsiApp')
 
     // TODO : faire des popovers
     // TODO : bind variables
+    // TODO : backup (toutes les secondes ?) des sql
 
     const DEFAULT_FETCH_SIZE = 50;
-    
+    const LOCAL_STORAGE_SQL_SEARCH = "sqlSearch";
+    const LOCAL_STORAGE_SQL_LIST = "sqlList";
+
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
-    		RUNNING: 1
-    };    
-    	
-	$scope.getEmptySqlEntry = function() {
+    		RUNNING : 1
+    };
+
+	$scope.newEmptySqlEntry = function() {
 		return {
 		    "sqlText":"",
 		    "result":[],
@@ -28,13 +31,103 @@ angular.module('mitsiApp')
 		    "timeout":"0"
 		    };
 	}
-	
+
+	$scope.newSqlEntry = function(sqlId, sqlText) {
+		return {
+		    "sqlId":sqlId,
+		    "sqlText":sqlText,
+		    "result":[],
+		    "columns":[],
+		    "status":$scope.SQL_STATUS.NOTHING,
+		    "error":null,
+		    "timeout":"0"
+		    };
+	}
+
     $scope.timers = {};
 
-    $scope.searchSql = localStorage.getItem("sqlSearch");
-    $scope.sqlList = [ $scope.getEmptySqlEntry() ];
+    $scope.searchSql = localStorage.getItem(LOCAL_STORAGE_SQL_SEARCH);
+    $scope.sqlList = [ $scope.newEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
+
+    $scope.backupSqlList = function() {
+        let backup = [];
+        for (let i=0; i!=$scope.sqlList.length; i++) {
+            let sqlEntry = $scope.sqlList[i];
+            backup.push({
+                "sqlId"   : sqlEntry.sqlId,
+                "sqlText" : sqlEntry.sqlText
+            });
+        }
+        let backupJson = JSON.stringify(backup);
+        localStorage.setItem(LOCAL_STORAGE_SQL_LIST, backupJson);
+    }
+
+    $scope.restoreSqlList = function() {
+        let backupJson = localStorage.getItem(LOCAL_STORAGE_SQL_LIST);
+
+        if (!backupJson) {
+            return;
+        }
+
+        let backup = JSON.parse(backupJson);
+        $scope.sqlList = [];
+        for (let i=0; i!=backup.length; i++) {
+            let backupSql = backup[i];
+            $scope.sqlList.push($scope.newSqlEntry(
+                backupSql.sqlId,
+                backupSql.sqlText
+            ));
+        }
+
+        sqlService.sqlStatus()
+        .then(function(response) {
+                let statusList = response.data.statusList;
+                if (!statusList) {
+                    return;
+                }
+                let missedRunningSqlCount = statusList.length;
+
+                let statusMap = {};
+                for(let i=0; i!=statusList.length; i++) {
+                    let status = statusList[i];
+                    statusMap[status.sqlId] = status;
+                }
+
+                for(let i=0; i!=$scope.sqlList.length; i++) {
+                    let sqlEntry = $scope.sqlList[i];
+                    if (!sqlEntry.sqlId) {
+                        continue;
+                    }
+
+                    let status = statusMap[sqlEntry.sqlId];
+                    if (!status) {
+                        sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+                        continue;
+                    }
+
+                    missedRunningSqlCount --;
+                    if (status.running) {
+                        sqlEntry.status = $scope.SQL_STATUS.RUNNING;
+                    }
+                    else {
+                        sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+                    }
+
+                    // TODO running for time
+                    // TODO running on datasource
+
+                }
+
+                if (missedRunningSqlCount > 0) {
+                    // TODO : fonctionnement à revoir
+                    $window.alert(missedRunningSqlCount+" statements are running for this session, but not displayed here."+
+                     "To cancel them, yo may cancel all the running statements for the datasource using the general cancel button.");
+                }
+            }
+        );
+    }
 
 	$scope.splitAndRun = function(i) {
 		let previousSql = $scope.sqlList[i];
@@ -119,12 +212,12 @@ angular.module('mitsiApp')
 
 	$scope.sqlTextRun = function(i, sql) {
 		let sqlEntry = $scope.sqlList[i];
-		
+		sqlEntry.sqlId = "sqlId_" + $scope.increaseAndGetSqlId();
+	    $scope.backupSqlList();
+
 		if (!$rootScope.currentSource) { // TODO : afficher une erreur
 			return;
 		}
-		
-		sqlEntry.sqlId = "sqlId_" + $scope.increaseAndGetSqlId();
 
 		sqlEntry.canceler = $q.defer();
 		sqlEntry.cancelled = false;
@@ -179,7 +272,7 @@ angular.module('mitsiApp')
 		}
 
 		if (i == $scope.sqlList.length-1) {
-			$scope.sqlList.push($scope.getEmptySqlEntry());
+			$scope.sqlList.push($scope.newEmptySqlEntry());
 		}
 
 	}
@@ -220,7 +313,7 @@ angular.module('mitsiApp')
 		}			
 			
 		if (i==$scope.sqlList.length-1) {
-			$scope.sqlList[i] = $scope.getEmptySqlEntry();
+			$scope.sqlList[i] = $scope.newEmptySqlEntry();
 		}
 		else {
 			$scope.sqlList.splice(i, 1);
@@ -279,7 +372,7 @@ angular.module('mitsiApp')
 	}
 
 	$scope.searchSqlChange = function() {
-        localStorage.setItem("sqlSearch", $scope.searchSql);
+        localStorage.setItem(LOCAL_STORAGE_SQL_SEARCH, $scope.searchSql);
 	    let search = ""
 	    if ($scope.searchSql) {
 	        search = $scope.searchSql.trim();
@@ -303,4 +396,5 @@ angular.module('mitsiApp')
 	    }
 	}
 
+    $scope.restoreSqlList();
 });

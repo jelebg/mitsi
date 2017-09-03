@@ -34,5 +34,9 @@ angular.module('mitsiApp')
 			cancelSqlId : null
 		});
 	}
-	
+
+	this.sqlStatus = function() {
+		return mitsiHttpService.postForSql(null, 'rest/sqlStatus', null, {});
+	}
+
 });
