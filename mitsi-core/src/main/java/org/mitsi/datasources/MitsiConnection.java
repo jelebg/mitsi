@@ -626,7 +626,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		
 		return result;
 	}
-	
+
 	public GetDataResult runSql(String sqlText, Integer timeout, final Integer maxRows, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException, MitsiException {
 		// TODO : bind variables
 		final GetDataResult result = new GetDataResult();
@@ -637,15 +637,15 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		try {
 			executeRawSql(sqlText, null, null, null, timeout, maxRows, cancellableStatementsManager, cancelSqlId, new ExecuteRowSqlCallback() {
 				int rowCount = 0;
-				
+
 				@Override
 				public void onNewColumn(String columnName, String type) {
 					Column column = new Column();
 					column.type = type;
 					column.name = columnName;
-					result.columns.add(column);				
+					result.columns.add(column);
 				}
-	
+
 				@Override
 				public void onNewRow(String[] row) {
 					result.results.add(row);
@@ -662,14 +662,50 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 					return maxRows!=null && rowCount >= maxRows;
 				}
 			});
-			
+
 			return result;
 		}
 		catch (SQLException e) {
 			throw new MitsiException(e.getMessage(), e);
 		}
 	}
-	
+
+	public long runSqlForTime(String sqlText, Integer timeout, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId) throws SQLException, MitsiException {
+		// TODO : bind variables
+		final long[] rowCount = new long[1];
+
+		try {
+			executeRawSql(sqlText, null, null, null, timeout, 0, cancellableStatementsManager, cancelSqlId,
+					new ExecuteRowSqlCallback() {
+
+				@Override
+				public void onNewColumn(String columnName, String type) {
+					// nothing
+				}
+
+				@Override
+				public void onNewRow(String[] row) {
+					rowCount[0]++;
+				}
+
+				@Override
+				public void addMessage(String message) {
+					// nothing
+				}
+
+				@Override
+				public boolean mustStop() {
+					return false;
+				}
+			});
+
+			return rowCount[0];
+		}
+		catch (SQLException e) {
+			throw new MitsiException(e.getMessage(), e);
+		}
+	}
+
 	public void cancelAllRunningSql(CancellableStatementsManager cancellableStatementsManager) throws SQLException {
 		cancellableStatementsManager.cancelAllForDatasource(datasource.getName());
 	}

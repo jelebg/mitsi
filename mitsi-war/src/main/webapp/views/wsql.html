@@ -37,17 +37,20 @@
 
 	</td><td ng-hide="!sql.isHidden" class="sqlShortText">
 		{{ getShortSql(sql) }}
-		<a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
+		<a href="" ng-click="sqlRun($index, false)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
 			<i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
 		</a>
-		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}">
+        <a href="" ng-click="sqlRun($index, true)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
+            <i class="glyphicon glyphicon-time" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING_FOR_TIME}"></i>
+        </a>
+		<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.NOTHING}">
 			<i class="glyphicon glyphicon-stop"></i>
 		</a>
-		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}">
+		<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.NOTHING}">
 			<i class="glyphicon glyphicon-trash" ></i>
 		</a>
 		<span ng-if="sql.duration">time: {{ sql.duration }}</span>
-		<span class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
+		<span class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status!=SQL_STATUS.NOTHING}">
 			{{ sql.error }}
 		</span>
 	</td><td ng-hide="sql.isHidden">
@@ -57,16 +60,16 @@
 				ng-keypress="sqlTextKeyPress($event, $index)"
 		></ui-codemirror>
 		<div>
-            <a href="" ng-click="sqlRun($index)"  ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
+            <a href="" ng-click="sqlRun($index, false)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
                 <i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
             </a>
-            <a href="" ng-class="{'anchorDisabled' : currentSource==null || sql.status==SQL_STATUS.RUNNING }">
-                <i class="glyphicon glyphicon-time" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
+            <a href="" ng-click="sqlRun($index, true)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
+                <i class="glyphicon glyphicon-time" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING_FOR_TIME}"></i>
             </a>
-			<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.RUNNING}">
+			<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.NOTHING}">
 				<i class="glyphicon glyphicon-stop"></i>
 			</a>
-			<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.RUNNING}">
+			<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.NOTHING}">
 				<i class="glyphicon glyphicon-trash" ></i>
 			</a>
 			<span ng-if="sql.duration">time: {{ sql.duration }}</span>
@@ -77,10 +80,10 @@
 			  <option value="1800">30min</option>
 			</select>
 		</div>
-		<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status==SQL_STATUS.RUNNING}">
+		<div class="sqlError" ng-class="{'sqlErrorSqlRunning' : sql.status!=SQL_STATUS.NOTHING}">
 			{{ sql.error }}
 		</div>
-		<table ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}"
+		<table ng-class="{'sqlTransparentWhenRunning' : sql.status!=SQL_STATUS.NOTHING}"
 			   ng-if="sql.columns && sql.columns.length > 0 && sql.result"
 			   class="sqlTable">
 			<tr>
@@ -100,11 +103,11 @@
 			</tr>
 		</table>
 		<div ng-hide="!sql.maxRowsReached" class="sqlResultMaxRowsReached"
-			 ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}">
+			 ng-class="{'sqlTransparentWhenRunning' : sql.status!=SQL_STATUS.NOTHING}">
 			(only {{ sql.result.length }} first rows are displayed)
 		</div>
 		<div ng-repeat="msg in sql.messages"
-			 ng-class="{'sqlTransparentWhenRunning' : sql.status==SQL_STATUS.RUNNING}">
+			 ng-class="{'sqlTransparentWhenRunning' : sql.status!=SQL_STATUS.NOTHING}">
 			{{ msg }}
 		</div>
 	</td></tr></table>

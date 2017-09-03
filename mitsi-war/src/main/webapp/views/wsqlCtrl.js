@@ -18,7 +18,8 @@ angular.module('mitsiApp')
 
     $scope.SQL_STATUS = { 
     		NOTHING : 0,
-    		RUNNING : 1
+    		RUNNING : 1,
+    		RUNNING_FOR_TIME : 2
     };
 
 	$scope.newEmptySqlEntry = function() {
@@ -108,14 +109,16 @@ angular.module('mitsiApp')
                     }
 
                     missedRunningSqlCount --;
-                    if (status.running) {
+                    if (status.runningFortime) {
+                        sqlEntry.status = $scope.SQL_STATUS.RUNNING_FOR_TIME;
+                    }
+                    else if (status.running) {
                         sqlEntry.status = $scope.SQL_STATUS.RUNNING;
                     }
                     else {
                         sqlEntry.status = $scope.SQL_STATUS.NOTHING;
                     }
 
-                    // TODO running for time
                     // TODO running on datasource
 
                 }
@@ -143,9 +146,6 @@ angular.module('mitsiApp')
 			}
 			
 			let isEqualToPreviousSql = sqlText.trim() == previousSql.sqlText.trim();
-			//let sqlResult = isEqualToPreviousSql ? previousSql.result : [];
-			//let sqlColumns = isEqualToPreviousSql ? previousSql.columns : [];
-			//let status = isEqualToPreviousSql ? $scope.SQL_STATUS.NOTHING : $scope.SQL_STATUS.TO_RUN;
 			if (isEqualToPreviousSql) {
 			    insertSqlList.push({
 			        "sqlText":sqlText,
@@ -182,8 +182,8 @@ angular.module('mitsiApp')
 		}
 		
 	}
-	
-	$scope.sqlRun = function(i) {
+
+	$scope.sqlRun = function(i, forTime) {
 		let sql = $scope.sqlList[i].sqlText;
 		if (sql==null || sql=="") {
 			return;
@@ -193,7 +193,7 @@ angular.module('mitsiApp')
 			$scope.splitAndRun(i);
 		}
 		else {
-			$scope.sqlTextRun(i, sql);
+			$scope.sqlTextRun(i, sql, forTime);
 		}
 	}
 
@@ -210,7 +210,7 @@ angular.module('mitsiApp')
         }
     }
 
-	$scope.sqlTextRun = function(i, sql) {
+	$scope.sqlTextRun = function(i, sql, isForTime) {
 		let sqlEntry = $scope.sqlList[i];
 		sqlEntry.sqlId = "sqlId_" + $scope.increaseAndGetSqlId();
 	    $scope.backupSqlList();
@@ -221,20 +221,39 @@ angular.module('mitsiApp')
 
 		sqlEntry.canceler = $q.defer();
 		sqlEntry.cancelled = false;
-		sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
-	    .then(function(response) {
-				$scope.setSqlResult(i, response.data.results, response.data.columns, response.data.maxRowsReached, response.data.messages); // TODO
-		    },
-		    function(error) {
-		    	$scope.setSqlResult(i, [], [], false, null);
-		    }
-		)
-	    .finally(function () {
-	    		sqlEntry.status = $scope.SQL_STATUS.NOTHING;
-	    		$scope.stopTimer(sqlEntry);
-	    	}
-	    );
-		sqlEntry.status = $scope.SQL_STATUS.RUNNING;
+		if (isForTime) {
+            sqlService.runSqlForTime(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, sqlEntry.canceler)
+            .then(function(response) {
+                    $scope.setSqlResult(i, [], [], false, null);
+                    $scope.sqlList[i].rowCount = response.data.nbRows;
+                },
+                function(error) {
+                    $scope.setSqlResult(i, [], [], false, null);
+                }
+            )
+            .finally(function () {
+                    sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+                    $scope.stopTimer(sqlEntry);
+                }
+            );
+    		sqlEntry.status = $scope.SQL_STATUS.RUNNING_FOR_TIME;
+		}
+		else {
+            sqlService.runSql(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, DEFAULT_FETCH_SIZE, sqlEntry.canceler)
+            .then(function(response) {
+                    $scope.setSqlResult(i, response.data.results, response.data.columns, response.data.maxRowsReached, response.data.messages); // TODO
+                },
+                function(error) {
+                    $scope.setSqlResult(i, [], [], false, null);
+                }
+            )
+            .finally(function () {
+                    sqlEntry.status = $scope.SQL_STATUS.NOTHING;
+                    $scope.stopTimer(sqlEntry);
+                }
+            );
+    		sqlEntry.status = $scope.SQL_STATUS.RUNNING;
+        }
 		$scope.startTimer(sqlEntry, sqlEntry.sqlId);
 	}
 	
@@ -245,7 +264,7 @@ angular.module('mitsiApp')
 
 		$scope.timers[sqlId] = $interval(function() {
 			if (sqlEntry.endTime) {
-				sqlEntry.duration = ((sqlEntry.endTime - sqlEntry.beginTime) / 1000)+"s";
+				sqlEntry.duration = ((sqlEntry.endTime - sqlEntry.beginTime) / 1000)+"s ("+sqlEntry.rowCount+" rows)";
 				$interval.cancel($scope.timers[sqlId]);
 				delete $scope.timers[sqlId];
 			}
@@ -260,10 +279,12 @@ angular.module('mitsiApp')
 	}
 
 	$scope.setSqlResult = function(i, result, columns, maxRowsReached, messages) {
-		$scope.sqlList[i].result = result;
-		$scope.sqlList[i].columns = columns;
-		$scope.sqlList[i].maxRowsReached = maxRowsReached;
-		$scope.sqlList[i].messages = messages;
+	    let sqlEntry = $scope.sqlList[i];
+		sqlEntry.result = result;
+		sqlEntry.columns = columns;
+		sqlEntry.maxRowsReached = maxRowsReached;
+		sqlEntry.messages = messages;
+		sqlEntry.rowCount = sqlEntry.result ? sqlEntry.result.length : 0;
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {
@@ -280,7 +301,7 @@ angular.module('mitsiApp')
 	$scope.sqlStop = function(i) {
 		let sql = $scope.sqlList[i];
 		
-		if (sql.status != $scope.SQL_STATUS.RUNNING) {
+		if (sql.status == $scope.SQL_STATUS.NOTHING) {
 			return;
 		}
 		
@@ -295,7 +316,7 @@ angular.module('mitsiApp')
 	$scope.sqlStopAll = function() {
 		for (let i=0; i!=$scope.sqlList.length; i++) {
 			let sql = $scope.sqlList[i];
-			if (sql.status == $scope.SQL_STATUS.RUNNING) {
+			if (sql.status != $scope.SQL_STATUS.NOTHING) {
 				if (sql.canceler) {
 					sql.canceler.resolve();
 				}
@@ -308,7 +329,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTrash = function(i) {
-		if ($scope.sqlList[i].status == $scope.SQL_STATUS.RUNNING) {
+		if ($scope.sqlList[i].status != $scope.SQL_STATUS.NOTHING) {
 			return;
 		}			
 			
