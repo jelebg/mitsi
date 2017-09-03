@@ -11,9 +11,21 @@
 	<a href="" ng-click="redo" ng-class="{'anchorDisabled' : redoCommands.length==0}">
 		<i class="glyphicon glyphicon-share-alt sqlMenuButton"></i>
 	</a>
+    <div class="form-group has-feedback pull-right">
+        <a  href=""
+            class="glyphicon glyphicon-remove form-control-feedback filter-glyphicon sqlSearchClear"
+            ng-click="clearSearch($event)"></a>
+        <input type="text"
+               ng-model="searchSql"
+               ng-change="searchSqlChange()"
+               class="form-control sqlSearchInput"
+               placeholder="Search SQL here..."/>
+    </div>
+
 </div>
 <div class="sqlScrolldiv">
 <div ng-repeat="sql in sqlList  track by $index"
+     ng-hide="sql.searchSqlHide"
      class="sqlList"
 >
 	<hr class="sqlListHr" g-if="$index > 0">

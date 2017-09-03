@@ -31,6 +31,7 @@ angular.module('mitsiApp')
 	
     $scope.timers = {};
 
+    $scope.searchSql = localStorage.getItem("sqlSearch");
     $scope.sqlList = [ $scope.getEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
@@ -270,4 +271,36 @@ angular.module('mitsiApp')
         }
 	    return short;
 	}
+
+	$scope.clearSearch = function(event) {
+	    $scope.searchSql='';
+	    $scope.searchSqlChange();
+	    event.stopPropagation();
+	}
+
+	$scope.searchSqlChange = function() {
+        localStorage.setItem("sqlSearch", $scope.searchSql);
+	    let search = ""
+	    if ($scope.searchSql) {
+	        search = $scope.searchSql.trim();
+	    }
+
+	    if (search == "") {
+	        // show all
+	        for (let i=0; i!=$scope.sqlList.length; i++) {
+	            let sqlEntry = $scope.sqlList[i];
+	            sqlEntry.searchSqlHide = false;
+	        }
+	    }
+	    else {
+	        for (let i=0; i<$scope.sqlList.length-1; i++) {
+	            let sqlEntry = $scope.sqlList[i];
+	            sqlEntry.searchSqlHide = (sqlEntry.sqlText.indexOf(search) < 0);
+	        }
+	        if ($scope.sqlList.length > 0) {
+	            $scope.sqlList[$scope.sqlList.length-1].searchSqlHide=false;
+	        }
+	    }
+	}
+
 });

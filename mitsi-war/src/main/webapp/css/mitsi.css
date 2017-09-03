@@ -715,3 +715,15 @@
     height:auto;
     overflow-y:auto;"
 }
+
+.sqlSearchInput {
+    margin-right:7px;
+    width:250px;
+    padding-top:0px;
+    padding-bottom:0px;
+}
+
+.sqlSearchClear {
+    pointer-events: all;
+}
+
