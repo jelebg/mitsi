@@ -48,14 +48,13 @@ angular.module('mitsiApp')
     $scope.timers = {};
 
     $scope.searchSql = localStorage.getItem(LOCAL_STORAGE_SQL_SEARCH);
-    $scope.sqlList = [ $scope.newEmptySqlEntry() ];
     $scope.undoCommands = [];
     $scope.redoCommands = [];
 
     $scope.backupSqlList = function() {
         let backup = [];
-        for (let i=0; i!=$scope.sqlList.length; i++) {
-            let sqlEntry = $scope.sqlList[i];
+        for (let i=0; i!=$rootScope.sqlList.length; i++) {
+            let sqlEntry = $rootScope.sqlList[i];
             backup.push({
                 "sqlId"   : sqlEntry.sqlId,
                 "sqlText" : sqlEntry.sqlText
@@ -66,17 +65,21 @@ angular.module('mitsiApp')
     }
 
     $scope.restoreSqlList = function() {
-        let backupJson = localStorage.getItem(LOCAL_STORAGE_SQL_LIST);
+        if ($rootScope.sqlList) {
+            return;
+        }
 
+        let backupJson = localStorage.getItem(LOCAL_STORAGE_SQL_LIST);
         if (!backupJson) {
+            $rootScope.sqlList = [ $scope.newEmptySqlEntry() ];
             return;
         }
 
         let backup = JSON.parse(backupJson);
-        $scope.sqlList = [];
+        $rootScope.sqlList = [];
         for (let i=0; i!=backup.length; i++) {
             let backupSql = backup[i];
-            $scope.sqlList.push($scope.newSqlEntry(
+            $rootScope.sqlList.push($scope.newSqlEntry(
                 backupSql.sqlId,
                 backupSql.sqlText
             ));
@@ -96,8 +99,8 @@ angular.module('mitsiApp')
                     statusMap[status.sqlId] = status;
                 }
 
-                for(let i=0; i!=$scope.sqlList.length; i++) {
-                    let sqlEntry = $scope.sqlList[i];
+                for(let i=0; i!=$rootScope.sqlList.length; i++) {
+                    let sqlEntry = $rootScope.sqlList[i];
                     if (!sqlEntry.sqlId) {
                         continue;
                     }
@@ -133,8 +136,8 @@ angular.module('mitsiApp')
     }
 
 	$scope.splitAndRun = function(i) {
-		let previousSql = $scope.sqlList[i];
-		let sql = $scope.sqlList[i].sqlText;
+		let previousSql = $rootScope.sqlList[i];
+		let sql = $rootScope.sqlList[i].sqlText;
 
 		let sqlParts = sql.split(";");
 		
@@ -168,14 +171,14 @@ angular.module('mitsiApp')
 		    }
 		}
 		
-		let before = i == 0 ? [] : $scope.sqlList.slice(0, i);
-		let after = i == $scope.sqlList.length - 1 ? [] : $scope.sqlList.slice(i+1);
+		let before = i == 0 ? [] : $rootScope.sqlList.slice(0, i);
+		let after = i == $rootScope.sqlList.length - 1 ? [] : $rootScope.sqlList.slice(i+1);
 		
-		$scope.sqlList[i].sqlText = sqlParts[0];
-		$scope.sqlList = before.concat(insertSqlList).concat(after);
+		$rootScope.sqlList[i].sqlText = sqlParts[0];
+		$rootScope.sqlList = before.concat(insertSqlList).concat(after);
 		
 		for (let j=before.length; j<before.length+insertSqlList.length; j++) {
-			let sql = $scope.sqlList[j];
+			let sql = $rootScope.sqlList[j];
 			if (sql.status == $scope.SQL_STATUS.TO_RUN) {
 				$scope.sqlTextRun(j, sql.sqlText);
 			}
@@ -184,7 +187,7 @@ angular.module('mitsiApp')
 	}
 
 	$scope.sqlRun = function(i, forTime) {
-		let sql = $scope.sqlList[i].sqlText;
+		let sql = $rootScope.sqlList[i].sqlText;
 		if (sql==null || sql=="") {
 			return;
 		}
@@ -211,7 +214,7 @@ angular.module('mitsiApp')
     }
 
 	$scope.sqlTextRun = function(i, sql, isForTime) {
-		let sqlEntry = $scope.sqlList[i];
+		let sqlEntry = $rootScope.sqlList[i];
 		sqlEntry.sqlId = "sqlId_" + $scope.increaseAndGetSqlId();
 	    $scope.backupSqlList();
 
@@ -225,7 +228,7 @@ angular.module('mitsiApp')
             sqlService.runSqlForTime(sqlEntry, $rootScope.currentSource.name, sql, sqlEntry.sqlId, sqlEntry.timeout, sqlEntry.canceler)
             .then(function(response) {
                     $scope.setSqlResult(i, [], [], false, null);
-                    $scope.sqlList[i].rowCount = response.data.nbRows;
+                    $rootScope.sqlList[i].rowCount = response.data.nbRows;
                 },
                 function(error) {
                     $scope.setSqlResult(i, [], [], false, null);
@@ -279,7 +282,7 @@ angular.module('mitsiApp')
 	}
 
 	$scope.setSqlResult = function(i, result, columns, maxRowsReached, messages) {
-	    let sqlEntry = $scope.sqlList[i];
+	    let sqlEntry = $rootScope.sqlList[i];
 		sqlEntry.result = result;
 		sqlEntry.columns = columns;
 		sqlEntry.maxRowsReached = maxRowsReached;
@@ -292,14 +295,14 @@ angular.module('mitsiApp')
 			$scope.sqlRun(i);
 		}
 
-		if (i == $scope.sqlList.length-1) {
-			$scope.sqlList.push($scope.newEmptySqlEntry());
+		if (i == $rootScope.sqlList.length-1) {
+			$rootScope.sqlList.push($scope.newEmptySqlEntry());
 		}
 
 	}
 	
 	$scope.sqlStop = function(i) {
-		let sql = $scope.sqlList[i];
+		let sql = $rootScope.sqlList[i];
 		
 		if (sql.status == $scope.SQL_STATUS.NOTHING) {
 			return;
@@ -314,8 +317,8 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlStopAll = function() {
-		for (let i=0; i!=$scope.sqlList.length; i++) {
-			let sql = $scope.sqlList[i];
+		for (let i=0; i!=$rootScope.sqlList.length; i++) {
+			let sql = $rootScope.sqlList[i];
 			if (sql.status != $scope.SQL_STATUS.NOTHING) {
 				if (sql.canceler) {
 					sql.canceler.resolve();
@@ -329,27 +332,27 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTrash = function(i) {
-		if ($scope.sqlList[i].status != $scope.SQL_STATUS.NOTHING) {
+		if ($rootScope.sqlList[i].status != $scope.SQL_STATUS.NOTHING) {
 			return;
 		}			
 			
-		if (i==$scope.sqlList.length-1) {
-			$scope.sqlList[i] = $scope.newEmptySqlEntry();
+		if (i==$rootScope.sqlList.length-1) {
+			$rootScope.sqlList[i] = $scope.newEmptySqlEntry();
 		}
 		else {
-			$scope.sqlList.splice(i, 1);
+			$rootScope.sqlList.splice(i, 1);
 		}
 	}
 	
 	$scope.sqlTrashAll = function() {
-		for (let i=$scope.sqlList.length-2; i>=0; i--) {
+		for (let i=$rootScope.sqlList.length-2; i>=0; i--) {
 			$scope.sqlTrash(i);
 		}
 	}
 	
 	$scope.isOneSqlStatus = function(status) {
-		for (let i=0; i!=$scope.sqlList.length; i++) {
-			if ($scope.sqlList[i].status == status) {
+		for (let i=0; i!=$rootScope.sqlList.length; i++) {
+			if ($rootScope.sqlList[i].status == status) {
 				return true;
 			}
 		}
@@ -369,6 +372,7 @@ angular.module('mitsiApp')
 			$interval.cancel($scope.timers[key]);
 		}
 		$scope.timers = {};
+		$scope.backupSqlList();
 	});
 
 	$scope.getShortSql = function(sqlEntry) {
@@ -401,18 +405,18 @@ angular.module('mitsiApp')
 
 	    if (search == "") {
 	        // show all
-	        for (let i=0; i!=$scope.sqlList.length; i++) {
-	            let sqlEntry = $scope.sqlList[i];
+	        for (let i=0; i!=$rootScope.sqlList.length; i++) {
+	            let sqlEntry = $rootScope.sqlList[i];
 	            sqlEntry.searchSqlHide = false;
 	        }
 	    }
 	    else {
-	        for (let i=0; i<$scope.sqlList.length-1; i++) {
-	            let sqlEntry = $scope.sqlList[i];
+	        for (let i=0; i<$rootScope.sqlList.length-1; i++) {
+	            let sqlEntry = $rootScope.sqlList[i];
 	            sqlEntry.searchSqlHide = (sqlEntry.sqlText.indexOf(search) < 0);
 	        }
-	        if ($scope.sqlList.length > 0) {
-	            $scope.sqlList[$scope.sqlList.length-1].searchSqlHide=false;
+	        if ($rootScope.sqlList.length > 0) {
+	            $rootScope.sqlList[$rootScope.sqlList.length-1].searchSqlHide=false;
 	        }
 	    }
 	}
