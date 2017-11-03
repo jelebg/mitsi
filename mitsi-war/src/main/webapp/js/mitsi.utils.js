@@ -24,3 +24,8 @@ function nullSavePushToArrayInCollection(collection, index, element) {
 		array.push(element);
 	}
 }
+
+function isMitsiExperimental() {
+    let val = localStorage.getItem("mitsi_experimental");
+    return val != null && val.toLowerCase() != "false";
+}

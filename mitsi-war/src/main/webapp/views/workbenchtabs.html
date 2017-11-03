@@ -31,6 +31,11 @@
 			      <span>SQL</span> 
 			    </tab-heading>
 			  </tab>
+				<tab ui-sref="workbench.diff" ui-sref-active="active" ng-hide="!isMitsiExperimentalScope()">
+					<tab-heading>
+						<span>diff</span>
+					</tab-heading>
+				</tab>
 			</tabset>
 			
 			<div ui-view ></div>

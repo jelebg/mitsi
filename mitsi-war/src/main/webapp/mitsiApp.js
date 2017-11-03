@@ -34,6 +34,11 @@ angular
         		   { url: "/wdata", 
         	   		 templateUrl: "views/wdata.html",
 			   		 controller:'wdataCtrl' 
+        	   	   })
+           .state("workbench.diff",
+        		   { url: "/wdiff",
+        	   		 templateUrl: "views/wdiff.html",
+			   		 controller:'wdiffCtrl'
         	   	   });
 
 	   $urlRouterProvider.otherwise("/workbench/wgraph");

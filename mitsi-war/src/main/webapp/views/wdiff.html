@@ -1,0 +1,35 @@
+
+diff between :<br/>
+A : <select ng-model="aName" ng-change="reset()">
+    <option ng-repeat="datasource in datasources | orderBy:'name' " value="{{ datasource.name }}">
+        {{ datasource.name }}
+    </option>
+</select>
+<br/>
+and <br/>
+B : <select ng-model="bName" ng-change="reset()">
+    <option ng-repeat="datasource in datasources | orderBy:'name' " value="{{ datasource.name }}">
+        {{ datasource.name }}
+    </option>
+</select>
+<br/>
+
+<button ng-click="diff()">diff</button>
+<br/>
+{{ infoMessage }}
+<br/>
+
+<div ng-if="columnsAAndNotB">
+    <h3>Columns existing in A and Not in B : {{ columnsAAndNotB.length }} columns</h3>
+    <div ng-repeat="column in columnsAAndNotB track by $index" style="font-family:monospace;">
+        {{ column }}
+    </div>
+</div>
+
+
+<div ng-if="columnsBAndNotA">
+    <h3>Columns existing in B and Not in A : {{ columnsBAndNotA.length }} columns</h3>
+    <div ng-repeat="column in columnsBAndNotA track by $index" style="font-family:monospace;">
+        {{ column }}
+    </div>
+</div>
