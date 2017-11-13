@@ -47,7 +47,7 @@ function ruleCompute(rule, variables, labels) {
 		if(!rule.left.name) {
 			throw "left-hand side of LIKE is not a variable name"; 
 		}
-		lhsValue = getVariableValue(rule.left.value, variables);
+		lhsValue = getVariableValue(rule.left.value, variables, false, false);
 		if(!lhsValue) {
 			throw rule.left.value+" is undefined"; 
 		}
@@ -69,7 +69,7 @@ function ruleCompute(rule, variables, labels) {
 					tostore["group"+i] = regexExec[i];
 				}
 			}				
-			variables[rule.storeResultInVariable] = tostore;
+			variables.customVariables[rule.storeResultInVariable] = tostore;
 		}
 		
 		return regexExec != null;
@@ -78,31 +78,35 @@ function ruleCompute(rule, variables, labels) {
 		if(!rule.right.name) {
 			throw "right-hand side of IN is not a collection name"; 
 		}
-		let collection = getVariableValue(rule.right.value, variables);
+		let collection = getVariableValue(rule.right.value, variables, false, true);
 		if (!collection) {
 			throw "collection "+rule.right.value+" does not exist"; 
 		}
-		// TODO : test if collection is really a collection
-		let lhsValue = null;
+		let lhsValues = null;
 		if(rule.left.name) {
-			lhsValue = getVariableValue(rule.left.value, variables);
-			if(!lhsValue) {
+    		lhsValues = getVariableValue(rule.left.value, variables, true, false);
+			if(!lhsValues) {
 				throw rule.left.value+" is undefined"; 
 			}
 		}
 		else if(rule.left.literal) {
-			lhsValue = rule.left.value;
+			lhsValues = [ rule.left.value ];
 		}
 		else {
 			throw "unknown lhs type";
 		}
-		let ret = collection[lhsValue];
+		let ret = [];
+		for (let iLhsValue = 0; iLhsValue != lhsValues.length; iLhsValue ++) {
+		    let lhsValue = lhsValues[iLhsValue]
+		    let v = collection[lhsValue];
+		    if (v) {
+		        ret = ret.concat(v);
+		    }
+		}
 		if (rule.storeResultInVariable) {
-			// TODO : eviter d'écraser les variables built-in mitsi
-			// TODO : marquer la variable comme custom pour pouvoir l'écraser ensuite
-			variables[rule.storeResultInVariable] = ret ? ret : null;
+			variables.customArrays[rule.storeResultInVariable] = ret;
 		} 
-		return ret != null;
+		return ret.length > 0;
 	}
 	else if(rule.operator == "==") {
 		return ruleComputeEquality(rule, variables, labels);
@@ -123,7 +127,7 @@ function ruleComputeEquality(rule, variables, labels) {
 	
 	let lhsValue = null;
 	if(rule.left.name) {
-		lhsValue = getVariableValue(rule.left.value, variables);
+		lhsValue = getVariableValue(rule.left.value, variables, false, false);
 		if(!lhsValue) {
 			throw rule.left.value+" is undefined"; 
 		}
@@ -134,7 +138,7 @@ function ruleComputeEquality(rule, variables, labels) {
 	
 	let rhsValue = null;
 	if(rule.right.name) {
-		rhsValue = variables[rule.right.value];
+		rhsValue = getVariableValue(rule.right.value, variables, false, false);;
 		if(!rhsValue) {
 			throw rule.right.value+" is undefined"; 
 		}
@@ -146,29 +150,79 @@ function ruleComputeEquality(rule, variables, labels) {
 	return lhsValue.toUpperCase() == rhsValue.toUpperCase();
 }
 
-function getVariableValue(name, variables) {
+function getVariableValueInNameTree(nameParts, tree) {
+    let varPart = tree[nameParts[0]];
+
+    if (!varPart) {
+        return null;
+    }
+
+    for (let i=1; i<nameParts.length; i++) {
+        let namePart = nameParts[i];
+        varPart = varPart[namePart];
+        if (!varPart) {
+            return null;
+            //break;
+        }
+	}
+
+	return varPart;
+}
+
+function getVariableValue(name, variables, asArray, asCollection) {
 	let nameParts = name.split(".");
-	
+
+	// TODO : mutualiser les trois premiers cas
+
 	// test if it is a variable
-	let varPart = variables[nameParts[0]];
-	if (varPart) {
-		for (let i=1; i<nameParts.length; i++) {
-			let namePart = nameParts[i];
-			varPart = varPart[namePart];
-			if (!varPart) {
-				break;
-			}		
-		}
-		if (varPart) {
-			return varPart;
-		}
+	let varInVariables = getVariableValueInNameTree(nameParts, variables.variables);
+    if (varInVariables) {
+        if (asCollection) {
+            return null;
+        }
+        if (asArray) {
+            return [varInVariables];
+        }
+        return varInVariables;
+    }
+
+	// test if it is a collection
+	let varInCollections = getVariableValueInNameTree(nameParts, variables.collections);
+    if (varInCollections) {
+        if (asCollection) {
+            return varInCollections;
+        }
+        return null;
+    }
+
+	// test if it is a custom variable
+    let varInCustomVariables = getVariableValueInNameTree(nameParts, variables.customVariables);
+    if (varInCustomVariables) {
+        if (asCollection) {
+		        return null;
+        }
+        if (asArray) {
+            return [varInCustomVariables];
+        }
+        return varPart;
+    }
+
+	// test if it is a custom array.
+	let customCollection = variables.customArrays[name];
+	if (customCollection) {
+	    if (asCollection) {
+	        return null;
+	    }
+	    if (asArray) {
+	        return customCollection;
+	    }
+	    return customCollection.join(",");
 	}
 	
 	return null;
-
 }
 
-// functions to handle strings containing variables with ${} 
+// functions to handle strings containing variables with ${}
 
 function getVariableStringParts(varPegjs, str) {
 	let parts = [];
@@ -197,8 +251,7 @@ function getVariableStringParts(varPegjs, str) {
  * parents : []
  */
 function computeVariableStringPartVariable(expression, variables, parents) {
-	// TODO : arrays a tester (par exemple si on a deux indexs sur une même colonne)
-	
+
 	let next = expression.next;
 	let currents = [];
 
@@ -214,12 +267,9 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 		// TODO : tester les undefined etc. et renvoyer null si on ne trouve rien
 		
 		if (parents == null) { 
-			currents = getVariableValue(expression.expr.value, variables);
+			currents = getVariableValue(expression.expr.value, variables, true, false);
 			if (!currents) {
 				return null;
-			}
-			if (!Array.isArray(currents)) {
-				currents = [ currents ];
 			}
 		}
 		else {
@@ -239,13 +289,10 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 				// collection name has to be a name and nothing else
 				return null;
 			}
-			currentCollections = getVariableValue(collection.value, variables);
+			currentCollections = getVariableValue(collection.value, variables, true, false);
 			// TODO : test if currentCollections are really collections
 			if (!currentCollections) {
 				return null;
-			}
-			if (!Array.isArray(currentCollections)) {
-				currentCollections = [ currentCollections ];
 			}
 		}
 		else {
@@ -282,8 +329,6 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 		return computeVariableStringPartVariable(next, variables, currents);
 	}
 	return currents;
-
-	
 }
 
 function computeVariableString(parts, variables) {

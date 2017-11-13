@@ -163,17 +163,22 @@ angular.module('mitsiApp')
 		source.labelFilterExclude = {};
 
 		let variables = {
-			"source": {
-				"name"          : source.name,
-				"provider"      : source.dbProvider,
-				"currentSchema" : source.currentSchemaName
-			}
+		    "variables" : {
+                "source": {
+                    "name"          : source.name,
+                    "provider"      : source.dbProvider,
+                    "currentSchema" : source.currentSchemaName
+                }
+            },
+            "collections" : {},
+            "customVariables" : {},
+            "customArrays" : {}
 		};
-		$scope.computeColumnCollections(source, variables);
+		$scope.computeColumnCollections(source, variables.collections);
 
 		for(let i=0; i!=rules.length; i++) {
 			let rule = rules[i];
-			rule.parsedRule = peg.parse(rule.rule);
+			rule.parsedRule = peg.parse(rule.rule.trim());
 			if (rule.comment) {
 				rule.commentParts = getVariableStringParts(pegVariables, rule.comment);
 			}
@@ -210,7 +215,7 @@ angular.module('mitsiApp')
 				continue;
 			}
 
-			variables["table"] = {
+			variables.variables["table"] = {
 			        "type"     : obj.id.type,
 					"fullName" : source.currentSchemaName+"."+obj.id.name,
 					"shortName": obj.id.name
@@ -221,7 +226,7 @@ angular.module('mitsiApp')
 			for(let i=0; i!=obj.columns.length; i++) {
 				let column = obj.columns[i];
 				
-				variables["column"] = {
+				variables.variables["column"] = {
 						"fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
 						"shortName": column.name
 				};
@@ -248,7 +253,7 @@ angular.module('mitsiApp')
 				column.labelsString = labels.normal.join(",");
 				column.labelsWarningString = labels.warning.join(",");
 				column.labelsComments = labelsComments;
-				// TODO : rajouter le currentSchema aux tables des candidateDks sauf si deja dans le nom
+				// TODO : rajouter le currentSchema aux tables des candidateFks sauf si deja dans le nom
 				column.candidateFks = candidateFks;
 				
 				for(let j=0; j!=column.labels.length; j++) {
@@ -264,7 +269,8 @@ angular.module('mitsiApp')
 			let rule = rules[iRule];
 			let parsedRule = rule.parsedRule;
 
-			// TODO : cleanup custom variables each time (is it really necessary ?)
+			variables.customArrays = {};
+			variables.customVariables = {};
 			let result = ruleCompute(parsedRule, variables, labels);
 			if(result) { 
 				if(rule.label) { 
@@ -289,7 +295,7 @@ angular.module('mitsiApp')
 					}
 					candidateFks.push(candidateFkElement);
 				}
-				
+
 				if (candidateFkElement && comment) {
 					candidateFkElement["comment"] = comment;
 				}
@@ -303,6 +309,7 @@ angular.module('mitsiApp')
 		let pkColumnNames = {};
 		let ukColumnNames = {};
 		let indexedColumnNames = {};
+		let indexedColumnsDefinitions = {};
 		let tablesByShortName  = {};
 		let tablesByFullName   = {};
 		collections["foreignKeys"] = {
@@ -315,7 +322,8 @@ angular.module('mitsiApp')
 				"columns" : ukColumnNames
 		}
 		collections["index"] = {
-				"columns" : indexedColumnNames
+				"columns" : indexedColumnNames,
+				"columnsDefinitions" : indexedColumnsDefinitions // contains all col1 col1,col2 col1,col2,col3
 		}
 		collections["tables"] = {
 				"byShortName" : tablesByShortName,
@@ -347,19 +355,32 @@ angular.module('mitsiApp')
 					for(let c=0; c!=cols.length; c++) {
 						let columnName = cols[c];
 						let columnFullName = source.currentSchemaName+"."+obj.id.name+"."+columnName;
+						let columnsDefinition = (c==cols.length-1) ? index.columns : cols.slice(0, c+1).join(",");
+                        let indexCollectionEntry = {"index":index, "position":c+1, "columnsDefinition":index.columns};
+
+						// first columnsDefinition
+						let currentDefs = indexedColumnsDefinitions[columnsDefinition];
+						if (!currentDefs) {
+						    currentDefs = [];
+						    indexedColumnsDefinitions[columnsDefinition] = currentDefs;
+						}
+						currentDefs.push(indexCollectionEntry);
+
+                        // then column only
 						let current = indexedColumnNames[columnFullName];
-						if(!current) {
+						if (!current) {
 							current = [];
 							indexedColumnNames[columnFullName] = current;
 						}
-						current.push({"index":index, "position":c+1});
-						if(index.uniqueness == 't') {
+						current.push(indexCollectionEntry);
+
+						if (index.uniqueness == 't') {
 							let ukCurrent = ukColumnNames[columnFullName];
-							if(!ukCurrent) {
+							if (!ukCurrent) {
 								ukCurrent = [];
 								ukColumnNames[columnFullName] = ukCurrent;
 							}
-							ukCurrent.push({"index":index, "position":c+1});
+							ukCurrent.push(indexCollectionEntry);
 						}
 					}
 				}
@@ -382,6 +403,7 @@ angular.module('mitsiApp')
 						let columnFullName = source.currentSchemaName+"."+obj.id.name+"."+columnName;
 
 						let current = null;
+						let currentColDef = null;
 						if(constraint.type == "R") {
 							current = fkColumnNames[columnFullName];
 							if(!current) {
@@ -396,7 +418,7 @@ angular.module('mitsiApp')
 								pkColumnNames[columnFullName] = current;
 							}
 						}
-						current.push({"constraint":constraint, "position":c+1});
+						current.push({"constraint":constraint, "position":c+1, "columnsDefinition":constraint.columns});
 					}
 				}
 			}
@@ -444,7 +466,7 @@ angular.module('mitsiApp')
 		  $scope.initGraph(source);
 		  
 	}
-	
+
 	$scope.initGraph = function(datasource) {
 		datasource.mitsiGraph = new MitsiGraph(null); // NOSONAR MitsiGraph does realy exist but sonar doesn't see it
 		if(!datasource.objects) {
