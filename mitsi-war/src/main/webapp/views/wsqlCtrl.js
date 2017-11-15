@@ -188,6 +188,11 @@ angular.module('mitsiApp')
 
 	$scope.sqlRun = function(i, forTime) {
 		let sql = $rootScope.sqlList[i].sqlText;
+
+	    if ( !$scope.currentSource || (sql.status && sql.status!=$scope.SQL_STATUS.NOTHING) ) {
+	        return;
+	    }
+
 		if (sql==null || sql=="") {
 			return;
 		}
@@ -291,9 +296,16 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {
-		if (event.key == 'F9') {
-			$scope.sqlRun(i);
-		}
+	    if (event.key == "Enter") {
+	        if (event.ctrlKey) {
+    			$scope.sqlRun(i, false);
+    			  event.preventDefault();
+	        }
+	        else if (event.shiftKey ) {
+    			$scope.sqlRun(i, true);
+    			event.preventDefault();
+	        }
+        }
 
 		if (i == $rootScope.sqlList.length-1) {
 			$rootScope.sqlList.push($scope.newEmptySqlEntry());

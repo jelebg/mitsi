@@ -60,16 +60,40 @@
 				ng-keypress="sqlTextKeyPress($event, $index)"
 		></ui-codemirror>
 		<div>
-            <a href="" ng-click="sqlRun($index, false)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
+            <a href=""
+			   ng-click="sqlRun($index, false)"
+			   ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }"
+			   popover="run SQL (ctrl-enter)"
+			   popover-trigger="mouseenter"
+			   popover-placement="right-bottom"
+			>
                 <i class="glyphicon glyphicon-play" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING}"></i>
             </a>
-            <a href="" ng-click="sqlRun($index, true)" ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }">
+            <a href=""
+			   ng-click="sqlRun($index, true)"
+			   ng-class="{'anchorDisabled' : currentSource==null || sql.status!=SQL_STATUS.NOTHING }"
+			   popover="run SQL completely for time (shift-enter)"
+			   popover-trigger="mouseenter"
+			   popover-placement="right-bottom"
+			>
                 <i class="glyphicon glyphicon-time" ng-class="{'fast-right-spinner' : sql.status==SQL_STATUS.RUNNING_FOR_TIME}"></i>
             </a>
-			<a href="" ng-click="sqlStop($index)" ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.NOTHING}">
+			<a href=""
+			   ng-click="sqlStop($index)"
+			   ng-class="{'anchorDisabled' : sql.status==SQL_STATUS.NOTHING}"
+			   popover="stop running SQL"
+			   popover-trigger="mouseenter"
+			   popover-placement="right-bottom"
+			>
 				<i class="glyphicon glyphicon-stop"></i>
 			</a>
-			<a href="" ng-click="sqlTrash($index)" ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.NOTHING}">
+			<a href=""
+			   ng-click="sqlTrash($index)"
+			   ng-class="{'anchorDisabled' : sql.status!=SQL_STATUS.NOTHING}"
+			   popover="delete SQL (alt-enter)"
+			   popover-trigger="mouseenter"
+			   popover-placement="right-bottom"
+			>
 				<i class="glyphicon glyphicon-trash" ></i>
 			</a>
 			<span ng-if="sql.duration">time: {{ sql.duration }}</span>
