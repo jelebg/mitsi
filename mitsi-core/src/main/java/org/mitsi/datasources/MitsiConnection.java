@@ -27,14 +27,7 @@ import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
 import org.mitsi.commons.pojos.Filter;
 import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.annotations.ColumnDisplayType;
-import org.mitsi.core.annotations.DefaultOwner;
-import org.mitsi.core.annotations.DefaultOwnerIsConnectedUser;
-import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
-import org.mitsi.core.annotations.MitsiColumnTitles;
-import org.mitsi.core.annotations.MitsiColumnsAsRows;
-import org.mitsi.core.annotations.MitsiDatasourceDetail;
-import org.mitsi.core.annotations.MitsiTableDetail;
+import org.mitsi.core.annotations.*;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -49,11 +42,12 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 	private static final Pattern forEachFilterPattern = Pattern.compile("__frch_filter_(\\d+).filter");
 	
-	SqlSession sqlSession = null; 
-	IMitsiMapper mapper = null;
-	MitsiDatasource datasource = null;
+	private SqlSession sqlSession = null;
+	private IMitsiMapper mapper = null;
+	private MitsiDatasource datasource = null;
+	private Pattern restrictSqlRegex = null;
 	
-	Class<IMitsiMapper> mapperInterface;
+	private Class<IMitsiMapper> mapperInterface;
 	public enum DETAIL_TYPE { TABLE, DATASOURCE };
 	private class DetailMethod {
 		public DetailMethod(DETAIL_TYPE type, String title, Method method, int order, String [] columnTitles, ColumnDisplayType[] columnDisplayTypes, String[] columnsAsRowsTitles, String[] columnsAsRowsExclusions) {
@@ -81,9 +75,8 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			return columnsAsRowsTitles != null;
 		}
 	}
-	List<DetailMethod> tableDetailsMethods;
-	List<DetailMethod> datasourceDetailsMethods;
-	
+	private List<DetailMethod> tableDetailsMethods;
+	private List<DetailMethod> datasourceDetailsMethods;
 
 	public MitsiConnection(SqlSession sqlSession, IMitsiMapper mapper, MitsiDatasource datasource) {
 		this.sqlSession = sqlSession;
@@ -99,7 +92,10 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			log.error("mapper has more or less than one interface : "+mapperInterfaces.length);
 		}
 		mapperInterface = mapperInterfaces[0];
-		
+		RestrictSql restrictSql = mapperInterface.getAnnotation(RestrictSql.class);
+		String restrictSqlString = restrictSql == null ? RestrictSql.DEFAULT_RESTRICTION : restrictSql.value();
+		restrictSqlRegex = Pattern.compile(restrictSqlString, Pattern.CASE_INSENSITIVE+Pattern.MULTILINE+ Pattern.DOTALL);
+
 		Method[] methods = mapperInterface.getMethods();
 		for(Method method : methods) {
 			MitsiTableDetail mitsiTableDetail = method.getAnnotation(MitsiTableDetail.class);
@@ -251,7 +247,11 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 	}
 
 	void executeRawSql(String sqlText, List<ParameterMapping> parameterMappings, Map<String, Object> params, Filter[] filters, Integer timeout, Integer fetchSize, CancellableStatementsManager cancellableStatementsManager, String cancelSqlId, ExecuteRowSqlCallback callback) throws SQLException, MitsiException {
-		
+
+		if (!restrictSqlRegex.matcher(sqlText).matches()) {
+			throw new MitsiSecurityException("only select statements are allowed");
+		}
+
 		try(PreparedStatement statement = sqlSession.getConnection().prepareStatement(sqlText)) {
 			
 			statement.setFetchSize(fetchSize == null ? DEFAULT_FETCH_SIZE : fetchSize); 
@@ -523,7 +523,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		// TODO : conserver le pattern pour ne pas le recompiler systématiquement
 		
 		String regex = "[^a-zA-Z0-9_]";
-	    Pattern pattern = Pattern.compile(regex);
+	    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 	    Matcher match = pattern.matcher(tableName);
 		if(match.matches()) {
 			log.warn("invalid name : "+tableName);

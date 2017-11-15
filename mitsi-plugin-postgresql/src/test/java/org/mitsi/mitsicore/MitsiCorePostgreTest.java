@@ -24,6 +24,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.MitsiConnection.GetDataResult;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
+import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,5 +213,11 @@ public class MitsiCorePostgreTest {
 		}
 	}
 
-		
+	@Test(expected= MitsiSecurityException.class)
+	public void runSqlRestrictedUpdate() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			connection.runSql("update tutu set id = 1", 1, null, null, null);
+		}
+	}
+
 }

@@ -24,6 +24,7 @@ import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.MitsiConnection.GetDataResult;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
+import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,6 +206,10 @@ public class MitsiCoreOracleTest {
 			GetDataResult result = connection.runSql("select 1 from dual", 1, null, null, null);
 			assertEquals(result.columns.size(), 1);
 			assertEquals(result.results.size(), 1);
+
+			GetDataResult result2 = connection.runSql("WITH tutu as (select 2 x from dual) select x from tutu", 1, null, null, null);
+			assertEquals(result2.columns.size(), 1);
+			assertEquals(result2.results.size(), 1);
 		}
 	}
 	
@@ -215,5 +220,11 @@ public class MitsiCoreOracleTest {
 		}
 	}
 
-		
+	@Test(expected= MitsiSecurityException.class)
+	public void runSqlRestrictedUpdate() throws IOException, ClassNotFoundException, SQLException, MitsiException {
+		try (MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME)) {
+			connection.runSql("update tutu set id = 1", 1, null, null, null);
+		}
+	}
+
 }

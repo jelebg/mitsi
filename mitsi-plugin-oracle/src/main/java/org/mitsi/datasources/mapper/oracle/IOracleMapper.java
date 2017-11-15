@@ -5,17 +5,12 @@ import static org.mitsi.core.annotations.ColumnDisplayType.NORMAL;
 import static org.mitsi.core.annotations.ColumnDisplayType.TABLE_LINK;
 
 import org.apache.ibatis.annotations.Param;
-import org.mitsi.core.annotations.DefaultOwnerIsConnectedUser;
-import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
-import org.mitsi.core.annotations.MitsiColumnTitles;
-import org.mitsi.core.annotations.MitsiColumnsAsRows;
-import org.mitsi.core.annotations.MitsiDatasourceDetail;
-import org.mitsi.core.annotations.MitsiProviderMapper;
-import org.mitsi.core.annotations.MitsiTableDetail;
+import org.mitsi.core.annotations.*;
 import org.mitsi.datasources.IMitsiMapper;
 
 @MitsiProviderMapper("oracle_11g")
 @DefaultOwnerIsConnectedUser
+@RestrictSql("\\s*(SELECT|WITH)\\s.*") // TODO : select for update à gérer
 public interface IOracleMapper extends IMitsiMapper {
 
 	// table details
