@@ -523,7 +523,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 		// TODO : conserver le pattern pour ne pas le recompiler systématiquement
 		
 		String regex = "[^a-zA-Z0-9_]";
-	    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+	    Pattern pattern = Pattern.compile(regex);
 	    Matcher match = pattern.matcher(tableName);
 		if(match.matches()) {
 			log.warn("invalid name : "+tableName);
