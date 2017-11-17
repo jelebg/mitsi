@@ -296,7 +296,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sqlTextKeyPress = function(event, i) {
-	    if (event.key == "Enter") {
+	    if (event.keyCode == 10 || event.keyCode == 13) {
 	        if (event.ctrlKey) {
     			$scope.sqlRun(i, false);
     			  event.preventDefault();
