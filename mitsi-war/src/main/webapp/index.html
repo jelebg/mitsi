@@ -72,7 +72,8 @@
 	          </div>
 			
 			  <div ng-controller="loginCtrl" style="display:inline-block;">
-				<table ng-hide="isUserLoggedIn()">
+				<span ng-hide="isProtocolSecure()" class="loginNotSafeMessage">to log in, please use https</span>
+				<table ng-hide="isUserLoggedIn() || !isProtocolSecure()">
 					<tr><td><input type="text"      ng-model="loginUser"     style="width:200px;" class="form-control" placeholder="username"/>
 					</td><td><input type="password" ng-model="loginPassword" ng-keypress="loginOnEnter($event)" style="width:200px;" class="form-control" placeholder="password"/>
 					</td><td><a href="" class="btn btn-default" ng-click="login()" ng-keypress="loginOnSpacebar($event)">log in</a>

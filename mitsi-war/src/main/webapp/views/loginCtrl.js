@@ -1,10 +1,14 @@
 angular.module('mitsiApp')
-    .controller('loginCtrl', function($scope, $rootScope, $state, userService, errorService) {
+    .controller('loginCtrl', function($scope, $rootScope, $state, $location, userService, errorService) {
+
+    $scope.isProtocolSecure = function() {
+        return $location.protocol()!=null && $location.protocol().toLowerCase() ==="https";
+    }
 
     $rootScope.loggedUser = null;
 	
     $scope.loginOnEnter = function(e) {
-    	if(e.code == "Enter") {
+    	if(e.keyCode == 10 || e.keyCode == 13) {
     		$scope.login();
     	}
     }
