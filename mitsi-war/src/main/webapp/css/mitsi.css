@@ -733,3 +733,40 @@
     color : lightgrey;
     padding-right:20px;
 }
+
+div.tab {
+    float: left;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 100px;
+    height: auto;
+}
+
+div.tab button {
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 5px 5px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+div.tab button:hover {
+    background-color: #ddd;
+}
+
+div.tab button.active {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    float: left;
+    padding: 0px 12px;
+    width: auto;
+    border-left: none;
+    height: 100%;
+}

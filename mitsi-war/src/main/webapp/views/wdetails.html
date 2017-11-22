@@ -1,5 +1,5 @@
 
-<body data-ng-app="mitsiApp" class="container">
+<body data-ng-app="mitsiApp" class="container" style="width:100%;">
 
     <a href="" ng-click="refresh();$event.stopPropagation();"
        ng-if="detailsSections.length == 0 && loading"
@@ -8,61 +8,67 @@
     	   ng-class="{'fast-right-spinner':loading}" 
     	></i>
     </a>
-    
-	<accordion close-others="false">
-		<accordion-group 
-			ng-repeat="section in detailsSections" 
-			is-open="section.isOpen"
-			 >
-		    <accordion-heading>
-	        	<i class="glyphicon " 
-	        	   ng-class="{'glyphicon-chevron-down': section.isOpen, 'glyphicon-chevron-right': !section.isOpen}">
-	        	   </i>
-			    {{ section.title }}
-			    
-			    <a href="" ng-click="refresh();$event.stopPropagation();">
-			    	<i class="pull-right glyphicon glyphicon-refresh"
-			    	   ng-class="{'fast-right-spinner':loading}" 
-			    	></i>
-			    </a>
-			</accordion-heading>
-			
-			<table class="mitsiDetailsQuickFindTable"><tr>
-				<td class="mitsiDetailsQuickFindLabel">quick find : </td>
-				<td style="position:absolute">
-					<a href="" 
-						class="glyphicon glyphicon-remove mitsiDetailsQuickFindReset" 
-						ng-click="section.filter=null; $event.stopPropagation();"></a>
-					<input type="text" class="mitsiDetailsQuickFindInput" ng-model="section.filter"/>
-				</td>
-			</tr></table>
-			<table class="table-striped" style="width:100%;">
+
+	<table><td style="vertical-align:top;">
+
+	<div class="tab" ng-hide="!detailsSections || detailsSections.length==0">
+		<button ng-repeat="section in detailsSections"
+				class="tablinks"
+				ng-click="selectSection($index)"
+				ng-class="{'active' : isSectionSelected($index)}">
+			{{ section.title }}
+		</button>
+	</div>
+
+	</td><td style="vertical-align:top;">
+
+		<table class="mitsiDetailsQuickFindTable"><tr>
+			<td class="mitsiDetailsQuickFindLabel">quick find : </td>
+			<td style="position:absolute">
+				<a href=""
+				   class="glyphicon glyphicon-remove mitsiDetailsQuickFindReset"
+				   ng-click="filter=null; $event.stopPropagation();"></a>
+				<input type="text" class="mitsiDetailsQuickFindInput" ng-model="filter"/>
+			</td>
+		</tr></table>
+
+		<div ng-repeat="section in detailsSections"
+		 ng-show="isSectionSelected($index)"
+		 class="tabcontent">
+
+		<div style="position:absolute;top:80px;bottom:0;height:auto;width:100%;overflow:auto;">
+			<div style="position:absolute;top:0px;left:0px;width:1500px;height:1500px;">
+
+			<table class="table-striped">
 			<thead>
-				<tr>
-					<th ng-repeat="column in section.columns"
-					    class="mitsiDetailsTableHeader">
-						{{ prettyColumnTitle(column.name) }}
-					</th>
-				</tr>
+			<tr>
+				<th ng-repeat="column in section.columns"
+					class="mitsiDetailsTableHeader">
+					{{ prettyColumnTitle(column.name) }}
+				</th>
+			</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="myrow in section.data"
-					ng-hide="isRowExcludedByFilter(section, myrow)"
+			<tr ng-repeat="myrow in section.data"
+				ng-hide="isRowExcludedByFilter(section, myrow)"
+			>
+				<td ng-repeat="d in myrow track by $index"
+					class="mitsiDetailsTableTd"
 				>
-			 	  <td ng-repeat="d in myrow track by $index" 
-			 	  	  class="mitsiDetailsTableTd"
-			 	  >
-			 	  <span ng-if="section.columns[$index].displayType==null || section.columns[$index].displayType=='NORMAL'">{{ d }}</span>
-			 	  <i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='toTheTable'"   class="glyphicon glyphicon-log-in"></i>
-			 	  <i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='fromTheTable'" class="glyphicon glyphicon-log-out"></i>
-			 	  <a    ng-if="section.columns[$index].displayType=='TABLE_LINK' " href="" ng-click="selectTable(d)">{{ d }}</a>
-			 	  </td>
-				</tr>
+					<span ng-if="section.columns[$index].displayType==null || section.columns[$index].displayType=='NORMAL'">{{ d }}</span>
+					<i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='toTheTable'"   class="glyphicon glyphicon-log-in"></i>
+					<i    ng-if="section.columns[$index].displayType=='FK_DIRECTION' && d=='fromTheTable'" class="glyphicon glyphicon-log-out"></i>
+					<a    ng-if="section.columns[$index].displayType=='TABLE_LINK' " href="" ng-click="selectTable(d)">{{ d }}</a>
+				</td>
+			</tr>
 			</tbody>
-			</table>
-			
+		</table>
+			</div></div>
 
-	    </accordion-group>
-	</accordion>
+	</div>
+
+
+	</td></table>
+
 </body>
 </html>

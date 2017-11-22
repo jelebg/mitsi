@@ -4,45 +4,28 @@ angular.module('mitsiApp')
     $scope.detailsSections = [];
     
     $scope.lastObjectType = null;
-    $scope.sectionsOpeningSave = {};
+    $scope.currentSectionByType = {};
     $scope.loading = false;
-    
+
+    $scope.selectSection = function(sectionIndex) {
+        $scope.currentSectionByType[$scope.lastObjectType] = sectionIndex;
+    }
+
+    $scope.isSectionSelected = function(sectionIndex) {
+        let current = $scope.currentSectionByType[$scope.lastObjectType];
+        if (!current) {
+            $scope.currentSectionByType[$scope.lastObjectType] = 0;
+            return sectionIndex == 0;
+        }
+        return current == sectionIndex;
+    }
+
     $scope.prettyColumnTitle = function (str) {
     	return capitalizeFirstLetter(str.replace("_", " "));
     }
-    
-    $scope.saveSectionsOpening = function() {
-    	var objectType = $scope.lastObjectType;
 
-    	if(!$scope.detailsSections) {
-    		return;
-    	}
-    	if($scope.detailsSections.length == 0) {
-    		return;
-    	}
-    	
-    	var save = [];
-    	for(var i=0; i!=$scope.detailsSections.length; i++) {
-    		save.push($scope.detailsSections[i].isOpen);
-    	}
-    	$scope.sectionsOpeningSave[objectType] = save;
-    }
-    	
     $scope.restoreSectionsOpening = function(objectType) {
     	$scope.lastObjectType = objectType;
-    	if(!$scope.detailsSections) {
-    		return;
-    	}
-
-    	var save = $scope.sectionsOpeningSave[objectType];
-    	for(var i=0; i!=$scope.detailsSections.length; i++) {
-    		var isOpen = false;
-    		if(save && save.length > i) {
-    			isOpen = save[i];
-    		}
-    		
-    		$scope.detailsSections[i].isOpen = isOpen;
-    	}
     }
 
     $scope.getTableDetails = function(source, databaseObject) {
@@ -50,9 +33,8 @@ angular.module('mitsiApp')
     	if(databaseObject) {
 	    	detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
 		    .then(function(response) {
-		    	  $scope.saveSectionsOpening();
-		    	  $scope.detailsSections = response.data.sections;
 		    	  $scope.restoreSectionsOpening("table");
+		    	  $scope.detailsSections = response.data.sections;
 		    },
 		    errorService.getGenericHttpErrorCallback())
 		    .finally(function() {
@@ -62,9 +44,8 @@ angular.module('mitsiApp')
     	else {
 	    	detailsService.getDetails(source, null, null, null)
 		    .then(function(response) {
-		    	  $scope.saveSectionsOpening();
-		    	  $scope.detailsSections = response.data.sections;
 		    	  $scope.restoreSectionsOpening("source");
+		    	  $scope.detailsSections = response.data.sections;
 		    },
 		    errorService.getGenericHttpErrorCallback())
 		    .finally(function() {
@@ -74,7 +55,8 @@ angular.module('mitsiApp')
     }
     
     $scope.isRowExcludedByFilter = function(detailsSection, row) {
-    	let filter = detailsSection.filter;
+    // TODO : have one filter per section ?
+    	let filter = $scope.filter;
     	if(!filter) {
     		return false;
     	}
