@@ -1,5 +1,7 @@
-
-<body data-ng-app="mitsiApp" class="container" style="width:100%;">
+<div class="sidePanelResizeHeightControl sidePanelResizeHeightInitControl">
+<div style="position:absolute;height:auto;top:45px;bottom:0px;right:0px;left:0px;width:auto;"
+     class="sidePanelManageTop"
+>
 
     <a href="" ng-click="refresh();$event.stopPropagation();"
        ng-if="detailsSections.length == 0 && loading"
@@ -9,7 +11,7 @@
     	></i>
     </a>
 
-	<table><td style="vertical-align:top;">
+	<table style="width:100%;"><td style="vertical-align:top;width:155px;">
 
 	<div class="tab" ng-hide="!detailsSections || detailsSections.length==0">
 		<button ng-repeat="section in detailsSections"
@@ -31,15 +33,14 @@
 				<input type="text" class="mitsiDetailsQuickFindInput" ng-model="filter"/>
 			</td>
 		</tr></table>
+	</td></table>
 
-		<div ng-repeat="section in detailsSections"
-		 ng-show="isSectionSelected($index)"
-		 class="tabcontent">
+    <div style="position:absolute;right:0px;left:160px;top:40px;bottom:0px;height:auto;width:auto;overflow:auto;">
+	  <div style="position:absolute;top:0px;left:0px;">
 
-		<div style="position:absolute;top:80px;bottom:0;height:auto;width:100%;overflow:auto;">
-			<div style="position:absolute;top:0px;left:0px;width:1500px;height:1500px;">
+		<div ng-repeat="section in detailsSections" ng-show="isSectionSelected($index)">
 
-			<table class="table-striped">
+			<table class="table-striped" style="width:100%">
 			<thead>
 			<tr>
 				<th ng-repeat="column in section.columns"
@@ -50,7 +51,7 @@
 			</thead>
 			<tbody>
 			<tr ng-repeat="myrow in section.data"
-				ng-hide="isRowExcludedByFilter(section, myrow)"
+				ng-hide="isRowExcludedByFilter(section, myrow, filter)"
 			>
 				<td ng-repeat="d in myrow track by $index"
 					class="mitsiDetailsTableTd"
@@ -66,9 +67,5 @@
 			</div></div>
 
 	</div>
-
-
-	</td></table>
-
-</body>
-</html>
+  </div>
+</div>

@@ -160,6 +160,21 @@ angular.module('mitsiApp')
 		}
 		else {
 			$scope.panelDisplayed = name;
+
+            $timeout(function() {
+
+                let heightControls= document.getElementsByClassName("sidePanelResizeHeightInitControl");
+                for (let i=0; i!=heightControls.length; i++) {
+                    if (!heightControls[i].style.height || heightControls[i].style.height === "") {
+                        heightControls[i].style.height = "300px";
+                    }
+                }
+
+                let topControls= document.getElementsByClassName("sidePanelManageTop");
+                for (let i=0; i!=topControls.length; i++) {
+                    topControls[i].style.top = "0px";
+                }
+            }, 50); // TODO : we need asynchronism as elements of class sidePanelResizeHeightInitControl do not exist yet, but 0.05s is too much
 		}
 		$scope.resizeSidePanelGrid();
 	}
@@ -1631,5 +1646,5 @@ angular.module('mitsiApp')
 	$scope.jsplumbInit();
 	$scope.tablesInit();
 	$scope.restoreScope();
-	
+
 });

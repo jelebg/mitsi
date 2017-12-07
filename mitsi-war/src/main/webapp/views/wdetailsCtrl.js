@@ -54,9 +54,7 @@ angular.module('mitsiApp')
     	}
     }
     
-    $scope.isRowExcludedByFilter = function(detailsSection, row) {
-    // TODO : have one filter per section ?
-    	let filter = $scope.filter;
+    $scope.isRowExcludedByFilter = function(detailsSection, row, filter) {
     	if(!filter) {
     		return false;
     	}

@@ -171,10 +171,12 @@ angular.module('mitsiApp')
 		$scope.loadingBegins();
 		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, nbRow, orderByColumns, filters)
 		  .then(function(response) {
-			  $scope.dataGridApi.core.scrollTo(
-					  $scope.dataGrid.data[0],
-					  $scope.dataGrid.columnDefs[0]
-			  );
+              if ($scope.dataGridApi) { // on init, dataGridApi may not be registered yet
+                  $scope.dataGridApi.core.scrollTo(
+                          $scope.dataGrid.data[0],
+                          $scope.dataGrid.columnDefs[0]
+                  );
+              }
 			  $scope.dataGrid.data = [];
 			  
 			  if(!preserveColumns) {
