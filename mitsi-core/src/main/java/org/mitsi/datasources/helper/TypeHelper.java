@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +58,23 @@ public class TypeHelper {
 	public static String fromJdbcToString(int jdbcType, ResultSet rs, int column) throws SQLException {
 		switch(jdbcType) {
 		case Types.TIMESTAMP :
-		//case Types.TIMESTAMP_WITH_TIMEZONE :
+		//case Types.TIMESTAMP_WITH_TIMEZONE : // TODO
+			Timestamp timestamp = rs.getTimestamp(column);
+			if(timestamp == null) {
+				return null;
+			}
+			Calendar cTimestamp = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			cTimestamp.setTimeInMillis(timestamp.getTime());
+			return String.format("%04d-%02d-%02dT%02d:%02d:%02d.%09d",
+					cTimestamp.get(Calendar.YEAR),
+					cTimestamp.get(Calendar.MONTH)+1,
+					cTimestamp.get(Calendar.DAY_OF_MONTH),
+					cTimestamp.get(Calendar.HOUR_OF_DAY),
+					cTimestamp.get(Calendar.MINUTE),
+					cTimestamp.get(Calendar.SECOND),
+					1000000*cTimestamp.get(Calendar.MILLISECOND) + timestamp.getNanos()
+			);
+
 		case Types.TIME :
 		case Types.DATE :
 			// I know there is hundreeds of other 'better' ways to do that but I didn't want another lib like JODA just for that
@@ -105,11 +122,17 @@ public class TypeHelper {
 			
 		case Types.NCHAR :
 		case Types.VARCHAR :
-		default :
 			if(rs.getObject(column) == null) {
 				return null;
 			}
 			return rs.getString(column);
+
+		default :
+			if(rs.getObject(column) == null) {
+				return null;
+			}
+			return "(object)";
+
 		}
 		
 	}

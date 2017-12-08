@@ -334,7 +334,7 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 
 				while (resultSet.next()) {
 					String[] row = new String[nbColumns];
-					for (int i = 0; i != row.length; i++) {
+					for (int i = 0; i != columnPos.length; i++) {
 						if (columnPos[i] >= 0) {
 							//if(jdbcTypes[i]!=-1) {
 							row[columnPos[i]] = TypeHelper.fromJdbcToString(jdbcTypes[i], resultSet, i + 1);
