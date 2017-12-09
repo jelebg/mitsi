@@ -59,6 +59,13 @@
 								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.rule }}</pre></td>
 							</tr>
 							<tr class="eyeshinePopupListRuleTableLabel"
+								ng-if="r.candidateFkToTable">
+								<td>candidate fk model :</td>
+							</tr>
+							<tr ng-if="r.candidateFkToTable">
+								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.candidateFkToTable }}</pre></td>
+							</tr>
+							<tr class="eyeshinePopupListRuleTableLabel"
 								ng-if="displayComments">
 								<td>comment :</td>
 							</tr>
