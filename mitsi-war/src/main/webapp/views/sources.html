@@ -6,6 +6,9 @@
   <script type="text/ng-template" id="popover.sourceinfo.html">
     <span>Display&nbsp;datasource&nbsp;global&nbsp;informations</span>
   </script>
+  <script type="text/ng-template" id="popover.eyeshine.html">
+	<span>Eyeshine&nbsp;rules&nbsp;for&nbsp;labels</span>
+  </script>
   <script type="text/ng-template" id="popover.table.filter.options.html">
     <span>filter&nbsp;options</span>
   </script>
@@ -25,7 +28,53 @@
 	<div ng-repeat="comment in c.labelsComments">{{ comment }}</div>
   </script>
 
+	<script type="text/ng-template" id="popups/eyeshine.inline.html">
+		<div class="modal-header">
+			<h3 class="modal-title" id="modal-title">Eyeshine rules for labels in {{ sourceName }}</h3>
+		</div>
+		<div class="modal-body" id="modal-body"  >
+			<a href=""
+			   ng-click="displayComments=!displayComments; $event.stopPropagation();"
+			   class="mitsiCheckOption"
+			   ng-class="{'mitsi-grey':!displayComments}" >
+				<i class="glyphicon glyphicon-ok" ></i>
+				display label comments
+			</a>
+			<br/>
 
+			<table >
+				<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
+					<td>
+						<span class="eyeshinePopupListLabel labelFilter"
+							ng-class="{ 'filterWarningLabelNotSelected' : r.labelWarning , 'filterLabelNotSelected' : r.label }">
+							{{ r.label ? r.label : r.labelWarning }}
+						</span>
+					</td>
+					<td>
+						<table>
+							<tr class="eyeshinePopupListRuleTableLabel">
+								<td>rule :</td>
+							</tr>
+							<tr>
+								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.rule }}</pre></td>
+							</tr>
+							<tr class="eyeshinePopupListRuleTableLabel"
+								ng-if="displayComments">
+								<td>comment :</td>
+							</tr>
+							<tr ng-if="displayComments">
+								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.comment }}</pre></td>
+							</tr>
+						</table>
+					</tr>
+				</tr>
+			</table>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" type="button" ng-click="closeOptionsDialog()">OK</button>
+			<!--button class="btn btn-warning" type="button" ng-click="closeOptionsDialog()">Cancel</button-->
+		</div>
+	</script>
 </head>
 
 <body data-ng-app="mitsiApp">
@@ -68,6 +117,21 @@
 				   popover-placement="left-bottom"
 	            ></i>
             </a>
+
+			<a href=""
+			   ng-click="showEyeshineDialog(s); $event.stopPropagation();"
+			   ng-class="{ 'anchorDisabled' : !s.rules }"
+			>
+				<img src="img/eyeshine_16px_blue.png"
+				   class="pull-right"
+				   ng-class="{ 'mitsiGrayscale' : !s.rules }"
+				   style="margin-right:5px"
+				   popover-template="'popover.eyeshine.html'"
+				   popover-trigger="mouseenter"
+				   popover-placement="left-bottom"
+				></img>
+			  </a>
+
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>
  

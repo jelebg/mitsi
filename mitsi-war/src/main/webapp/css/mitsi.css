@@ -303,13 +303,15 @@
 }
 
 .anchorDisabled {
-  pointer-events: none;
+#  pointer-events: none; # disabled because it is a little too much
   cursor: default;
   color : grey;
+  text-decoration:none;
 }
 .anchorDisabled:hover {
   cursor: default;
   color : grey;
+  text-decoration:none;
 }
 
 .columnAttributeLabel {
@@ -482,17 +484,6 @@
 }
 .verticalMenuTdSelected a:visited  {
 	color:white;
-}
-
-
-.anchorDisabled {
-	color : #515151;
-	text-decoration:none;
-}
-
-.anchorDisabled:hover {
-	color : #515151;
-	text-decoration:none;
 }
 
 .mitsiCheckOption {
@@ -769,4 +760,26 @@ div.tab button.active {
     width: auto;
     border-left: none;
     height: 100%;
+}
+
+.eyeshinePopupListTr {
+    border-bottom:1px solid lightgrey;
+}
+
+.eyeshinePopupListLabel {
+    margin-right:3px;
+    font-size:110%;
+}
+
+.eyeshinePopupListRuleTableLabel {
+    font-size:80%;
+    font-weight:bold;
+}
+
+.eyeshinePopupListRuleTable pre {
+}
+
+.eyeshinePopupListRuleTableContent {
+    white-space:pre-wrap;
+    width:500px;
 }

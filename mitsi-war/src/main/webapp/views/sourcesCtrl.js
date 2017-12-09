@@ -1,10 +1,58 @@
 angular.module('mitsiApp')
+    .controller('sourceEyeshineCtrl', function($scope, $rootScope, $modalInstance, sourceName, rules) {
+    	$scope.sourceName = sourceName;
+    	$scope.rules = rules;
+
+    $scope.closeAndSaveOptionsDialog = function() {
+        $modalInstance.close( {
+            //alwaysDisplaySchema    : $scope.alwaysDisplaySchema,
+            //sqlGeneratedWithSchema : $scope.sqlGeneratedWithSchema
+        });
+    }
+
+    $scope.closeOptionsDialog = function() {
+        $modalInstance.dismiss();
+    }
+
+});
+
+angular.module('mitsiApp')
     .controller('sourcesCtrl', 
-    		function($scope, $rootScope, $state, $timeout, $interval, $location, $q, userService, sourceService, errorService) { // NOSONAR too many parameters
+    		function($scope, $rootScope, $state, $timeout, $interval, $location, $q, $modal, userService, sourceService, errorService) { // NOSONAR too many parameters
 
 	$scope.datasources = [];
 
-	
+    // eyeshine popoup
+    $scope.showEyeshineDialog = function(source) {
+        if (!source.rules) {
+            return;
+        }
+
+        const modalInstance = $modal.open({
+              animation: true,
+              ariaLabelledBy: 'modal-title',
+              ariaDescribedBy: 'modal-body',
+              templateUrl: 'popups/eyeshine.inline.html',
+              controller: 'sourceEyeshineCtrl',
+              resolve: {
+                  sourceName: function () {
+                    return source.name;
+                  },
+                  rules: function () {
+                    return source.rules;
+                  }
+                }
+
+            });
+
+        modalInstance.result.then(function (source) {
+              //$scope.source.rules = ;
+            }, function () {
+              // nothing
+            });
+
+    }
+
 	$scope.init = function() {
 		if($scope.datasources.length > 0) {
 			return;
@@ -436,6 +484,7 @@ angular.module('mitsiApp')
 		  source.schemas = response.data.schemas;
 		  source.dbProvider = response.data.provider;
 		  source.currentSchemaName = null;
+		  source.rules = response.data.rules;
 		  
 		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {

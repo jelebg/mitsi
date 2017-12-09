@@ -3,7 +3,7 @@ angular.module('mitsiApp')
     	$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
     	$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
     	
-    	$scope.init = function(options) {
+    	$scope.init = function(options) { // TODO : never called ??
     		$scope.alwaysDisplaySchema    = options.alwaysDisplaySchema;
     		$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
     	}
