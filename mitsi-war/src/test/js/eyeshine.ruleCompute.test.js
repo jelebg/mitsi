@@ -287,6 +287,46 @@ describe("eyeshine rule computation", function() {
                   "columnsDefinition": "ID"
                 }
               ],
+              "PUBLIC.PLANET.NAME": [
+                  {
+                    "index": {
+                      "owner": "PUBLIC",
+                      "tableName": "PLANET",
+                      "name": "NAME_INDEX_1",
+                      "type": "3",
+                      "uniqueness": "f",
+                      "columns": "NAME,PLANET_TYPE_FK"
+                    },
+                    "position": 1,
+                    "columnsDefinition": "NAME,PLANET_TYPE_FK" // TODO : check if correct
+                  }
+              ],
+              "PUBLIC.PLANET.PLANET_TYPE_FK": [ // TODO : refaire ces deux indexs dans le SQL et exporter les collections correctement
+                  {
+                    "index": {
+                      "owner": "PUBLIC",
+                      "tableName": "PLANET",
+                      "name": "PLANET_TYPE_FK_INDEX",
+                      "type": "3",
+                      "uniqueness": "f",
+                      "columns": "PLANET_TYPE_FK"
+                    },
+                    "position": 1,
+                    "columnsDefinition": "PLANET_TYPE_FK" // TODO : check if correct
+                  },
+                  {
+                    "index": {
+                      "owner": "PUBLIC",
+                      "tableName": "PLANET",
+                      "name": "NAME_INDEX_1",
+                      "type": "3",
+                      "uniqueness": "f",
+                      "columns": "NAME,PLANET_TYPE_FK"
+                    },
+                    "position": 2,
+                    "columnsDefinition": "NAME,PLANET_TYPE_FK" // TODO : check if correct
+                  }
+              ],
               "PUBLIC.PLANET.STAR_FK": [
                 {
                   "index": {
@@ -660,7 +700,7 @@ describe("eyeshine rule computation", function() {
         .toBe(true);
         expect(ruleCompute(parsedRule, getVariablesForColumn("ID"), {"normal": [], "warning": []}))
         .toBe(true);
-        expect(ruleCompute(parsedRule, getVariablesForColumn("NAME"), {"normal": [], "warning": []}))
+        expect(ruleCompute(parsedRule, getVariablesForColumn("DESCRIPTION"), {"normal": [], "warning": []}))
         .toBe(false);
     });
 
@@ -800,12 +840,78 @@ describe("eyeshine rule computation", function() {
 
     });
 
+    it("IN operator with store in variables as custom array with 2 occurences, testing with ==", function() {
+        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        // variable stored as string
+        let parsedRule2 = peg.parse("myvar.index.name == 'PLANET_TYPE_FK_INDEX'");
+        let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' == myvar.index.name");
+        // variable stored as integer
+        let parsedRule3 = peg.parse("myvar.index.tableName == 'PLANET'");
+        let parsedRule3Reverse = peg.parse("'PLANET' == myvar.index.tableName");
 
-    /*it("IN operator with store in variables as custom array with 2 occurences", function() {
-        TODO
+        let variables = getVariablesForColumn("PLANET_TYPE_FK");
+
+        // myvar.index.name is not set yet in variables
+        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.tableName is undefined"));
+        expect(function(){ ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.tableName is undefined"));
+
+        expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // now myvar.index.name exists
+        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) })
+        .toThrow(new Error("different values are found for left value in == or != test myvar.index.name"));
+        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}) })
+        .toThrow(new Error("different values are found for right value in == or != test myvar.index.name"));
+
+        // now myvar.index.tableName exists. there is two occurences, but each value is the same and equal to 'PLANET'
+        expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+        expect(ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(true);
     });
-*/
 
+    it("IN operator with store in variables as custom array with 2 occurences, testing with !=", function() {
+        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        // variable stored as string
+        let parsedRule2 = peg.parse("myvar.index.name != 'PLANET_TYPE_FK_INDEX'");
+        let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' != myvar.index.name");
+        // variable stored as integer
+        let parsedRule3 = peg.parse("myvar.index.tableName != 'PLANET'");
+        let parsedRule3Reverse = peg.parse("'PLANET' != myvar.index.tableName");
 
+        let variables = getVariablesForColumn("PLANET_TYPE_FK");
+
+        // myvar.index.name is not set yet in variables
+        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.tableName is undefined"));
+        expect(function(){ ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.tableName is undefined"));
+
+        expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // now myvar.index.name exists
+        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) })
+        .toThrow(new Error("different values are found for left value in == or != test myvar.index.name"));
+        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}) })
+        .toThrow(new Error("different values are found for right value in == or != test myvar.index.name"));
+
+        // now myvar.index.tableName exists. there is two occurences, but each value is the same and equal to 'PLANET'
+        expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
+        .toBe(false);
+        expect(ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(false);
+    });
 
 });

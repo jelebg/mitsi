@@ -162,7 +162,7 @@ function ruleComputeEquality(rule, variables, labels) {
 	}
 
     if (typeof(lhsValue) != "string") {
-        lhsValue = lhsValue.toString()
+        lhsValue = lhsValue.toString();
     }
     if (typeof(rhsValue) != "string") {
         rhsValue = rhsValue.toString();
@@ -180,7 +180,7 @@ function getVariableValueInAllNameTrees(nameParts, treeList) {
                 values = [ v ];
             }
             else {
-                values = values.push(v);
+                values.push(v);
             }
         }
     }
