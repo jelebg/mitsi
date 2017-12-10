@@ -668,17 +668,23 @@ describe("eyeshine rule computation", function() {
         let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
         // variable stored as string
         let parsedRule2 = peg.parse("myvar.index.name == 'CONSTRAINT_INDEX_8'");
+        let parsedRule2Reverse = peg.parse("'CONSTRAINT_INDEX_8' == myvar.index.name");
         // variable stored as integer
         let parsedRule3 = peg.parse("myvar.position == '1'");
+        let parsedRule3Reverse = peg.parse("'1' == myvar.position");
         // variables that does not exist
-        let parsedRuleUndefined1 = peg.parse("myvar.undefined == '1'");
-        let parsedRuleUndefined2 = peg.parse("undefined == '1'");
 
         let variables = getVariablesForColumn("STAR_FK");
 
         // myvar.index.name is not set yet in variables
         expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
         .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+        expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.position is undefined"));
+        expect(function(){ ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.position is undefined"));
 
         expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
         .toBe(true);
@@ -686,11 +692,23 @@ describe("eyeshine rule computation", function() {
         // now myvar.index.name exists
         expect(ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}))
         .toBe(true);
+        expect(ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // now myvar.position exists
+        expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+        expect(ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(true);
 
         // others inexistence tests
-        expect(function(){ ruleCompute(parsedRuleUndefined1, variables, {"normal": [], "warning": []})})
+        expect(function(){ ruleCompute(peg.parse("myvar.undefined == '1'"), variables, {"normal": [], "warning": []})})
         .toThrow(new Error("myvar.undefined is undefined"));
-        expect(function(){ ruleCompute(parsedRuleUndefined2, variables, {"normal": [], "warning": []})})
+        expect(function(){ ruleCompute(peg.parse("undefined == '1'"), variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("undefined is undefined"));
+        expect(function(){ ruleCompute(peg.parse("'1' == myvar.undefined"), variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.undefined is undefined"));
+        expect(function(){ ruleCompute(peg.parse("'1' == undefined"), variables, {"normal": [], "warning": []})})
         .toThrow(new Error("undefined is undefined"));
 
     });
