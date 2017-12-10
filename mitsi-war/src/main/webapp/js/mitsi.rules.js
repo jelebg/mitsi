@@ -186,6 +186,10 @@ function ruleComputeEquality(rule, variables, labels) {
 }
 
 function getVariableValueInAllNameTrees(nameParts, treeList) {
+    if (!nameParts || nameParts.length == 0) {
+        return treeList;
+    }
+
     let values = null;
 
     for (let i=0; i!=treeList.length; i++) {
@@ -243,6 +247,9 @@ function getVariableValue(name, variables, asArray, asCollection) {
     if (varInCollections) {
         if (asCollection) {
             return varInCollections;
+        }
+        if (asArray) {
+            return [ varInCollections ];
         }
         return null;
     }
@@ -310,7 +317,7 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 	let next = expression.next;
 	let currents = [];
 
-	if (name.literal) {
+	if (expression.expr.literal) {
 		if (parents != null || next != null) {
 			// on ne peut pas utiliser un literal dans une expression du type truc."literal".machin
 			return null;
