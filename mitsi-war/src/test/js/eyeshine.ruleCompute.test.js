@@ -672,7 +672,6 @@ describe("eyeshine rule computation", function() {
         // variable stored as integer
         let parsedRule3 = peg.parse("myvar.position == '1'");
         let parsedRule3Reverse = peg.parse("'1' == myvar.position");
-        // variables that does not exist
 
         let variables = getVariablesForColumn("STAR_FK");
 
@@ -721,7 +720,6 @@ describe("eyeshine rule computation", function() {
         // variable stored as integer
         let parsedRule3 = peg.parse("myvar.position != '1'");
         let parsedRule3Reverse = peg.parse("'1' != myvar.position");
-        // variables that does not exist
 
         let variables = getVariablesForColumn("STAR_FK");
 
@@ -768,7 +766,8 @@ describe("eyeshine rule computation", function() {
         let parsedRule2 = peg.parse("myvar.index.name LIKE 'CONSTRAINT_INDEX.*'");
         // variable stored as integer
         let parsedRule3 = peg.parse("myvar.position LIKE '\\d+'");
-        // variables that does not exist
+        // regex that does not match
+        let parsedRule4 = peg.parse("myvar.position LIKE '[a-z]+'");
 
         let variables = getVariablesForColumn("STAR_FK");
 
@@ -776,6 +775,8 @@ describe("eyeshine rule computation", function() {
         expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
         .toThrow(new Error("myvar.index.name is undefined"));
         expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.position is undefined"));
+        expect(function(){ ruleCompute(parsedRule4, variables, {"normal": [], "warning": []})})
         .toThrow(new Error("myvar.position is undefined"));
 
         expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
@@ -788,6 +789,8 @@ describe("eyeshine rule computation", function() {
         // now myvar.position exists
         expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
         .toBe(true);
+        expect(ruleCompute(parsedRule4, variables, {"normal": [], "warning": []}))
+        .toBe(false);
 
         // others inexistence tests
         expect(function(){ ruleCompute(peg.parse("myvar.undefined LIKE 'TEST.*'"), variables, {"normal": [], "warning": []})})
