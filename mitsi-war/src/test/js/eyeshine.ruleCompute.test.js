@@ -663,7 +663,7 @@ describe("eyeshine rule computation", function() {
     };
 
     let getVariablesForColumn = function(column) {
-        return { // TODO : remove
+        return {
            "variables" : {
                     "source": {
                        "name": "BUBULLE-TEST",
@@ -842,25 +842,16 @@ describe("eyeshine rule computation", function() {
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with ==", function() {
         let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
-        // variable stored as string
+        // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name == 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' == myvar.index.name");
-        // variable stored as integer
+        // variable matching 2 equal values : will throw exception
         let parsedRule3 = peg.parse("myvar.index.tableName == 'PLANET'");
         let parsedRule3Reverse = peg.parse("'PLANET' == myvar.index.tableName");
 
         let variables = getVariablesForColumn("PLANET_TYPE_FK");
 
-        // myvar.index.name is not set yet in variables
-        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.name is undefined"));
-        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.name is undefined"));
-        expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.tableName is undefined"));
-        expect(function(){ ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.tableName is undefined"));
-
+        // initializes myvar.index.name
         expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
         .toBe(true);
 
@@ -879,25 +870,16 @@ describe("eyeshine rule computation", function() {
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with !=", function() {
         let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
-        // variable stored as string
+        // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name != 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' != myvar.index.name");
-        // variable stored as integer
+        // variable matching 2 equal values : will throw exception
         let parsedRule3 = peg.parse("myvar.index.tableName != 'PLANET'");
         let parsedRule3Reverse = peg.parse("'PLANET' != myvar.index.tableName");
 
         let variables = getVariablesForColumn("PLANET_TYPE_FK");
 
-        // myvar.index.name is not set yet in variables
-        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.name is undefined"));
-        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.name is undefined"));
-        expect(function(){ ruleCompute(parsedRule3, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.tableName is undefined"));
-        expect(function(){ ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []})})
-        .toThrow(new Error("myvar.index.tableName is undefined"));
-
+        // initializes myvar.index.name
         expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
         .toBe(true);
 
@@ -914,4 +896,33 @@ describe("eyeshine rule computation", function() {
         .toBe(false);
     });
 
+    it("IN operator with store in variables as custom array with 2 occurences, testing with LIKE", function() {
+        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        // variable matching 2 different values : OK only if regex matches every values
+        let parsedRule2 = peg.parse("myvar.index.name LIKE 'PLANET_TYPE_FK_(.*)'");
+        // variable matching 2 equal values : OK only if regex matches the value
+        let parsedRule3 = peg.parse("myvar.index.tableName LIKE 'PLANET'");
+        // variable matching 2 equal values, capturing a group
+        let parsedRule4 = peg.parse("mycapture:(myvar.index.tableName LIKE 'PLA(.*)')");
+
+        let variables = getVariablesForColumn("PLANET_TYPE_FK");
+
+        // initializes myvar.index.name
+        expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // now myvar.index.name exists
+        expect(ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}))
+        .toBe(false);
+
+        // now myvar.index.tableName exists. there is two occurences, but each value is the same and equal to 'PLANET'
+        expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // test that group capture works
+        expect(ruleCompute(parsedRule4, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+        expect(ruleCompute(peg.parse("mycapture.group1 == 'NET,NET'"), variables, {"normal": [], "warning": []}))
+        .toBe(true);
+    });
 });

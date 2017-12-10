@@ -47,8 +47,8 @@ function ruleCompute(rule, variables, labels) {
 		if(!rule.left.name) {
 			throw new Error("left-hand side of LIKE is not a variable name");
 		}
-		lhsValue = getVariableValue(rule.left.value, variables, false, false);
-		if(!lhsValue) {
+		lhsValues = getVariableValue(rule.left.value, variables, true, false);
+		if(!lhsValues || lhsValues.length == 0) {
 			throw new Error(rule.left.value+" is undefined");
 		}
 		let regex = rule.regex;
@@ -56,23 +56,38 @@ function ruleCompute(rule, variables, labels) {
 			regex = new RegExp(rule.right.value);
 			rule.regex = regex;
 		}
+
+        // if many variables are found, return true only if every on matches the regex
+		let maxGroups = 0;
+		let regexExecList = [];
+		for (let i=0; i!=lhsValues.length; i++) {
+            let regexExec = regex.exec(lhsValues[i]);
+            if (! regexExec) {
+                return false;
+            }
+            if (maxGroups < regexExec.length) {
+                maxGroups = regexExec.length;
+            }
+            regexExecList.push(regexExec);
+        }
+
+        if (rule.storeResultInVariable) {
+            // if many variables are found, and all matches,
+            // and we want to store the matching groups, concatenates the groups,
+            // then we concatenate the groups with ','
+            // TODO : fair des tableaux plutôt ? ça va devenir compliqué, est-ce bien nécessaire ?
+            let tostore = {};
+    		for (let i=0; i!=regexExecList.length; i++) {
+                let regexExec = regexExecList[i];
+                for (let j=0; j!=maxGroups; j++) {
+                    let group = (j>=regexExec.length ? "" : regexExec[j]);
+                    tostore["group"+j] = (i==0 ? group : tostore["group"+i]+","+group);
+                }
+            }
+            variables.customVariables[rule.storeResultInVariable] = tostore;
+        }
 		
-		let regexExec = regex.exec(lhsValue);
-		
-		if (rule.storeResultInVariable) {
-			let tostore = null;
-			if (regexExec!=null) {
-				// TODO : eviter d'écraser les variables built-in mitsi
-				// TODO : marquer la variable comme custom pour pouvoir l'écraser ensuite
-				tostore = {};
-				for (let i=0; i!=regexExec.length; i++) {
-					tostore["group"+i] = regexExec[i];
-				}
-			}				
-			variables.customVariables[rule.storeResultInVariable] = tostore;
-		}
-		
-		return regexExec != null;
+		return true;
 	}
 	else if(rule.operator == "IN") {
 		if(!rule.right.name) {
