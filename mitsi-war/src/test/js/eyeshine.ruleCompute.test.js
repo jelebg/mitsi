@@ -664,4 +664,42 @@ describe("eyeshine rule computation", function() {
         .toBe(false);
     });
 
+    it("IN operator with store in variables as custom array", function() {
+        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        // variable stored as string
+        let parsedRule2 = peg.parse("myvar.index.name == 'CONSTRAINT_INDEX_8'");
+        // variable stored as integer
+        let parsedRule3 = peg.parse("myvar.position == '1'");
+        // variables that does not exist
+        let parsedRuleUndefined1 = peg.parse("myvar.undefined == '1'");
+        let parsedRuleUndefined2 = peg.parse("undefined == '1'");
+
+        let variables = getVariablesForColumn("STAR_FK");
+
+        // myvar.index.name is not set yet in variables
+        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.index.name is undefined"));
+
+        expect(ruleCompute(parsedRule1, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // now myvar.index.name exists
+        expect(ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // others inexistence tests
+        expect(function(){ ruleCompute(parsedRuleUndefined1, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("myvar.undefined is undefined"));
+        expect(function(){ ruleCompute(parsedRuleUndefined2, variables, {"normal": [], "warning": []})})
+        .toThrow(new Error("undefined is undefined"));
+
+    });
+
+    /*it("IN operator with store in variables as custom array with 2 occurences", function() {
+        TODO
+    });
+*/
+
+
+
 });

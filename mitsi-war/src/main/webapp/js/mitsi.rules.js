@@ -4,7 +4,7 @@
 // TODO : faire une gestion des dependances pour "LABELLED" : si une rule utilise LABELLED, le label indiqué doit etre compute avant + erreur si dependence circulaire
 function ruleCompute(rule, variables, labels) {
 	if(rule.literal || rule.name) {
-		throw "cannot evaluate literal or expression outside of expression";
+		throw new Error("cannot evaluate literal or expression outside of expression");
 	}
 	
 	if(rule.operator == "LABELLED") {
@@ -42,14 +42,14 @@ function ruleCompute(rule, variables, labels) {
 	}
 	else if(rule.operator == "LIKE") {
 		if(!rule.right.literal) {
-			throw "right-hand side of LIKE is not a litteral"; 
+			throw new Error("right-hand side of LIKE is not a litteral");
 		}
 		if(!rule.left.name) {
-			throw "left-hand side of LIKE is not a variable name"; 
+			throw new Error("left-hand side of LIKE is not a variable name");
 		}
 		lhsValue = getVariableValue(rule.left.value, variables, false, false);
 		if(!lhsValue) {
-			throw rule.left.value+" is undefined"; 
+			throw new Error(rule.left.value+" is undefined");
 		}
 		let regex = rule.regex;
 		if(!regex) {
@@ -76,24 +76,24 @@ function ruleCompute(rule, variables, labels) {
 	}
 	else if(rule.operator == "IN") {
 		if(!rule.right.name) {
-			throw "right-hand side of IN is not a collection name"; 
+			throw new Error("right-hand side of IN is not a collection name");
 		}
 		let collection = getVariableValue(rule.right.value, variables, false, true);
 		if (!collection) {
-			throw "collection "+rule.right.value+" does not exist"; 
+			throw new Error("collection "+rule.right.value+" does not exist");
 		}
 		let lhsValues = null;
 		if(rule.left.name) {
     		lhsValues = getVariableValue(rule.left.value, variables, true, false);
 			if(!lhsValues) {
-				throw rule.left.value+" is undefined"; 
+				throw new Error(rule.left.value+" is undefined");
 			}
 		}
 		else if(rule.left.literal) {
 			lhsValues = [ rule.left.value ];
 		}
 		else {
-			throw "unknown lhs type";
+			throw new Error("unknown lhs type");
 		}
 		let ret = [];
 		for (let iLhsValue = 0; iLhsValue != lhsValues.length; iLhsValue ++) {
@@ -119,17 +119,24 @@ function ruleCompute(rule, variables, labels) {
 
 function ruleComputeEquality(rule, variables, labels) {
 	if(!rule.right.literal && !rule.right.name) {
-		throw "right-hand side of LIKE is not a litteral or a variable name"; 
+		throw new Error("right-hand side of == or != is not a litteral or a variable name");
 	}
 	if(!rule.left.literal && !rule.left.name) {
-		throw "left-hand side of LIKE is not a litteral or a variable name"; 
+		throw new Error("left-hand side of == or != is not a litteral or a variable name");
 	}
 	
 	let lhsValue = null;
 	if(rule.left.name) {
-		lhsValue = getVariableValue(rule.left.value, variables, false, false);
-		if(!lhsValue) {
-			throw rule.left.value+" is undefined"; 
+		let lhsValues = getVariableValue(rule.left.value, variables, true, false);
+		if(!lhsValues || lhsValues.length == 0) {
+			throw new Error(rule.left.value+" is undefined");
+		}
+
+		lhsValue = lhsValues[0]
+		for (let i=1; i<lhsValues.length; i++) {
+		    if (lhsValue !== lhsValues[i]) {
+		        throw new Error("different values are found for left value in == or != test "+rule.left.value);
+		    }
 		}
 	}
 	else {
@@ -138,16 +145,46 @@ function ruleComputeEquality(rule, variables, labels) {
 	
 	let rhsValue = null;
 	if(rule.right.name) {
-		rhsValue = getVariableValue(rule.right.value, variables, false, false);;
-		if(!rhsValue) {
-			throw rule.right.value+" is undefined"; 
+		rhsValues = getVariableValue(rule.right.value, variables, true, false);;
+		if(!rhsValues || rhsValues.length == 0) {
+			throw new Error(rule.right.value+" is undefined");
 		}
-	}
+
+		rhsValue = rhsValues[0]
+		for (let i=1; i<rhsValues.length; i++) {
+		    if (rhsValue !== rhsValues[i]) {
+		        throw new Error("different values are found for right value in == or != test "+rule.right.value);
+		    }
+		}
+    }
 	else {
 		rhsValue = rule.right.value;
 	}
 
+    if (typeof(lhsValue) != "string") {
+        lhsValue = lhsValue.toString()
+    }
+    if (typeof(rhsValue) != "string") {
+        rhsValue = rhsValue.toString();
+    }
 	return lhsValue.toUpperCase() == rhsValue.toUpperCase();
+}
+
+function getVariableValueInAllNameTrees(nameParts, treeList) {
+    let values = null;
+
+    for (let i=0; i!=treeList.length; i++) {
+        let v = getVariableValueInNameTree(nameParts, treeList[i]);
+        if (v) {
+            if (values == null) {
+                values = [ v ];
+            }
+            else {
+                values = values.push(v);
+            }
+        }
+    }
+    return values;
 }
 
 function getVariableValueInNameTree(nameParts, tree) {
@@ -208,16 +245,19 @@ function getVariableValue(name, variables, asArray, asCollection) {
     }
 
 	// test if it is a custom array.
-	let customCollection = variables.customArrays[name];
-	if (customCollection) {
-	    if (asCollection) {
-	        return null;
-	    }
-	    if (asArray) {
-	        return customCollection;
-	    }
-	    return customCollection.join(",");
-	}
+	let customarraySubTreeList = variables.customArrays[nameParts[0]];
+	if (customarraySubTreeList) {
+        let customCollection = getVariableValueInAllNameTrees(nameParts.slice(1), customarraySubTreeList);
+        if (customCollection) {
+            if (asCollection) {
+                return null;
+            }
+            if (asArray) {
+                return customCollection;
+            }
+            return customCollection.join(",");
+        }
+    }
 	
 	return null;
 }
