@@ -18,7 +18,7 @@ function computeColumnCollections(source, collections) {
     collections["uniqueContraints"] = {
             "columns" : ukColumnNames
     }
-    collections["index"] = {
+    collections["indexes"] = {
             "columns" : indexedColumnNames,
             "columnsDefinitions" : indexedColumnsDefinitions // contains all col1 col1,col2 col1,col2,col3
     }

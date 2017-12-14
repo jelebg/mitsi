@@ -393,55 +393,6 @@ describe("eyeshine collections computation", function() {
            ],
            "partitionned":false
         }
-     ],
-     "schemas":[
-        {
-           "name":"INFORMATION_SCHEMA",
-           "current":false
-        },
-        {
-           "name":"PUBLIC",
-           "current":true
-        }
-     ],
-     "provider":"h2",
-     "rules":[
-        {
-           "rule":"pkColumn:(column.fullName in primaryKeys.columns)",
-           "label":"PK",
-           "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
-        },
-        {
-           "rule":"column.fullName IN uniqueContraints.columns AND NOT LABELLED \u0027PK\u0027",
-           "label":"UK",
-           "comment":"Unique constraint indexed by ${uniqueContraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"
-        },
-        {
-           "rule":"column.fullName IN foreignKeys.columns",
-           "label":"FK",
-           "comment":"Foreign Key constraint ${foreignKeys.columns[column.fullName].constraint.owner}.${foreignKeys.columns[column.fullName].constraint.name} (column position in FK : #${foreignKeys.columns[column.fullName].position})"
-        },
-        {
-           "rule":"column.fullName IN index.columns ",
-           "label":"I",
-           "comment":"Indexed by ${index.columns[column.fullName].index.owner}.${index.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"
-        },
-        {
-           "rule":"prefix:(column.shortName LIKE \u0027(.*)_FK\u0027) AND NOT LABELLED \u0027FK\u0027 AND prefix.group1 IN tables.byShortName",
-           "labelWarning":"FK??",
-           "comment":"Column ${column.shortName} ending with \u0027_FK\u0027, is it a foreign key to ${prefix.group1} ?",
-           "candidateFkToTable":"${source.currentSchema}.${prefix.group1}"
-        },
-        {
-           "rule":"column.fullName LIKE \u0027.*_FK\u0027 AND NOT LABELLED \u0027FK\u0027 AND NOT LABELLED \u0027FK??\u0027",
-           "labelWarning":"FK?",
-           "comment":"Column name ${column.shortName} ending with \u0027_FK\u0027, should it be declared as a Foreign Key ?"
-        },
-        {
-           "rule":"column.fullName IN foreignKeys.columns AND NOT column.fullName IN index.columns",
-           "labelWarning":"I?",
-           "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target table is deleted/updated often, an index should be created for this column."
-        }
      ]
   }
 
@@ -455,7 +406,7 @@ describe("eyeshine collections computation", function() {
         "foreignKeys",
         "primaryKeys",
         "uniqueContraints", // TODO : renommer uniqueConstraints avec un s
-        "index", // TODO : renommer en indexs
+        "indexes", // TODO : renommer en indexs
         "tables"
     ] );
 
@@ -473,7 +424,7 @@ describe("eyeshine collections computation", function() {
         "columns"
     ]);
 
-    expect(Object.keys(collections.index)).toEqual( [
+    expect(Object.keys(collections.indexes)).toEqual( [
         "columns",
         "columnsDefinitions" // TODO : pas sur de garder
     ]);
@@ -549,9 +500,9 @@ describe("eyeshine collections computation", function() {
 
     // TODO : créer une colonne qui appartient à deux UK différentes, même si ça n'arrive aps très très souvent
 
-    // index collection
+    // indexes collection
 
-    expect(collections.index.columns["PUBLIC.GALAXY.ID"]).toEqual(
+    expect(collections.indexes.columns["PUBLIC.GALAXY.ID"]).toEqual(
         [
            {
              "index": {
@@ -568,7 +519,7 @@ describe("eyeshine collections computation", function() {
         ]
     );
 
-    expect(collections.index.columns["PUBLIC.PLANET.PLANET_TYPE_FK"]).toEqual(
+    expect(collections.indexes.columns["PUBLIC.PLANET.PLANET_TYPE_FK"]).toEqual(
         [ // TODO : refaire ces deux indexs dans le SQL et exporter les collections correctement
           {
             "index": {
@@ -598,7 +549,7 @@ describe("eyeshine collections computation", function() {
     );
 
     // TODO : columnDefinitions a revoir completement
-    expect(collections.index.columnsDefinitions["PLANET_TYPE_FK"]).toEqual(
+    expect(collections.indexes.columnsDefinitions["PLANET_TYPE_FK"]).toEqual(
         [ // TODO : refaire ces deux indexs dans le SQL et exporter les collections correctement
           {
             "index": {
@@ -615,7 +566,7 @@ describe("eyeshine collections computation", function() {
         ]
     );
 
-    expect(collections.index.columnsDefinitions["NAME,PLANET_TYPE_FK"]).toEqual(
+    expect(collections.indexes.columnsDefinitions["NAME,PLANET_TYPE_FK"]).toEqual(
         [ // TODO : refaire ces deux indexs dans le SQL et exporter les collections correctement
           {
             "index": {
