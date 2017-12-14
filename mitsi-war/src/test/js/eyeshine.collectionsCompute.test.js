@@ -405,7 +405,7 @@ describe("eyeshine collections computation", function() {
     expect(Object.keys(collections)).toEqual( [
         "foreignKeys",
         "primaryKeys",
-        "uniqueContraints", // TODO : renommer uniqueConstraints avec un s
+        "uniqueConstraints", // TODO : renommer uniqueConstraints avec un s
         "indexes", // TODO : renommer en indexs
         "tables"
     ] );
@@ -420,7 +420,7 @@ describe("eyeshine collections computation", function() {
         "columns"
     ]);
 
-    expect(Object.keys(collections.uniqueContraints)).toEqual( [
+    expect(Object.keys(collections.uniqueConstraints)).toEqual( [
         "columns"
     ]);
 
@@ -481,7 +481,7 @@ describe("eyeshine collections computation", function() {
 
     // unique contraints column collection
 
-    expect(collections.uniqueContraints.columns["PUBLIC.GALAXY.ID"]).toEqual(
+    expect(collections.uniqueConstraints.columns["PUBLIC.GALAXY.ID"]).toEqual(
         [
             {
               "index": {

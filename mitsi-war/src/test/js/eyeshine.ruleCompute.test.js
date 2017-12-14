@@ -155,7 +155,7 @@ describe("eyeshine rule computation", function() {
               ]
             }
           },
-          "uniqueContraints" : {
+          "uniqueConstraints" : {
             "columns": {
               "PUBLIC.GALAXY.ID": [
                 {
@@ -243,7 +243,7 @@ describe("eyeshine rule computation", function() {
               ]
             }
           },
-          "index" : {
+          "indexes" : {
             "columns": {
               "PUBLIC.GALAXY.ID": [
                 {
@@ -695,7 +695,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator for indexes", function() {
-        let parsedRule = peg.parse("column.fullName in index.columns");
+        let parsedRule = peg.parse("column.fullName in indexes.columns");
         expect(ruleCompute(parsedRule, getVariablesForColumn("STAR_FK"), {"normal": [], "warning": []}))
         .toBe(true);
         expect(ruleCompute(parsedRule, getVariablesForColumn("ID"), {"normal": [], "warning": []}))
@@ -705,7 +705,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array, testing with ==", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable stored as string
         let parsedRule2 = peg.parse("myvar.index.name == 'CONSTRAINT_INDEX_8'");
         let parsedRule2Reverse = peg.parse("'CONSTRAINT_INDEX_8' == myvar.index.name");
@@ -753,7 +753,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array, testing with !=", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable stored as string
         let parsedRule2 = peg.parse("myvar.index.name != 'CONSTRAINT_INDEX_8'");
         let parsedRule2Reverse = peg.parse("'CONSTRAINT_INDEX_8' != myvar.index.name");
@@ -801,7 +801,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array, testing with LIKE", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable stored as string
         let parsedRule2 = peg.parse("myvar.index.name LIKE 'CONSTRAINT_INDEX.*'");
         // variable stored as integer
@@ -841,7 +841,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with ==", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name == 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' == myvar.index.name");
@@ -869,7 +869,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with !=", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name != 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' != myvar.index.name");
@@ -897,7 +897,7 @@ describe("eyeshine rule computation", function() {
     });
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with LIKE", function() {
-        let parsedRule1 = peg.parse("myvar:(column.fullName in index.columns)");
+        let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
         // variable matching 2 different values : OK only if regex matches every values
         let parsedRule2 = peg.parse("myvar.index.name LIKE 'PLANET_TYPE_FK_(.*)'");
         // variable matching 2 equal values : OK only if regex matches the value

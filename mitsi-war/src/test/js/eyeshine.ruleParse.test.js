@@ -51,7 +51,7 @@ describe("eyeshine rule parsing", function() {
     });
 
     it("AND operator", function() {
-        expect(peg.parse("column.fullName IN uniqueContraints.columns AND NOT LABELLED 'PK'"))
+        expect(peg.parse("column.fullName IN uniqueConstraints.columns AND NOT LABELLED 'PK'"))
         .toEqual({
           "operator": "AND",
           "left": {
@@ -62,7 +62,7 @@ describe("eyeshine rule parsing", function() {
             },
             "right": {
               "name": true,
-              "value": "uniqueContraints.columns"
+              "value": "uniqueConstraints.columns"
             }
           },
           "right": {
@@ -197,7 +197,7 @@ describe("eyeshine rule parsing", function() {
     });
 
     it("index candidate for foreign keys rule", function() {
-       expect(peg.parse("column.fullName IN foreignKeys.columns AND NOT column.fullName IN index.columns"))
+       expect(peg.parse("column.fullName IN foreignKeys.columns AND NOT column.fullName IN indexes.columns"))
        .toEqual({
           "operator": "AND",
           "left": {
@@ -221,7 +221,7 @@ describe("eyeshine rule parsing", function() {
               },
               "right": {
                 "name": true,
-                "value": "index.columns"
+                "value": "indexes.columns"
               }
             }
           }

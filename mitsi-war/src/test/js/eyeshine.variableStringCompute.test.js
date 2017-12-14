@@ -155,7 +155,7 @@ describe("eyeshine variable string computation", function() {
               ]
             }
           },
-          "uniqueContraints" : {
+          "uniqueConstraints" : {
             "columns": {
               "PUBLIC.GALAXY.ID": [
                 {
@@ -243,7 +243,7 @@ describe("eyeshine variable string computation", function() {
               ]
             }
           },
-          "index" : {
+          "indexes" : {
             "columns": {
               "PUBLIC.GALAXY.ID": [
                 {
@@ -689,11 +689,11 @@ describe("eyeshine variable string computation", function() {
     it("common variable string computation for indexes", function() {
         let variables = getVariablesForColumn("STAR_FK");
 
-        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${index.columns[column.fullName].index.owner}.${index.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"), variables))
+        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"), variables))
         .toBe('Indexed by PUBLIC.CONSTRAINT_INDEX_8 (position in index : #1)');
 
         // the same using a stored variable
-        expect(ruleCompute(peg.parse("myIndex:(column.fullName in index.columns)"), variables, {"normal": [], "warning": []}))
+        expect(ruleCompute(peg.parse("myIndex:(column.fullName in indexes.columns)"), variables, {"normal": [], "warning": []}))
         .toBe(true);
 
         expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${myIndex.index.owner}.${myIndex.index.name} (position in index : #${myIndex.position})"), variables))

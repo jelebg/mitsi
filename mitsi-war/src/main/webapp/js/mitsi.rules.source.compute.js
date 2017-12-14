@@ -15,7 +15,7 @@ function computeColumnCollections(source, collections) {
     collections["primaryKeys"] = {
             "columns" : pkColumnNames
     }
-    collections["uniqueContraints"] = {
+    collections["uniqueConstraints"] = {
             "columns" : ukColumnNames
     }
     collections["indexes"] = {

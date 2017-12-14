@@ -5,16 +5,16 @@
 		   "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
 		 },
 		 { "label":"UK",
-		   "rule": "column.fullName IN uniqueContraints.columns AND NOT LABELLED 'PK'",
-		   "comment":"Unique constraint indexed by ${uniqueContraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"
+		   "rule": "column.fullName IN uniqueConstraints.columns AND NOT LABELLED 'PK'",
+		   "comment":"Unique constraint indexed by ${uniqueConstraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
 		 },
 		 { "label":"FK", 
 		   "rule": "column.fullName IN foreignKeys.columns",
 		   "comment":"Foreign Key constraint ${foreignKeys.columns[column.fullName].constraint.owner}.${foreignKeys.columns[column.fullName].constraint.name} (column position in FK : #${foreignKeys.columns[column.fullName].position})"
 		 },		         
 		 { "label":"I",
-		   "rule": "column.fullName IN index.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
-		   "comment":"Indexed by ${index.columns[column.fullName].index.owner}.${index.columns[column.fullName].index.name} (position in index : #${index.columns[column.fullName].position})"   
+		   "rule": "column.fullName IN indexes.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
+		   "comment":"Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
 		 },	         
 		 { "labelWarning":"FK??",
 		   "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
