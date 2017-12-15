@@ -6,7 +6,7 @@
 		 },
 		 { "label":"UK",
 		   "rule": "column.fullName IN uniqueConstraints.columns AND NOT LABELLED 'PK'",
-		   "comment":"Unique constraint indexed by ${uniqueConstraints.columns[column.fullName].index.owner}.${uniqueContraints.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
+		   "comment":"Unique constraint indexed by ${uniqueConstraints.columns[column.fullName].index.owner}.${uniqueConstraints.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
 		 },
 		 { "label":"FK", 
 		   "rule": "column.fullName IN foreignKeys.columns",
