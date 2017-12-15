@@ -405,8 +405,8 @@ describe("eyeshine collections computation", function() {
     expect(Object.keys(collections)).toEqual( [
         "foreignKeys",
         "primaryKeys",
-        "uniqueConstraints", // TODO : renommer uniqueConstraints avec un s
-        "indexes", // TODO : renommer en indexs
+        "uniqueConstraints",
+        "indexes",
         "tables"
     ] );
 
