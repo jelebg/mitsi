@@ -369,17 +369,16 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 			}
 		}
 		
-		// TODO : mettre un maximum pour le nombre de résultats renvoyés, de toute façon on ne peut pas en afficher trop ...
-		for (let i=0; i!=currentCollections.length; i++) {
-			let currentCollection = currentCollections[i];
-			
-			let indexValue = computeVariableStringPartVariable(expression.expr.index, variables, null);
-			if (!indexValue) {
-				continue;
-			}
-			let found = currentCollection[indexValue];
-			if (found) {
-				currents = currents.concat(found);
+		let indexValue = computeVariableStringPartVariable(expression.expr.index, variables, null);
+		if (indexValue) {
+    		// TODO : mettre un maximum pour le nombre de résultats renvoyés, de toute façon on ne peut pas en afficher trop ...
+	    	for (let i=0; i!=currentCollections.length; i++) {
+		    	let currentCollection = currentCollections[i];
+
+			    let found = currentCollection[indexValue];
+			    if (found) {
+				    currents = currents.concat(found);
+			    }
 			}
 		}
 	}

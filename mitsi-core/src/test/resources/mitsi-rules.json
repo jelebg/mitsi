@@ -27,7 +27,7 @@
 		 },		         
 		 { "labelWarning":"I?", // TODO cette r�gle est peut-�tre un peu trop stricte
 		   "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
-		   "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target tableis deleted/updated often, an index should be created for this column."   
+		   "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target table is deleted/updated often, an index should be created for this column."
 		 }
 	]
 }
