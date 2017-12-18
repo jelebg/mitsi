@@ -440,15 +440,6 @@ describe("eyeshine labels computation", function() {
   debugger;
     computeColumnLabels(solarSystemDatasource, packageRules);
 
-    /* TODO : supprimer
-    for(let i=0; i!=solarSystemDatasource.objects.length; i++) {
-        let o=solarSystemDatasource.objects[i];
-        for(let j=0; j!=o.columns.length; j++) {
-            let c = o.columns[j];
-            console.log(c);
-        }
-    } */
-
     let galaxy = solarSystemDatasource.objects[0];
     expect(galaxy.id).toEqual( {
         "type":"table",
