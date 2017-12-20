@@ -56,7 +56,16 @@
 										ui-codemirror-opts="editorOptions"
 										ng-model="r.label"
 								></ui-codemirror>
-							</div>
+								<div class="labelFilter labelFilterChoose"
+									 ng-class="{ 'filterLabelKeepIfExists' : r.type!=='warning' , 'filterLabelNotSelected' : r.type==='warning' }"
+									ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+									&nbsp;
+								</div>
+								<div class="labelFilter labelFilterChoose"
+									 ng-class="{ 'filterWarningLabelKeepIfExists' : r.type==='warning' , 'filterWarningLabelNotSelected' : r.type!=='warning' }"
+									 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+									&nbsp;
+								</div>							</div>
 						</div>
 						<!-- todo : gerer les warnings à l'édition -->
 					</td>

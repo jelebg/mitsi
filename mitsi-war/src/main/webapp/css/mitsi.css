@@ -353,6 +353,11 @@
 	user-select: none;
 }
 
+.labelFilterChoose {
+	height:16px;
+	width:16px;
+}
+
 .filterLabelDisabled {
 	background-color:white;
 	color:#bebebe;
