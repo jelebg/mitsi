@@ -17,16 +17,19 @@ describe("eyeshine labels computation", function() {
            "rule": "column.fullName IN indexes.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
            "comment":"Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
          },
-         { "labelWarning":"FK??",
+         { "label":"FK??",
+           "type":"warning",
            "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
            "candidateFkToTable" : "${source.currentSchema}.${prefix.group1}",
            "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"
          },
-         { "labelWarning":"FK?",
+         { "label":"FK?",
+           "type":"warning",
             "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK' AND NOT LABELLED 'FK??'",
            "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"
          },
-         { "labelWarning":"I?", // TODO cette r�gle est peut-�tre un peu trop stricte
+         { "label":"I?", // TODO cette r�gle est peut-�tre un peu trop stricte
+           "type":"warning",
            "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
            "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target table is deleted/updated often, an index should be created for this column."
          }

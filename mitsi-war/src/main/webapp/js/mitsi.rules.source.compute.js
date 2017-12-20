@@ -152,26 +152,7 @@ function computeColumnLabels(source, rules) {
             rule.candidateFkToTableParts = getVariableStringParts(pegVariables, rule.candidateFkToTable);
         }
 
-        if (rule.label) {
-            if (labelsFilters[rule.label]) {
-                if (labelsFilters[rule.label] && rule.labelWarning) {
-                    // if a label is defined in two rules as warning and normal, then consider it as warning
-                    labelsFilters[rule.label].type = "warning";
-                }
-            }
-            else {
-                labelsFilters[rule.label] = { "label":rule.label, "status":0, "type":"normal", "count":0 };
-            }
-        }
-        if (rule.labelWarning) {
-            if (labelsFilters[rule.labelWarning]) {
-                // if a label is defined in two rules as warning and normal, then consider it as warning
-                // so no need to check here
-            }
-            else {
-                labelsFilters[rule.labelWarning] = { "label":rule.labelWarning, "status":0, "type":"warning", "count":0 };
-            }
-        }
+        labelsFilters[rule.label] = { "label":rule.label, "status":0, "type":(rule.type !== "warning"?"normal":"warning"), "count":0 };
     }
 
     for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -239,12 +220,11 @@ function computeRulesForSource(rules, variables, labels, labelsComments, candida
         variables.customVariables = {};
         let result = ruleCompute(parsedRule, variables, labels);
         if(result) {
-            if(rule.label) {
+            if(rule.type !== "warning") {
                 labels.normal.push(rule.label);
             }
-
-            if(rule.labelWarning) {
-                labels.warning.push(rule.labelWarning);
+            else {
+                labels.warning.push(rule.label);
             }
 
             let comment = null;

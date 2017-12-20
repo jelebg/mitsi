@@ -47,9 +47,9 @@
 					<td>
 						<div
 							  class="eyeshinePopupListLabel labelFilter"
-							ng-class="{ 'filterWarningLabelNotSelected' : r.labelWarning , 'filterLabelNotSelected' : r.label }">
+							ng-class="{ 'filterWarningLabelNotSelected' : r.type==='warning' , 'filterLabelNotSelected' : r.type!=='warning' }">
 							<div ng-if="!updateMode">
-								{{ r.label ? r.label : r.labelWarning }}
+								{{ r.label }}
 							</div>
 							<div  ng-if="updateMode">
 								<ui-codemirror
