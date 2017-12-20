@@ -489,6 +489,10 @@
 .mitsiCheckOption {
 	text-decoration : none !important;
 }
+.mitsiCheckOptionBig {
+	text-decoration : none !important;
+	font-weight:bold;
+}
 
 /* animations */
 
@@ -769,6 +773,7 @@ div.tab button.active {
 .eyeshinePopupListLabel {
     margin-right:3px;
     font-size:110%;
+    height:27px;
 }
 
 .eyeshinePopupListRuleTableLabel {
@@ -776,10 +781,17 @@ div.tab button.active {
     font-weight:bold;
 }
 
-.eyeshinePopupListRuleTable pre {
+.eyeshinePopupListEditor {
+    width:500px;
+    padding:3px;
+    border:1px solid rgb(204, 204, 204);
+    border-radius: 4px;
 }
 
-.eyeshinePopupListRuleTableContent {
-    white-space:pre-wrap;
-    width:500px;
+.eyeshinePopupListEditorUpdate {
+    background-color:rgb(255, 255, 255);
+}
+
+.eyeshinePopupListEditorReadOnly {
+    background-color:rgb(240, 240, 240);
 }

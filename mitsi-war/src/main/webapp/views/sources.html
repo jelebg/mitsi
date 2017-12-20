@@ -34,21 +34,31 @@
 		</div>
 		<div class="modal-body" id="modal-body"  >
 			<a href=""
-			   ng-click="displayComments=!displayComments; $event.stopPropagation();"
-			   class="mitsiCheckOption"
-			   ng-class="{'mitsi-grey':!displayComments}" >
-				<i class="glyphicon glyphicon-ok" ></i>
-				display label comments
+			   ng-click="updateMode=!updateMode; $event.stopPropagation();"
+			   class="mitsiCheckOptionBig"
+			   ng-class="{'mitsi-grey':!updateMode}" >
+				<i class="glyphicon glyphicon-pencil" ></i>
+				unlock
 			</a>
 			<br/>
 
 			<table >
 				<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
 					<td>
-						<span class="eyeshinePopupListLabel labelFilter"
+						<div
+							  class="eyeshinePopupListLabel labelFilter"
 							ng-class="{ 'filterWarningLabelNotSelected' : r.labelWarning , 'filterLabelNotSelected' : r.label }">
-							{{ r.label ? r.label : r.labelWarning }}
-						</span>
+							<div ng-if="!updateMode">
+								{{ r.label ? r.label : r.labelWarning }}
+							</div>
+							<div  ng-if="updateMode">
+								<ui-codemirror
+										ui-codemirror-opts="editorOptions"
+										ng-model="r.label"
+								></ui-codemirror>
+							</div>
+						</div>
+						<!-- todo : gerer les warnings à l'édition -->
 					</td>
 					<td>
 						<table>
@@ -56,21 +66,65 @@
 								<td>rule :</td>
 							</tr>
 							<tr>
-								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.rule }}</pre></td>
+								<td>
+									<div ng-if="!updateMode"
+										 class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptionsReadOnly"
+												ng-model="r.rule"
+										></ui-codemirror>
+									</div>
+									<div 	ng-if="updateMode"
+											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptions"
+												ng-model="r.rule"
+										></ui-codemirror>
+									</div>
+								</td>
 							</tr>
 							<tr class="eyeshinePopupListRuleTableLabel"
 								ng-if="r.candidateFkToTable">
 								<td>candidate fk model :</td>
 							</tr>
 							<tr ng-if="r.candidateFkToTable">
-								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.candidateFkToTable }}</pre></td>
+								<td>
+									<div 	ng-if="!updateMode"
+											class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptionsReadOnly"
+												ng-model="r.candidateFkToTable"
+										></ui-codemirror>
+									</div>
+									<div 	ng-if="updateMode"
+											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptions"
+												ng-model="r.candidateFkToTable"
+										></ui-codemirror>
+									</div>
+								</td>
 							</tr>
-							<tr class="eyeshinePopupListRuleTableLabel"
-								ng-if="displayComments">
+							<tr class="eyeshinePopupListRuleTableLabel">
 								<td>comment :</td>
 							</tr>
-							<tr ng-if="displayComments">
-								<td><pre class="eyeshinePopupListRuleTableContent">{{ r.comment }}</pre></td>
+							<tr >
+								<td>
+									<div 	ng-if="!updateMode"
+											class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptionsReadOnly"
+												ng-model="r.comment"
+										></ui-codemirror>
+									</div>
+									<div 	ng-if="updateMode"
+											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+										<ui-codemirror
+												ui-codemirror-opts="editorOptions"
+												ng-model="r.comment"
+										></ui-codemirror>
+									</div>
+								</td>
 							</tr>
 						</table>
 					</tr>

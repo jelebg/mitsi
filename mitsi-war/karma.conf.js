@@ -23,6 +23,7 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
+        'src/main/webapp/js/codemirror.eyeshine.mode.js'
     ],
 
 
