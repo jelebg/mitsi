@@ -9,6 +9,9 @@ import org.apache.log4j.Logger;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.common.Datasource;
+import org.mitsi.rules.Rule;
+import org.mitsi.users.MitsiRulesConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +29,8 @@ class Response {
 
 	String connectedUsername;
 	List<Datasource> datasources;
-	
+	List<Rule> rules;
+
 	public Response() {
 	}
 }
@@ -36,7 +40,10 @@ class Response {
 @RequestMapping("/getClientStatus")
 public class GetClientStatusController extends MitsiRestController {
 	private static final Logger log = Logger.getLogger(GetClientStatusController.class);
-	
+
+	@Autowired
+	protected MitsiRulesConfig mitsiRulesConfig; //NOSONAR
+
 	@RequestMapping(value="", method = RequestMethod.POST)
 	public @ResponseBody Response proceed(@RequestBody Request request, HttpSession httpSession) throws Exception {
 	
@@ -57,6 +64,8 @@ public class GetClientStatusController extends MitsiRestController {
 				datasource.tags = mitsiDatasource.getTags();
 				response.datasources.add(datasource);
 			}
+
+			response.rules = mitsiRulesConfig.getRules();
 		}
 		
 		return response;

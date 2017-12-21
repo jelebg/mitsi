@@ -142,7 +142,11 @@ angular.module('mitsiApp')
 	$scope.globalRefresh = function() {
 		userService.getClientStatus()
 		  .then(function(response) { // NOSONAR
-			  
+
+			  if (response.data.rules) {
+			    $rootScope.rules = response.data.rules;
+			  }
+
 			  const responseDatasources = response.data.datasources;
 			  if($rootScope.loggedUser) {
 				  if(response.data.connectedUsername == null) {
@@ -233,8 +237,7 @@ angular.module('mitsiApp')
 		  source.schemas = response.data.schemas;
 		  source.dbProvider = response.data.provider;
 		  source.currentSchemaName = null;
-		  source.rules = response.data.rules;
-		  
+
 		  if(source.schemas) {
 			  for(var i=0; i!=source.schemas.length; i++) {
 				  if( source.schemas[i].current) {
@@ -254,9 +257,9 @@ angular.module('mitsiApp')
 				  exclusion:"^(.*\\$|SYS_)"
 		  };
 		  
-		  if(response.data.rules) {
+		  if($rootScope.rules) {
 			  let startMs = new Date().getTime();
-			  computeColumnLabels(source, response.data.rules);
+			  computeColumnLabels(source, $rootScope.rules);
 			  let endMs = new Date().getTime();
 			  console.log("rule applying time : " + (endMs-startMs)+"ms");
 		  }
