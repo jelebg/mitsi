@@ -6,9 +6,6 @@
   <script type="text/ng-template" id="popover.sourceinfo.html">
     <span>Display&nbsp;datasource&nbsp;global&nbsp;informations</span>
   </script>
-  <script type="text/ng-template" id="popover.eyeshine.html">
-	<span>Eyeshine&nbsp;rules&nbsp;for&nbsp;labels</span>
-  </script>
   <script type="text/ng-template" id="popover.table.filter.options.html">
     <span>filter&nbsp;options</span>
   </script>
@@ -28,123 +25,6 @@
 	<div ng-repeat="comment in c.labelsComments">{{ comment }}</div>
   </script>
 
-	<script type="text/ng-template" id="popups/eyeshine.inline.html">
-		<div class="modal-header">
-			<h3 class="modal-title" id="modal-title">Eyeshine rules for labels in {{ sourceName }}</h3>
-		</div>
-		<div class="modal-body" id="modal-body"  >
-			<a href=""
-			   ng-click="updateMode=!updateMode; $event.stopPropagation();"
-			   class="mitsiCheckOptionBig"
-			   ng-class="{'mitsi-grey':!updateMode}" >
-				<i class="glyphicon glyphicon-pencil" ></i>
-				unlock
-			</a>
-			<br/>
-
-			<table >
-				<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
-					<td>
-						<div
-							  class="eyeshinePopupListLabel labelFilter"
-							ng-class="{ 'filterWarningLabelNotSelected' : r.type==='warning' , 'filterLabelNotSelected' : r.type!=='warning' }">
-							<div ng-if="!updateMode">
-								{{ r.label }}
-							</div>
-							<div  ng-if="updateMode">
-								<ui-codemirror
-										ui-codemirror-opts="editorOptions"
-										ng-model="r.label"
-								></ui-codemirror>
-								<div class="labelFilter labelFilterChoose"
-									 ng-class="{ 'filterLabelKeepIfExists' : r.type!=='warning' , 'filterLabelNotSelected' : r.type==='warning' }"
-									ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
-									&nbsp;
-								</div>
-								<div class="labelFilter labelFilterChoose"
-									 ng-class="{ 'filterWarningLabelKeepIfExists' : r.type==='warning' , 'filterWarningLabelNotSelected' : r.type!=='warning' }"
-									 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
-									&nbsp;
-								</div>
-							</div>
-						</div>
-					</td>
-					<td>
-						<table>
-							<tr class="eyeshinePopupListRuleTableLabel">
-								<td>rule :</td>
-							</tr>
-							<tr>
-								<td>
-									<div ng-if="!updateMode"
-										 class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptionsReadOnly"
-												ng-model="r.rule"
-										></ui-codemirror>
-									</div>
-									<div 	ng-if="updateMode"
-											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptions"
-												ng-model="r.rule"
-										></ui-codemirror>
-									</div>
-								</td>
-							</tr>
-							<tr class="eyeshinePopupListRuleTableLabel"
-								ng-if="r.candidateFkToTable">
-								<td>candidate fk model :</td>
-							</tr>
-							<tr ng-if="r.candidateFkToTable">
-								<td>
-									<div 	ng-if="!updateMode"
-											class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptionsReadOnly"
-												ng-model="r.candidateFkToTable"
-										></ui-codemirror>
-									</div>
-									<div 	ng-if="updateMode"
-											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptions"
-												ng-model="r.candidateFkToTable"
-										></ui-codemirror>
-									</div>
-								</td>
-							</tr>
-							<tr class="eyeshinePopupListRuleTableLabel">
-								<td>comment :</td>
-							</tr>
-							<tr >
-								<td>
-									<div 	ng-if="!updateMode"
-											class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptionsReadOnly"
-												ng-model="r.comment"
-										></ui-codemirror>
-									</div>
-									<div 	ng-if="updateMode"
-											class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
-										<ui-codemirror
-												ui-codemirror-opts="editorOptions"
-												ng-model="r.comment"
-										></ui-codemirror>
-									</div>
-								</td>
-							</tr>
-						</table>
-					</tr>
-				</tr>
-			</table>
-		</div>
-		<div class="modal-footer">
-			<button class="btn btn-primary" type="button" ng-click="closeOptionsDialog()">OK</button>
-			<!--button class="btn btn-warning" type="button" ng-click="closeOptionsDialog()">Cancel</button-->
-		</div>
-	</script>
 </head>
 
 <body data-ng-app="mitsiApp">
@@ -187,20 +67,6 @@
 				   popover-placement="left-bottom"
 	            ></i>
             </a>
-
-			<a href=""
-			   ng-click="showEyeshineDialog(s); $event.stopPropagation();"
-			   ng-class="{ 'anchorDisabled' : !s.rules }"
-			>
-				<img src="img/eyeshine_16px_blue.png"
-				   class="pull-right"
-				   ng-class="{ 'mitsiGrayscale' : !s.rules }"
-				   style="margin-right:5px"
-				   popover-template="'popover.eyeshine.html'"
-				   popover-trigger="mouseenter"
-				   popover-placement="left-bottom"
-				></img>
-			  </a>
 
             <br/>
             <span class="sourceTags">{{ s.tags.join(", ") }}</span><br ng-if="s.errorMessage!=null"/>

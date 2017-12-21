@@ -1,76 +1,8 @@
 angular.module('mitsiApp')
-    .controller('sourceEyeshineCtrl', function($scope, $rootScope, $modalInstance, sourceName, rules) {
-
-   	$scope.sourceName = sourceName;
-   	$scope.rules = rules;
-
-    // the readOnly attribute cannot be changed at runtime, that's why I have to maintain two editors
-    // and display only one at a time
-	$scope.editorOptionsReadOnly = {
-		"lineWrapping" : true,
-		"lineNumbers": false,
-		"readOnly" : true,
-		"theme"       : "3024-day-custom-ro",
-		"mode": "eyeshine"
-	};
-
-	$scope.editorOptions = {
-		"lineWrapping" : true,
-		"lineNumbers"  : false,
-		"readOnly"     : false,
-		"theme"       : "3024-day-custom",
-		"mode": "eyeshine"
-	}; // TODO : utiliser un mode différent pour les commentaires
-
-    $scope.closeAndSaveOptionsDialog = function() {
-        $modalInstance.close( {
-            //alwaysDisplaySchema    : $scope.alwaysDisplaySchema,
-            //sqlGeneratedWithSchema : $scope.sqlGeneratedWithSchema
-        });
-    }
-
-    $scope.closeOptionsDialog = function() {
-        $modalInstance.dismiss();
-    }
-
-});
-
-angular.module('mitsiApp')
     .controller('sourcesCtrl', 
     		function($scope, $rootScope, $state, $timeout, $interval, $location, $q, $modal, userService, sourceService, errorService) { // NOSONAR too many parameters
 
 	$scope.datasources = [];
-
-    // eyeshine popoup
-    $scope.showEyeshineDialog = function(source) {
-        if (!source.rules) {
-            return;
-        }
-
-        const modalInstance = $modal.open({
-              animation: true,
-              ariaLabelledBy: 'modal-title',
-              ariaDescribedBy: 'modal-body',
-              templateUrl: 'popups/eyeshine.inline.html',
-              controller: 'sourceEyeshineCtrl',
-              resolve: {
-                  sourceName: function () {
-                    return source.name;
-                  },
-                  rules: function () {
-                    return source.rules;
-                  }
-                }
-
-            });
-
-        modalInstance.result.then(function (source) {
-              //$scope.source.rules = ;
-            }, function () {
-              // nothing
-            });
-
-    }
 
 	$scope.init = function() {
 		if($scope.datasources.length > 0) {
