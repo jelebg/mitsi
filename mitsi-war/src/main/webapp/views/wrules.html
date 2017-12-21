@@ -1,0 +1,144 @@
+<div class="wrulesEnclosingDiv">
+
+    <a href=""
+       ng-click="updateMode=!updateMode; $event.stopPropagation();"
+       class="mitsiCheckOptionBig"
+       ng-class="{'mitsi-grey':!updateMode}" >
+        <i class="glyphicon glyphicon-pencil" ></i>
+        unlock
+    </a>
+    &nbsp;&nbsp;
+    <a href=""
+       ng-if="updateMode"
+       ng-click="addRule();"
+       class="mitsiCheckOptionBig" >
+        <i class="glyphicon glyphicon-plus" ></i>
+        add
+    </a>
+    &nbsp;&nbsp;
+    <a href=""
+       ng-if="updateMode"
+       ng-click="resetRules();"
+       class="mitsiCheckOptionBig" >
+        <i class="glyphicon glyphicon-share-alt fliVertically"></i>
+        reset all rules
+    </a>
+<br/>
+
+<table   >
+	<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
+		<td>
+			<div class="eyeshinePopupListLabel "
+				  ng-class="{ 'filterWarningLabelNotSelected' : r.type==='warning' , 'filterLabelNotSelected' : r.type!=='warning' }">
+				<div ng-if="!updateMode">
+					{{ r.label }}
+				</div>
+				<div  ng-if="updateMode">
+					<ui-codemirror
+							ui-codemirror-opts="editorOptions"
+							ng-model="r.label"
+					></ui-codemirror>
+                </div>
+            </div>
+            <div ng-if="updateMode">
+                <table style="margin-left:10px;margin-bottom:10px;">
+                    <tr>
+                        <td>
+                            <div class="labelFilterChoose"
+                                  style="width:16px;height:16px;margin:3px;"
+                                 ng-class="{ 'filterLabelKeepIfExists' : r.type!=='warning' , 'filterLabelNotSelected' : r.type==='warning' }"
+                                 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+                                &nbsp;
+                            </div>
+                        </td>
+                        <td>
+                            <div class="labelFilterChoose"
+                                  style="width:16px;height:16px;margin:3px;"
+                                 ng-class="{ 'filterWarningLabelKeepIfExists' : r.type==='warning' , 'filterWarningLabelNotSelected' : r.type!=='warning' }"
+                                 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+                                &nbsp;
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <a href=""
+                   ng-click="removeRule(r);"
+                   style="margin-left:24px;"
+                   class="mitsiCheckOptionBig" style="margin-top:15px;horizontal-align:center;">
+                    <i class="glyphicon glyphicon-trash" ></i>
+                </a>
+            </div>
+		</td>
+		<td>
+			<table>
+				<tr class="eyeshinePopupListRuleTableLabel">
+					<td>rule :</td>
+				</tr>
+				<tr>
+					<td>
+						<div ng-if="!updateMode"
+							 class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptionsReadOnly"
+									ng-model="r.rule"
+							></ui-codemirror>
+						</div>
+						<div 	ng-if="updateMode"
+								class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptions"
+									ng-model="r.rule"
+							></ui-codemirror>
+						</div>
+					</td>
+				</tr>
+				<tr class="eyeshinePopupListRuleTableLabel"
+					ng-if="r.candidateFkToTable">
+					<td>candidate fk model :</td>
+				</tr>
+				<tr ng-if="r.candidateFkToTable">
+					<td>
+						<div 	ng-if="!updateMode"
+								class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptionsReadOnly"
+									ng-model="r.candidateFkToTable"
+							></ui-codemirror>
+						</div>
+						<div 	ng-if="updateMode"
+								class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptions"
+									ng-model="r.candidateFkToTable"
+							></ui-codemirror>
+						</div>
+					</td>
+				</tr>
+				<tr class="eyeshinePopupListRuleTableLabel">
+					<td>comment :</td>
+				</tr>
+				<tr >
+					<td>
+						<div 	ng-if="!updateMode"
+								class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptionsReadOnly"
+									ng-model="r.comment"
+							></ui-codemirror>
+						</div>
+						<div 	ng-if="updateMode"
+								class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+							<ui-codemirror
+									ui-codemirror-opts="editorOptions"
+									ng-model="r.comment"
+							></ui-codemirror>
+						</div>
+					</td>
+				</tr>
+			</table>
+	</tr>
+	</tr>
+</table>
+
+</div>

@@ -30,7 +30,12 @@ angular
         	         templateUrl: "views/wsql.html",
 			   		 controller:'wsqlCtrl' 
         	       })
-           .state("workbench.data", 
+           .state("workbench.rules",
+        		   { url: "/wrules",
+        	         templateUrl: "views/wrules.html",
+			   		 controller:'wrulesCtrl'
+        	       })
+           .state("workbench.data",
         		   { url: "/wdata", 
         	   		 templateUrl: "views/wdata.html",
 			   		 controller:'wdataCtrl' 

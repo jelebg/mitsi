@@ -776,9 +776,18 @@ div.tab button.active {
 }
 
 .eyeshinePopupListLabel {
-    margin-right:3px;
+    margin:8px;
     font-size:110%;
-    height:27px;
+
+    font-weight:bold;
+    padding-left:2px;
+    padding-right:2px;
+    border-radius:2px;
+    vertical-align: middle;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
 }
 
 .eyeshinePopupListRuleTableLabel {
@@ -787,7 +796,7 @@ div.tab button.active {
 }
 
 .eyeshinePopupListEditor {
-    width:500px;
+    width:100%;
     padding:3px;
     border:1px solid rgb(204, 204, 204);
     border-radius: 4px;
@@ -799,4 +808,11 @@ div.tab button.active {
 
 .eyeshinePopupListEditorReadOnly {
     background-color:rgb(240, 240, 240);
+}
+
+.wrulesEnclosingDiv {
+    position:relative;
+    left:0px;
+    right:0px;
+    width:auto;
 }
