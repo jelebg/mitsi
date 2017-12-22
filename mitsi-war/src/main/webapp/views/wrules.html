@@ -3,10 +3,10 @@
 <div style="margin:12px;">
     <a href=""
        ng-click="updateMode=!updateMode; $event.stopPropagation();"
-       class="mitsiCheckOptionBig"
-       ng-class="{'mitsi-grey':!updateMode}" >
+       class="mitsiCheckOptionBig">
         <i class="glyphicon glyphicon-pencil" ></i>
-        unlock
+		<span ng-if="!updateMode">unlock</span>
+		<span ng-if="updateMode">lock</span>
     </a>
     &nbsp;&nbsp;
     <a href=""
@@ -26,7 +26,7 @@
     </a>
 </div>
 
-<table   >
+<table>
 	<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
 		<td>
 			<div class="eyeshinePopupListLabel "
@@ -117,11 +117,22 @@
 					</td>
 				</tr>
 				<tr class="eyeshinePopupListRuleTableLabel">
-					<td>comment :</td>
+					<td>
+						<a href=""
+						   ng-click="r.tmpDisplayInScreen = !r.tmpDisplayInScreen"
+						   ng-if="!updateMode">
+							<i class="glyphicon"
+							   ng-class="{ 'glyphicon-chevron-down' : r.tmpDisplayInScreen, 'glyphicon-chevron-right' : !r.tmpDisplayInScreen }"></i>
+							comment :
+						</a>
+						<div ng-if="updateMode">
+							comment :
+						</div>
+					</td>
 				</tr>
 				<tr >
 					<td>
-						<div 	ng-if="!updateMode"
+						<div 	ng-if="!updateMode && r.tmpDisplayInScreen"
 								class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
 							<ui-codemirror
 									ui-codemirror-opts="editorOptionsReadOnly"
@@ -138,7 +149,6 @@
 					</td>
 				</tr>
 			</table>
-	</tr>
 	</tr>
 </table>
 
