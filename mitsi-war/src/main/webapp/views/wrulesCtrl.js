@@ -21,6 +21,13 @@ angular.module('mitsiApp')
         "lineWrapping":true
     }; // TODO : utiliser un mode différent pour les commentaires
 
+    $scope.update = function() {
+        $scope.updateMode = true;
+    }
+    $scope.cancel = function() {
+        $scope.updateMode = false;
+    }
+
     $scope.addRule = function() {
         let index = $rootScope.rules.length;
         $rootScope.rules.push({});

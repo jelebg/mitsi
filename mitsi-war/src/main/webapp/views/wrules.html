@@ -1,14 +1,30 @@
 <div class="wrulesEnclosingDiv" >
 
 <div style="margin:12px;">
-    <a href=""
-       ng-click="updateMode=!updateMode; $event.stopPropagation();"
-       class="mitsiCheckOptionBig">
-        <i class="glyphicon glyphicon-pencil" ></i>
-		<span ng-if="!updateMode">unlock</span>
-		<span ng-if="updateMode">lock</span>
-    </a>
-    &nbsp;&nbsp;
+	<a href=""
+	   ng-if="!updateMode"
+	   ng-click="update();"
+	   class="mitsiCheckOptionBig">
+		<i class="glyphicon glyphicon-pencil" ></i>
+		<span>unlock</span>
+	</a>
+	&nbsp;&nbsp;
+	<a href=""
+	   ng-if="updateMode"
+	   ng-click="cancel()"
+	   class="mitsiCheckOptionBig">
+		<i class="glyphicon glyphicon-floppy-disk" ></i>
+		<span>apply</span>
+	</a>
+	&nbsp;&nbsp;
+	<a href=""
+	   ng-if="updateMode"
+	   ng-click="cancel()"
+	   class="mitsiCheckOptionBig">
+		<i class="glyphicon glyphicon-remove" ></i>
+		<span>cancel (TODO)</span>
+	</a>
+	&nbsp;&nbsp;
     <a href=""
        ng-if="updateMode"
        ng-click="addRule();"
