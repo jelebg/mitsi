@@ -35,7 +35,7 @@
 					{{ r.label }}
 				</div>
 				<div  ng-if="updateMode">
-					<ui-codemirror
+					<ui-codemirror id="labelNameCodeMirror_{{$index}}"
 							ui-codemirror-opts="editorOptions"
 							ng-model="r.label"
 					></ui-codemirror>
@@ -64,7 +64,7 @@
                 </table>
 
                 <a href=""
-                   ng-click="removeRule(r);"
+                   ng-click="removeRule(r, $index);"
                    style="margin-left:24px;"
                    class="mitsiCheckOptionBig" style="margin-top:15px;horizontal-align:center;">
                     <i class="glyphicon glyphicon-trash" ></i>
