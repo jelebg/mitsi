@@ -188,17 +188,28 @@ angular.module('mitsiApp')
 				  constraintName:true,
 				  exclusion:"^(.*\\$|SYS_)"
 		  };
-		  
-		  if($rootScope.rules) {
-			  let startMs = new Date().getTime();
-			  computeColumnLabels(source, $rootScope.rules);
-			  let endMs = new Date().getTime();
-			  console.log("rule applying time : " + (endMs-startMs)+"ms");
-		  }
-		  
+
+		  $scope.refreshRules(source);
+
 		  $scope.initGraph(source);
 		  
 	}
+
+    $scope.refreshRules = function(source) {
+        if (!source.objects) {
+            return;
+        }
+
+        if(!$rootScope.rules) {
+            return;
+        }
+
+        let startMs = new Date().getTime();
+        computeColumnLabels(source, $rootScope.rules);
+        let endMs = new Date().getTime();
+        console.log("rule applying time for " + source.name + " : " + (endMs-startMs)+"ms");
+
+    }
 
 	$scope.initGraph = function(datasource) {
 		datasource.mitsiGraph = new MitsiGraph(null); // NOSONAR MitsiGraph does realy exist but sonar doesn't see it
@@ -364,6 +375,17 @@ angular.module('mitsiApp')
 	
 	$scope.$on(EVENT_LOGIN_LOGOUT, function (event) { // NOSONAR
 		$scope.globalRefresh();
+	});
+
+	$scope.$on(EVENT_RULES_UPDATED, function (event) { // NOSONAR
+	    if (!$scope.datasources) {
+	        return;
+	    }
+
+	    for(let i=0; i!=$scope.datasources.length; i++) {
+	        let source = $scope.datasources[i];
+		    $scope.refreshRules(source);
+		}
 	});
 
 	

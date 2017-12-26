@@ -123,6 +123,10 @@ function computeColumnCollections(source, collections) {
 }
 
 function computeColumnLabels(source, rules) {
+    if (!source.objects) {
+        return;
+    }
+
     let labelsFilters = {};
     source.labelsFilters = labelsFilters;
     source.labelFilterInclude = {};

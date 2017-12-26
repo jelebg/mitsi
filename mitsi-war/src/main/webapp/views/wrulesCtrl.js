@@ -30,7 +30,7 @@ angular.module('mitsiApp')
 
     $scope.addRule = function() {
         let index = $rootScope.rules.length;
-        $rootScope.rules.push({});
+        $scope.rulesCopy.push({});
         let workbenchScroll = document.getElementById("workbenchScroll");
 
         $timeout(function() {
@@ -47,7 +47,24 @@ angular.module('mitsiApp')
     }
 
     $scope.removeRule = function(rule, index) {
-        $rootScope.rules.splice(index, 1);
+        $scope.rulesCopy.splice(index, 1);
     }
 
+    $scope.saveRules = function() {
+        $rootScope.rules = JSON.parse(JSON.stringify($scope.rulesCopy));
+        $rootScope.$broadcast(EVENT_RULES_UPDATED);
+         $scope.updateMode = false;
+   }
+
+    $scope.cancel = function() {
+        $scope.init();
+        $scope.updateMode = false;
+    }
+
+    $scope.init = function() {
+        // clone the rules before modifying them
+        $scope.rulesCopy = JSON.parse(JSON.stringify($rootScope.rules));
+    }
+
+    $scope.init();
 });

@@ -11,7 +11,7 @@
 	&nbsp;&nbsp;
 	<a href=""
 	   ng-if="updateMode"
-	   ng-click="cancel()"
+	   ng-click="saveRules()"
 	   class="mitsiCheckOptionBig">
 		<i class="glyphicon glyphicon-floppy-disk" ></i>
 		<span>apply</span>
@@ -43,7 +43,7 @@
 </div>
 
 <table>
-	<tr class="eyeshinePopupListTr" ng-repeat="r in rules">
+	<tr class="eyeshinePopupListTr" ng-repeat="r in rulesCopy">
 		<td>
 			<div class="eyeshinePopupListLabel "
 				  ng-class="{ 'filterWarningLabelNotSelected' : r.type==='warning' , 'filterLabelNotSelected' : r.type!=='warning' }">
