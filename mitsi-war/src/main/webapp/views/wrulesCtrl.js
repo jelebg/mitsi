@@ -53,9 +53,11 @@ angular.module('mitsiApp')
     }
 
     $scope.saveRules = function() {
-        $rootScope.rules = JSON.parse(JSON.stringify($scope.rulesCopy));
+        let stringified = JSON.stringify($scope.rulesCopy);
+        $rootScope.rules = JSON.parse(stringified);
+        localStorage.setItem("rules", stringified);
         $rootScope.$broadcast(EVENT_RULES_UPDATED);
-         $scope.updateMode = false;
+        $scope.updateMode = false;
    }
 
     $scope.cancel = function() {
@@ -71,8 +73,10 @@ angular.module('mitsiApp')
     $scope.resetRules = function() {
         userService.getRules().then(function(response) {
             $rootScope.rules = response.data.rules;
+            localStorage.removeItem("rules");
             $scope.init();
             $scope.updateMode = false;
+            $rootScope.$broadcast(EVENT_RULES_UPDATED);
         });
     }
 

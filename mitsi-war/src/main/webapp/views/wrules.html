@@ -46,7 +46,7 @@
 	<tbody >
 	<tr id="montest_{{$index}}"
 		class="eyeshinePopupListTr"
-		ng-repeat="r in rulesCopy"
+		ng-repeat="r in rulesCopy track by $index"
 		mitsi-draggable="true"
 		mitsi-draggable-condition="updateMode"
 		mitsi-drop-handler="moveRule(from, to)"

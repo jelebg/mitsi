@@ -76,7 +76,13 @@ angular.module('mitsiApp')
 		  .then(function(response) { // NOSONAR
 
 			  if (response.data.rules) {
-			    $rootScope.rules = response.data.rules;
+			    let savedRules = localStorage.getItem("rules");
+                if (savedRules) {
+                    $rootScope.rules = JSON.parse(savedRules);
+                }
+                else {
+    			    $rootScope.rules = response.data.rules;
+                }
 			  }
 
 			  const responseDatasources = response.data.datasources;
