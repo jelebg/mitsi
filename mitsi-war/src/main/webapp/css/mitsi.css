@@ -816,3 +816,11 @@ div.tab button.active {
     right:0px;
     width:auto;
 }
+
+.mitsiDragOver {
+    background-color:grey
+}
+
+.mitsiDragDragging {
+ 	filter: opacity(20%);
+}

@@ -1,6 +1,8 @@
 angular.module('mitsiApp')
     .controller('wrulesCtrl', function($scope, $rootScope, $timeout) { // TODO : rulesService
 
+    $scope.updateMode = false;
+
     // the readOnly attribute cannot be changed at runtime, that's why I have to maintain two editors
     // and display only one at a time
     $scope.editorOptionsReadOnly = {
@@ -59,6 +61,11 @@ angular.module('mitsiApp')
     $scope.cancel = function() {
         $scope.init();
         $scope.updateMode = false;
+    }
+
+    $scope.moveRule = function(from, to) {
+        let removed = $scope.rulesCopy.splice(from, 1)[0];
+        $scope.rulesCopy.splice(to, 0, removed);
     }
 
     $scope.init = function() {
