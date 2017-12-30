@@ -53,9 +53,8 @@ angular.module('mitsiApp')
     }
 
     $scope.saveRules = function() {
-        let stringified = JSON.stringify($scope.rulesCopy);
-        $rootScope.rules = JSON.parse(stringified);
-        localStorage.setItem("rules", stringified);
+        $rootScope.rules = JSON.parse(JSON.stringify($scope.rulesCopy));
+        saveRulesInLocalStorage($rootScope.rules);
         $rootScope.$broadcast(EVENT_RULES_UPDATED);
         $scope.updateMode = false;
    }
@@ -71,18 +70,24 @@ angular.module('mitsiApp')
     }
 
     $scope.resetRules = function() {
-        userService.getRules().then(function(response) {
-            $rootScope.rules = response.data.rules;
-            localStorage.removeItem("rules");
-            $scope.init();
-            $scope.updateMode = false;
-            $rootScope.$broadcast(EVENT_RULES_UPDATED);
-        });
+        removeRulesFromLocalStorage();
+        $scope.init();
     }
 
     $scope.init = function() {
-        // clone the rules before modifying them
-        $scope.rulesCopy = JSON.parse(JSON.stringify($rootScope.rules));
+        let savedRules = getRulesFromLocalStorage();
+        if (!savedRules) {
+            userService.getRules().then(function(response) {
+                $rootScope.rules = response.data.rules;
+                $scope.rulesCopy = JSON.parse(JSON.stringify($rootScope.rules));
+                $scope.updateMode = false;
+                $rootScope.$broadcast(EVENT_RULES_UPDATED);
+            });
+        }
+        else {
+            // clone the rules before modifying them
+            $scope.rulesCopy = JSON.parse(JSON.stringify($rootScope.rules));
+        }
     }
 
     $scope.init();

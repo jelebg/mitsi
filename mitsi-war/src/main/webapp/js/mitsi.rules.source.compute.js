@@ -1,5 +1,23 @@
 // depends on the source of sourceCtrl
 
+function removeRulesFromLocalStorage() {
+    localStorage.removeItem("rules");
+}
+
+function getRulesFromLocalStorage() {
+    let savedRules = localStorage.getItem("rules");
+    if (savedRules) {
+        return JSON.parse(savedRules);
+    }
+
+    return null;
+}
+
+function saveRulesInLocalStorage(rules) {
+    localStorage.setItem("rules", JSON.stringify(rules));
+}
+
+
 function computeColumnCollections(source, collections) {
     // TODO : gérer la case-insensitivity en ne stockant que des majuscules ?
     let fkColumnNames = {};
