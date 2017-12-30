@@ -8,6 +8,10 @@ angular.module('mitsiApp')
 		return mitsiHttpService.post('rest/getClientStatus', { "btwGetDatasources":false });
 	}
 
+	this.getRules = function() {
+		return mitsiHttpService.post('rest/getRules', {  });
+	}
+
 	this.login = function(loginUser, loginPassword) {
 		return mitsiHttpService.post('rest/login', { "login":loginUser, "password":loginPassword });
 	}
@@ -18,6 +22,5 @@ angular.module('mitsiApp')
 	
 	this.getServerInfo = function() {
 		return mitsiHttpService.post('rest/getServerInfo', { });
-
 	}
 });

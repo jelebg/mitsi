@@ -1,5 +1,5 @@
 angular.module('mitsiApp')
-    .controller('wrulesCtrl', function($scope, $rootScope, $timeout) { // TODO : rulesService
+    .controller('wrulesCtrl', function($scope, $rootScope, $timeout, userService) { // TODO : rulesService
 
     $scope.updateMode = false;
 
@@ -66,6 +66,14 @@ angular.module('mitsiApp')
     $scope.moveRule = function(from, to) {
         let removed = $scope.rulesCopy.splice(from, 1)[0];
         $scope.rulesCopy.splice(to, 0, removed);
+    }
+
+    $scope.resetRules = function() {
+        userService.getRules().then(function(response) {
+            $rootScope.rules = response.data.rules;
+            $scope.init();
+            $scope.updateMode = false;
+        });
     }
 
     $scope.init = function() {
