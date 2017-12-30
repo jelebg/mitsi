@@ -5,3 +5,7 @@
 .cm-eyeshine-code-string {
     color:green;
 }
+
+.cm-eyeshine-code-error {
+    color:red;
+}

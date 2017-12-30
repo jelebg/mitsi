@@ -5,7 +5,25 @@ var keywords = ["like", "in", "and", "or", "labelled", "not"];
 CodeMirror.defineMode("eyeshine", function() {
 
   return {
-    token: function(stream, state) {
+    token: function(stream) {
+      let c = stream.peek();
+      if (c == "'") {
+        stream.next();
+        stream.eatWhile(/[^']/);
+        if (stream.next() != "'") {
+            return "eyeshine-code-error";
+        }
+        return "eyeshine-code-string";
+      }
+      if (c == '"') {
+        stream.next();
+        stream.eatWhile(/[^"]/);
+        if (stream.next() != '"') {
+            return "eyeshine-code-error";
+        }
+        return "eyeshine-code-string";
+      }
+
       stream.eatWhile(/\w/);
 
       let lower = stream.current().toLowerCase();
