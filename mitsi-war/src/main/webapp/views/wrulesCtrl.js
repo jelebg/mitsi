@@ -1,5 +1,57 @@
 angular.module('mitsiApp')
-    .controller('wrulesCtrl', function($scope, $rootScope, $timeout, userService) { // TODO : rulesService
+.controller('wrulesVariablesCtrl', function($scope, $modalInstance, variables) {
+
+    $scope.closeOptionsDialog = function() {
+        $modalInstance.dismiss();
+    }
+
+
+    // TODO : mettre dans un JS a part pour pouvoir faire un TU
+    $scope.variablesTransform = function(variables) {
+        let tree = {};
+        $scope.mergeNoLeafs(tree, variables.variables  , 0, 2);
+        $scope.mergeNoLeafs(tree, variables.collections, 0, 2);
+
+        console.log(JSON.stringify(tree, null, 2));
+        console.log(JSON.stringify(variables, null, 2));
+
+        let list = [];
+        $scope.appendToListWithIndent(list, tree, 0);
+
+        return list;
+    }
+
+    $scope.appendToListWithIndent = function(list, tree, level) {
+        for (k in tree) {
+            list.push({"level":level, "name":k});
+
+            $scope.appendToListWithIndent(list, tree[k], level+1);
+        }
+    }
+
+    $scope.mergeNoLeafs = function(destTree, sourceTree, level, maxLevel) {
+        if (level >= maxLevel) {
+            return;
+        }
+        if (typeof sourceTree !== 'object') {
+            return;
+        }
+
+        for (k in sourceTree) {
+            let d = destTree[k];
+            if (!d) {
+                d = {};
+                destTree[k] = d;
+            }
+
+            $scope.mergeNoLeafs(d, sourceTree[k], level+1, maxLevel);
+        }
+    }
+
+    $scope.variables = $scope.variablesTransform(variables);
+
+})
+.controller('wrulesCtrl', function($scope, $rootScope, $timeout, $modal, userService) { // TODO : rulesService
 
     $scope.updateMode = false;
 
@@ -72,6 +124,74 @@ angular.module('mitsiApp')
     $scope.resetRules = function() {
         removeRulesFromLocalStorage();
         $scope.init();
+    }
+
+    $scope.displayCollections = function() {
+          let fakeDatasource = {
+             "currentSchemaName" : "FAKE",
+             "objects":[
+                {
+                   "id":{
+                      "type":"table",
+                      "schema":"FAKE",
+                      "name":"fake"
+                   },
+                   "secondaryType":"TABLE",
+                   "description":"",
+                   "columns":[
+                      {
+                         "name":"FAKE",
+                         "type":"4",
+                         "length":0,
+                         "description":""
+                      }
+                   ],
+                   "indexes":[
+                      {
+                         "owner":"FAKE",
+                         "tableName":"fake",
+                         "name":"fake",
+                         "type":"",
+                         "uniqueness":"t",
+                         "columns":"FAKE"
+                      }
+                   ],
+                   "constraints":[
+                      {
+                         "owner":"FAKE",
+                         "name":"fake",
+                         "tableName":"fake",
+                         "type":"P",
+                         "columns":"FAKE"
+                      }
+                   ],
+                   "partitionned":false
+                }
+             ]
+          };
+
+        let variables = computeColumnLabels(fakeDatasource, $scope.rulesCopy, true);
+        //console.log("variables : "+JSON.stringify(variables, null, 2));
+
+        const modalInstance = $modal.open({
+              "animation": true,
+              "ariaLabelledBy": 'modal-title',
+              "ariaDescribedBy": 'modal-body',
+              "templateUrl": 'popups/rulesVariables.inline.html',
+              "controller": 'wrulesVariablesCtrl',
+              "resolve": {
+                  "variables": function () {
+                    return variables;
+                  }
+              }
+            });
+
+        modalInstance.result.then(function () {
+          // nothing
+        }, function () {
+          // nothing
+        });
+
     }
 
     $scope.init = function() {

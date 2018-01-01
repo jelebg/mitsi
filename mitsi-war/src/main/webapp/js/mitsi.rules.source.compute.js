@@ -140,7 +140,7 @@ function computeColumnCollections(source, collections) {
     }
 }
 
-function computeColumnLabels(source, rules) {
+function computeColumnLabels(source, rules, returnVariables) {
     if (!source.objects) {
         return;
     }
@@ -206,6 +206,10 @@ function computeColumnLabels(source, rules) {
             }
             let labelsComments = [ ];
             let candidateFks = [];
+
+            if (returnVariables) {
+                return variables;
+            }
 
             computeRulesForSource(rules, variables, labels, labelsComments, candidateFks);
 

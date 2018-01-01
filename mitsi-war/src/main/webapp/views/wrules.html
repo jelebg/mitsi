@@ -1,3 +1,17 @@
+<script type="text/ng-template" id="popups/rulesVariables.inline.html">
+	<div class="modal-header">
+		<h3 class="modal-title" id="modal-title">available variables</h3>
+	</div>
+	<div class="modal-body" id="modal-body"  >
+		<!-- TODO : formatting -->
+		<div ng-repeat="v in variables" style="font-family:monospace;padding-left:{{20*v.level}}px;">{{ v.name }}</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" ng-click="closeOptionsDialog()">OK</button>
+	</div>
+</script>
+
+
 <div class="wrulesEnclosingDiv" >
 
 <div style="margin:12px;">
@@ -40,6 +54,14 @@
         <i class="glyphicon glyphicon-share-alt fliVertically"></i>
         reset all rules
     </a>
+	&nbsp;&nbsp;
+	<a href=""
+	   ng-if="updateMode"
+	   ng-click="displayCollections();"
+	   class="mitsiCheckOptionBig" >
+		<i class="glyphicon glyphicon-list"></i>
+		display collections
+	</a>
 </div>
 
 <table>
