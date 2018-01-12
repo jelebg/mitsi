@@ -141,10 +141,10 @@
 					</td>
 				</tr>
 				<tr class="eyeshinePopupListRuleTableLabel"
-					ng-if="r.candidateFkToTable">
+					ng-if="updateMode || r.candidateFkToTable">
 					<td>candidate fk model :</td>
 				</tr>
-				<tr ng-if="r.candidateFkToTable">
+				<tr ng-if="updateMode || r.candidateFkToTable">
 					<td>
 						<div 	ng-if="!updateMode"
 								class="eyeshinePopupListEditor eyeshinePopupListEditorReadOnly">
