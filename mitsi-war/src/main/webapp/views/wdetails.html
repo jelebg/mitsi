@@ -22,7 +22,7 @@
 
 	</td><td style="vertical-align:top;">
 
-		<table ng-if="detailsSections && detailsSections.length > 0"
+		<table ng-hide="!detailsSections || detailsSections.length == 0"
 			   class="mitsiDetailsQuickFindTable"><tr>
 			<td class="mitsiDetailsQuickFindLabel">quick find : </td>
 			<td style="position:absolute">
@@ -33,7 +33,6 @@
 			</td>
 		</tr></table>
 	</td></table>
-
     <div style="position:absolute;right:0px;left:160px;top:40px;bottom:0px;height:auto;width:auto;overflow:auto;">
 	  <div style="position:absolute;top:0px;left:0px;">
 
