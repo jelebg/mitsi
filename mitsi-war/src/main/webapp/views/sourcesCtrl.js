@@ -232,6 +232,7 @@ angular.module('mitsiApp')
 		let name = source.name.toLowerCase();
 		
 		let tags = source.tags ? source.tags.join(" ") : "";
+		tags = tags.toLowerCase();
 		return name.indexOf( filter ) === -1 && tags.indexOf( filter ) === -1;
 	}
 	
