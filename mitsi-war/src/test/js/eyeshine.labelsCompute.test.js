@@ -23,6 +23,12 @@ describe("eyeshine labels computation", function() {
            "candidateFkToTable" : "${source.currentSchema}.${prefix.group1}",
            "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"
          },
+         { "label":"FK2?",
+           "type":"warning",
+           "rule": "prefix:(column.shortName LIKE 'PLA(.*)_FK') AND NOT LABELLED 'FK' AND '${source.currentSchema}.PLA${prefix.group1}' IN tables.byFullName",
+           "candidateFkToTable" : "${source.currentSchema}.PLA${prefix.group1}",
+           "comment":"FK2: Column ${column.shortName} ending with '_FK', is it a foreign key to PLA${prefix.group1} ?"
+         },
          { "label":"FK?",
            "type":"warning",
             "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK' AND NOT LABELLED 'FK??'",
@@ -440,7 +446,6 @@ describe("eyeshine labels computation", function() {
   };
 
   it("compute labels for the solar system example database", function() {
-  debugger;
     computeColumnLabels(solarSystemDatasource, packageRules);
 
     let galaxy = solarSystemDatasource.objects[0];
@@ -499,7 +504,7 @@ describe("eyeshine labels computation", function() {
     expect(planet_TypeFk.labelsWarningString).toBe("");
     expect(planet_TypeFk.labelsComments).toEqual( [
         "Foreign Key constraint PUBLIC.CONSTRAINT_8CD (column position in FK : #1)",
-        "Indexed by PUBLIC, PUBLIC.CONSTRAINT_INDEX_8C, NAME_INDEX_1 (position in index : #1, 2)"
+        "Indexed by PUBLIC, PUBLIC.CONSTRAINT_INDEX_8C, NAME_INDEX_1 (position in index : #1, 2)" // TODO : a revoir avec des arrays
     ] );
     expect(planet_TypeFk.candidateFks).toEqual([]);
 
@@ -544,19 +549,24 @@ describe("eyeshine labels computation", function() {
       "name":"SATELLITE"
     } );
 
-    // PLANET.PLANET_TYPE_FK
+    // PLANET.PLANET_FK
     let star_PlanetFk = star.columns[2];
     expect(star_PlanetFk.name).toBe("PLANET_FK");
-    expect(star_PlanetFk.labels).toEqual(["FK??"]);
+    expect(star_PlanetFk.labels).toEqual(["FK??","FK2?"]);
     expect(star_PlanetFk.labelsString).toBe("");
-    expect(star_PlanetFk.labelsWarningString).toBe("FK??");
+    expect(star_PlanetFk.labelsWarningString).toBe("FK??,FK2?");
     expect(star_PlanetFk.labelsComments).toEqual( [
-        "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
+        "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?",
+        "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
     ] );
     expect(star_PlanetFk.candidateFks).toEqual([{
         "targetTableName": "PUBLIC.PLANET",
         "comment": "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
-    }]);
+       },{
+        "targetTableName": "PUBLIC.PLANET",
+        "comment": "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
+      }
+    ]);
 
 
 

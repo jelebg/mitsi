@@ -41,6 +41,7 @@ function ruleCompute(rule, variables, labels) {
 		return leftResult || rightResult;
 	}
 	else if(rule.operator == "LIKE") {
+	    // TODO : right hand side of a like must be a litteral, but cannot be evaluated because $ and { are used by regex and expression. maybe it could be possible to find a solution, because $ can only be at the end of a regex ... but would it be usefull ?
 		if(!rule.right.literal) {
 			throw new Error("right-hand side of LIKE is not a litteral");
 		}
@@ -105,7 +106,10 @@ function ruleCompute(rule, variables, labels) {
 			}
 		}
 		else if(rule.left.literal) {
-			lhsValues = [ rule.left.value ];
+		    if (!rule.left.literalNameParts) {
+		        rule.left.literalNameParts = getVariableStringParts(pegVariables, rule.left.value);
+		    }
+			lhsValues = computeVariableString(rule.left.literalNameParts, variables, true);
 		}
 		else {
 			throw new Error("unknown lhs type");
@@ -392,21 +396,75 @@ function computeVariableStringPartVariable(expression, variables, parents) {
 	return currents;
 }
 
-function computeVariableString(parts, variables) {
-	let str = "";
-	
-	for(let i=0; i<parts.length; i++) {
-		let part = parts[i];
-		if(part.fixed) {
-			str += part.fixed;
-		}
-		if(part.variable) {
-			let o = computeVariableStringPartVariable(part.variable, variables, null);
-			str += getStringFromObject(o, false);
-		}
+function computeVariableString(parts, variables, returnAsArray) {
+    // TODO : supprimer le paramètre returnAsArray quand il ne sera plus utilisé, et quand on saura traiter les array correctement ici (cf test eyeshine.variableStringCompute.test.js->it("use computeVariableString to return an array of 2 element"))
+    if (returnAsArray) {
+        let t = [];
+
+        for (let i=0; i<parts.length; i++) {
+            let part = parts[i];
+
+            if (part.fixed) {
+                if (t.length == 0) {
+                    t = [ part.fixed ];
+                }
+                else {
+                    for (j=0; j!=t.length; j++) {
+                        t[j] += part.fixed;
+                    }
+                }
+            }
+            if (part.variable) {
+                let o = computeVariableStringPartVariable(part.variable, variables, null);
+                let toadd = getStringArrayFromObject(o);
+                if (t.length == 0) {
+                    t = toadd;
+                }
+                else {
+                    let newt = [];
+                    for (j=0; j!=t.length; j++) {
+                        for (k=0; k!=toadd.length; k++) {
+                            newt.push(t[j]+toadd[k]);
+                        }
+                    }
+                    t = newt;
+                }
+            }
+        }
+
+        return t;
+    }
+    else {
+    // TODO : supprimer ce code quand il ne sera plus utilisé, cf commentaire plus haut
+        let str = "";
+
+        for (let i=0; i<parts.length; i++) {
+            let part = parts[i];
+            if (part.fixed) {
+                str += part.fixed;
+            }
+            if (part.variable) {
+                let o = computeVariableStringPartVariable(part.variable, variables, null);
+                str += getStringFromObject(o, false);
+            }
+        }
+
+        return str;
+    }
+}
+
+function getStringArrayFromObject(obj) {
+	if (obj == null) {
+		return [];
 	}
-	
-	return str;
+
+	if(Array.isArray(obj)) {
+		return obj;
+	}
+	if(typeof obj === 'string') {
+		return [ obj ];
+	}
+
 }
 
 function getStringFromObject(obj, stringifyArrays) {

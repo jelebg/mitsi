@@ -712,4 +712,41 @@ describe("eyeshine variable string computation", function() {
 
     });
 
+    it("use computeVariableString to return an array of 1 element", function() {
+        let variables = getVariablesForColumn("STAR_FK");
+
+        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"),
+                variables))
+        .toBe('Indexed by PUBLIC.CONSTRAINT_INDEX_8 (position in index : #1)');
+        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"),
+                variables,
+                true))
+        .toEqual( [ 'Indexed by PUBLIC.CONSTRAINT_INDEX_8 (position in index : #1)' ] );
+    });
+
+    it("use computeVariableString to return an array of 2 element", function() {
+        let variables = getVariablesForColumn("PLANET_TYPE_FK");
+
+        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"),
+                variables))
+        .toBe('Indexed by PUBLIC, PUBLIC.PLANET_TYPE_FK_INDEX, NAME_INDEX_1 (position in index : #1, 2)');
+        expect(computeVariableString(getVariableStringParts(pegVariables, "Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"),
+                variables,
+                true))
+        .toEqual( [
+        // TODO : ici on devrait retourner seulement les deux elements en commentaires. il faudrait eviter de retourner toutes les combinaisons possibles, mais seulement les combinaisons pertinentes
+        //    'Indexed by PUBLIC.PLANET_TYPE_FK_INDEX (position in index : #1)',
+        //    'Indexed by PUBLIC.NAME_INDEX_1 (position in index : #2)'
+
+            'Indexed by PUBLIC.PLANET_TYPE_FK_INDEX (position in index : #1)',
+            'Indexed by PUBLIC.PLANET_TYPE_FK_INDEX (position in index : #2)',
+            'Indexed by PUBLIC.NAME_INDEX_1 (position in index : #1)',
+            'Indexed by PUBLIC.NAME_INDEX_1 (position in index : #2)',
+            'Indexed by PUBLIC.PLANET_TYPE_FK_INDEX (position in index : #1)',
+            'Indexed by PUBLIC.PLANET_TYPE_FK_INDEX (position in index : #2)',
+            'Indexed by PUBLIC.NAME_INDEX_1 (position in index : #1)',
+            'Indexed by PUBLIC.NAME_INDEX_1 (position in index : #2)'
+        ] );
+    });
+
 });
