@@ -842,12 +842,12 @@ describe("eyeshine rule computation", function() {
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with ==", function() {
         let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
-        // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name == 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' == myvar.index.name");
-        // variable matching 2 equal values : will throw exception
         let parsedRule3 = peg.parse("myvar.index.tableName == 'PLANET'");
         let parsedRule3Reverse = peg.parse("'PLANET' == myvar.index.tableName");
+        let parsedRule4 = peg.parse("'test_${myvar.index.tableName}_test' == 'test_PLANET_test'");
+        let parsedRule4Reverse = peg.parse("'test_PLANET_test' == 'test_${myvar.index.tableName}_test'");
 
         let variables = getVariablesForColumn("PLANET_TYPE_FK");
 
@@ -856,26 +856,33 @@ describe("eyeshine rule computation", function() {
         .toBe(true);
 
         // now myvar.index.name exists
-        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) })
-        .toThrow(new Error("different values are found for left value in == or != test myvar.index.name"));
-        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}) })
-        .toThrow(new Error("different values are found for right value in == or != test myvar.index.name"));
+        // TODO ruleCompute returns true because for now, if only one combination matches it is considered ==. But that will change
+        expect(ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) )
+        .toBe(true);
+        expect(ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}) )
+        .toBe(true);
 
         // now myvar.index.tableName exists. there is two occurences, but each value is the same and equal to 'PLANET'
         expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
         .toBe(true);
         expect(ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+
+        // what if litterals are expressions
+        expect(ruleCompute(parsedRule4, variables, {"normal": [], "warning": []}))
+        .toBe(true);
+        expect(ruleCompute(parsedRule4Reverse, variables, {"normal": [], "warning": []}))
         .toBe(true);
     });
 
     it("IN operator with store in variables as custom array with 2 occurences, testing with !=", function() {
         let parsedRule1 = peg.parse("myvar:(column.fullName in indexes.columns)");
-        // variable matching 2 different values : will throw exception
         let parsedRule2 = peg.parse("myvar.index.name != 'PLANET_TYPE_FK_INDEX'");
         let parsedRule2Reverse = peg.parse("'PLANET_TYPE_FK_INDEX' != myvar.index.name");
-        // variable matching 2 equal values : will throw exception
         let parsedRule3 = peg.parse("myvar.index.tableName != 'PLANET'");
         let parsedRule3Reverse = peg.parse("'PLANET' != myvar.index.tableName");
+        let parsedRule4 = peg.parse("'test_${myvar.index.tableName}_test' != 'test_PLANET_test'");
+        let parsedRule4Reverse = peg.parse("'test_PLANET_test' != 'test_${myvar.index.tableName}_test'");
 
         let variables = getVariablesForColumn("PLANET_TYPE_FK");
 
@@ -884,15 +891,22 @@ describe("eyeshine rule computation", function() {
         .toBe(true);
 
         // now myvar.index.name exists
-        expect(function(){ ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) })
-        .toThrow(new Error("different values are found for left value in == or != test myvar.index.name"));
-        expect(function(){ ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}) })
-        .toThrow(new Error("different values are found for right value in == or != test myvar.index.name"));
+        // TODO ruleCompute returns false because for now, if only one combination matches it is considered ==. But that will change
+        expect(ruleCompute(parsedRule2, variables, {"normal": [], "warning": []}) )
+        .toBe(false);
+        expect(ruleCompute(parsedRule2Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(false);
 
         // now myvar.index.tableName exists. there is two occurences, but each value is the same and equal to 'PLANET'
         expect(ruleCompute(parsedRule3, variables, {"normal": [], "warning": []}))
         .toBe(false);
         expect(ruleCompute(parsedRule3Reverse, variables, {"normal": [], "warning": []}))
+        .toBe(false);
+
+        // what if litterals are expressions
+        expect(ruleCompute(parsedRule4, variables, {"normal": [], "warning": []}))
+        .toBe(false);
+        expect(ruleCompute(parsedRule4Reverse, variables, {"normal": [], "warning": []}))
         .toBe(false);
     });
 

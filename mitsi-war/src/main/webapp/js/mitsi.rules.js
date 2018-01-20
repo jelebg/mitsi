@@ -144,49 +144,52 @@ function ruleComputeEquality(rule, variables, labels) {
 		throw new Error("left-hand side of == or != is not a litteral or a variable name");
 	}
 	
-	let lhsValue = null;
+	let lhsValues = null;
 	if(rule.left.name) {
-		let lhsValues = getVariableValue(rule.left.value, variables, true, false);
-		if(!lhsValues || lhsValues.length == 0) {
-			throw new Error(rule.left.value+" is undefined");
-		}
-
-		lhsValue = lhsValues[0]
-		for (let i=1; i<lhsValues.length; i++) {
-		    if (lhsValue !== lhsValues[i]) {
-		        throw new Error("different values are found for left value in == or != test "+rule.left.value);
-		    }
-		}
+		lhsValues = getVariableValue(rule.left.value, variables, true, false);
 	}
 	else {
-		lhsValue = rule.left.value;
+        if (!rule.left.literalNameParts) {
+            rule.left.literalNameParts = getVariableStringParts(pegVariables, rule.left.value);
+        }
+        lhsValues = computeVariableString(rule.left.literalNameParts, variables, true);
 	}
-	
-	let rhsValue = null;
+    if(!lhsValues || lhsValues.length == 0) {
+        throw new Error(rule.left.value+" is undefined");
+    }
+
+	let rhsValues = null;
 	if(rule.right.name) {
 		rhsValues = getVariableValue(rule.right.value, variables, true, false);;
 		if(!rhsValues || rhsValues.length == 0) {
 			throw new Error(rule.right.value+" is undefined");
 		}
-
-		rhsValue = rhsValues[0]
-		for (let i=1; i<rhsValues.length; i++) {
-		    if (rhsValue !== rhsValues[i]) {
-		        throw new Error("different values are found for right value in == or != test "+rule.right.value);
-		    }
-		}
     }
 	else {
-		rhsValue = rule.right.value;
+        if (!rule.right.literalNameParts) {
+            rule.right.literalNameParts = getVariableStringParts(pegVariables, rule.right.value);
+        }
+        rhsValues = computeVariableString(rule.right.literalNameParts, variables, true);
 	}
 
-    if (typeof(lhsValue) != "string") {
-        lhsValue = lhsValue.toString();
+    // return true if one matches
+    // TODO return true only if everything matches in any variable context cf test eyeshine.ruleCompute.test.js -> "IN operator with store in variables as custom array with 2 occurences, testing with ==" and "IN operator with store in variables as custom array with 2 occurences, testing with !="
+    for (let i=0; i!=lhsValues.length; i++) {
+        let lhsValue = lhsValues[i];
+        if (typeof(lhsValue) != "string") {
+           lhsValue = lhsValue.toString();
+        }
+        for(let j=0; j!=rhsValues.length; j++) {
+            let rhsValue = rhsValues[j];
+            if (typeof(rhsValue) != "string") {
+               rhsValue = rhsValue.toString();
+            }
+            if (lhsValue.toUpperCase() == rhsValue.toUpperCase()) {
+                return true;
+            }
+        }
     }
-    if (typeof(rhsValue) != "string") {
-        rhsValue = rhsValue.toString();
-    }
-	return lhsValue.toUpperCase() == rhsValue.toUpperCase();
+    return false;
 }
 
 function getVariableValueInAllNameTrees(nameParts, treeList) {
