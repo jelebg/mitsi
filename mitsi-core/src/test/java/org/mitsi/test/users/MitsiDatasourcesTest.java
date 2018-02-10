@@ -9,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.datasources.MitsiDatasource;
+import org.mitsi.datasources.MitsiLayer;
 import org.mitsi.users.MitsiDatasources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,13 +28,20 @@ public class MitsiDatasourcesTest {
 	}
 
 	@Test
-	@Ignore // TODO faire un mock pour que ça refonctionne
 	public void test() throws IOException, ClassNotFoundException, SQLException {
 
 		mitsiDatasources.loadIfNecessary();
 		MitsiDatasource datasource = mitsiDatasources.getDatasource(null, true, "POSTGRE-TEST");
 		assertEquals(datasource.getName(), "POSTGRE-TEST");
-		
+
+		assert(mitsiDatasources.getDatasources(null, true).size() > 0);
+
+		MitsiLayer layer = mitsiDatasources.getLayer(null, false,"TEST-LAYER");
+		assertEquals(layer.getName(), "TEST-LAYER");
+		assertEquals(layer.getDatasources().size(), 2);
+
+		assert(mitsiDatasources.getLayers(null, true).size() > 0);
+
 	}
 
 }

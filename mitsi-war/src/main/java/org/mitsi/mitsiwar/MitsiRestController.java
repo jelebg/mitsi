@@ -13,6 +13,7 @@ import org.mitsi.commons.MitsiException;
 import org.mitsi.core.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
+import org.mitsi.datasources.MitsiLayer;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.mitsiwar.connections.Client;
 import org.mitsi.users.MitsiDatasources;
@@ -60,14 +61,27 @@ public abstract class MitsiRestController {
 
 		return datasourceManager.getConnection(groups, connectedUsername!=null, datasourceName);
 	}
+
+	public static class DatasourcesAndLayers {
+		public List<MitsiDatasource> datasources;
+		public List<MitsiLayer> layers;
+
+		public DatasourcesAndLayers(List<MitsiDatasource> datasources, List<MitsiLayer> layers) {
+			this.datasources = datasources;
+			this.layers = layers;
+		}
+	}
 	
-	protected @NotNull List<MitsiDatasource> getDatasources(HttpSession httpSession) {
+	protected @NotNull DatasourcesAndLayers getDatasourcesAndLayers(HttpSession httpSession) {
 		String connectedUsername = getConnectedUsername(httpSession);
 		SortedSet<String> groups = null;
 		if(connectedUsername != null) {
 			groups = mitsiUsersConfig.getUserGrantedGroups(connectedUsername);
 		}
-		return mitsiDatasources.getDatasources(groups, connectedUsername!=null);
+		return new DatasourcesAndLayers(
+			mitsiDatasources.getDatasources(groups, connectedUsername!=null),
+			mitsiDatasources.getLayers(groups, connectedUsername!=null)
+		);
 	}
 	
 	@ExceptionHandler(MitsiException.class)

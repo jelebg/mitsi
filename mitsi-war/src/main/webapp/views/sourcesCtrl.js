@@ -28,7 +28,7 @@ angular.module('mitsiApp')
 		ds.searchObject          = $scope.getLocalStorageValueDs(ds, "searchObject");
 	}
 
-	
+
 	$scope.localStorageUpdateForDs = function(s, value, modelName) {
 		let itemName = "source|"+s.name+"|"+modelName;
 		localStorage.setItem(itemName, value);
@@ -80,7 +80,23 @@ angular.module('mitsiApp')
 			    $rootScope.rules = saved ? saved : response.data.rules;
 			  }
 
-			  const responseDatasources = response.data.datasources;
+			  //const responseDatasources = response.data.datasources;
+			  let responseDatasources = response.data.layers;
+  			  for (let i=0; i!=responseDatasources.length; i++) {
+  			    responseDatasources[i].isLayer = true;
+  			  }
+
+			  for (let i=0; i!=response.data.datasources.length; i++) {
+			    let ds = response.data.datasources[i];
+			    responseDatasources.push({
+			        "name"        : ds.name,
+                    "description" : ds.description,
+                    "tags"        : ds.tags,
+                    "datasources" : [ ds.name ],
+                    "isLayer"     : false
+                });
+			  }
+
 			  if($rootScope.loggedUser) {
 				  if(response.data.connectedUsername == null) {
 					  $rootScope.loggedUser = null;
@@ -169,16 +185,8 @@ angular.module('mitsiApp')
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.dbProvider = response.data.provider;
-		  source.currentSchemaName = null;
+		  source.currentSchemaName = response.data.currentSchemaName;
 
-		  if(source.schemas) {
-			  for(var i=0; i!=source.schemas.length; i++) {
-				  if( source.schemas[i].current) {
-					  source.currentSchemaName = source.schemas[i].name;
-					  break;
-				  }
-			  }
-		  }
 		  source.filter = {
 				  hideTables:false,
 				  hideViews:false,
@@ -447,7 +455,7 @@ angular.module('mitsiApp')
 			}
 		}
 		type = type.toUpperCase();
-		return [ type, o.description ].filter(function (val) {return val;}).join(' / ');
+		return [ type, o.description, o.diffDescription ].filter(function (val) {return val;}).join(' / ');
     }
 	
 	$scope.toggleLabel = function(source, label) {

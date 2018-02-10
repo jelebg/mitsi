@@ -1,5 +1,12 @@
-{ 
-  "datasources" : {
+{
+	"layers" : {
+		"TEST-LAYER" : {
+			"description" : "my layer's description",
+			"tags"        : ["tag1", "tag2", "tag3"],
+			"datasources" : ["POSTGRE-TEST", "POSTGRE-TEST-ON-TEST2"]
+		}
+	},
+    "datasources" : {
    	// comment test
 	  "LOCALHOST-TEST" :  {
 	    "userGroups" : [ "_public" ],

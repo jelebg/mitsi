@@ -9,6 +9,5 @@ public class Datasource {
 	public String name;
 	public String description;
 	public List<String> tags;
-	public List<Schema> schemas;
 
 }

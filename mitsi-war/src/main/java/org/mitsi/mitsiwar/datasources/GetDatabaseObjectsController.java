@@ -33,6 +33,7 @@ class GetDatabaseObjectsResponse {
 	List<DatabaseObject> databaseObjects;
 	List<Schema> schemas;
 	String provider;
+	String datasourceName;
 
 	public GetDatabaseObjectsResponse() {}
 }
@@ -58,6 +59,7 @@ public class GetDatabaseObjectsController extends MitsiRestController {
 			
 			response.databaseObjects = connection.getTablesAndViews(schema);
 			response.provider = connection.getProviderName();
+			response.datasourceName = request.datasourceName;
 
 		} 
 		catch(Exception e) {
