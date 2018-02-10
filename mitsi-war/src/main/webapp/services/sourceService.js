@@ -30,13 +30,39 @@ angular.module('mitsiApp')
               let source = response.data;
               source.currentSchemaName = null;
 
-              if(source.schemas) {
+              if (source.schemas) {
                   for(var i=0; i!=source.schemas.length; i++) {
                       if( source.schemas[i].current) {
                           source.currentSchemaName = source.schemas[i].name;
                           break;
                       }
                   }
+              }
+
+
+              // TODO : check impact on performances
+              if (source.databaseObjects) {
+                for (let i=0; i!=source.databaseObjects.length; i++) {
+                    let o = source.databaseObjects[i];
+                    o.diff = {
+                      notEverywhere : false.toString(),
+                      simple        : false.toString(),
+                      technical     : false.toString(),
+                      model         : false.toString(),
+                      other         : false.toString()
+                    }
+
+                    for (k=0; k!=o.columns.length; k++) {
+                        let column = o.columns[k];
+                        column.diff = {
+                            notEverywhere : false.toString(),
+                            simple        : false.toString(),
+                            technical     : false.toString(),
+                            model         : false.toString(),
+                            other         : false.toString()
+                        }
+                    }
+                }
               }
 
               d.resolve(response)
@@ -74,8 +100,6 @@ angular.module('mitsiApp')
 	}
 
 	this.mergeObjectsResponses = function(responses) {
-	    // TODO : faire le bilan des différences simples (noms de colonnes), techniques (types des colonnes, index, contraintes, partitionnement), modele (fks), annexe (commentaire)
-
 	    let merged = { data:{} };
 	    let nbLayers = responses.length;
 
@@ -128,6 +152,14 @@ angular.module('mitsiApp')
         for (let i=0; i!=doNamesOrdered.length; i++) {
             let doName = doNamesOrdered[i];
 
+            let objectMergeStatus = {
+                notEverywhere : { f : false},
+                simple : { f : false},
+                technical : { f : false},
+                model : { f : false}, // TODO : usefulle ? could be modelDiff ?
+                other : { f : false}
+            }
+
             let foundList = [];
             let foundLayerNameList = [];
             for (let j=0; j!=doBySources.length; j++) {
@@ -141,21 +173,35 @@ angular.module('mitsiApp')
                 }
             }
 
-            databaseObjects.push({
+            if (foundList.length < nbLayers) {
+                objectMergeStatus.notEverywhere.f = true;
+            }
+
+            let o = {
                 "id" : {
-                    "type"   : distinctList(foundList, function(x) { return x.id.type; }).join(", "),
-		            "schema" : distinctList(foundList, function(x) { return x.id.schema; }).join(", "), // TODO : si le schema est le default, et qu'ils ne sont pas tous identiques, remplacer par chaine vide
+                    "type"   : distinctList(foundList, function(x) { return x.id.type; }, objectMergeStatus.simple).join(", "),
+		            "schema" : distinctList(foundList, function(x) { return x.id.schema; }, objectMergeStatus.simple).join(", "), // TODO : si le schema est le default, et qu'ils ne sont pas tous identiques, remplacer par chaine vide
 		            "name"   : doName
 		        },
-		        "secondaryType"   : distinctList(foundList, function(x) { return x.secondaryType; }).join(", "),
+		        "secondaryType"   : distinctList(foundList, function(x) { return x.secondaryType; }, objectMergeStatus.simple).join(", "),
 		        "diffDescription" : sourceService.getDiffDescription(nbLayers, foundLayerNameList),
-		        "description"     : distinctList(foundList, function(x) { return x.description; }).join(", "),
-		        "columns"         : sourceService.mergeColumns(responses, foundList, function(x) { return x.columns; }), // TODO
+		        "description"     : distinctList(foundList, function(x) { return x.description; }, objectMergeStatus.other).join(", "),
+		        "columns"         : sourceService.mergeColumns(responses, foundList, function(x) { return x.columns; }, objectMergeStatus), // TODO
 		        "indexes"         : foundList[0].indexes, // TODO
 		        "constraints"     : foundList[0].constraints, // TODO
-		        "partitionned"    : distinctList(foundList, function(x) { return x.partitionned; }).join(", "),
-		        "partitionningBy" : distinctList(foundList, function(x) { return x.partitionningBy; }).join(", "),
-            })
+		        "partitionned"    : distinctList(foundList, function(x) { return x.partitionned; }, objectMergeStatus.technical).join(", "),
+		        "partitionningBy" : distinctList(foundList, function(x) { return x.partitionningBy; }, objectMergeStatus.technical).join(", "),
+            };
+
+            o.diff = {
+                notEverywhere : objectMergeStatus.notEverywhere.f.toString(),
+                simple        : objectMergeStatus.simple.f.toString(),
+                technical     : objectMergeStatus.technical.f.toString(),
+                model         : objectMergeStatus.model.f.toString(),
+                other         : objectMergeStatus.other.f.toString()
+            }
+
+            databaseObjects.push(o);
         }
 
 	    merged.data.databaseObjects = databaseObjects;
@@ -163,7 +209,8 @@ angular.module('mitsiApp')
 	    return merged;
 	}
 
-	this.mergeColumns = function(responses, foundList, getColumns) {
+	this.mergeColumns = function(responses, foundList, getColumns, objectMergeStatus) {
+	// TODO : handle objectMergeStatus
 	    let columnsByResponse = [];
 	    let columnIndexByResponse = [];
 	    let columnNameCount = {};
@@ -209,6 +256,20 @@ angular.module('mitsiApp')
                 break;
             }
 
+            columnDiff = {
+                notEverywhere : { f : false },
+                simple        : { f : false },
+                technical     : { f : false },
+                model         : { f : false },
+                other         : { f : false }
+            }
+
+            if (minCount != responses.length) {
+                // if the column is not on every layer, for the table it is just a simple diff
+                objectMergeStatus.simple.f = true;
+                columnDiff.notEverywhere.f = true;
+            }
+
             let chosenName = columnsByResponse[chosenFound][columnIndexByResponse[chosenFound]].name;
 
             let columnDescriptions = [];
@@ -249,12 +310,31 @@ angular.module('mitsiApp')
 
             }
 
+            if (columnDescriptions.length > 1) {
+                objectMergeStatus.other.f = true;
+                columnDiff.other.f = true;
+            }
+
+            if (columnLengths.length > 1 ||
+                columnTypes.length > 1) {
+                objectMergeStatus.technical.f = true;
+                columnDiff.technical.f = true;
+            }
+
             let column = {
                 "name" : chosenName,
    	            "diffDescription" : sourceService.getDiffDescription(responses.length, foundLayerNameList),
                 "description" : columnDescriptions.join(" / "),
                 "length" : columnLengths.join(" / "),
                 "type" : columnTypes.join(" / ")
+            }
+
+            column.diff = {
+                notEverywhere : columnDiff.notEverywhere.f.toString(),
+                simple        : columnDiff.simple.f.toString(),
+                technical     : columnDiff.technical.f.toString(),
+                model         : columnDiff.model.f.toString(),
+                other         : columnDiff.other.f.toString()
             }
 
             mergedColumns.push(column);

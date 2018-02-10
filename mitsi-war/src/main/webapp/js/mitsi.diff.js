@@ -1,4 +1,4 @@
-function distinctList(arr, f) {
+function distinctList(arr, f, notAllEquals) {
     if (!f) {
         f = function(x) { return x; };
     }
@@ -12,6 +12,11 @@ function distinctList(arr, f) {
             u[v] = 1;
         }
     }
+
+    if (notAllEquals) {
+        notAllEquals.f = (a.length > 1);
+    }
+
     return a;
 }
 

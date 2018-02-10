@@ -187,7 +187,8 @@ function computeColumnLabels(source, rules, returnVariables) {
         variables.variables["table"] = {
                 "type"     : obj.id.type,
                 "fullName" : source.currentSchemaName+"."+obj.id.name,
-                "shortName": obj.id.name
+                "shortName": obj.id.name,
+                "diff"     : obj.diff
         }
 
         obj.columnsLabels = {};
@@ -197,7 +198,8 @@ function computeColumnLabels(source, rules, returnVariables) {
 
             variables.variables["column"] = {
                     "fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
-                    "shortName": column.name
+                    "shortName": column.name,
+                    "diff"     : column.diff
             };
 
             let labels = {

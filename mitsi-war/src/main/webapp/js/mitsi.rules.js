@@ -222,11 +222,10 @@ function getVariableValueInNameTree(nameParts, tree) {
 
     for (let i=1; i<nameParts.length; i++) {
         let namePart = nameParts[i];
-        varPart = varPart[namePart];
-        if (!varPart) {
+        if (!varPart.hasOwnProperty(namePart)) {
             return null;
-            //break;
         }
+        varPart = varPart[namePart];
 	}
 
 	return varPart;

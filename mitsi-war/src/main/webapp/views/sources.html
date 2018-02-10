@@ -23,7 +23,7 @@
     <div style="font-weight:bold;">{{ c.type }}</div>
 	<div>{{ c.diffDescription }}</div>
 	<div>{{ c.description }}</div>
-	<div ng-repeat="comment in c.labelsComments">{{ comment }}</div>
+	<div ng-repeat="comment in c.labelsComments track by $index">{{ comment }}</div>
   </script>
 
 </head>
