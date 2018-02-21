@@ -432,20 +432,24 @@ describe("eyeshine labels computation", function() {
     for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
         let o = mergedDatasource.data.databaseObjects[i];
 
-        expect(o.diff.notEverywhere).toBe("false");
-        expect(o.diff.simple).toBe("false");
-        expect(o.diff.technical).toBe("false");
-        expect(o.diff.model).toBe("false");
-        expect(o.diff.other).toBe("false");
+        expect(o.diff).toEqual({
+            notEverywhere : "false",
+            simple        : "false",
+            technical     : "false",
+            model         : "false",
+            other         : "false"
+        });
 
         for (let j=0; j!=o.columns.length; j++) {
             let c = o.columns[j];
 
-            expect(c.diff.notEverywhere).toBe("false");
-            expect(c.diff.simple).toBe("false");
-            expect(c.diff.technical).toBe("false");
-            expect(c.diff.model).toBe("false");
-            expect(c.diff.other).toBe("false");
+            expect(c.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
         }
 
     }
@@ -488,29 +492,45 @@ describe("eyeshine labels computation", function() {
         let o = mergedDatasource.data.databaseObjects[i];
 
         if (o.id.name == "CLONE") {
-            expect(o.diff.notEverywhere).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "true",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
         }
         else {
-            expect(o.diff.notEverywhere).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
         }
-        expect(o.diff.simple).toBe("false");
-        expect(o.diff.technical).toBe("false");
-        expect(o.diff.model).toBe("false");
-        expect(o.diff.other).toBe("false");
 
         for (let j=0; j!=o.columns.length; j++) {
             let c = o.columns[j];
 
             if (o.id.name == "CLONE") {
-                expect(c.diff.notEverywhere).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "true",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
             }
             else {
-                expect(c.diff.notEverywhere).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
             }
-            expect(c.diff.simple).toBe("false");
-            expect(c.diff.technical).toBe("false");
-            expect(c.diff.model).toBe("false");
-            expect(c.diff.other).toBe("false");
         }
 
     }
@@ -533,29 +553,45 @@ describe("eyeshine labels computation", function() {
           let o = mergedDatasource.data.databaseObjects[i];
 
           if (i == 0) {
-            expect(o.diff.simple).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "true",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
           else {
-            expect(o.diff.simple).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
-          expect(o.diff.notEverywhere).toBe("false");
-          expect(o.diff.technical).toBe("false");
-          expect(o.diff.model).toBe("false");
-          expect(o.diff.other).toBe("false");
 
           for (let j=0; j!=o.columns.length; j++) {
               let c = o.columns[j];
 
               if (c.name == "DIFF") {
-                  expect(c.diff.notEverywhere).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "true",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
               else {
-                  expect(c.diff.notEverywhere).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
-              expect(c.diff.simple).toBe("false");
-              expect(c.diff.technical).toBe("false");
-              expect(c.diff.model).toBe("false");
-              expect(c.diff.other).toBe("false");
           }
 
       }
@@ -578,29 +614,45 @@ describe("eyeshine labels computation", function() {
           let o = mergedDatasource.data.databaseObjects[i];
 
           if (i == 0) {
-            expect(o.diff.simple).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "true",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
           else {
-            expect(o.diff.simple).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
-          expect(o.diff.notEverywhere).toBe("false");
-          expect(o.diff.technical).toBe("false");
-          expect(o.diff.model).toBe("false");
-          expect(o.diff.other).toBe("false");
 
           for (let j=0; j!=o.columns.length; j++) {
               let c = o.columns[j];
 
               if (i == 0 && (j == 0 || j == 1)) {
-                  expect(c.diff.notEverywhere).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "true",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
               else {
-                  expect(c.diff.notEverywhere).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
-              expect(c.diff.technical).toBe("false");
-              expect(c.diff.simple).toBe("false");
-              expect(c.diff.model).toBe("false");
-              expect(c.diff.other).toBe("false");
           }
 
       }
@@ -617,29 +669,45 @@ describe("eyeshine labels computation", function() {
           let o = mergedDatasource.data.databaseObjects[i];
 
           if (i == 0) {
-            expect(o.diff.technical).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "true",
+                model         : "false",
+                other         : "false"
+            });
           }
           else {
-            expect(o.diff.technical).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
-          expect(o.diff.notEverywhere).toBe("false");
-          expect(o.diff.simple).toBe("false");
-          expect(o.diff.model).toBe("false");
-          expect(o.diff.other).toBe("false");
 
           for (let j=0; j!=o.columns.length; j++) {
               let c = o.columns[j];
 
               if (i == 0 && j == 0) {
-                  expect(c.diff.technical).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "true",
+                    model         : "false",
+                    other         : "false"
+                });
               }
               else {
-                  expect(c.diff.technical).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
-              expect(c.diff.simple).toBe("false");
-              expect(c.diff.notEverywhere).toBe("false");
-              expect(c.diff.model).toBe("false");
-              expect(c.diff.other).toBe("false");
           }
 
       }
@@ -657,29 +725,45 @@ describe("eyeshine labels computation", function() {
           let o = mergedDatasource.data.databaseObjects[i];
 
           if (i == 0) {
-            expect(o.diff.technical).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "true",
+                model         : "false",
+                other         : "false"
+            });
           }
           else {
-            expect(o.diff.technical).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
-          expect(o.diff.notEverywhere).toBe("false");
-          expect(o.diff.simple).toBe("false");
-          expect(o.diff.model).toBe("false");
-          expect(o.diff.other).toBe("false");
 
           for (let j=0; j!=o.columns.length; j++) {
               let c = o.columns[j];
 
               if (i == 0 && j == 0) {
-                  expect(c.diff.technical).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "true",
+                    model         : "false",
+                    other         : "false"
+                });
               }
               else {
-                  expect(c.diff.technical).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
-              expect(c.diff.simple).toBe("false");
-              expect(c.diff.notEverywhere).toBe("false");
-              expect(c.diff.model).toBe("false");
-              expect(c.diff.other).toBe("false");
           }
 
       }
@@ -697,29 +781,45 @@ describe("eyeshine labels computation", function() {
           let o = mergedDatasource.data.databaseObjects[i];
 
           if (i == 0) {
-            expect(o.diff.other).toBe("true");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "true"
+            });
           }
           else {
-            expect(o.diff.other).toBe("false");
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
           }
-          expect(o.diff.notEverywhere).toBe("false");
-          expect(o.diff.simple).toBe("false");
-          expect(o.diff.technical).toBe("false");
-          expect(o.diff.model).toBe("false");
 
           for (let j=0; j!=o.columns.length; j++) {
               let c = o.columns[j];
 
               if (i == 0 && j == 0) {
-                  expect(c.diff.other).toBe("true");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "true"
+                });
               }
               else {
-                  expect(c.diff.other).toBe("false");
+                expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+                });
               }
-              expect(c.diff.simple).toBe("false");
-              expect(c.diff.notEverywhere).toBe("false");
-              expect(c.diff.technical).toBe("false");
-              expect(c.diff.model).toBe("false");
           }
 
       }

@@ -140,7 +140,7 @@ function mergeObjectsResponses(responses) {
 function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
     let columnsByResponse = [];
     let columnIndexByResponse = [];
-    let columnNameCount = {};
+    let columnNameInfos = {};
     let mergedColumns = [];
 
     for (let i=0; i!=foundList.length; i++) {
@@ -150,12 +150,16 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
 
         for (let j=0; j!=columns.length; j++) {
             let columnName = columns[j].name;
-            if (columnNameCount.hasOwnProperty(columnName)) {
-                columnNameCount[columnName] = columnNameCount[columnName] + 1;
+            if (columnNameInfos.hasOwnProperty(columnName)) {
+                columnNameInfos[columnName].count ++;
             }
             else {
-                columnNameCount[columnName] = 1;
+                columnNameInfos[columnName] = {
+                    count : 1,
+                    positions : []
+                };
             }
+            columnNameInfos[columnName].positions[i] = j;
         }
     }
 
@@ -167,10 +171,26 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
                 continue;
             }
 
-            let columnName = columnsByResponse[i][columnIndexByResponse[i]].name;
-            let count = columnNameCount[columnName];
-            if (minCount == 0 || count < minCount) {
-                minCount = count;
+            // TODO : on doit pouvoir simplifier
+            let columnName = null;
+            let columnInfos = null;
+            do {
+                columnName = columnsByResponse[i][columnIndexByResponse[i]].name
+                columnInfos = columnNameInfos[columnName];
+
+                if (!columnInfos.alreadyDone) {
+                    break;
+                }
+
+                columnIndexByResponse[i] ++;
+            } while (columnIndexByResponse[i] < columnsByResponse[i].length)
+
+            if (columnIndexByResponse[i] >= columnsByResponse[i].length) {
+                continue;
+            }
+
+            if (minCount == 0 || columnInfos.count < minCount) {
+                minCount = columnInfos.count;
                 chosenFound = i;
             }
         }
@@ -195,6 +215,7 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
         }
 
         let chosenName = columnsByResponse[chosenFound][columnIndexByResponse[chosenFound]].name;
+        let chosenInfos = columnNameInfos[chosenName];
 
         let columnDescriptions = [];
         let columnDescriptionsUnique = {};
@@ -211,9 +232,18 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
 
             let column = columnsByResponse[i][columnIndexByResponse[i]];
             if (column.name != chosenName) {
-                continue;
+                if (chosenInfos.positions[i] !== undefined) {
+                    // column exists but after in the list
+                    // TODO : add a status notInOrder pour le diff ??
+                    column = columnsByResponse[i][chosenInfos.positions[i]];
+                }
+                else {
+                    continue;
+                }
             }
-            columnIndexByResponse[i] = columnIndexByResponse[i] + 1;
+            else {
+                columnIndexByResponse[i] ++;
+            }
 
             foundLayerNameList.push(responses[i].data.datasourceName);
 
@@ -231,6 +261,7 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
                 columnTypesUnique[column.type] = true;
                 columnLengths.push(column.type);
             }
+            chosenInfos.alreadyDone = true;
 
         }
 
