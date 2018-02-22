@@ -1553,5 +1553,4 @@ describe("eyeshine labels computation", function() {
 
     });
 
-    // TODO : indexes
 });

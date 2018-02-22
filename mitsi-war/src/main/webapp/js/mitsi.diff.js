@@ -120,7 +120,7 @@ function mergeObjectsResponses(responses) {
             "diffDescription" : getDiffDescription(nbLayers, foundLayerNameList),
             "description"     : distinctList(foundList, function(x) { return x.description; }, objectMergeStatus.other).join(", "),
             "columns"         : mergeColumns(responses, foundList, function(x) { return x.columns; }, objectMergeStatus),
-            "indexes"         : foundList[0].indexes, // TODO
+            "indexes"         : mergeIndexes(responses, foundList, function(x) { return x.indexes; }, objectMergeStatus, doName),
             "constraints"     : mergeConstraints(responses, foundList, function(x) { return x.constraints; }, objectMergeStatus, doName),
             "partitionned"    : distinctList(foundList, function(x) { return x.partitionned; }, objectMergeStatus.technical).join(", "),
             "partitionningBy" : distinctList(foundList, function(x) { return x.partitionningBy; }, objectMergeStatus.technical).join(", "),
@@ -140,6 +140,58 @@ function mergeObjectsResponses(responses) {
     merged.data.databaseObjects = databaseObjects;
 
     return merged;
+}
+
+function mergeIndexes(responses, foundList, getIndexes, objectMergeStatus, objectName) {
+    let mergedIndexes = [];
+
+    let indexesInfos = { };
+
+    for (let i=0; i!=foundList.length; i++) {
+        let indexes = getIndexes(foundList[i]);
+
+        if(!indexes) {
+            continue;
+        }
+
+        for (let j=0; j!=indexes.length; j++) {
+            let index = indexes[j];
+            let id = index.type+"/"+index.columns;
+            if (! indexesInfos.hasOwnProperty(id)) {
+                indexesInfos[id] = {
+                    indexes : [],
+                    type : index.type,
+                    columns : index.columns
+                };
+            }
+
+            // we should not have two fk with same columns/fkTable/fkColumns in the same response
+            indexesInfos[id].indexes[i] = index;
+        }
+    }
+
+    for (let id in indexesInfos) {
+        let indexInfo = indexesInfos[id];
+
+        let mergedIndex = {
+            owner : distinctList(indexInfo.indexes, function(x) { return x.owner; }, objectMergeStatus.other).join(","),
+            tableName : objectName,
+            name : distinctList(indexInfo.indexes, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            type : indexInfo.type,
+            uniqueness : distinctList(indexInfo.indexes, function(x) { return x.uniqueness; }, objectMergeStatus.technical).join(","),
+            columns : indexInfo.columns
+        }
+        mergedIndexes.push(mergedIndex);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (indexInfo.indexes[j] === undefined) {
+                objectMergeStatus.technical.f = true;
+                break;
+            }
+        }
+    }
+
+    return mergedIndexes;
 }
 
 function mergeConstraints(responses, foundList, getConstraints, objectMergeStatus, objectName) {
