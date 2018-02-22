@@ -1553,8 +1553,5 @@ describe("eyeshine labels computation", function() {
 
     });
 
-
-    // TODO : model (fk contraints)
-    // TODO : other constraints
     // TODO : indexes
 });

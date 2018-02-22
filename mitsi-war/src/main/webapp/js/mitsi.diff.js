@@ -143,16 +143,15 @@ function mergeObjectsResponses(responses) {
 }
 
 function mergeConstraints(responses, foundList, getConstraints, objectMergeStatus, objectName) {
-    let mergedConstraintsFk = mergeConstraintsFk(responses, foundList, getConstraints, objectMergeStatus, objectName);
-    let mergedConstraintsOther = mergeConstraintsOther(responses, foundList, getConstraints, objectMergeStatus, objectName);
-
-    return mergedConstraintsFk.concat(mergedConstraintsOther);
-}
-
-function mergeConstraintsFk(responses, foundList, getConstraints, objectMergeStatus, objectName) {
     let mergedConstraints = [];
 
-    let fkInfos = {};
+    let constraintsInfos = {
+        R : {},
+        C : {},
+        U : {},
+        P : {},
+        others : {}
+    };
 
     for (let i=0; i!=foundList.length; i++) {
         let constraints = getConstraints(foundList[i]);
@@ -163,55 +162,169 @@ function mergeConstraintsFk(responses, foundList, getConstraints, objectMergeSta
 
         for (let j=0; j!=constraints.length; j++) {
             let constraint = constraints[j];
-            if (constraint.type != "R") {
-                continue;
+            if (constraint.type == "R") {
+                let id = constraint.columns+"/"+constraint.fkTable+"/"+constraint.fkColumns;
+                if (! constraintsInfos.R.hasOwnProperty(id)) {
+                    constraintsInfos.R[id] = {
+                        constraints : [],
+                        columns   : constraint.columns,
+                        fkTable   : constraint.fkTable,
+                        fkColumns : constraint.fkColumns
+                    };
+                }
+
+                // we should not have two fk with same columns/fkTable/fkColumns in the same response
+                constraintsInfos.R[id].constraints[i] = constraint;
             }
+            else if (constraint.type == "P") {
+                let id = constraint.columns;
+                if (! constraintsInfos.P.hasOwnProperty(id)) {
+                    constraintsInfos.P[id] = {
+                        constraints : [],
+                        columns   : constraint.columns
+                    };
+                }
 
-            let fkId = constraint.columns+"/"+constraint.fkTable+"/"+constraint.fkColumns;
-            if (! fkInfos.hasOwnProperty(fkId)) {
-                fkInfos[fkId] = {
-                    constraints : [],
-                    columns   : constraint.columns,
-                    fkTable   : constraint.fkTable,
-                    fkColumns : constraint.fkColumns
-                };
+                // we should not have two fk with same columns/fkTable/fkColumns in the same response
+                constraintsInfos.P[id].constraints[i] = constraint;
             }
+            else if (constraint.type == "U") {
+                let id = constraint.columns;
+                if (! constraintsInfos.U.hasOwnProperty(id)) {
+                    constraintsInfos.U[id] = {
+                        constraints : [],
+                        columns   : constraint.columns
+                    };
+                }
 
-            // we should not have two fk with same columns/fkTable/fkColumns in the same response
-            fkInfos[fkId].constraints[i] = constraint;
+                // we should not have two fk with same columns/fkTable/fkColumns in the same response
+                constraintsInfos.U[id].constraints[i] = constraint;
+            }
+            else if (constraint.type == "C") {
+                let id = constraint.checkCondition;
+                if (! constraintsInfos.C.hasOwnProperty(id)) {
+                    constraintsInfos.C[id] = {
+                        constraints : [],
+                        checkCondition   : constraint.checkCondition
+                    };
+                }
 
+                // we should not have two check constraint with same checkCondition in the same response
+                constraintsInfos.C[id].constraints[i] = constraint;
+            }
+            else {
+                let id = constraint.name;
+                if (! constraintsInfos.others.hasOwnProperty(id)) {
+                    constraintsInfos.others[id] = {
+                        constraints : []
+                    };
+                }
+
+                // we should not have two check constraint with same checkCondition in the same response
+                constraintsInfos.others[id].constraints[i] = constraint;
+            }
         }
     }
 
-    for (let fkId in fkInfos) {
-        let fkInfo = fkInfos[fkId];
+    for (let id in constraintsInfos.R) {
+        let constraintInfo = constraintsInfos.R[id];
 
-        let mergedFk = {
-            name              : distinctList(fkInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
-            fkConstraintName  : distinctList(fkInfo.constraints, function(x) { return x.fkConstraintName; }, objectMergeStatus.other).join(","),
-            fkConstraintOwner : distinctList(fkInfo.constraints, function(x) { return x.fkConstraintOwner; }, objectMergeStatus.other).join(","),
-            columns   : fkInfo.columns,
-            fkTable   : fkInfo.fkTable,
-            fkColumns : fkInfo.fkColumns,
+        let mergedConstraint = {
+            name              : distinctList(constraintInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            fkConstraintName  : distinctList(constraintInfo.constraints, function(x) { return x.fkConstraintName; }, objectMergeStatus.other).join(","),
+            fkConstraintOwner : distinctList(constraintInfo.constraints, function(x) { return x.fkConstraintOwner; }, objectMergeStatus.other).join(","),
+            columns   : constraintInfo.columns,
+            fkTable   : constraintInfo.fkTable,
+            fkColumns : constraintInfo.fkColumns,
             type      : "R",
             tableName : objectName
         }
-        mergedConstraints.push(mergedFk);
+        mergedConstraints.push(mergedConstraint);
 
         for (let j = 0; j != foundList.length; j++) {
-            if (fkInfo.constraints[j] === undefined) {
+            if (constraintInfo.constraints[j] === undefined) {
                 objectMergeStatus.model.f = true;
                 break;
             }
         }
     }
 
-    return mergedConstraints;
-}
+    for (let id in constraintsInfos.P) {
+        let constraintInfo = constraintsInfos.P[id];
 
-function mergeConstraintsOther(responses, foundList, getConstraints, objectMergeStatus) {
-    // TODO
-    return [];
+        let mergedConstraint = {
+            name              : distinctList(constraintInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            columns   : constraintInfo.columns,
+            type      : "P",
+            tableName : objectName
+        }
+        mergedConstraints.push(mergedConstraint);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (constraintInfo.constraints[j] === undefined) {
+                objectMergeStatus.model.f = true;
+                break;
+            }
+        }
+    }
+
+    for (let id in constraintsInfos.U) {
+        let constraintInfo = constraintsInfos.U[id];
+
+        let mergedConstraint = {
+            name              : distinctList(constraintInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            columns   : constraintInfo.columns,
+            type      : "U",
+            tableName : objectName
+        }
+        mergedConstraints.push(mergedConstraint);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (constraintInfo.constraints[j] === undefined) {
+                objectMergeStatus.model.f = true;
+                break;
+            }
+        }
+    }
+
+    for (let id in constraintsInfos.C) {
+        let constraintInfo = constraintsInfos.C[id];
+
+        let mergedConstraint = {
+            name              : distinctList(constraintInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            checkCondition    : constraintInfo.checkCondition,
+            type      : "C",
+            tableName : objectName
+        }
+        mergedConstraints.push(mergedConstraint);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (constraintInfo.constraints[j] === undefined) {
+                objectMergeStatus.technical.f = true;
+                break;
+            }
+        }
+    }
+
+    for (let id in constraintsInfos.others) {
+        let constraintInfo = constraintsInfos.others[id];
+
+        let mergedConstraint = {
+            name      : id,
+            type      : constraintInfo.type,
+            tableName : objectName
+        }
+        mergedConstraints.push(mergedConstraint);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (constraintInfo.constraints[j] === undefined) {
+                objectMergeStatus.technical.f = true;
+                break;
+            }
+        }
+    }
+
+    return mergedConstraints;
 }
 
 function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
