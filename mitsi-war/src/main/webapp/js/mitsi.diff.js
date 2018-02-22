@@ -6,8 +6,13 @@ function distinctList(arr, f, notAllEquals) {
     let u = {};
     let a = [];
     for(let i = 0, l = arr.length; i < l; ++i){
-        let v = f(arr[i]);
-        if(!u.hasOwnProperty(v)) {
+        let arrv = arr[i];
+        if(!arrv) {
+            continue;
+        }
+
+        let v = f(arrv);
+        if(v && !u.hasOwnProperty(v)) {
             a.push(v);
             u[v] = 1;
         }
@@ -114,9 +119,9 @@ function mergeObjectsResponses(responses) {
             "secondaryType"   : distinctList(foundList, function(x) { return x.secondaryType; }/*, objectMergeStatus.simple*/).join(", "),
             "diffDescription" : getDiffDescription(nbLayers, foundLayerNameList),
             "description"     : distinctList(foundList, function(x) { return x.description; }, objectMergeStatus.other).join(", "),
-            "columns"         : mergeColumns(responses, foundList, function(x) { return x.columns; }, objectMergeStatus), // TODO
+            "columns"         : mergeColumns(responses, foundList, function(x) { return x.columns; }, objectMergeStatus),
             "indexes"         : foundList[0].indexes, // TODO
-            "constraints"     : foundList[0].constraints, // TODO
+            "constraints"     : mergeConstraints(responses, foundList, function(x) { return x.constraints; }, objectMergeStatus, doName),
             "partitionned"    : distinctList(foundList, function(x) { return x.partitionned; }, objectMergeStatus.technical).join(", "),
             "partitionningBy" : distinctList(foundList, function(x) { return x.partitionningBy; }, objectMergeStatus.technical).join(", "),
         };
@@ -135,6 +140,78 @@ function mergeObjectsResponses(responses) {
     merged.data.databaseObjects = databaseObjects;
 
     return merged;
+}
+
+function mergeConstraints(responses, foundList, getConstraints, objectMergeStatus, objectName) {
+    let mergedConstraintsFk = mergeConstraintsFk(responses, foundList, getConstraints, objectMergeStatus, objectName);
+    let mergedConstraintsOther = mergeConstraintsOther(responses, foundList, getConstraints, objectMergeStatus, objectName);
+
+    return mergedConstraintsFk.concat(mergedConstraintsOther);
+}
+
+function mergeConstraintsFk(responses, foundList, getConstraints, objectMergeStatus, objectName) {
+    let mergedConstraints = [];
+
+    let fkInfos = {};
+
+    for (let i=0; i!=foundList.length; i++) {
+        let constraints = getConstraints(foundList[i]);
+
+        if(!constraints) {
+            continue;
+        }
+
+        for (let j=0; j!=constraints.length; j++) {
+            let constraint = constraints[j];
+            if (constraint.type != "R") {
+                continue;
+            }
+
+            let fkId = constraint.columns+"/"+constraint.fkTable+"/"+constraint.fkColumns;
+            if (! fkInfos.hasOwnProperty(fkId)) {
+                fkInfos[fkId] = {
+                    constraints : [],
+                    columns   : constraint.columns,
+                    fkTable   : constraint.fkTable,
+                    fkColumns : constraint.fkColumns
+                };
+            }
+
+            // we should not have two fk with same columns/fkTable/fkColumns in the same response
+            fkInfos[fkId].constraints[i] = constraint;
+
+        }
+    }
+
+    for (let fkId in fkInfos) {
+        let fkInfo = fkInfos[fkId];
+
+        let mergedFk = {
+            name              : distinctList(fkInfo.constraints, function(x) { return x.name; }, objectMergeStatus.other).join(","),
+            fkConstraintName  : distinctList(fkInfo.constraints, function(x) { return x.fkConstraintName; }, objectMergeStatus.other).join(","),
+            fkConstraintOwner : distinctList(fkInfo.constraints, function(x) { return x.fkConstraintOwner; }, objectMergeStatus.other).join(","),
+            columns   : fkInfo.columns,
+            fkTable   : fkInfo.fkTable,
+            fkColumns : fkInfo.fkColumns,
+            type      : "R",
+            tableName : objectName
+        }
+        mergedConstraints.push(mergedFk);
+
+        for (let j = 0; j != foundList.length; j++) {
+            if (fkInfo.constraints[j] === undefined) {
+                objectMergeStatus.model.f = true;
+                break;
+            }
+        }
+    }
+
+    return mergedConstraints;
+}
+
+function mergeConstraintsOther(responses, foundList, getConstraints, objectMergeStatus) {
+    // TODO
+    return [];
 }
 
 function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {

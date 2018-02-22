@@ -451,9 +451,7 @@ describe("eyeshine labels computation", function() {
                 other         : "false"
             });
         }
-
     }
-
   });
 
   it("diff 2 datasources with 1 new table", function() {
@@ -532,9 +530,7 @@ describe("eyeshine labels computation", function() {
                 });
             }
         }
-
     }
-
   });
 
   it("diff 2 datasources with 1 new column", function() {
@@ -593,9 +589,7 @@ describe("eyeshine labels computation", function() {
                 });
               }
           }
-
       }
-
     });
 
   it("diff 2 datasources with 1 column with different name", function() {
@@ -654,7 +648,6 @@ describe("eyeshine labels computation", function() {
                 });
               }
           }
-
       }
   });
 
@@ -709,9 +702,7 @@ describe("eyeshine labels computation", function() {
                 });
               }
           }
-
       }
-
     });
 
   it("diff 2 datasources with 1 column with different length", function() {
@@ -765,9 +756,7 @@ describe("eyeshine labels computation", function() {
                 });
               }
           }
-
       }
-
     });
 
   it("diff 2 datasources with 1 column with different description", function() {
@@ -821,12 +810,198 @@ describe("eyeshine labels computation", function() {
                 });
               }
           }
-
       }
-
     });
 
-    // TODO : model (fk contraints)
+    it("diff 2 datasources with 1 fk added", function() {
+      let clone = JSON.parse(JSON.stringify(solarSystemDatasource));
+
+      expect(clone.objects[3].id.name).toBe("SATELLITE");
+      clone.objects[3].constraints.push({
+         "owner":"PUBLIC",
+         "name":"DIFF",
+         "tableName":"SATELLITE",
+         "type":"R",
+         "columns":"PLANET_FK",
+         "fkConstraintOwner":"PUBLIC",
+         "fkConstraintName":"CONSTRAINT_8",
+         "fkTable":"PLANET",
+         "fkColumns":"ID"
+      });
+
+      let mergedDatasource = getMergedDatasource(solarSystemDatasource, clone);
+
+      for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
+          let o = mergedDatasource.data.databaseObjects[i];
+
+          if (i == 3) {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "true",
+                other         : "false"
+            });
+          }
+          else {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
+          }
+
+          for (let j=0; j!=o.columns.length; j++) {
+              let c = o.columns[j];
+
+              expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+              });
+          }
+      }
+    });
+
+    it("diff 2 datasources with 1 fk with different name", function() {
+      let clone = JSON.parse(JSON.stringify(solarSystemDatasource));
+
+      expect(clone.objects[1].id.name).toBe("PLANET");
+      expect(clone.objects[1].constraints[0].name).toBe("CONSTRAINT_8CD");
+      clone.objects[1].constraints[0].name = "DIFF";
+
+      let mergedDatasource = getMergedDatasource(solarSystemDatasource, clone);
+
+      for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
+          let o = mergedDatasource.data.databaseObjects[i];
+
+          if (i == 1) {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "true"
+            });
+          }
+          else {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
+          }
+
+          for (let j=0; j!=o.columns.length; j++) {
+              let c = o.columns[j];
+
+              expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+              });
+          }
+      }
+    });
+
+    it("diff 2 datasources with 1 fk with different fkConstraintName", function() {
+      let clone = JSON.parse(JSON.stringify(solarSystemDatasource));
+
+      expect(clone.objects[1].id.name).toBe("PLANET");
+      expect(clone.objects[1].constraints[0].name).toBe("CONSTRAINT_8CD");
+      clone.objects[1].constraints[0].fkConstraintName = "DIFF";
+
+      let mergedDatasource = getMergedDatasource(solarSystemDatasource, clone);
+
+      for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
+          let o = mergedDatasource.data.databaseObjects[i];
+
+          if (i == 1) {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "true"
+            });
+          }
+          else {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
+          }
+
+          for (let j=0; j!=o.columns.length; j++) {
+              let c = o.columns[j];
+
+              expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+              });
+          }
+      }
+    });
+
+    it("diff 2 datasources with 1 fk with different fkConstraintOwner", function() {
+      let clone = JSON.parse(JSON.stringify(solarSystemDatasource));
+
+      expect(clone.objects[1].id.name).toBe("PLANET");
+      expect(clone.objects[1].constraints[0].name).toBe("CONSTRAINT_8CD");
+      clone.objects[1].constraints[0].fkConstraintOwner = "DIFF";
+
+      let mergedDatasource = getMergedDatasource(solarSystemDatasource, clone);
+
+      for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
+          let o = mergedDatasource.data.databaseObjects[i];
+
+          if (i == 1) {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "true"
+            });
+          }
+          else {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
+          }
+
+          for (let j=0; j!=o.columns.length; j++) {
+              let c = o.columns[j];
+
+              expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+              });
+          }
+      }
+    });
+
     // TODO : other constraints
     // TODO : indexes
 });

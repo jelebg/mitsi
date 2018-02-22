@@ -1495,6 +1495,65 @@ describe("eyeshine labels computation", function() {
 
     });
 
+
+    it("diff 3 datasources with 1 fk added in clone 1", function() {
+      let clone1 = JSON.parse(JSON.stringify(solarSystemDatasource));
+      let clone2 = JSON.parse(JSON.stringify(solarSystemDatasource));
+
+      expect(clone1.objects[3].id.name).toBe("SATELLITE");
+      clone1.objects[3].constraints.push({
+         "owner":"PUBLIC",
+         "name":"DIFF",
+         "tableName":"SATELLITE",
+         "type":"R",
+         "columns":"PLANET_FK",
+         "fkConstraintOwner":"PUBLIC",
+         "fkConstraintName":"CONSTRAINT_8",
+         "fkTable":"PLANET",
+         "fkColumns":"ID"
+      });
+
+      let mergedDatasource = getMergedDatasource(solarSystemDatasource, clone1, clone2);
+
+      for (let i=0; i!=mergedDatasource.data.databaseObjects.length; i++) {
+          let o = mergedDatasource.data.databaseObjects[i];
+
+          if (i == 3) {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "true",
+                other         : "false"
+            });
+          }
+          else {
+            expect(o.diff).toEqual({
+                notEverywhere : "false",
+                simple        : "false",
+                technical     : "false",
+                model         : "false",
+                other         : "false"
+            });
+          }
+
+          for (let j=0; j!=o.columns.length; j++) {
+              let c = o.columns[j];
+
+              expect(c.diff).toEqual({
+                    notEverywhere : "false",
+                    simple        : "false",
+                    technical     : "false",
+                    model         : "false",
+                    other         : "false"
+              });
+          }
+
+      }
+
+    });
+
+
     // TODO : model (fk contraints)
     // TODO : other constraints
     // TODO : indexes
