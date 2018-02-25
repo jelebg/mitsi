@@ -780,7 +780,7 @@ angular.module('mitsiApp')
 		     "Arrow", 
 			 [ "Label", { label:fk.fromColumns, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
 		  ];
-		if (fk.columnsTo) {
+		if (fk.toColumns) {
 			connectionOverlays.push([ "Label", { label:fk.toColumns, location:0.7, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]);
 		}
 		if (fk.candidateFkComment) {
