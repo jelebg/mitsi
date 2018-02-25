@@ -23,7 +23,7 @@
     <div style="font-weight:bold;">{{ c.type }}</div>
 	<div>{{ c.diffDescription }}</div>
 	<div>{{ c.description }}</div>
-	<div ng-repeat="comment in c.labelsComments track by $index">{{ comment }}</div>
+	<div ng-repeat="comment in c.labelsContext.labelsComments track by $index">{{ comment }}</div>
   </script>
 
 </head>
@@ -211,7 +211,9 @@
 						  	popover="{{ getTablePopover(o) }}"
 						    popover-placement="bottom-left"
 							popover-trigger="mouseenter" >
-				  		{{ o.id.name }}
+						<span ng-if="hasLabels(o.labelsContext)" class="columnAttributeLabel" >{{ getLabels(o.labelsContext) }}</span>
+						<span ng-if="hasLabelsWarning(o.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabelsWarning(o.labelsContext) }}</span>
+						{{ o.id.name }}
 				  	</span>
 				  	</div>
 			      </accordion-heading>
@@ -225,8 +227,8 @@
 							ng-mouseleave="currentColumn=null"
 							 >
 							<table><tr><td style="width:23px;white-space:nowrap;">
-								<span ng-if="hasLabelsForColumn(c)" class="columnAttributeLabel" >{{ getLabelsForColumn(c) }}</span>
-								<span ng-if="hasLabelsWarningForColumn(c)" class="columnAttributeLabelWarning" >{{ getLabelsWarningForColumn(c) }}</span>
+								<span ng-if="hasLabels(c.labelsContext)" class="columnAttributeLabel" >{{ getLabels(c.labelsContext) }}</span>
+								<span ng-if="hasLabelsWarning(c.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabels(c.labelsContext) }}</span>
 							</td><td>
 								&nbsp;{{ c.name }}
 							</td></tr></table>

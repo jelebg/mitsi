@@ -535,20 +535,20 @@ angular.module('mitsiApp')
 		}
 	}
 	
-	$scope.hasLabelsForColumn = function(c) {
-		return c.labelsString && c.labelsString != "";
+	$scope.hasLabels = function(labelsContext) {
+		return labelsContext.labelsString && labelsContext.labelsString != "";
 	}
 	
-	$scope.getLabelsForColumn = function(c) {
-		return c.labelsString;
+	$scope.getLabels = function(labelsContext) {
+		return labelsContext.labelsString;
 	}
 	
-	$scope.hasLabelsWarningForColumn = function(c) {
-		return c.labelsWarningString && c.labelsWarningString != "";
+	$scope.hasLabelsWarning = function(labelsContext) {
+		return labelsContext.labelsWarningString && labelsContext.labelsWarningString != "";
 	}
 	
-	$scope.getLabelsWarningForColumn = function(c) {
-		return c.labelsWarningString;
+	$scope.getLabelsWarning = function(labelsContext) {
+		return labelsContext.labelsWarningString;
 	}
 	
     $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument

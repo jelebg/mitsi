@@ -6,4 +6,5 @@ public class Rule {
 	public String type;
 	public String comment;
 	public String candidateFkToTable;
+	public String scope;
 }

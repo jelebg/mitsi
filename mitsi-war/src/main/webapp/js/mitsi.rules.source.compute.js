@@ -140,6 +140,36 @@ function computeColumnCollections(source, collections) {
     }
 }
 
+function initLabelsWorkingContext() {
+    return {
+        labels : {
+           "normal"   : [],
+           "warning"  : []
+        },
+        labelsComments : [ ],
+        candidateFks : []
+    }
+}
+
+function getLabelsContext(labelsWorkingContext) {
+    // TODO : rajouter le currentSchema aux tables des candidateFks sauf si deja dans le nom
+    return {
+        "labels"              : labelsWorkingContext.labels.normal.concat(labelsWorkingContext.labels.warning),
+        "labelsString"        : labelsWorkingContext.labels.normal.join(","),
+        "labelsWarningString" : labelsWorkingContext.labels.warning.join(","),
+        "labelsComments"      : labelsWorkingContext.labelsComments,
+        "candidateFks"        : labelsWorkingContext.candidateFks
+    };
+}
+
+function updateLabelsCount(labels, columnsLabels, labelsFilters) {
+    for (let i=0; i!=labels.length; i++) {
+        let label = labels[i];
+        labelsFilters[label].count ++;
+        columnsLabels[label] = true;
+    }
+}
+
 function computeColumnLabels(source, rules, returnVariables) {
     if (!source.objects) {
         return;
@@ -189,9 +219,22 @@ function computeColumnLabels(source, rules, returnVariables) {
                 "fullName" : source.currentSchemaName+"."+obj.id.name,
                 "shortName": obj.id.name,
                 "diff"     : obj.diff
-        }
+        };
 
         obj.columnsLabels = {};
+
+        variables.variables["column"] = {
+                "fullName" : "",
+                "shortName": "",
+                "diff"     : ""
+        };
+
+        let labelsWorkingContext = initLabelsWorkingContext();
+
+        computeRulesForSource(rules, variables, labelsWorkingContext, "table");
+
+        obj.labelsContext = getLabelsContext(labelsWorkingContext);
+        updateLabelsCount(obj.labelsContext.labels, obj.columnsLabels, labelsFilters);
 
         for(let i=0; i!=obj.columns.length; i++) {
             let column = obj.columns[i];
@@ -202,47 +245,35 @@ function computeColumnLabels(source, rules, returnVariables) {
                     "diff"     : column.diff
             };
 
-            let labels = {
-                    "normal"   : [],
-                    "warning"  : []
-            }
-            let labelsComments = [ ];
-            let candidateFks = [];
+            let labelsWorkingContext = initLabelsWorkingContext();
 
             if (returnVariables) {
                 return variables;
             }
 
-            computeRulesForSource(rules, variables, labels, labelsComments, candidateFks);
+            computeRulesForSource(rules, variables, labelsWorkingContext, "column");
 
-            for (let j=0; j!=labels.normal.length; j++) {
-                let label = labels.normal[j];
-                labelsFilters[label].count ++;
-            }
-            for (let j=0; j!=labels.warning.length; j++) {
-                let label = labels.warning[j];
-                labelsFilters[label].count ++;
-            }
-
-            column.labels = labels.normal.concat(labels.warning);
-            column.labelsString = labels.normal.join(",");
-            column.labelsWarningString = labels.warning.join(",");
-            column.labelsComments = labelsComments;
-            // TODO : rajouter le currentSchema aux tables des candidateFks sauf si deja dans le nom
-            column.candidateFks = candidateFks;
-
-            for(let j=0; j!=column.labels.length; j++) {
-                let label = column.labels[j];
-                obj.columnsLabels[label] = true;
-            }
+            column.labelsContext = getLabelsContext(labelsWorkingContext);
+            updateLabelsCount(column.labelsContext.labels, obj.columnsLabels, labelsFilters);
         }
     }
 }
 
-function computeRulesForSource(rules, variables, labels, labelsComments, candidateFks) {
+function computeRulesForSource(rules, variables, labelsWorkingContext, scope) {
+    let labels = labelsWorkingContext.labels;
+    let labelsComments = labelsWorkingContext.labelsComments;
+    let candidateFks = labelsWorkingContext.candidateFks;
+
     for(let iRule=0; iRule!=rules.length; iRule	++) {
         let rule = rules[iRule];
         let parsedRule = rule.parsedRule;
+
+        if (!rule.scope && scope != "column") {
+            continue;
+        }
+        if (rule.scope && rule.scope != "all" && rule.scope != scope) {
+            continue;
+        }
 
         variables.customArrays = {};
         variables.customVariables = {};
