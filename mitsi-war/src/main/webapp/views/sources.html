@@ -91,11 +91,29 @@
 			</div>
             {{ s.description }}
             <br/>
-	        <table style="width:100%;margin-bottom:3px"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
-	        	<option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
-					{{ schema.name }}
-           	    </option>
-	        </select></td></tr></table>
+            <table ng-hide="s.isLayer" style="width:100%;margin-bottom:3px"><tr><td style="width:80px">schema : </td><td><select name="currentSchemaSelect" ng-model="s.currentSchemaName" ng-change="refresh(s, s.currentSchemaName)" style="width:100%">
+                <option ng-repeat="schema in s.schemas | orderBy:'name' " value="{{ schema.name }}">
+                    {{ schema.name }}
+                </option>
+            </select></td></tr></table>
+            <table ng-show="s.isLayer"
+                   style="width:100%;margin-bottom:3px">
+                <tr>
+                    <td style="width:80px">layer : </td>
+                    <td>
+                        <select name="currentLayerSelect"
+                                ng-model="s.currentLayerDatasourceIndex"
+                                ng-init="s.currentLayerDatasourceIndex = '-1'"
+                                ng-change="refreshSelectedLayer(s)"
+                                style="width:100%">
+                            <option value="-1"></option>
+                            <option ng-repeat="datasourceName in s.datasources track by $index" value="{{ $index }}">
+                                {{ datasourceName }}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
 	      	<table style="width:100%;"><td>
 				<span dropdown on-toggle="toggled(open)" >
 			      	<div class="form-group has-feedback" style="margin-bottom:2px;">
@@ -228,7 +246,7 @@
 							 >
 							<table><tr><td style="width:23px;white-space:nowrap;">
 								<span ng-if="hasLabels(c.labelsContext)" class="columnAttributeLabel" >{{ getLabels(c.labelsContext) }}</span>
-								<span ng-if="hasLabelsWarning(c.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabels(c.labelsContext) }}</span>
+								<span ng-if="hasLabelsWarning(c.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabelsWarning(c.labelsContext) }}</span>
 							</td><td>
 								&nbsp;{{ c.name }}
 							</td></tr></table>

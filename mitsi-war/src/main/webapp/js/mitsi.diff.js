@@ -40,6 +40,22 @@ function mergeObjectsResponses(responses) {
 
     merged.data.provider = distinctList(responses, function(x) { return x.data.provider; }).join(", ");
 
+    // keep the original datasources for later
+    merged.data.originalDatasources = [];
+    for (let i=0; i!=responses.length; i++) {
+        let resp = responses[i].data;
+        merged.data.originalDatasources.push({
+            "data" : {
+                "name" : resp.name,
+                "provider" : resp.provider,
+                "currentSchemaName" : resp.currentSchemaName,
+                "schemas" : resp.schemas,
+                "databaseObjects" : resp.databaseObjects
+            }
+        });
+    }
+
+
     // TODO : logique sur les schema a revoir certainement. il pourrait etre meilleur de les effacer, peut-être sur une configuration
     let schemaList = [];
     for (let i = 0; i != responses.length; i++) {
@@ -132,6 +148,11 @@ function mergeObjectsResponses(responses) {
             technical     : objectMergeStatus.technical.f.toString(),
             model         : objectMergeStatus.model.f.toString(),
             other         : objectMergeStatus.other.f.toString()
+        };
+
+        // diff can be used even if the user select only one layer, so we copy the result in any datasource
+        for (let j=0; j!=foundList.length; j++) {
+            foundList[j].diff = o.diff;
         }
 
         databaseObjects.push(o);
@@ -466,6 +487,7 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
         let columnTypes = [];
         let columnTypesUnique = {};
         let foundLayerNameList = [];
+        let originalColumns = [];
 
         for (let i=0; i!=foundList.length; i++) {
             if (columnIndexByResponse[i] >= columnsByResponse[i].length) {
@@ -486,6 +508,7 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
             else {
                 columnIndexByResponse[i] ++;
             }
+            originalColumns.push(column);
 
             foundLayerNameList.push(responses[i].data.datasourceName);
 
@@ -532,6 +555,11 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
             technical     : columnDiff.technical.f.toString(),
             model         : columnDiff.model.f.toString(),
             other         : columnDiff.other.f.toString()
+        }
+
+        // diff can be used even if the user select only one layer, so we copy the result in any datasource
+        for (let j=0; j!=originalColumns.length; j++) {
+            originalColumns[j].diff = column.diff;
         }
 
         mergedColumns.push(column);

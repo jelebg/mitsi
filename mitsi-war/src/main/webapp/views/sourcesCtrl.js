@@ -149,7 +149,20 @@ angular.module('mitsiApp')
 			  $scope.initFromLocation();
 		  });
 	};
-	
+
+	$scope.refreshSelectedLayer = function(s) {
+	    if (s.currentLayerDatasourceIndex < 0) {
+	        $scope.initSourceWithResponse(s, s.originalResponse);
+	    }
+	    else {
+	        $scope.initSourceWithResponse(s, s.originalResponse.data.originalDatasources[s.currentLayerDatasourceIndex]);
+	    }
+
+	    $scope.refreshRules(s);
+
+        // TODO : update graph for transparency
+	}
+
 	$scope.refresh = function(source, schema) {
 		
 	   source.loading = true;
@@ -180,12 +193,17 @@ angular.module('mitsiApp')
 			arr.push(str);
 		}
 	}
-	
-	$scope.initSource = function(source, response) {
+
+	$scope.initSourceWithResponse = function(source, response) {
 		  source.objects = response.data.databaseObjects;
 		  source.schemas = response.data.schemas;
 		  source.dbProvider = response.data.provider;
 		  source.currentSchemaName = response.data.currentSchemaName;
+	}
+	
+	$scope.initSource = function(source, response) {
+	      source.originalResponse = response;
+          $scope.initSourceWithResponse(source, response);
 
 		  source.filter = {
 				  hideTables:false,
@@ -201,7 +219,6 @@ angular.module('mitsiApp')
 		  $scope.refreshRules(source);
 
 		  $scope.initGraph(source);
-		  
 	}
 
     $scope.refreshRules = function(source) {
@@ -536,7 +553,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.hasLabels = function(labelsContext) {
-		return labelsContext.labelsString && labelsContext.labelsString != "";
+		return labelsContext && labelsContext.labelsString && labelsContext.labelsString != "";
 	}
 	
 	$scope.getLabels = function(labelsContext) {
@@ -544,7 +561,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.hasLabelsWarning = function(labelsContext) {
-		return labelsContext.labelsWarningString && labelsContext.labelsWarningString != "";
+		return labelsContext && labelsContext.labelsWarningString && labelsContext.labelsWarningString != "";
 	}
 	
 	$scope.getLabelsWarning = function(labelsContext) {
