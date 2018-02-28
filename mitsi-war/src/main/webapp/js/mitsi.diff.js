@@ -44,11 +44,23 @@ function mergeObjectsResponses(responses) {
     merged.data.originalDatasources = [];
     for (let i=0; i!=responses.length; i++) {
         let resp = responses[i].data;
+
+        let currentSchemaName = null;
+        if (resp.schemas) {
+            for (let j=0; j!=resp.schemas.length; j++) {
+                let schema = resp.schemas[j];
+                if (schema.current) {
+                    currentSchemaName = schema.name;
+                    break;
+                }
+            }
+        }
+
         merged.data.originalDatasources.push({
             "data" : {
                 "name" : resp.name,
                 "provider" : resp.provider,
-                "currentSchemaName" : resp.currentSchemaName,
+                "currentSchemaName" : currentSchemaName,
                 "schemas" : resp.schemas,
                 "databaseObjects" : resp.databaseObjects
             }

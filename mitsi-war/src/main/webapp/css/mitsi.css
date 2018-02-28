@@ -260,6 +260,10 @@
 	padding-right:5px;
 }
 
+.linksTableRestricted {
+	filter: opacity(40%);
+}
+
 .linksTableHighlight {
 	text-align:center;
     background-color: orange; 

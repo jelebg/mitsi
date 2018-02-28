@@ -46,7 +46,8 @@ angular.module('mitsiApp')
 	$scope.hideProximityGraphTimeoutPromise = null;
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
-	
+    $scope.restrictToTables = null;
+
 	$scope.endpointStyles= {
 		"paintStyle" :  { 
 	    	"strokeStyle":"lightgrey", 
@@ -886,6 +887,23 @@ angular.module('mitsiApp')
 		$scope.initGraphDisplay();	
 	});
 	
+	$scope.$on(EVENT_LAYER_DATABASE_SELECTED, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED does exist
+		$scope.restrictToDatasource(source);
+	});
+
+	$scope.restrictToDatasource = function(source) {
+	    if (source == null) {
+	        $scope.restrictToTables = null;
+	        return;
+	    }
+
+        $scope.restrictToTables = {};
+        for (let i=0; i!=source.data.databaseObjects.length; i++) {
+            let o = source.data.databaseObjects[i];
+            $scope.restrictToTables[o.id.schema+"."+o.id.name] = true;
+        }
+	}
+
 	// TODO :  source, databaseObject ne servent plus ?
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_OBJECT_SELECTED does exist
 		
@@ -973,7 +991,6 @@ angular.module('mitsiApp')
 	
 	$scope.existsTable = function(tableName) {
 		return ($scope.tables[tableName] !=null);
-
 	}
 
 	
@@ -1078,6 +1095,10 @@ angular.module('mitsiApp')
 
 	$scope.isTableTemporary = function(tableName) {
 		return $scope.tablesTemporary.indexOf(tableName)!=-1;
+	}
+
+	$scope.isTableRestricted = function(tableName) {
+	    return $scope.restrictToTables != null && ! $scope.restrictToTables.hasOwnProperty(tableName);
 	}
 	
 	$scope.hideProximityGraph = function() {

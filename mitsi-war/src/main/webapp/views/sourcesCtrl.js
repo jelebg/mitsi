@@ -151,16 +151,20 @@ angular.module('mitsiApp')
 	};
 
 	$scope.refreshSelectedLayer = function(s) {
+	    let ds = null;
 	    if (s.currentLayerDatasourceIndex < 0) {
 	        $scope.initSourceWithResponse(s, s.originalResponse);
+	        $rootScope.currentDatasourceInLayer = null;
 	    }
 	    else {
-	        $scope.initSourceWithResponse(s, s.originalResponse.data.originalDatasources[s.currentLayerDatasourceIndex]);
+	        ds = s.originalResponse.data.originalDatasources[s.currentLayerDatasourceIndex];
+	        $scope.initSourceWithResponse(s, ds);
+            $rootScope.currentDatasourceInLayer = ds.name;
 	    }
 
 	    $scope.refreshRules(s);
+	    $rootScope.$broadcast(EVENT_LAYER_DATABASE_SELECTED, ds);
 
-        // TODO : update graph for transparency
 	}
 
 	$scope.refresh = function(source, schema) {
