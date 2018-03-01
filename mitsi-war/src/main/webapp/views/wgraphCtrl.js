@@ -290,7 +290,14 @@ angular.module('mitsiApp')
 	    
 	});
 
-	
+	$scope.isRestrictedFk = function(fk) {
+	    return $scope.restrictToFks && ! $scope.restrictToFks.hasOwnProperty(fk.fromTable + "->" + fk.toTable);
+	}
+
+    $scope.addRestrictedFk = function (tableFrom, tableTo) {
+        $scope.restrictToFks[tableFrom+"->"+tableTo] = true;
+    }
+
 	$scope.initGraphDisplay = function() {
 		$scope.removeAllTables();
 		$scope.sqlTables = [];
@@ -434,7 +441,28 @@ angular.module('mitsiApp')
 			}
 		}
 	}
-	
+
+    $scope.updateRestrictedFks = function() {
+        var connectionList = $scope.jsplumb.getConnections();
+        if(!connectionList) {
+            return;
+        }
+        for(const key in connectionList) {
+            if(!connectionList.hasOwnProperty(key)) {
+                continue;
+            }
+
+            const connection = connectionList[key];
+
+            let fromTable = connection.source.id.substring($scope.divPrefix.length);
+            let toTable = connection.target.id.substring($scope.divPrefix.length);
+            connection.removeClass("linksConnectionRestricted");
+            if ($scope.restrictToFks && ! $scope.restrictToFks.hasOwnProperty(fromTable+"->"+toTable)) {
+                connection.addClass("linksConnectionRestricted");
+            }
+        }
+    }
+
 	$scope.highlightPathsConnections = function(paths) { // NOSONAR complexity is OK
 		for(let iPath=0; iPath!=paths.length; iPath++) {
 			const path=paths[iPath];
@@ -777,6 +805,11 @@ angular.module('mitsiApp')
 			? $scope.connectionStyles.hoverPaintStyleForCandidateFk 
 			: $scope.connectionStyles.hoverPaintStyle;
 
+        let cssClass = null;
+		if ($scope.isRestrictedFk(fk)) {
+		    cssClass = "linksConnectionRestricted";
+		}
+
 		let connectionOverlays = [ 
 		     "Arrow", 
 			 [ "Label", { label:fk.fromColumns, location:0.1, labelStyle:{fillStyle:"white", borderWidth:"1", borderStyle:"lightgrey"}} ]
@@ -824,7 +857,8 @@ angular.module('mitsiApp')
 			    	"endpointStyle" : $scope.endpointStyles.paintStyle,
 			    	"connector" : [ "StateMachine" ],
 					"overlays" : connectionOverlays,
-			    	"detachable" : false
+			    	"detachable" : false,
+			    	"cssClass" : cssClass
 				});
 			}
 			catch(e) {
@@ -842,7 +876,8 @@ angular.module('mitsiApp')
 		    	"anchor" : [ "Right", "Left" ],
 		    	"connector" : [ "Bezier", { curviness:50 } ],
 				"overlays" : connectionOverlays,
-		    	"detachable" : false
+		    	"detachable" : false,
+                "cssClass" : cssClass
 			});
 		}
 		if(connection) {
@@ -894,14 +929,29 @@ angular.module('mitsiApp')
 	$scope.restrictToDatasource = function(source) {
 	    if (source == null) {
 	        $scope.restrictToTables = null;
-	        return;
+	        $scope.restrictToFks = null;
 	    }
+        else {
+            $scope.restrictToTables = {};
+            $scope.restrictToFks = {};
 
-        $scope.restrictToTables = {};
-        for (let i=0; i!=source.data.databaseObjects.length; i++) {
-            let o = source.data.databaseObjects[i];
-            $scope.restrictToTables[o.id.schema+"."+o.id.name] = true;
+            for (let i=0; i!=source.data.databaseObjects.length; i++) {
+                let o = source.data.databaseObjects[i];
+                $scope.restrictToTables[o.id.schema+"."+o.id.name] = true;
+
+                for (let j=0; j!=o.constraints.length; j++) {
+                    let constraint = o.constraints[j];
+
+                    if (constraint.type != 'R') {
+                        continue;
+                    }
+
+                    $scope.addRestrictedFk(o.id.schema+"."+o.id.name, constraint.fkConstraintOwner+"."+constraint.fkTable);
+                }
+            }
         }
+
+        $scope.updateRestrictedFks();
 	}
 
 	// TODO :  source, databaseObject ne servent plus ?

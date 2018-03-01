@@ -263,6 +263,9 @@
 .linksTableRestricted {
 	filter: opacity(40%);
 }
+.linksConnectionRestricted {
+	filter: opacity(20%);
+}
 
 .linksTableHighlight {
 	text-align:center;
