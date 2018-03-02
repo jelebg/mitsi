@@ -1121,7 +1121,7 @@ angular.module('mitsiApp')
 			return ;
 		}
 		
-		for(let i=0; i!=source.length; i++) {
+		for(let i=0; i!=source.objects.length; i++) {
 			let o = source.objects[i];
 			if((o.id.schema+"."+o.id.name) == table.name) {
 				$rootScope.currentSource.currentObject = o;
