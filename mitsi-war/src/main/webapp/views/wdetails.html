@@ -9,7 +9,13 @@
     	></i>
     </a>
 
-	<table style="width:100%;"><td style="vertical-align:top;width:155px;">
+    <div ng-if="detailsMessage" style="margin-top:20px;color:darkblue;font-weight:bold;">
+        <i class="glyphicon glyphicon-warning-sign"></i>
+        {{ detailsMessage }}
+    </div>
+
+	<table ng-hide="detailsMessage"
+           style="width:100%;"><td style="vertical-align:top;width:155px;">
 
 	<div class="tab" ng-hide="!detailsSections || detailsSections.length==0">
 		<button ng-repeat="section in detailsSections"
@@ -33,7 +39,9 @@
 			</td>
 		</tr></table>
 	</td></table>
-    <div style="position:absolute;right:0px;left:160px;top:40px;bottom:0px;height:auto;width:auto;overflow:auto;">
+
+    <div ng-hide="detailsMessage"
+         style="position:absolute;right:0px;left:160px;top:40px;bottom:0px;height:auto;width:auto;overflow:auto;">
 	  <div style="position:absolute;top:0px;left:0px;">
 
 		<div ng-repeat="section in detailsSections" ng-show="isSectionSelected($index)">

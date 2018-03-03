@@ -200,7 +200,16 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sidePanelShouldShowDetails = function() {
-		return $rootScope.currentSource != null && $rootScope.currentSource.currentObject != null;
+	    if (!$rootScope.currentSource) {
+	        return false;
+	    }
+	    if ($rootScope.currentSource.isLayer && $rootScope.currentSource.currentLayerDatasourceIndex < 0) {
+		    return false;
+	    }
+		if ($rootScope.currentSource.currentObject == null) {
+		    return false;
+		}
+		return true;
 	}
 	
 	$scope.sidePanelShouldShowSql = function() {
@@ -223,11 +232,16 @@ angular.module('mitsiApp')
 		if($scope.panelDisplayed == null || $scope.panelDisplayed == "") {
 			return "";
 		}
-		
+
+		let datasourceName = getDatasourceNameNoLayer($rootScope.currentSource);
+
 		let fullTableName =
 			$rootScope.currentSource ? 
 		   		($rootScope.currentSource.currentObject ? 
-		   			$rootScope.currentSource.currentObject.id.schema + "." + $rootScope.currentSource.currentObject.id.name + " (" + $rootScope.currentSource.currentObject.id.type + ")"
+		   			$rootScope.currentSource.currentObject.id.schema + "." + $rootScope.currentSource.currentObject.id.name
+		   			+ " (" + $rootScope.currentSource.currentObject.id.type
+		   			+ (datasourceName && datasourceName!=="" ? " in " + datasourceName : "")
+		   			+ ")"
 		   			: "" ) 
 		   	: "";
 		   		
@@ -922,7 +936,7 @@ angular.module('mitsiApp')
 		$scope.initGraphDisplay();	
 	});
 	
-	$scope.$on(EVENT_LAYER_DATABASE_SELECTED, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED does exist
+	$scope.$on(EVENT_LAYER_DATABASE_SELECTED, function (event, layerOrSource, source) { // NOSONAR EVENT_DATABASE_SELECTED does exist
 		$scope.restrictToDatasource(source);
 	});
 

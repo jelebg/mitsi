@@ -162,8 +162,8 @@ angular.module('mitsiApp')
             $rootScope.currentDatasourceInLayer = ds.name;
 	    }
 
-	    $scope.refreshRules(s);
-	    $rootScope.$broadcast(EVENT_LAYER_DATABASE_SELECTED, ds);
+        $scope.refreshRules(s);
+	    $rootScope.$broadcast(EVENT_LAYER_DATABASE_SELECTED, s, ds);
 
 	}
 

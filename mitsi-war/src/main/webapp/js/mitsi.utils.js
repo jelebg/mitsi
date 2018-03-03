@@ -29,3 +29,34 @@ function isMitsiExperimental() {
     let val = localStorage.getItem("mitsi_experimental");
     return val != null && val.toLowerCase() != "false";
 }
+
+function getDatasourceNameNoLayer(datasource) {
+    if (!datasource) {
+        return null;
+    }
+
+    if (!datasource.isLayer) {
+        return datasource.name;
+    }
+
+    if (datasource.currentLayerDatasourceIndex < 0) {
+        return null;
+    }
+
+    return datasource.datasources[datasource.currentLayerDatasourceIndex];
+
+}
+
+function objectExistsInDatasource(datasource, name, schema) {
+    let objects = datasource.objects;
+
+    for (let i=0; i!=objects.length; i++) {
+        let o = objects[i];
+
+        if (o.id.name == name && o.id.schema == schema) {
+            return true;
+        }
+    }
+
+    return false;
+}

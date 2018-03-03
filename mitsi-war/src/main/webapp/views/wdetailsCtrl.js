@@ -5,6 +5,7 @@ angular.module('mitsiApp')
     
     $scope.lastObjectType = null;
     $scope.currentSectionByType = {};
+    $scope.detailsMessage = null;
     $scope.loading = false;
 
     $scope.selectSection = function(sectionIndex) {
@@ -29,17 +30,33 @@ angular.module('mitsiApp')
     }
 
     $scope.getTableDetails = function(source, databaseObject) {
+    	$scope.detailsMessage = null;
+        if (!source) {
+             $scope.detailsMessage = "no datsource selected";
+            return;
+        }
+        if (source.isLayer && source.currentLayerDatasourceIndex < 0) {
+            $scope.detailsMessage = "no datasource selected in layer "+source.name;
+            return;
+        }
+
     	$scope.loading = true;
     	if(databaseObject) {
-	    	detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
-		    .then(function(response) {
-		    	  $scope.restoreSectionsOpening("table");
-		    	  $scope.detailsSections = response.data.sections;
-		    },
-		    errorService.getGenericHttpErrorCallback())
-		    .finally(function() {
-	    	   $scope.loading = false;
-			});
+            if (!objectExistsInDatasource(source, databaseObject.id.name, databaseObject.id.schema)) {
+                $scope.detailsMessage = "object "+databaseObject.id.schema + "." + databaseObject.id.name+" does not exist in "+getDatasourceNameNoLayer(source);
+    	        $scope.loading = false;
+            }
+            else {
+                detailsService.getDetails(source, "table", databaseObject.id.name, databaseObject.id.schema)
+                .then(function(response) {
+                      $scope.restoreSectionsOpening("table");
+                      $scope.detailsSections = response.data.sections;
+                },
+                errorService.getGenericHttpErrorCallback())
+                .finally(function() {
+                   $scope.loading = false;
+                });
+            }
     	}
     	else {
 	    	detailsService.getDetails(source, null, null, null)
@@ -109,11 +126,19 @@ angular.module('mitsiApp')
 			}
     	}
     }
-    
+
+    $scope.$on(EVENT_DATABASE_SELECTED, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
+        $scope.getTableDetails(source, source.currentObject);
+    });
+
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
 		$scope.getTableDetails(source, databaseObject);
 	});
-	
+
+	$scope.$on(EVENT_LAYER_DATABASE_SELECTED, function (event, layerOrSource, source) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
+		$scope.getTableDetails(layerOrSource, layerOrSource.currentObject);
+	});
+
 	$scope.$on(EVENT_DATABASE_SELECTED_FOR_DETAILS, function (event, source) { // NOSONAR EVENT_DATABASE_SELECTED_FOR_DETAILS does exist
 		$scope.getTableDetails(source, null);
 	});
