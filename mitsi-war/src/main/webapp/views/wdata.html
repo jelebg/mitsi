@@ -1,5 +1,11 @@
-	 
-  <div  ng-if="!gridRefresh" 
+<div ng-if="dataMessage"
+     style="margin-top:20px;color:darkblue;font-weight:bold;">
+    <i class="glyphicon glyphicon-warning-sign"></i>
+    {{ dataMessage }}
+</div>
+
+  <div  ng-hide="dataMessage"
+        ng-if="!gridRefresh"
   		class="mitsi-fit-viewport-height" 
   		ui-grid-exporter 
   		ui-grid-selection

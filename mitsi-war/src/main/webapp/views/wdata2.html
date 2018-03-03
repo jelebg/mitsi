@@ -1,5 +1,10 @@
-	 
-  <div  
+<div ng-if="dataMessage"
+     style="margin-top:20px;color:darkblue;font-weight:bold;">
+    <i class="glyphicon glyphicon-warning-sign"></i>
+    {{ dataMessage }}
+</div>
+
+  <div ng-hide="dataMessage"
   		class="sidePanelResizeHeightControl"
   		ng-if="!gridRefresh" 
   		ui-grid-exporter 

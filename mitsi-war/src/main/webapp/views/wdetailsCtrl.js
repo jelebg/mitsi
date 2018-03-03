@@ -32,18 +32,18 @@ angular.module('mitsiApp')
     $scope.getTableDetails = function(source, databaseObject) {
     	$scope.detailsMessage = null;
         if (!source) {
-             $scope.detailsMessage = "no datsource selected";
+             $scope.detailsMessage = "No datasource selected";
             return;
         }
         if (source.isLayer && source.currentLayerDatasourceIndex < 0) {
-            $scope.detailsMessage = "no datasource selected in layer "+source.name;
+            $scope.detailsMessage = "No datasource selected in layer "+source.name;
             return;
         }
 
     	$scope.loading = true;
     	if(databaseObject) {
             if (!objectExistsInDatasource(source, databaseObject.id.name, databaseObject.id.schema)) {
-                $scope.detailsMessage = "object "+databaseObject.id.schema + "." + databaseObject.id.name+" does not exist in "+getDatasourceNameNoLayer(source);
+                $scope.detailsMessage = "Object "+databaseObject.id.schema + "." + databaseObject.id.name+" does not exist in "+getDatasourceNameNoLayer(source);
     	        $scope.loading = false;
             }
             else {

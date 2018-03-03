@@ -22,7 +22,6 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.refresh = function() {
-		
 		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, $scope.lastOrderByColumns, $scope.getFilters(), true, false, null);
 	} 
 	
@@ -95,33 +94,12 @@ angular.module('mitsiApp')
 		};
 	}
 
+	$scope.$on(EVENT_LAYER_DATABASE_SELECTED, function (event, layerOrSource, source) { // NOSONAR
+	    // TODO : preserve columns only if columns are the same in previous and next source of the layer. be carefule, for now it does not work with preserving the filters ...
+	    let preserveColumns = false;
+		$scope.beginData(layerOrSource, layerOrSource.currentObject, $scope.lastOrderByColumns, $scope.getFilters(), preserveColumns, false, null);
+	});
 
-	/* TODO : unused, delete ? 
-	  
-	$scope.gridFit = function() {
-		var eltList = document.getElementsByClassName("mitsi-fit-viewport-height");
-		for(let i=0; i!=eltList.length; i++) {
-			const element = eltList[i];
-			const windowHW = getWindowHW();
-			const elementXY = getAbsoluteXY(element);
-			
-	        $scope.currentGridHeight = ((windowHW.h-elementXY.y)-3)+"px";
-			bug ?? break;
-		}
-
-	    $scope.gridRefresh = true;
-	    $timeout(function() {
-	      $scope.gridRefresh = false;
-	      
-	      $timeout(function() {
-	          $scope.dataGridApi.grid.queueGridRefresh();
-	      }, 0);
-	      
-     
-	    }, 0);
-
-	} */
-	
 	$scope.$on(EVENT_DATABASE_OBJECT_SELECTED, function (event, source, databaseObject) { // NOSONAR
 		$scope.dataGrid.exporterCsvFilename = databaseObject.id.name+".csv";
 		$scope.beginData(source, databaseObject, null, null, false, false, null);
@@ -162,6 +140,24 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.beginData = function(source, databaseObject, orderByColumns, filters, preserveColumns, maxServerRows, endPromise) {
+        $scope.dataMessage = null;
+        if (!source) {
+            $scope.dataMessage = "No datasource selected";
+            return;
+        }
+        if (!databaseObject) {
+            $scope.dataMessage = "No objet selected in "+source.name;
+            return;
+        }
+        if (source.isLayer && source.currentLayerDatasourceIndex < 0) {
+            $scope.dataMessage = "No datasource selected in "+source.name;
+            return;
+        }
+        if (!objectExistsInDatasource(source, databaseObject.id.name, databaseObject.id.schema)) {
+            $scope.dataMessage = "Object " + databaseObject.id.schema + "." + databaseObject.id.name + " does not exist in " + getDatasourceNameNoLayer(source);
+            return;
+        }
+
 		$scope.updateClearAllFiltersVisibility(filters);
 		
 		var nbRow = maxServerRows ? 0 : $scope.nbRowToFetch;
@@ -169,7 +165,7 @@ angular.module('mitsiApp')
 		$scope.lastOrderByColumns = orderByColumns;
 		$scope.alreadyFetched = 0;
 		$scope.loadingBegins();
-		sqlService.getData(source.name, databaseObject.id.schema, databaseObject.id.name, 0, nbRow, orderByColumns, filters)
+		sqlService.getData(getDatasourceNameNoLayer(source), databaseObject.id.schema, databaseObject.id.name, 0, nbRow, orderByColumns, filters)
 		  .then(function(response) {
               if ($scope.dataGridApi) { // on init, dataGridApi may not be registered yet
                   $scope.dataGridApi.core.scrollTo(
@@ -285,7 +281,7 @@ angular.module('mitsiApp')
 	    var promise = $q.defer();
 		var noMoreData = true;
 		sqlService.getData(
-				$rootScope.currentSource.name, 
+				GetDatasourceNoLayer($rootScope.currentSource),
 				$rootScope.currentSource.currentObject.id.schema, 
 				$rootScope.currentSource.currentObject.id.name, 
 				$scope.alreadyFetched, 
@@ -312,7 +308,7 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.initGrid();
-	if($rootScope.currentSource &&
+	if ($rootScope.currentSource &&
 		$rootScope.currentSource.currentObject) {
 		$scope.beginData($rootScope.currentSource, $rootScope.currentSource.currentObject, null, null, false, false, null);
 	}

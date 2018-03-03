@@ -225,7 +225,16 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.sidePanelShouldShowData = function() {
-		return $rootScope.currentSource != null && $rootScope.currentSource.currentObject != null;
+	    if (!$rootScope.currentSource) {
+	        return false;
+	    }
+	    if ($rootScope.currentSource.isLayer && $rootScope.currentSource.currentLayerDatasourceIndex < 0) {
+		    return false;
+	    }
+		if ($rootScope.currentSource.currentObject == null) {
+		    return false;
+		}
+		return true;
 	}
 	
 	$scope.getSidePanelTitle = function() {
