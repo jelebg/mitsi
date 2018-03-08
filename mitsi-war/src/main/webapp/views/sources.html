@@ -224,15 +224,23 @@
             		/>
 			        </a>
 				        <img src="img/{{ (o.id.type=='table' ? 'table' : (o.id.type=='matview' ? 'matview' : (o.id.type=='view' ? 'view' : 'question'))) }}.png"/>
-				  	<span   ng-click="selectObject(s, o)"   
-							ng-class="{'sourceObjectSelect':s.currentObject.id.name==o.id.name && s.currentObject.id.schema==o.id.schema}"
-						  	popover="{{ getTablePopover(o) }}"
-						    popover-placement="bottom-left"
-							popover-trigger="mouseenter" >
-						<span ng-if="hasLabels(o.labelsContext)" class="columnAttributeLabel" >{{ getLabels(o.labelsContext) }}</span>
-						<span ng-if="hasLabelsWarning(o.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabelsWarning(o.labelsContext) }}</span>
-						{{ o.id.name }}
-				  	</span>
+                        <div style="display:inline;position:relative;">
+                            <div style="display:inline;">&nbsp;</div>
+
+                            <div style="display:block;position:absolute;top:-16px;left:0px;white-space:nowrap;">
+                                <span ng-if="hasLabels(o.labelsContext)" class="columnAttributeLabel">{{ getLabels(o.labelsContext) }}</span>
+                                <span ng-if="hasLabelsWarning(o.labelsContext)" class="columnAttributeLabelWarning">{{ getLabelsWarning(o.labelsContext) }}</span>
+                            </div>
+                            <span style="display:inline;position:absolute;"
+                                    ng-click="selectObject(s, o)"
+                                    ng-class="{'sourceObjectSelect':s.currentObject.id.name==o.id.name && s.currentObject.id.schema==o.id.schema}"
+                                    popover="{{ getTablePopover(o) }}"
+                                    popover-placement="bottom-left"
+                                    popover-trigger="mouseenter" >
+                                {{ o.id.name }}
+                            </span>
+                        </div>
+
 				  	</div>
 			      </accordion-heading>
 					<ul class="mitsi-columns-list" >
