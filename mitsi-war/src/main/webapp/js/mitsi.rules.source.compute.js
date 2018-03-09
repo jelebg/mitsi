@@ -142,10 +142,7 @@ function computeColumnCollections(source, collections) {
 
 function initLabelsWorkingContext() {
     return {
-        labels : {
-           "normal"   : [],
-           "warning"  : []
-        },
+        labels : {},
         labelsComments : [ ],
         candidateFks : []
     }
@@ -153,10 +150,19 @@ function initLabelsWorkingContext() {
 
 function getLabelsContext(labelsWorkingContext) {
     // TODO : rajouter le currentSchema aux tables des candidateFks sauf si deja dans le nom
+    let labelsConcat = [];
+    let labelsStringByType = {};
+
+    for (let t in labelsWorkingContext.labels) {
+        let byType = labelsWorkingContext.labels[t];
+
+        labelsConcat = labelsConcat.concat(byType.labels);
+        labelsStringByType[t] = byType.displays.join(",");
+    }
+
     return {
-        "labels"              : labelsWorkingContext.labels.normal.concat(labelsWorkingContext.labels.warning),
-        "labelsString"        : labelsWorkingContext.labels.normal.join(","),
-        "labelsWarningString" : labelsWorkingContext.labels.warning.join(","),
+        "labels"              : labelsConcat,
+        "labelsStringByType"  : labelsStringByType,
         "labelsComments"      : labelsWorkingContext.labelsComments,
         "candidateFks"        : labelsWorkingContext.candidateFks
     };
@@ -204,7 +210,14 @@ function computeColumnLabels(source, rules, returnVariables) {
             rule.candidateFkToTableParts = getVariableStringParts(pegVariables, rule.candidateFkToTable);
         }
 
-        labelsFilters[rule.label] = { "label":rule.label, "status":0, "type":(rule.type !== "warning"?"normal":"warning"), "count":0 };
+        labelsFilters[rule.label] = {
+            "label":rule.label,
+            "labelDisplay":getLabelDisplay(rule),
+            "labelComment":rule.labelComment,
+            "status":0,
+            "type":getRuleType(rule),
+            "count":0
+        };
     }
 
     for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -279,12 +292,17 @@ function computeRulesForSource(rules, variables, labelsWorkingContext, scope) {
         variables.customVariables = {};
         let result = ruleCompute(parsedRule, variables, labels);
         if(result) {
-            if(rule.type !== "warning") {
-                labels.normal.push(rule.label);
+            let ruleType = getRuleType(rule);
+            let byType = labels[ruleType];
+            if (!byType) {
+                byType = {
+                    labels : [],
+                    displays : []
+                };
+                labels[ruleType] = byType;
             }
-            else {
-                labels.warning.push(rule.label);
-            }
+            byType.labels.push(rule.label);
+            byType.displays.push(getLabelDisplay(rule));
 
             let comment = null;
             if(rule.commentParts) {

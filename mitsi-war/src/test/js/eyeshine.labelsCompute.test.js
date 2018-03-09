@@ -7,6 +7,7 @@ describe("eyeshine labels computation", function() {
            "scope" : "table"
          },
          { "label":"PK",
+           "labelDisplay":"PK_display",
            "rule": "pkColumn:(column.fullName in primaryKeys.columns)",
            "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
          },
@@ -23,6 +24,7 @@ describe("eyeshine labels computation", function() {
            "comment":"Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
          },
          { "label":"FK??",
+           "labelDisplay":"FK_display",
            "type":"warning",
            "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
            "candidateFkToTable" : "${source.currentSchema}.${prefix.group1}",
@@ -473,8 +475,9 @@ describe("eyeshine labels computation", function() {
     let galaxy_Pk = galaxy.columns[0];
     expect(galaxy_Pk.name).toBe("ID");
     expect(galaxy_Pk.labelsContext.labels).toEqual(["PK"]);
-    expect(galaxy_Pk.labelsContext.labelsString).toBe("PK");
-    expect(galaxy_Pk.labelsContext.labelsWarningString).toBe("");
+    expect(galaxy_Pk.labelsContext.labelsStringByType).toEqual( {
+        "normal":"PK_display"
+    } );
     expect(galaxy_Pk.labelsContext.labelsComments).toEqual( [
        "Primary Key (constraint(s) : CONSTRAINT_7, column position in PK : 1)"
     ] );
@@ -484,8 +487,7 @@ describe("eyeshine labels computation", function() {
     let galaxy_Name = galaxy.columns[1];
     expect(galaxy_Name.name).toBe("NAME");
     expect(galaxy_Name.labelsContext.labels).toEqual([]);
-    expect(galaxy_Name.labelsContext.labelsString).toBe("");
-    expect(galaxy_Name.labelsContext.labelsWarningString).toBe("");
+    expect(galaxy_Name.labelsContext.labelsStringByType).toEqual( { } );
     expect(galaxy_Name.labelsContext.labelsComments).toEqual([]);
     expect(galaxy_Name.labelsContext.candidateFks).toEqual([]);
 
@@ -503,8 +505,9 @@ describe("eyeshine labels computation", function() {
     let planet_Name = planet.columns[1];
     expect(planet_Name.name).toBe("NAME");
     expect(planet_Name.labelsContext.labels).toEqual(["I"]);
-    expect(galaxy_Name.labelsContext.labelsString).toBe("");
-    expect(galaxy_Name.labelsContext.labelsWarningString).toBe("");
+    expect(planet_Name.labelsContext.labelsStringByType).toEqual( {
+        "normal" : "I"
+    } );
     expect(planet_Name.labelsContext.labelsComments).toEqual( [
         "Indexed by PUBLIC.NAME_INDEX_1 (position in index : #1)"
     ] );
@@ -514,8 +517,9 @@ describe("eyeshine labels computation", function() {
     let planet_TypeFk = planet.columns[4];
     expect(planet_TypeFk.name).toBe("PLANET_TYPE_FK");
     expect(planet_TypeFk.labelsContext.labels).toEqual(["FK", "I"]);
-    expect(planet_TypeFk.labelsContext.labelsString).toBe("FK,I");
-    expect(planet_TypeFk.labelsContext.labelsWarningString).toBe("");
+    expect(planet_TypeFk.labelsContext.labelsStringByType).toEqual( {
+        "normal" : "FK,I"
+    } );
     expect(planet_TypeFk.labelsContext.labelsComments).toEqual( [
         "Foreign Key constraint PUBLIC.CONSTRAINT_8CD (column position in FK : #1)",
         "Indexed by PUBLIC, PUBLIC.CONSTRAINT_INDEX_8C, NAME_INDEX_1 (position in index : #1, 2)" // TODO : a revoir avec des arrays
@@ -535,8 +539,9 @@ describe("eyeshine labels computation", function() {
     let planetType_Name = planetType.columns[1];
     expect(planetType_Name.name).toBe("NAME");
     expect(planetType_Name.labelsContext.labels).toEqual(["UK"]);
-    expect(planetType_Name.labelsContext.labelsString).toBe("UK");
-    expect(planetType_Name.labelsContext.labelsWarningString).toBe("");
+    expect(planetType_Name.labelsContext.labelsStringByType).toEqual( {
+        "normal" : "UK"
+    } );
     expect(planetType_Name.labelsContext.labelsComments).toEqual( [
         "Unique constraint indexed by PUBLIC.UK_9999 (position in index : #1)"
     ] );
@@ -546,8 +551,10 @@ describe("eyeshine labels computation", function() {
     let planet_starFk = planet.columns[3];
     expect(planet_starFk.name).toBe("STAR_FK");
     expect(planet_starFk.labelsContext.labels).toEqual(["FK", "I?"]);
-    expect(planet_starFk.labelsContext.labelsString).toBe("FK");
-    expect(planet_starFk.labelsContext.labelsWarningString).toBe("I?");
+    expect(planet_starFk.labelsContext.labelsStringByType).toEqual( {
+        "normal"  : "FK",
+        "warning" : "I?"
+    } );
     expect(planet_starFk.labelsContext.labelsComments).toEqual( [
         "Foreign Key constraint PUBLIC.CONSTRAINT_8C (column position in FK : #1)",
         "STAR_FK is declared as a Foreign Key, but without any index. If the target table is deleted/updated often, an index should be created for this column."
@@ -567,8 +574,9 @@ describe("eyeshine labels computation", function() {
     let star_PlanetFk = star.columns[2];
     expect(star_PlanetFk.name).toBe("PLANET_FK");
     expect(star_PlanetFk.labelsContext.labels).toEqual(["FK??","FK2?","FK3?"]);
-    expect(star_PlanetFk.labelsContext.labelsString).toBe("");
-    expect(star_PlanetFk.labelsContext.labelsWarningString).toBe("FK??,FK2?,FK3?");
+    expect(star_PlanetFk.labelsContext.labelsStringByType).toEqual( {
+        "warning" : "FK_display,FK2?,FK3?"
+    } );
     expect(star_PlanetFk.labelsContext.labelsComments).toEqual( [
         "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?",
         "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?",

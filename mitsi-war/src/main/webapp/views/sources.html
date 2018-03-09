@@ -187,7 +187,7 @@
 				   popover="{{ getLabelPopover(s, labelFilter) }}" 
 				   popover-trigger="mouseenter" 
 				   popover-placement="bottom"
-				>{{ labelFilter.label }}</span>
+				>{{ getLabelFilterDisplay(labelFilter) }}</span>
 			</div>
 			      
 	      	<accordion close-others="false">
@@ -228,8 +228,8 @@
                             <div style="display:inline;">&nbsp;</div>
 
                             <div style="display:block;position:absolute;top:-16px;left:0px;white-space:nowrap;">
-                                <span ng-if="hasLabels(o.labelsContext)" class="columnAttributeLabel">{{ getLabels(o.labelsContext) }}</span>
-                                <span ng-if="hasLabelsWarning(o.labelsContext)" class="columnAttributeLabelWarning">{{ getLabelsWarning(o.labelsContext) }}</span>
+                                <span ng-if="hasLabels(o.labelsContext, 'normal')" class="columnAttributeLabel">{{ getLabels(o.labelsContext, 'normal') }}</span>
+                                <span ng-if="hasLabels(o.labelsContext, 'warning')" class="columnAttributeLabelWarning">{{ getLabels(o.labelsContext, 'warning') }}</span>
                             </div>
                             <span style="display:inline;position:absolute;"
                                     ng-click="selectObject(s, o)"
@@ -253,8 +253,8 @@
 							ng-mouseleave="currentColumn=null"
 							 >
 							<table><tr><td style="width:23px;white-space:nowrap;">
-								<span ng-if="hasLabels(c.labelsContext)" class="columnAttributeLabel" >{{ getLabels(c.labelsContext) }}</span>
-								<span ng-if="hasLabelsWarning(c.labelsContext)" class="columnAttributeLabelWarning" >{{ getLabelsWarning(c.labelsContext) }}</span>
+								<span ng-if="hasLabels(c.labelsContext, 'normal')" class="columnAttributeLabel" >{{ getLabels(c.labelsContext, 'normal') }}</span>
+								<span ng-if="hasLabels(c.labelsContext, 'warning')" class="columnAttributeLabelWarning" >{{ getLabels(c.labelsContext, 'warning') }}</span>
 							</td><td>
 								&nbsp;{{ c.name }}
 							</td></tr></table>

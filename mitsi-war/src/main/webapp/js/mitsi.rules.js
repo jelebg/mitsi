@@ -1,6 +1,20 @@
 
 // functions for mitsi rules
 
+function getLabelDisplay(label) {
+    if (label.labelDisplay) {
+        return label.labelDisplay;
+    }
+    return label.label;
+}
+
+function getRuleType(rule) {
+    if (rule.type) {
+        return rule.type;
+    }
+    return "normal";
+}
+
 // TODO : faire une gestion des dependances pour "LABELLED" : si une rule utilise LABELLED, le label indiqué doit etre compute avant + erreur si dependence circulaire
 function ruleCompute(rule, variables, labels) {
 	if(rule.literal || rule.name) {
@@ -13,7 +27,7 @@ function ruleCompute(rule, variables, labels) {
 		    	continue;
 		    }
 		    
-		    if (labels[labelsType].indexOf(rule.label)>=0) {
+		    if (labels[labelsType].labels.indexOf(rule.label)>=0) {
 		    	return true;
 		    }
 		}              

@@ -495,6 +495,10 @@ angular.module('mitsiApp')
 			source.labelFilterInclude[label.label] = true;
 		}
 	}
+
+	$scope.getLabelFilterDisplay = function(labelFilter) {
+	    return labelFilter.labelDisplay;
+	}
 	
 	$scope.getOrderedLabelsFilters = function(source) {
 		if (!source.labelsFilters) {
@@ -510,7 +514,7 @@ angular.module('mitsiApp')
 		});
 		return labelsFilters;
 	}
-	
+
 	$scope.getLabelClass = function(source, label) {
 		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
 			return "labelFilter filterLabelDisabled";
@@ -556,20 +560,12 @@ angular.module('mitsiApp')
 		}
 	}
 	
-	$scope.hasLabels = function(labelsContext) {
-		return labelsContext && labelsContext.labelsString && labelsContext.labelsString != "";
+	$scope.hasLabels = function(labelsContext, labelType) {
+		return labelsContext && labelsContext.labelsStringByType[labelType] && labelsContext.labelsStringByType[labelType] != "";
 	}
 	
-	$scope.getLabels = function(labelsContext) {
-		return labelsContext.labelsString;
-	}
-	
-	$scope.hasLabelsWarning = function(labelsContext) {
-		return labelsContext && labelsContext.labelsWarningString && labelsContext.labelsWarningString != "";
-	}
-	
-	$scope.getLabelsWarning = function(labelsContext) {
-		return labelsContext.labelsWarningString;
+	$scope.getLabels = function(labelsContext, labelType) {
+		return labelsContext.labelsStringByType[labelType];
 	}
 	
     $rootScope.$on('$locationChangeSuccess', function (event) { // NOSONAR keep argument
