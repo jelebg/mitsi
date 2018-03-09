@@ -228,8 +228,11 @@
                             <div style="display:inline;">&nbsp;</div>
 
                             <div style="display:block;position:absolute;top:-16px;left:0px;white-space:nowrap;">
-                                <span ng-if="hasLabels(o.labelsContext, 'normal')" class="columnAttributeLabel">{{ getLabels(o.labelsContext, 'normal') }}</span>
-                                <span ng-if="hasLabels(o.labelsContext, 'warning')" class="columnAttributeLabelWarning">{{ getLabels(o.labelsContext, 'warning') }}</span>
+                                <span   ng-repeat="t in getLabelsTypes(o.labelsContext)"
+                                        ng-if="hasLabels(o.labelsContext, t)"
+                                        ng-class="getLabelTypeClass(t)">
+                                    {{ getLabels(o.labelsContext, t) }}
+                                </span>
                             </div>
                             <span style="display:inline;position:absolute;"
                                     ng-click="selectObject(s, o)"
@@ -253,8 +256,11 @@
 							ng-mouseleave="currentColumn=null"
 							 >
 							<table><tr><td style="width:23px;white-space:nowrap;">
-								<span ng-if="hasLabels(c.labelsContext, 'normal')" class="columnAttributeLabel" >{{ getLabels(c.labelsContext, 'normal') }}</span>
-								<span ng-if="hasLabels(c.labelsContext, 'warning')" class="columnAttributeLabelWarning" >{{ getLabels(c.labelsContext, 'warning') }}</span>
+                                <span   ng-repeat="t in getLabelsTypes(c.labelsContext)"
+                                        ng-if="hasLabels(c.labelsContext, t)"
+                                        ng-class="getLabelTypeClass(t)">
+                                    {{ getLabels(c.labelsContext, t) }}
+                                </span>
 							</td><td>
 								&nbsp;{{ c.name }}
 							</td></tr></table>

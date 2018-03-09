@@ -559,6 +559,20 @@ angular.module('mitsiApp')
 			return "Label "+label.label+" is not filtered";
 		}
 	}
+
+	$scope.getLabelsTypes = function(labelsContext) {
+	    return Object.keys(labelsContext.labelsStringByType);
+	}
+
+	$scope.getLabelTypeClass = function(t) {
+	    switch (t) {
+	    case "warning" :
+	        return 'columnAttributeLabelWarning';
+
+	    default :
+	        return 'columnAttributeLabel';
+	    }
+	}
 	
 	$scope.hasLabels = function(labelsContext, labelType) {
 		return labelsContext && labelsContext.labelsStringByType[labelType] && labelsContext.labelsStringByType[labelType] != "";
