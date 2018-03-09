@@ -96,7 +96,7 @@ function ruleCompute(rule, variables, labels) {
                 let regexExec = regexExecList[i];
                 for (let j=0; j!=maxGroups; j++) {
                     let group = (j>=regexExec.length ? "" : regexExec[j]);
-                    tostore["group"+j] = (i==0 ? group : tostore["group"+i]+","+group);
+                    tostore["group"+j] = (i==0 ? group : tostore["group"+j]+","+group);
                 }
             }
             variables.customVariables[rule.storeResultInVariable] = tostore;

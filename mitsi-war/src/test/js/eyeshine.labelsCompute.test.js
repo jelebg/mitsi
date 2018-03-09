@@ -32,9 +32,9 @@ describe("eyeshine labels computation", function() {
          },
          { "label":"FK2?",
            "type":"warning",
-           "rule": "prefix:(column.shortName LIKE 'PLA(.*)_FK') AND NOT LABELLED 'FK' AND '${source.currentSchema}.PLA${prefix.group1}' IN tables.byFullName",
-           "candidateFkToTable" : "${source.currentSchema}.PLA${prefix.group1}",
-           "comment":"FK2: Column ${column.shortName} ending with '_FK', is it a foreign key to PLA${prefix.group1} ?"
+           "rule": "prefix1:(column.shortName LIKE 'PLA(.*)_FK') AND NOT LABELLED 'FK' AND '${source.currentSchema}.PLA${prefix1.group1}' IN tables.byFullName",
+           "candidateFkToTable" : "${source.currentSchema}.PLA${prefix1.group1}",
+           "comment":"FK2: Column ${column.shortName} ending with '_FK', is it a foreign key to PLA${prefix1.group1} ? test : var from other rule ${prefix.group1} ;"
          },
          { "label":"FK3?",
            "type":"warning",
@@ -579,7 +579,7 @@ describe("eyeshine labels computation", function() {
     } );
     expect(star_PlanetFk.labelsContext.labelsComments).toEqual( [
         "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?",
-        "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?",
+        "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ? test : var from other rule  ;",
         "FK3: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
     ] );
     expect(star_PlanetFk.labelsContext.candidateFks).toEqual([{
@@ -587,7 +587,7 @@ describe("eyeshine labels computation", function() {
         "comment": "Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
        },{
         "targetTableName": "PUBLIC.PLANET",
-        "comment": "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"
+        "comment": "FK2: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ? test : var from other rule  ;"
        },{
         "targetTableName": "PUBLIC.PLANET",
         "comment": "FK3: Column PLANET_FK ending with '_FK', is it a foreign key to PLANET ?"

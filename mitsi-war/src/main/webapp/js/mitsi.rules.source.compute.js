@@ -242,6 +242,9 @@ function computeColumnLabels(source, rules, returnVariables) {
                 "diff"     : ""
         };
 
+        variables.customVariables = {};
+        variables.customArrays = {};
+
         let labelsWorkingContext = initLabelsWorkingContext();
 
         computeRulesForSource(rules, variables, labelsWorkingContext, "table");
@@ -257,6 +260,8 @@ function computeColumnLabels(source, rules, returnVariables) {
                     "shortName": column.name,
                     "diff"     : column.diff
             };
+            variables.customVariables = {};
+            variables.customArrays = {};
 
             let labelsWorkingContext = initLabelsWorkingContext();
 
