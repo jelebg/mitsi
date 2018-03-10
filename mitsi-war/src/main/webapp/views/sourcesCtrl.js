@@ -545,18 +545,23 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getLabelPopover = function(source, label) {
+	    let pref = "";
+	    if (label.labelComment && label.labelComment != "") {
+	        pref = label.labelComment + " / ";
+	    }
+
 		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
-			return "the is no occurence of label "+label.label+" in this datasource";
+			return pref+"There is no occurence of this label in the datasource";
 		}
 
 		if (source.labelFilterInclude[label.label]) {
-			return "Tables without label "+label.label+" are hidden";
+			return pref+"Tables without this label are hidden";
 		}
 		else if (source.labelFilterExclude[label.label]) {
-			return "Tables with label "+label.label+" are hidden";
+			return pref+"Tables with this label are hidden";
 		}
 		else {
-			return "Label "+label.label+" is not filtered";
+			return pref+"Label is not filtered";
 		}
 	}
 

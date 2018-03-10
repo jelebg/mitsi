@@ -187,7 +187,8 @@
 				   popover="{{ getLabelPopover(s, labelFilter) }}" 
 				   popover-trigger="mouseenter" 
 				   popover-placement="bottom"
-				>{{ getLabelFilterDisplay(labelFilter) }}</span>
+				>{{ getLabelFilterDisplay(labelFilter) }} <sup>({{labelFilter.count}})</sup>
+                </span>
 			</div>
 			      
 	      	<accordion close-others="false">
