@@ -341,6 +341,16 @@
 	font-size:70%;
 	border:solid 1px grey;
 }
+.columnAttributeLabelDiff {
+	color:white;
+	background-color:#63cdd3;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	border-radius:2px;
+	font-size:70%;
+	border:solid 1px grey;
+}
 
 .labelFilter {
 	display:inline-block;
@@ -380,7 +390,6 @@
 	color:white;
 	border:solid 1px #B0B0B0;
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) inset, 0px 0px 8px rgba(82, 168, 236, 0.9);
-	border:solid 1px grey;
 }
 .filterLabelKeepIfNotExists {
 	background-color:#5151ff;
@@ -399,13 +408,30 @@
 	color:white;
 	border:solid 1px #B0B0B0;
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) inset, 0px 0px 8px rgba(235, 150, 73, 0.9);
-	border:solid 1px orange;
 }
 .filterWarningLabelKeepIfNotExists {
 	background-color:#eb9649;
 	color:white;
 	border:solid 1px orange;
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) inset, 0px 0px 8px rgba(235, 150, 73, 0.9);
+	text-decoration: line-through;
+}
+.filterDiffLabelNotSelected {
+	background-color:#a9c7c9;
+	color:white;
+	border:solid 1px #6e9fa3;
+}
+.filterDiffLabelKeepIfExists {
+	background-color:#63cdd3;
+	color:white;
+	border:solid 1px #587172;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) inset, 0px 0px 8px rgba(88, 113, 114, 0.9);
+}
+.filterDiffLabelKeepIfNotExists {
+	background-color:#63cdd3;
+	color:white;
+	border:solid 1px #587172;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) inset, 0px 0px 8px rgba(88, 113, 114, 0.9);
 	text-decoration: line-through;
 }
 .tableActionLabel {

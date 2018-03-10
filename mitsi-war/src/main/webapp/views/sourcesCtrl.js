@@ -519,29 +519,24 @@ angular.module('mitsiApp')
 		if (label.count == 0 || !source.labelFilterInclude || !source.labelFilterExclude) {
 			return "labelFilter filterLabelDisabled";
 		}
-		
+
+		let classTypeName = "";
 		if (label.type == "warning") {
-			if (source.labelFilterInclude[label.label]) {
-				return "labelFilter filterWarningLabelKeepIfExists";
-			}
-			else if (source.labelFilterExclude[label.label]) {
-				return "labelFilter filterWarningLabelKeepIfNotExists";
-			}
-			else {
-				return "labelFilter filterWarningLabelNotSelected";
-			}
+		    classTypeName = "Warning";
 		}
-		else {
-			if (source.labelFilterInclude[label.label]) {
-				return "labelFilter filterLabelKeepIfExists";
-			}
-			else if (source.labelFilterExclude[label.label]) {
-				return "labelFilter filterLabelKeepIfNotExists";
-			}
-			else {
-				return "labelFilter filterLabelNotSelected";
-			}
-		}
+		else if(label.type == "diff") {
+            classTypeName = "Diff";
+        }
+
+        if (source.labelFilterInclude[label.label]) {
+            return "labelFilter filter"+classTypeName+"LabelKeepIfExists";
+        }
+        else if (source.labelFilterExclude[label.label]) {
+            return "labelFilter filter"+classTypeName+"LabelKeepIfNotExists";
+        }
+        else {
+            return "labelFilter filter"+classTypeName+"LabelNotSelected";
+        }
 	}
 	
 	$scope.getLabelPopover = function(source, label) {
@@ -573,8 +568,9 @@ angular.module('mitsiApp')
 	    switch (t) {
 	    case "warning" :
 	        return 'columnAttributeLabelWarning';
-
-	    default :
+	    case "diff" :
+	        return 'columnAttributeLabelDiff';
+        default :
 	        return 'columnAttributeLabel';
 	    }
 	}

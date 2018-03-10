@@ -182,6 +182,7 @@
 				<!--  sadly, orderBy does not work for objects here -->
 				<span 
 				   ng-repeat="labelFilter in getOrderedLabelsFilters(s)"
+                   ng-if="s.isLayer || labelFilter.type != 'diff'"
 				   ng-class="getLabelClass(s, labelFilter)"
 				   ng-click="toggleLabel(s, labelFilter)"
 				   popover="{{ getLabelPopover(s, labelFilter) }}" 
