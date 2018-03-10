@@ -202,6 +202,11 @@ function computeColumnLabels(source, rules, returnVariables) {
 
     for(let i=0; i!=rules.length; i++) {
         let rule = rules[i];
+
+        if (isRuleDisabled(rule)) {
+            continue;
+        }
+
         rule.parsedRule = peg.parse(rule.rule.trim());
         if (rule.comment) {
             rule.commentParts = getVariableStringParts(pegVariables, rule.comment);
@@ -284,6 +289,11 @@ function computeRulesForSource(rules, variables, labelsWorkingContext, scope) {
 
     for(let iRule=0; iRule!=rules.length; iRule	++) {
         let rule = rules[iRule];
+
+        if (isRuleDisabled(rule)) {
+            continue;
+        }
+
         let parsedRule = rule.parsedRule;
 
         if (!rule.scope && scope != "column") {
