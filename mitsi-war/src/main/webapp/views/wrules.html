@@ -75,16 +75,21 @@
 		mitsi-drop-data="$index"
 	>
 		<td>
-			<div class="eyeshinePopupListLabel "
-				  ng-class="{ 'filterWarningLabelNotSelected' : r.type==='warning' , 'filterLabelNotSelected' : r.type!=='warning' }">
-				<div ng-if="!updateMode">
-					{{ r.label }}
-				</div>
-				<div  ng-if="updateMode">
-					<ui-codemirror id="labelNameCodeMirror_{{$index}}"
-							ui-codemirror-opts="editorOptions"
-							ng-model="r.label"
-					></ui-codemirror>
+            <div    popover="{{ r.labelComment }}"
+                    popover-trigger="mouseenter"
+                    popover-placement="bottom-right"
+            >
+                <div class="eyeshinePopupListLabel"
+                      ng-class="getLabelClass(r)">
+                    <div ng-if="!updateMode">
+                        {{ getLabelDisplayInReadOnlyMode(r) }}
+                    </div>
+                    <div  ng-if="updateMode">
+                        <ui-codemirror id="labelNameCodeMirror_{{$index}}"
+                               ui-codemirror-opts="editorOptions"
+                               ng-model="r.label"
+                        ></ui-codemirror>
+                    </div>
                 </div>
             </div>
             <div ng-if="updateMode">
@@ -93,16 +98,24 @@
                         <td>
                             <div class="labelFilterChoose"
                                   style="width:16px;height:16px;margin:3px;"
-                                 ng-class="{ 'filterLabelKeepIfExists' : r.type!=='warning' , 'filterLabelNotSelected' : r.type==='warning' }"
-                                 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+                                 ng-class="{ 'filterLabelKeepIfExists' : r.type!=='warning'&&r.type!=='diff' , 'filterLabelNotSelected' : r.type==='warning'||r.type==='diff' }"
+                                 ng-click="r.type = 'normal'">
                                 &nbsp;
                             </div>
                         </td>
                         <td>
                             <div class="labelFilterChoose"
-                                  style="width:16px;height:16px;margin:3px;"
+                                 style="width:16px;height:16px;margin:3px;"
                                  ng-class="{ 'filterWarningLabelKeepIfExists' : r.type==='warning' , 'filterWarningLabelNotSelected' : r.type!=='warning' }"
-                                 ng-click="r.type = (r.type==='warning' ? 'default' : 'warning')">
+                                 ng-click="r.type = 'warning'">
+                                &nbsp;
+                            </div>
+                        </td>
+                        <td>
+                            <div class="labelFilterChoose"
+                                 style="width:16px;height:16px;margin:3px;"
+                                 ng-class="{ 'filterDiffLabelKeepIfExists' : r.type==='diff' , 'filterDiffLabelNotSelected' : r.type!=='diff' }"
+                                 ng-click="r.type = 'diff'">
                                 &nbsp;
                             </div>
                         </td>
@@ -140,6 +153,20 @@
 						</div>
 					</td>
 				</tr>
+                <tr class="eyeshinePopupListRuleTableLabel"
+                    ng-if="updateMode">
+                    <td>display label :</td>
+                </tr>
+                <tr ng-if="updateMode">
+                    <td>
+                        <div class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+                            <ui-codemirror
+                                    ui-codemirror-opts="editorOptions"
+                                    ng-model="r.labelDisplay"
+                            ></ui-codemirror>
+                        </div>
+                    </td>
+                </tr>
 				<tr class="eyeshinePopupListRuleTableLabel"
 					ng-if="updateMode || r.candidateFkToTable">
 					<td>candidate fk model :</td>
@@ -162,6 +189,24 @@
 						</div>
 					</td>
 				</tr>
+                <tr class="eyeshinePopupListRuleTableLabel"
+                    ng-if="updateMode">
+                    <td>
+                        <div>
+                            label comment :
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-if="updateMode">
+                    <td>
+                        <div 	class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+                            <ui-codemirror
+                                    ui-codemirror-opts="editorOptions"
+                                    ng-model="r.labelComment"
+                            ></ui-codemirror>
+                        </div>
+                    </td>
+                </tr>
 				<tr class="eyeshinePopupListRuleTableLabel">
 					<td>
 						<a href=""
@@ -169,10 +214,10 @@
 						   ng-if="!updateMode">
 							<i class="glyphicon"
 							   ng-class="{ 'glyphicon-chevron-down' : r.tmpDisplayInScreen, 'glyphicon-chevron-right' : !r.tmpDisplayInScreen }"></i>
-							comment :
+							variable comment :
 						</a>
 						<div ng-if="updateMode">
-							comment :
+							variable comment :
 						</div>
 					</td>
 				</tr>
@@ -194,7 +239,31 @@
 						</div>
 					</td>
 				</tr>
-			</table>
+                <tr ng-if="updateMode"
+                    class="eyeshinePopupListRuleTableLabel">
+                    <td>
+                        <div >
+                            scope :
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-if="updateMode">
+                    <td>
+                        <div 	class="eyeshinePopupListEditor eyeshinePopupListEditorUpdate">
+                            <label>
+                                <input type="checkbox" ng-model="r.scope"
+                                   ng-true-value="'table'" ng-false-value="'column'"/>
+                                table
+                            </label>
+                            <label style="margin-left:50px;">
+                                <input type="checkbox" ng-model="r.scope"
+                                   ng-true-value="'column'" ng-false-value="'table'">
+                                column
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
 	</tr>
 	</tbody>
 </table>

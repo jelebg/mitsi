@@ -126,6 +126,21 @@ angular.module('mitsiApp')
         $scope.init();
     }
 
+    $scope.getLabelDisplayInReadOnlyMode = function(r) {
+        return getLabelDisplay(r);
+    }
+
+    $scope.getLabelClass = function(label) {
+		let classTypeName = "";
+		if (label.type == "warning") {
+		    classTypeName = "Warning";
+		}
+		else if(label.type == "diff") {
+            classTypeName = "Diff";
+        }
+        return "filter"+classTypeName+"LabelNotSelected";
+    }
+
     $scope.displayCollections = function() {
           let fakeDatasource = {
              "currentSchemaName" : "FAKE",
