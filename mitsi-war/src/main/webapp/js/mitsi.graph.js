@@ -119,11 +119,11 @@ function MitsiGraph() {
 	// candidateFk.targetTableName
 	// candidateFk.comment
 	this.createLinksForCandidateFks = function(dobj, column) {
-		if (!column.candidateFks) {
+		if (!column.labelsContext.candidateFks) {
 			return;
 		}
 		
-		let candidateFks = column.candidateFks;
+		let candidateFks = column.labelsContext.candidateFks;
 		for (let i=0; i!=candidateFks.length; i++) {
 			let candidateFk = candidateFks[i];
 			
