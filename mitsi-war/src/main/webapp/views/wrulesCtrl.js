@@ -75,6 +75,14 @@ angular.module('mitsiApp')
         "lineWrapping":true
     }; // TODO : utiliser un mode différent pour les commentaires
 
+    $scope.isRuleDisabled = function(rule) {
+        return isRuleDisabled(rule);
+    }
+
+    $scope.disableEnableRule = function(r) {
+         $scope.saveRules();
+    }
+
     $scope.update = function() {
         $scope.updateMode = true;
     }

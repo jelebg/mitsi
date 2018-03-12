@@ -804,6 +804,10 @@ div.tab button.active {
     height: 100%;
 }
 
+.eyeshineRuleDisabled {
+ 	filter: opacity(50%);
+}
+
 .eyeshinePopupListTr {
     border-bottom:1px solid lightgrey;
 }

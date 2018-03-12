@@ -74,7 +74,15 @@
 		mitsi-drop-handler="moveRule(from, to)"
 		mitsi-drop-data="$index"
 	>
-		<td>
+        <td>
+            <input type="checkbox"
+                   ng-model="r.disabled"
+                   ng-true-value="'true'"
+                   ng-false-value="'false'"
+                   ng-change="disableEnableRule(r)"
+                   title="disable">
+        </td>
+		<td ng-class="{ eyeshineRuleDisabled : isRuleDisabled(r) }">
             <div    popover="{{ r.labelComment }}"
                     popover-trigger="mouseenter"
                     popover-placement="bottom-right"
