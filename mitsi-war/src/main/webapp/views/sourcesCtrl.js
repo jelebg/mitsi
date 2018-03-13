@@ -221,6 +221,7 @@ angular.module('mitsiApp')
 		  };
 
 		  $scope.refreshRules(source);
+   		  source.originalObjects = source.objects;
 
 		  $scope.initGraph(source);
 	}
@@ -239,14 +240,30 @@ angular.module('mitsiApp')
         let endMs = new Date().getTime();
         console.log("rule applying time for " + source.name + " : " + (endMs-startMs)+"ms");
 
+        // source.originalObjects is used for the graph, we may have to recompute that also
+        if (source.isLayer) {
+            if (source.currentLayerDatasourceIndex < 0) {
+                source.originalObjects = source.objects;
+            }
+            else {
+                let startMs = new Date().getTime();
+                computeColumnLabels(source, $rootScope.rules, null, source.originalObjects);
+                let endMs = new Date().getTime();
+                console.log("rule applying time for original objects for " + source.name + " : " + (endMs-startMs)+"ms");
+            }
+        }
     }
 
 	$scope.initGraph = function(datasource) {
 		datasource.mitsiGraph = new MitsiGraph(null); // NOSONAR MitsiGraph does realy exist but sonar doesn't see it
-		if(!datasource.objects) {
+		if(!datasource.originalObjects) {
 			return;
 		}
-		datasource.mitsiGraph.initWithDatabaseObjects(datasource.objects);
+
+        let startMs = new Date().getTime();
+		datasource.mitsiGraph.initWithDatabaseObjects(datasource.originalObjects);
+        let endMs = new Date().getTime();
+        console.log("graph computation time for " + datasource.name + " : " + (endMs-startMs)+"ms");
 	}
 	
 	$scope.isSourceExcludedByFilter = function(source) {
@@ -416,7 +433,10 @@ angular.module('mitsiApp')
 	    for(let i=0; i!=$scope.datasources.length; i++) {
 	        let source = $scope.datasources[i];
 		    $scope.refreshRules(source);
+            $scope.initGraph(source);
 		}
+
+		$rootScope.$broadcast(EVENT_REFRESH_GRAPH);
 	});
 
 	

@@ -1657,7 +1657,20 @@ angular.module('mitsiApp')
 		
 		return name.substring(i+1);
 	}
-	
+
+	$scope.$on(EVENT_REFRESH_GRAPH, function () {
+	    if ($rootScope.currentSource.isLayer) {
+            if ($rootScope.currentSource.currentLayerDatasourceIndex < 0) {
+                $scope.restrictToDatasource(null);
+            }
+            else {
+                let restrictedSource = $rootScope.currentSource.originalResponse.data.originalDatasources[s.currentLayerDatasourceIndex];
+                $scope.restrictToDatasource(restrictedSource);
+            }
+        }
+	    $scope.afterTableUpdateFullRefresh();
+	});
+
 	$scope.$on(EVENT_DISPLAY_GRAPH, function (event, tableList, xList, yList) { // NOSONAR EVENT_DISPLAY_GRAPH does exist
 		
 		if(tableList && xList && yList) {

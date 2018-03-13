@@ -176,8 +176,11 @@ function updateLabelsCount(labels, columnsLabels, labelsFilters) {
     }
 }
 
-function computeColumnLabels(source, rules, returnVariables) {
-    if (!source.objects) {
+function computeColumnLabels(source, rules, returnVariables, altObjects) {
+    let objects = altObjects ? altObjects : source.objects;
+
+
+    if (!objects) {
         return;
     }
 
@@ -225,8 +228,8 @@ function computeColumnLabels(source, rules, returnVariables) {
         };
     }
 
-    for(let iObj=0; iObj!=source.objects.length; iObj++) {
-        let obj = source.objects[iObj];
+    for(let iObj=0; iObj!=objects.length; iObj++) {
+        let obj = objects[iObj];
 
         if(!obj.columns) {
             continue;
