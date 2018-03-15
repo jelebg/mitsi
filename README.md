@@ -65,9 +65,9 @@ This file is used to configure user management. There is three section in it :
 
 By default, mitsi is accessible on the port 9035.
 
-If you installed it on a server, you may access it using this URL : [http://<your_server_hostname>:9035/mitsi](http://<your_server_hostname>:9035/mitsi/)
+If you installed it on a server, you may access it using this URL : [http://<your_server_hostname>:9035/mitsi/](http://<your_server_hostname>:9035/mitsi/)
 
-If you installed it on your desktop, you may also use this URL : [http://localhost:9035/mitsi](http://localhost:9035/mitsi/)
+If you installed it on your desktop, you may also use this URL : [http://localhost:9035/mitsi/](http://localhost:9035/mitsi/)
 
 ## how may I compile it myself
 to compile sources, you will have to download oracle's jdbc driver, compile the custom version of c3p0 and compile mitsi :
