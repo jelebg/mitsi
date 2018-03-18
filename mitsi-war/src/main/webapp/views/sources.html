@@ -48,7 +48,7 @@
             <span class="datasource-accordion-false" 
                 id="source_{{s.name}}" 
             	ng-click="selectSource(s)"
-            ><i ng-if="s.isLayer" class="glyphicon glyphicon-link"></i> {{s.name}}</span>
+            ><i ng-if="s.isLayer" class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;{{s.name}}</span>
              
             <a href=""  ng-click="refresh(s, s.currentSchemaName); $event.stopPropagation();">
 	            <i class="pull-right glyphicon glyphicon-refresh "
