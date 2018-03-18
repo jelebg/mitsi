@@ -47,6 +47,7 @@ angular.module('mitsiApp')
 	$scope.sqlTables = [];
 	$scope.sqlText = [];
     $scope.restrictToTables = null;
+    $scope.restrictToFks = null;
 
 	$scope.endpointStyles= {
 		"paintStyle" :  { 
@@ -314,7 +315,9 @@ angular.module('mitsiApp')
 	});
 
 	$scope.isRestrictedFk = function(fk) {
-	    return $scope.restrictToFks && ! $scope.restrictToFks.hasOwnProperty(fk.fromTable + "->" + fk.toTable);
+	    return $scope.restrictToFks &&
+	            ! $scope.restrictToFks.hasOwnProperty(fk.fromTable + "->" + fk.toTable) &&
+	            ! $scope.isCandidateFkBetweenTables(fk.fromTable, fk.toTable);
 	}
 
     $scope.addRestrictedFk = function (tableFrom, tableTo) {
@@ -480,7 +483,7 @@ angular.module('mitsiApp')
             let fromTable = connection.source.id.substring($scope.divPrefix.length);
             let toTable = connection.target.id.substring($scope.divPrefix.length);
             connection.removeClass("linksConnectionRestricted");
-            if ($scope.restrictToFks && ! $scope.restrictToFks.hasOwnProperty(fromTable+"->"+toTable)) {
+            if ($scope.isRestrictedFk({ "fromTable":fromTable, "toTable":toTable})) {
                 connection.addClass("linksConnectionRestricted");
             }
         }
@@ -516,6 +519,7 @@ angular.module('mitsiApp')
 		}
 	};
 
+    // TODO : systeme a revoir. a priori, il semble y avoir un bug si candidate fk entre deux tables qui ont déjà une fk
 	 $scope.isCandidateFkBetweenTables = function(fromTableName, toTableName) {
 		let graph = $rootScope.currentSource.mitsiGraph;
 		if (!graph) {

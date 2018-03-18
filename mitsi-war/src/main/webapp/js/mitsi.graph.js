@@ -20,9 +20,10 @@ function MitsiGraph() {
 		for(let i=0; i!=databaseObjects.length; i++) {
 			const dobj = databaseObjects[i];
 			
-			if(dobj.id.type != "table" && dobj.id.type != "matview"  && dobj.id.type != "view") {
-				continue;
-			}
+			// pour les diffs, on peut avoir des types mixtes, on ne peut pas restreindre les objets ici ...
+			// if(dobj.id.type != "table" && dobj.id.type != "matview"  && dobj.id.type != "view") {
+			//   continue;
+			// }
 			
 			this.createVertexIfNecessary(dobj.id.schema+"."+dobj.id.name);
 
