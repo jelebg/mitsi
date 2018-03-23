@@ -21,6 +21,11 @@
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
+      <result property="length" column="column_length"/>
+      <result property="precision" column="column_precision"/>
+      <result property="scale" column="column_scale"/>
+      <result property="defaultValue" column="column_default_value"/>
+      <result property="nullable" column="column_nullable"/>
   </collection>
 </resultMap>
 
@@ -63,6 +68,11 @@
 		end	secondary_type,
     all_tab_columns.column_name column_name,
     all_tab_columns.data_type column_type,
+    all_tab_columns.data_length column_length,
+    all_tab_columns.data_precision column_precision,
+    all_tab_columns.data_scale column_scale,
+    all_tab_columns.data_default column_default_value,
+    DECODE(all_tab_columns.nullable, 'Y', 'true', 'false') column_nullable,
     all_tab_comments.comments object_comment,
     all_col_comments.comments column_comment
 	FROM all_objects

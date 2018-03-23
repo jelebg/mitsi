@@ -498,6 +498,14 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
         let columnLengthsUnique = {};
         let columnTypes = [];
         let columnTypesUnique = {};
+        let columnDefaultValue = [];
+        let columnDefaultValueUnique = {};
+        let columnNullable = [];
+        let columnNullableUnique = {};
+        let columnPrecision = [];
+        let columnPrecisionUnique = {};
+        let columnScale = [];
+        let columnScaleUnique = {};
         let foundLayerNameList = [];
         let originalColumns = [];
 
@@ -531,13 +539,34 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
 
             if (!columnLengthsUnique.hasOwnProperty(column.length)) {
                 columnLengthsUnique[column.length] = true;
-                columnTypes.push(column.length);
+                columnLengths.push(column.length);
             }
 
             if (!columnTypesUnique.hasOwnProperty(column.type)) {
                 columnTypesUnique[column.type] = true;
-                columnLengths.push(column.type);
+                columnTypes.push(column.type);
             }
+
+            if (!columnDefaultValueUnique.hasOwnProperty(column.defaultValue)) {
+                columnDefaultValueUnique[column.defaultValue] = true;
+                columnDefaultValue.push(column.defaultValue);
+            }
+
+            if (!columnNullableUnique.hasOwnProperty(column.nullable)) {
+                columnNullableUnique[column.nullable] = true;
+                columnNullable.push(column.nullable);
+            }
+
+            if (!columnPrecisionUnique.hasOwnProperty(column.precision)) {
+                columnPrecisionUnique[column.precision] = true;
+                columnPrecision.push(column.precision);
+            }
+
+            if (!columnScaleUnique.hasOwnProperty(column.scale)) {
+                columnScaleUnique[column.scale] = true;
+                columnScale.push(column.scale);
+            }
+
             chosenInfos.alreadyDone = true;
 
         }
@@ -547,8 +576,12 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
             columnDiff.other.f = true;
         }
 
-        if (columnLengths.length > 1 ||
-            columnTypes.length > 1) {
+        if ( columnLengths.length > 1 ||
+             columnTypes.length > 1 ||
+             columnDefaultValue.length > 1 ||
+             columnNullable.length > 1 ||
+             columnPrecision.length > 1 ||
+             columnScale.length > 1 ) {
             objectMergeStatus.technical.f = true;
             columnDiff.technical.f = true;
         }
@@ -558,7 +591,11 @@ function mergeColumns(responses, foundList, getColumns, objectMergeStatus) {
             "diffDescription" : getDiffDescription(responses.length, foundLayerNameList),
             "description" : columnDescriptions.join(" / "),
             "length" : columnLengths.join(" / "),
-            "type" : columnTypes.join(" / ")
+            "type" : columnTypes.join(" / "),
+            "defaultValue" : columnDefaultValue.join(" / "),
+            "nullable" : columnNullable.join(" / "),
+            "precision" : columnPrecision.join(" / "),
+            "scale" : columnScale.join(" / ")
         }
 
         column.diff = {

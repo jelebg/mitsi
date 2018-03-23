@@ -642,6 +642,26 @@ angular.module('mitsiApp')
 		}
 		
 	}
+
+	$scope.getTypeComplete = function(column) {
+	    let suffixes = [];
+
+	    if (column.length) {
+	        suffixes.push(column.length);
+	    }
+	    if (column.precision) {
+	        suffixes.push(column.precision);
+	    }
+	    if (column.scale) {
+	        suffixes.push(column.scale);
+	    }
+
+	    if (suffixes.length == 0) {
+	        return column.type;
+	    }
+
+	    return column.type + "(" + suffixes.join(",") + ")";
+	}
 	
 	$scope.init();
 	$scope.initKeepAlive();

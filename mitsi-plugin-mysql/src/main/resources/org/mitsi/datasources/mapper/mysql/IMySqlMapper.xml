@@ -21,6 +21,11 @@
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
+      <result property="length" column="column_length"/>
+      <result property="precision" column="column_precision"/>
+      <result property="scale" column="column_scale"/>
+      <result property="defaultValue" column="column_default_value"/>
+      <result property="nullable" column="column_nullable"/>
   </collection>
 </resultMap>
 
@@ -57,6 +62,11 @@
 	CONCAT(t.table_type, ' / ', t.engine) secondary_type, 
     c.column_name column_name,
     c.data_type column_type,
+    IF(c.data_type = 'varchar', CHARACTER_MAXIMUM_LENGTH, null) column_length,
+    numeric_precision column_precision,
+    numeric_scale column_scale,
+    column_default column_default_value,
+    IF(IS_NULLABLE = 'YES', 'true', 'false') column_nullable,
     t.table_comment object_comment,
     c.column_comment column_comment
 	FROM information_schema.tables t

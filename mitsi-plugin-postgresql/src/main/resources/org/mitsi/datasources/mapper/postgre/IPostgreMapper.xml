@@ -21,6 +21,11 @@
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
+      <result property="length" column="column_length"/>
+      <result property="precision" column="column_precision"/>
+      <result property="scale" column="column_scale"/>
+      <result property="defaultValue" column="column_default_value"/>
+      <result property="nullable" column="column_nullable"/>
   </collection>
 </resultMap>
 
@@ -49,11 +54,28 @@
           else 'table' end id_type,
      null secondary_type, <!--  TODO : postgresql table types -->
      (a.attname)::information_schema.sql_identifier AS column_name,
-          (
-         CASE
-             WHEN (a.attnotnull OR ((t.typtype = 'd'::"char") AND t.typnotnull)) THEN 'NO'::text
-             ELSE 'YES'::text
-         END)::information_schema.yes_or_no AS is_nullable,
+    <!-- TODO : A TESTER !!! -->
+    CASE
+      WHEN t.typcategory &lt;&gt; 'S' AND a.atttypmod &lt; 0 THEN null
+      ELSE a.atttypmod-4
+      END AS column_length,
+    CASE
+      WHEN t.typcategory = 'S' OR a.atttypmod = -1
+      THEN null
+      ELSE ((a.atttypmod - 4) &gt;&gt; 16) &amp; 65535
+      END AS column_precision,
+    CASE
+      WHEN t.typcategory = 'S' OR a.atttypmod = -1 THEN null
+      ELSE (a.atttypmod - 4) &amp; 65535
+      END AS column_scale,
+    CASE WHEN atthasdef THEN (SELECT adsrc FROM pg_attrdef WHERE pg_attrdef.adrelid = a.attrelid AND pg_attrdef.adnum = a.attnum)
+    ELSE null
+    END  AS column_default_value,
+    (
+        CASE
+        WHEN (a.attnotnull OR ((t.typtype = 'd'::"char") AND t.typnotnull)) THEN 'false'::text
+        ELSE 'true'::text
+        END) AS column_nullable,
      (
          CASE
              WHEN (t.typtype = 'd'::"char") THEN

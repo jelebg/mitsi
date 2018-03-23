@@ -20,7 +20,7 @@
   </script>
 
   <script type="text/ng-template" id="popover.columns.description">
-    <div style="font-weight:bold;">{{ c.type }}</div>
+    <div style="font-weight:bold;">{{ getTypeComplete(c) }}</div>
 	<div>{{ c.diffDescription }}</div>
 	<div>{{ c.description }}</div>
 	<div ng-repeat="comment in c.labelsContext.labelsComments track by $index">{{ comment }}</div>
