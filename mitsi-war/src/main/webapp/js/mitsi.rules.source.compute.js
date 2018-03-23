@@ -245,9 +245,15 @@ function computeColumnLabels(source, rules, returnVariables, altObjects) {
         obj.columnsLabels = {};
 
         variables.variables["column"] = {
-                "fullName" : "",
-                "shortName": "",
-                "diff"     : ""
+                "fullName"     : "",
+                "shortName"    : "",
+                "type"         : "",
+                "length"       : "",
+                "precision"    : "",
+                "scale"        : "",
+                "defaultValue" : "",
+                "nullable"     : "",
+                "diff"         : ""
         };
 
         variables.customVariables = {};
@@ -264,9 +270,15 @@ function computeColumnLabels(source, rules, returnVariables, altObjects) {
             let column = obj.columns[i];
 
             variables.variables["column"] = {
-                    "fullName" : source.currentSchemaName+"."+obj.id.name+"."+column.name,
-                    "shortName": column.name,
-                    "diff"     : column.diff
+                    "fullName"     : source.currentSchemaName+"."+obj.id.name+"."+column.name,
+                    "shortName"    : column.name,
+                    "type"         : column.type,
+                    "length"       : column.length,
+                    "precision"    : column.precision,
+                    "scale"        : column.scale,
+                    "defaultValue" : column.defaultValue,
+                    "nullable"     : column.nullable,
+                    "diff"         : column.diff
             };
             variables.customVariables = {};
             variables.customArrays = {};
