@@ -129,7 +129,7 @@ function MitsiGraph() {
 			let candidateFk = candidateFks[i];
 			
 			let fromIndex = this.getIndex(dobj.id.schema, dobj.id.name);
-			if (!fromIndex) {
+			if (fromIndex == null) {
 				continue;
 			}
 			let from = this.getVertex(fromIndex);
