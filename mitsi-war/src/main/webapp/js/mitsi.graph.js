@@ -135,7 +135,7 @@ function MitsiGraph() {
 			let from = this.getVertex(fromIndex);
 			
 			let toIndex = this.getIndex(candidateFk.targetTableName);
-			if (!toIndex) {
+			if (toIndex == null) {
 				continue;
 			}
 			let to = this.getVertex(toIndex);
