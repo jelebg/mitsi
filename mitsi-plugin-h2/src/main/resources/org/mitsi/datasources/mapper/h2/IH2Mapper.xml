@@ -4,12 +4,12 @@
 <mapper namespace="org.mitsi.datasources.mapper.h2.IH2Mapper">
 
 
-<resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
+<resultMap id="SchemaResultMap" type="org.mitsi.api.datasources.Schema">
 	<result property="name" column="schema_name"/>
 	<result property="current" column="is_current"/>
 </resultMap>
 
-<resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
+<resultMap id="DatabaseObjectResultMap" type="org.mitsi.api.datasources.DatabaseObject">
   <constructor>
     <idArg column="id_type" javaType="String"/>
     <idArg column="id_schema" javaType="String"/>
@@ -17,7 +17,7 @@
   </constructor>
   <result property="secondaryType" column="secondary_type"/>
   <result property="description" column="object_comment"/>
-  <collection property="columns" ofType="org.mitsi.datasources.Column">
+  <collection property="columns" ofType="org.mitsi.api.datasources.Column">
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
@@ -73,7 +73,7 @@
 	ORDER BY t.table_schema, t.table_name, t.table_type, c.ordinal_position
 </select>
 
-<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+<select id="getSchemaIndexes" resultType="org.mitsi.api.datasources.Index" fetchSize="2000">
 	select  
 	  i.table_schema owner,
 	  i.table_name tableName,
@@ -90,7 +90,7 @@
 	  i.index_type
 </select>
 
-<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+<select id="getSchemaConstraints" resultType="org.mitsi.api.datasources.Constraint" fetchSize="2000">
 SELECT 
 	  c.table_schema owner,
 	  c.constraint_name name,

@@ -24,10 +24,9 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
+import org.mitsi.api.datasources.*;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.commons.pojos.Filter;
-import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.annotations.*;
+import org.mitsi.api.annotations.*;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -529,13 +528,6 @@ public class MitsiConnection implements Closeable, IMitsiMapper {
 			log.warn("invalid name : "+tableName);
 			throw new MitsiSecurityException("invalid name : "+tableName);
 		}
-	}
-	
-	@SuppressWarnings("squid:ClassVariableVisibilityCheck") 
-	public static class GetDataResult {
-		public List<Column> columns;
-		public List<String[]> results;
-		public List<String> messages;
 	}
 	
 	private void setFilterBindVariable(PreparedStatement statement, int iParam, Filter filter) throws SQLException, ParseException {

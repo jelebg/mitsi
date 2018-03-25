@@ -2,7 +2,6 @@ package org.mitsi.mitsiwar.data;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.connections.Client;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.util.List;
 
 class RunSqlForTime {
 	String datasourceName;

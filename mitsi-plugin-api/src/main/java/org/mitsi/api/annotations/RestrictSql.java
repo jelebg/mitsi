@@ -1,4 +1,4 @@
-package org.mitsi.core.annotations;
+package org.mitsi.api.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

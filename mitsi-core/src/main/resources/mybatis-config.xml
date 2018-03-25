@@ -6,7 +6,7 @@
  </properties>
  
  <typeAliases>
-	<typeAlias type="org.mitsi.datasources.DatabaseObject" alias="DatabaseObject"/>
+	<typeAlias type="org.mitsi.api.datasources.DatabaseObject" alias="DatabaseObject"/>
  </typeAliases>
  
  <!-- TODO : supprimer ? -->

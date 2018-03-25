@@ -12,16 +12,11 @@ import java.util.TreeSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mitsi.api.datasources.*;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.commons.pojos.Filter;
-import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.DatasourceManager;
-import org.mitsi.datasources.Constraint;
-import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.api.DatasourceManager;
 import org.mitsi.datasources.DetailsSection;
-import org.mitsi.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.Schema;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.helper.TypeHelper;
 import org.mitsi.users.MitsiUsersException;
@@ -144,7 +139,7 @@ public class MitsiCoreH2Test {
 	@Test
 	public void getData() throws SQLException, MitsiException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, "LOCALHOST-TEST")) {
-			MitsiConnection.GetDataResult result = connection.getData(null, "PLANET", 2, 2, null, null);
+			GetDataResult result = connection.getData(null, "PLANET", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "ID");
 			assertEquals(result.columns.get(1).name, "NAME");
 			assertEquals(result.results.size(), 2);

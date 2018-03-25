@@ -10,10 +10,14 @@
 	<name>Mitsi core library</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.mitsi</groupId>
-			<artifactId>commons</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-plugin-api</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>

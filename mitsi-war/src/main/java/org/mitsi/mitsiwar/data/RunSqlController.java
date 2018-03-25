@@ -6,8 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.mitsi.api.datasources.GetDataResult;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.datasources.Column;
+import org.mitsi.api.datasources.Column;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.connections.Client;
@@ -55,7 +56,7 @@ public class RunSqlController extends MitsiRestController {
 			long maxRows = connection.getMaxExportRows();
 			long rowCount = request.count<=0||request.count>maxRows?maxRows:request.count;
 			
-			MitsiConnection.GetDataResult result = connection.runSql(
+			GetDataResult result = connection.runSql(
 					request.sqlText, request.timeout, (int) rowCount+1,
 					connectedClient.getCancelStatementManager(), request.cancelSqlId);
 			

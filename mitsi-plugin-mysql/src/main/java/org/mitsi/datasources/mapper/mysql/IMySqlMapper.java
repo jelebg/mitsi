@@ -1,18 +1,17 @@
 package org.mitsi.datasources.mapper.mysql;
 
-import static org.mitsi.core.annotations.ColumnDisplayType.FK_DIRECTION;
-import static org.mitsi.core.annotations.ColumnDisplayType.NORMAL;
-import static org.mitsi.core.annotations.ColumnDisplayType.TABLE_LINK;
+import static org.mitsi.api.annotations.ColumnDisplayType.FK_DIRECTION;
+import static org.mitsi.api.annotations.ColumnDisplayType.NORMAL;
+import static org.mitsi.api.annotations.ColumnDisplayType.TABLE_LINK;
 
 import org.apache.ibatis.annotations.Param;
-import org.mitsi.core.annotations.DefaultOwner;
-import org.mitsi.core.annotations.MitsiColumnDisplayTypes;
-import org.mitsi.core.annotations.MitsiColumnTitles;
-import org.mitsi.core.annotations.MitsiColumnsAsRows;
-import org.mitsi.core.annotations.MitsiDatasourceDetail;
-import org.mitsi.core.annotations.MitsiProviderMapper;
-import org.mitsi.core.annotations.MitsiTableDetail;
-import org.mitsi.datasources.IMitsiMapper;
+import org.mitsi.api.annotations.MitsiColumnDisplayTypes;
+import org.mitsi.api.annotations.MitsiColumnTitles;
+import org.mitsi.api.annotations.MitsiColumnsAsRows;
+import org.mitsi.api.annotations.MitsiDatasourceDetail;
+import org.mitsi.api.annotations.MitsiProviderMapper;
+import org.mitsi.api.annotations.MitsiTableDetail;
+import org.mitsi.api.datasources.IMitsiMapper;
 
 @MitsiProviderMapper("mysql")
 public interface IMySqlMapper extends IMitsiMapper {

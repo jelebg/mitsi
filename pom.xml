@@ -17,7 +17,8 @@
 		<module>commons</module>
 		<module>mitsi-core</module>
 		<module>mitsi-war</module>
-		<module>mitsi-plugin-oracle</module>
+        <module>mitsi-plugin-api</module>
+        <module>mitsi-plugin-oracle</module>
 		<module>mitsi-plugin-postgresql</module>
         <module>mitsi-plugin-mysql</module>
         <module>mitsi-plugin-h2</module>
@@ -44,11 +45,16 @@
 				<artifactId>datasources</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.mitsi</groupId>
-				<artifactId>mitsi-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.mitsi</groupId>
+                <artifactId>mitsi-plugin-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mitsi</groupId>
+                <artifactId>mitsi-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.mitsi</groupId>
 				<artifactId>mitsi-plugin-oracle</artifactId>

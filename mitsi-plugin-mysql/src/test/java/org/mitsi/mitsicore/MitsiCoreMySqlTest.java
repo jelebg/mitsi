@@ -12,16 +12,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.commons.pojos.Filter;
-import org.mitsi.commons.pojos.OrderByColumn;
-import org.mitsi.core.DatasourceManager;
-import org.mitsi.datasources.Constraint;
-import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.api.datasources.Filter;
+import org.mitsi.api.datasources.OrderByColumn;
+import org.mitsi.api.DatasourceManager;
+import org.mitsi.api.datasources.Constraint;
+import org.mitsi.api.datasources.DatabaseObject;
 import org.mitsi.datasources.DetailsSection;
-import org.mitsi.datasources.Index;
+import org.mitsi.api.datasources.Index;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.MitsiConnection.GetDataResult;
-import org.mitsi.datasources.Schema;
+import org.mitsi.api.datasources.GetDataResult;
+import org.mitsi.api.datasources.Schema;
 import org.mitsi.datasources.exceptions.MitsiDatasourceException;
 import org.mitsi.datasources.exceptions.MitsiSecurityException;
 import org.mitsi.datasources.helper.TypeHelper;
@@ -145,7 +145,7 @@ public class MitsiCoreMySqlTest {
 	@Test
 	public void getData() throws SQLException, MitsiException {
 		try(MitsiConnection connection = datasourceManager.getConnection(null, true, DATASOURCE_NAME_2)) {
-			MitsiConnection.GetDataResult result = connection.getData(null, "tata", 2, 2, null, null);
+			GetDataResult result = connection.getData(null, "tata", 2, 2, null, null);
 			assertEquals(result.columns.get(0).name, "id");
 			assertEquals(result.columns.get(1).name, "str");
 			assertEquals(result.results.size(), 2);

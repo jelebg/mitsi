@@ -1,11 +1,11 @@
 package org.mitsi.datasources.mapper.postgre;
 
 import org.apache.ibatis.annotations.Param;
-import org.mitsi.core.annotations.DefaultOwner;
-import org.mitsi.core.annotations.MitsiDatasourceDetail;
-import org.mitsi.core.annotations.MitsiProviderMapper;
-import org.mitsi.core.annotations.MitsiTableDetail;
-import org.mitsi.datasources.IMitsiMapper;
+import org.mitsi.api.annotations.DefaultOwner;
+import org.mitsi.api.annotations.MitsiDatasourceDetail;
+import org.mitsi.api.annotations.MitsiProviderMapper;
+import org.mitsi.api.annotations.MitsiTableDetail;
+import org.mitsi.api.datasources.IMitsiMapper;
 
 @MitsiProviderMapper("postgre")
 @DefaultOwner("public")

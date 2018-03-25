@@ -4,12 +4,12 @@
 <mapper namespace="org.mitsi.datasources.mapper.postgre.IPostgreMapper">
 
 
-<resultMap id="SchemaResultMap" type="org.mitsi.datasources.Schema">
+<resultMap id="SchemaResultMap" type="org.mitsi.api.datasources.Schema">
 	<result property="name" column="schema_name"/>
 	<result property="current" column="is_current"/>
 </resultMap>
 
-<resultMap id="DatabaseObjectResultMap" type="org.mitsi.datasources.DatabaseObject">
+<resultMap id="DatabaseObjectResultMap" type="org.mitsi.api.datasources.DatabaseObject">
   <constructor>
     <idArg column="id_type" javaType="String"/>
     <idArg column="id_schema" javaType="String"/>
@@ -17,7 +17,7 @@
   </constructor>
   <result property="secondaryType" column="secondary_type"/>
   <result property="description" column="object_comment"/>
-  <collection property="columns" ofType="org.mitsi.datasources.Column">
+  <collection property="columns" ofType="org.mitsi.api.datasources.Column">
       <result property="name" column="column_name"/>
       <result property="description" column="column_comment"/>
       <result property="type" column="column_type"/>
@@ -108,7 +108,7 @@
 	ORDER BY nc.nspname, c.relname, c.relkind, a.attnum
 </select>
 
-<select id="getSchemaIndexes" resultType="org.mitsi.datasources.Index" fetchSize="2000">
+<select id="getSchemaIndexes" resultType="org.mitsi.api.datasources.Index" fetchSize="2000">
 	SELECT
 	    nc.nspname      AS owner,
 	    t.relname       AS tableName,
@@ -129,7 +129,7 @@
 	GROUP BY nc.nspname, t.relname, i.relname, am.amname, ix.indisunique
 </select>
 
-<select id="getSchemaConstraints" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+<select id="getSchemaConstraints" resultType="org.mitsi.api.datasources.Constraint" fetchSize="2000">
 	SELECT 
 	    nc.nspname::information_schema.sql_identifier AS owner,
 	    c.conname::information_schema.sql_identifier AS name,
@@ -346,7 +346,7 @@
 	group by c.conname, c.contype, c.conkey, c.consrc, fnr.nspname, fr.relname, c.confkey
 </select>
 
-<select id="getTableFks" resultType="org.mitsi.datasources.Constraint" fetchSize="2000">
+<select id="getTableFks" resultType="org.mitsi.api.datasources.Constraint" fetchSize="2000">
 	SELECT * FROM (
 		SELECT 
 		   'toTheTable' AS fkDirection, 

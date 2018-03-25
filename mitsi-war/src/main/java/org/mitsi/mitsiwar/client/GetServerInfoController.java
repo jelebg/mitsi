@@ -2,7 +2,7 @@ package org.mitsi.mitsiwar.client;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.core.DatasourceManager;
+import org.mitsi.api.DatasourceManager;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;

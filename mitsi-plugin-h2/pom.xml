@@ -10,9 +10,14 @@
 	<name>Mitsi H2 Plugin</name>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-plugin-api</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.mitsi</groupId>
 			<artifactId>mitsi-core</artifactId>
+            <scope>test</scope>
 		</dependency>
 		
 		<dependency>

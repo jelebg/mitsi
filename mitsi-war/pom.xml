@@ -10,10 +10,14 @@
 	<name>Mitsi WebApp</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.mitsi</groupId>
-			<artifactId>mitsi-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-core</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.mitsi</groupId>
 			<artifactId>commons</artifactId>

@@ -1,15 +1,14 @@
 package org.mitsi.mitsiwar.datasources;
 
 import java.util.List;
-import java.util.SortedSet;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.datasources.DatabaseObject;
+import org.mitsi.api.datasources.DatabaseObject;
 import org.mitsi.datasources.MitsiConnection;
-import org.mitsi.datasources.Schema;
+import org.mitsi.api.datasources.Schema;
 import org.mitsi.mitsiwar.MitsiRestController;
 import org.mitsi.mitsiwar.exception.MitsiWarException;
 import org.springframework.stereotype.Controller;

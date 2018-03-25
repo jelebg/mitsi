@@ -10,11 +10,16 @@
 	<name>Mitsi Oracle Plugin</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.mitsi</groupId>
-			<artifactId>mitsi-core</artifactId>
-		</dependency>
-		
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>oracle-jdbc-driver</artifactId>

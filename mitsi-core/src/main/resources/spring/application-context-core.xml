@@ -9,7 +9,7 @@
 
     <context:annotation-config/>
     
-    <bean id="datasourceManager" class="org.mitsi.core.DatasourceManager"/>
+    <bean id="datasourceManager" class="org.mitsi.api.DatasourceManager"/>
     
 	<import resource="classpath:spring/application-context-users.xml"/>
 

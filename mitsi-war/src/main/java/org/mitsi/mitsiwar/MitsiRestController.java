@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
 import org.mitsi.commons.MitsiException;
-import org.mitsi.core.DatasourceManager;
+import org.mitsi.api.DatasourceManager;
 import org.mitsi.datasources.MitsiConnection;
 import org.mitsi.datasources.MitsiDatasource;
 import org.mitsi.datasources.MitsiLayer;

@@ -5,41 +5,21 @@
 		<artifactId>mitsi</artifactId>
 		<version>0.0.6-SNAPSHOT</version>
 	</parent>
-	<artifactId>mitsi-plugin-mysql</artifactId>
+	<artifactId>mitsi-plugin-api</artifactId>
 	<packaging>jar</packaging>
-	<name>Mitsi MySQL Plugin</name>
+	<name>Mitsi Plugin API</name>
 
 	<dependencies>
         <dependency>
             <groupId>org.mitsi</groupId>
-            <artifactId>mitsi-plugin-api</artifactId>
+            <artifactId>commons</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mitsi</groupId>
-            <artifactId>mitsi-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-		
-		<dependency>
-		    <groupId>org.mariadb.jdbc</groupId>
-		    <artifactId>mariadb-java-client</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+    </dependencies>
 	
 	<build>
 		<plugins>

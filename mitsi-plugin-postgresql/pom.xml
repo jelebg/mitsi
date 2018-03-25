@@ -10,11 +10,16 @@
 	<name>Mitsi PostgreSQL Plugin</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.mitsi</groupId>
-			<artifactId>mitsi-core</artifactId>
-		</dependency>
-		
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mitsi</groupId>
+            <artifactId>mitsi-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 		<dependency>
 		    <groupId>org.postgresql</groupId>
 		    <artifactId>postgresql</artifactId>
