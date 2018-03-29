@@ -24,7 +24,7 @@
       <result property="length" column="column_length"/>
       <result property="precision" column="column_precision"/>
       <result property="scale" column="column_scale"/>
-      <result property="defaultValue" column="column_default_value"/>
+      <result property="defaultValue" column="column_default_value" jdbcType="LONGVARCHAR"/>
       <result property="nullable" column="column_nullable"/>
   </collection>
 </resultMap>
@@ -71,7 +71,8 @@
     all_tab_columns.data_length column_length,
     all_tab_columns.data_precision column_precision,
     all_tab_columns.data_scale column_scale,
-    all_tab_columns.data_default column_default_value,
+    <!-- all_tab_columns.data_default column_default_value,
+    disabling the default value for the moment because ojdbc and/or mybatis cannot read LONG columns in all databases I tried -->
     DECODE(all_tab_columns.nullable, 'Y', 'true', 'false') column_nullable,
     all_tab_comments.comments object_comment,
     all_col_comments.comments column_comment

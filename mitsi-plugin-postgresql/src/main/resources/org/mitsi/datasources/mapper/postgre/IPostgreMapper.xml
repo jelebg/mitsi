@@ -135,7 +135,7 @@
 	    c.conname::information_schema.sql_identifier AS name,
 	    r.relname::information_schema.sql_identifier AS tableName,
 	    case when c.contype='f' then 'R' else upper(c.contype) end AS type,
-	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) columns,
+	    string_agg(a.attname, ',' order by array_position(c.conkey, a.attnum)) AS columns,
 	    fnr.nspname::information_schema.sql_identifier AS fkConstraintOwner,
 	    fr.relname::information_schema.sql_identifier AS fkTable,
 	    fnr.nspname::information_schema.sql_identifier AS  fkConstraintName,

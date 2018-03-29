@@ -9,7 +9,7 @@
 	<typeAlias type="org.mitsi.api.datasources.DatabaseObject" alias="DatabaseObject"/>
  </typeAliases>
  
- <!-- TODO : supprimer ? -->
+ <!-- TODO : supprimer ? supprimer le fichier complet ? -->
 	<mappers>
 		<mapper resource="mapper/oracle.xml" />
 	</mappers>
