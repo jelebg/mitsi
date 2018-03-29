@@ -281,7 +281,7 @@ angular.module('mitsiApp')
 	    var promise = $q.defer();
 		var noMoreData = true;
 		sqlService.getData(
-				GetDatasourceNoLayer($rootScope.currentSource),
+				getDatasourceNameNoLayer($rootScope.currentSource),
 				$rootScope.currentSource.currentObject.id.schema, 
 				$rootScope.currentSource.currentObject.id.name, 
 				$scope.alreadyFetched, 
