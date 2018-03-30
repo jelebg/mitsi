@@ -170,6 +170,11 @@
 	text-align:center;
 	border-left:1px solid #eee;
 }
+
+.mitsiDetailsTableHeader-nothingFound {
+	filter: opacity(50%);
+}
+
 .mitsiDetailsTableTd {
 	border-left:1px solid #eee;
 	border-right:1px solid #eee;

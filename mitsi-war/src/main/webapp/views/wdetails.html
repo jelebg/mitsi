@@ -21,7 +21,7 @@
 		<button ng-repeat="section in detailsSections"
 				class="tablinks"
 				ng-click="selectSection($index)"
-				ng-class="{'active' : isSectionSelected($index)}">
+				ng-class="{'active' : isSectionSelected($index), 'mitsiDetailsTableHeader-nothingFound' : nothingFoundForFilter(section, filter)}">
 			{{ section.title }}
 		</button>
 	</div>

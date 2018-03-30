@@ -7,6 +7,7 @@ angular.module('mitsiApp')
     $scope.currentSectionByType = {};
     $scope.detailsMessage = null;
     $scope.loading = false;
+    $scope.filter = null;
 
     $scope.selectSection = function(sectionIndex) {
         $scope.currentSectionByType[$scope.lastObjectType] = sectionIndex;
@@ -76,19 +77,45 @@ angular.module('mitsiApp')
     		return false;
     	}
     	
-		let filterSring = filter.trim().toLowerCase();
+		let filterString = filter.trim().toLowerCase();
 
     	for(let i=0; i!=row.length; i++) {
     		let str = row[i];
     		if(!str) {
     			continue;
     		}
-    		if(str.toLowerCase().indexOf(filter) !== -1) {
+    		if(str.toLowerCase().indexOf(filterString) !== -1) {
     			return false;
     		}
     	}
     	
     	return true;
+    }
+
+    $scope.nothingFoundForFilter = function(detailsSection, filter) {
+    	if(!filter) {
+    		return false;
+    	}
+		let filterString = filter.trim().toLowerCase();
+    	if(!filter) {
+    		return false;
+    	}
+
+        for (let i=0; i!=detailsSection.data.length; i++) {
+            let row = detailsSection.data[i];
+
+            for(let j=0; j!=row.length; j++) {
+                let str = row[j];
+                if(!str) {
+                    continue;
+                }
+                if(str.toLowerCase().indexOf(filterString) !== -1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
     
     $scope.selectTable = function(tableName) {
