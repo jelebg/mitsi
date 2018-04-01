@@ -3,7 +3,7 @@
 	<groupId>org.mitsi</groupId>
 	<artifactId>mitsi</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.6</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<name>Mitsi webapp for centralized database access</name>
 
 	<url>http://jelebg.github.io/mitsi/</url>
