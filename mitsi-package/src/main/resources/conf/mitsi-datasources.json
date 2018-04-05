@@ -1,36 +1,56 @@
 { 
-  "datasources" : {
-	  "MY-FIRST-DATABASE" :  {
-	    "userGroups" : [ "_public" ],
-		"description" : "my first database",
-		"provider" : "oracle_11g",
-		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
-		"user" : "test",
-		"password" : "test",
-		"tags" : [ "you", "may", "add", "some", "tag" ],
-		"maxExportRows" : 100000 // optional
-	  },
-	  "MY-SECOND-DATABASE": {
-	    "userGroups" : [ "_connected" ],
-		"description" : "my second database", 
-		"provider" : "oracle_11g",
-		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
-		"user" : "xe2",
-		"password" : "xe2",
-		"connectSchema" : "TEST",
-		"tags" : [ "you", "may", "add", "some", "tag" ]
-	  },
-	  "MY-THIRD-DATABASE": {
-	    "userGroups" : [ "group_1" ],
-		"description" : "my third database", 
-		"provider" : "oracle_11g",
-		"driver" : "oracle.jdbc.driver.OracleDriver",
-		"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
-		"user" : "xe3",
-		"password" : "xe3",
-		"tags" : [ "you", "may", "add", "some", "tag" ]
-	  }
-  } 
+	"datasources" : {
+		"ORACLE-TEMPLATE" :  {
+			"userGroups" : [ "_public" ],
+			"description" : "Oracle database",
+			"provider" : "oracle",
+			"driver" : "oracle.jdbc.driver.OracleDriver",
+			"jdbcUrl" : "jdbc:oracle:thin:@localhost:1521:XE",
+			"user" : "foo",
+			"password" : "bar",
+			"tags" : [ "you", "may", "add", "some", "tag" ]
+		},
+		"POSTGRESQL-TEMPLATE": {
+			"userGroups" : [ "_public" ],
+			"description" : "PostgreSQL database",
+			"provider" : "postgre",
+			"driver" : "org.postgresql.Driver",
+			"jdbcUrl" : "jdbc:postgresql://localhost:5432/pgsql",
+			"user" : "foo",
+			"password" : "bar",
+			"tags" : [ "you", "may", "add", "some", "tag" ]
+		},
+		"H2-TEMPLATE": {
+			"userGroups" : [ "_public" ],
+			"description" : "H2 database",
+			"provider" : "h2",
+			"driver" : "org.h2.Driver",
+			"jdbcUrl" : "jdbc:h2:file:/path/to/your/db",
+			"user" : "foo",
+			"password" : "bar",
+			"tags" : [ "you", "may", "add", "some", "tag" ]
+		},
+		"MYSQL-TEMPLATE": {
+			"userGroups" : [ "_public" ],
+			"description" : "MySQL database",
+			"provider" : "mysql",
+			"driver" : "org.mariadb.jdbc.Driver",
+			"jdbcUrl" : "jdbc:mariadb://localhost:3306/mysql",
+			"user" : "foo",
+			"password" : "bar",
+			"tags" : [ "you", "may", "add", "some", "tag" ]
+		}
+	},
+	"layers" : {
+		"LAYER-1" : {
+			"description" : "First layer",
+			"tags" : [ "you", "may", "add", "some", "tag" ],
+			"datasources" : ["ORACLE-TEMPLATE", "POSTGRESQL-TEMPLATE"]
+		},
+		"LAYER-2" : {
+			"description" : "Second layer",
+			"tags" : [ "you", "may", "add", "some", "tag" ],
+			"datasources" : ["H2-TEMPLATE", "MYSQL-TEMPLATE"]
+		}
+	}
 }

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.mitsi.api.annotations.*;
 import org.mitsi.api.datasources.IMitsiMapper;
 
-@MitsiProviderMapper("oracle_11g")
+@MitsiProviderMapper({"oracle_11g", "oracle"})
 @DefaultOwnerIsConnectedUser
 @RestrictSql("\\s*(SELECT|WITH)\\s.*") // TODO : select for update à gérer
 public interface IOracleMapper extends IMitsiMapper {

@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MitsiProviderMapper {
-	String value();
+	String[] value();
 
 }

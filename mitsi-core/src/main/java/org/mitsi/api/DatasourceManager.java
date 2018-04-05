@@ -130,8 +130,11 @@ public class DatasourceManager {
 						log.error("type "+mapperClass+" is annotated by MitsiProviderMapper but does not inherit IMitsiMapper");
 					}
 					else {
-						log.info("registered mapper : '"+mapperAnnotation.value()+"' - "+mapperClass);
-						mappers.put(mapperAnnotation.value().toLowerCase(), mapperClass);
+					    for (String providerName : mapperAnnotation.value()) {
+					        String providerNameLC = providerName.toLowerCase();
+                            log.info("registered mapper : '"+providerNameLC+"' - " + mapperClass);
+                            mappers.put(providerNameLC, mapperClass);
+                        }
 					}
 				}
 			} catch (ClassNotFoundException e) {

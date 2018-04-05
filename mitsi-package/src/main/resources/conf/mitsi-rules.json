@@ -1,36 +1,82 @@
 {
 	"rules" : [
+		 { "label":"diffModelTable",
+		   "labelDisplay":"👷 diff table",
+		   "labelComment":"Diff : The table does not exist in all datasources tutu",
+		   "rule": "table.diff.notEverywhere == 'true'",
+		   "comment":"table does not exist in all layers.",
+		   "type":"diff",
+		   "scope":"table"
+		 },
+		 { "label":"diffModelColumn",
+		   "labelDisplay":"👷 diff column",
+		   "labelComment":"Diff : Column does not exist in all datasources",
+		   "rule": "column.diff.notEverywhere == 'true' AND NOT table.diff.notEverywhere == 'true'",
+		   "comment":"Column does not exist in all layers.",
+		   "type":"diff"
+		 },
+		 { "label":"diffModelFk",
+		   "labelDisplay":"👷 diff relations",
+		   "labelComment":"Diff : Foreign key does not exist in all datasources",
+		   "rule": "table.diff.model == 'true'",
+		   "comment":"The foreign key(s) differ in certain layer(s).",
+		   "type":"diff",
+		   "scope":"table"
+		 },
+		 { "label":"diffTech",
+		   "labelDisplay":"👷 diff tech",
+		   "labelComment":"Diff : The type for this column is not the same in all datasources",
+		   "rule": "column.diff.technical  == 'true'",
+		   "type":"diff",
+		   "comment":"Column properties are not the same everywhere."
+		 },
+		 { "label":"N",
+		   "rule": "column.nullable == 'true'",
+		   "comment":"nullable"
+		 },
 		 { "label":"PK",
+		   "labelDisplay":"🔑",
+		   "labelComment":"Primary keys",
 		   "rule": "pkColumn:(column.fullName in primaryKeys.columns)",
 		   "comment":"Primary Key (constraint(s) : ${pkColumn.constraint.name}, column position in PK : ${pkColumn.position})"
 		 },
 		 { "label":"UK",
+		   "labelComment":"Unique constraints",
 		   "rule": "column.fullName IN uniqueConstraints.columns AND NOT LABELLED 'PK'",
 		   "comment":"Unique constraint indexed by ${uniqueConstraints.columns[column.fullName].index.owner}.${uniqueConstraints.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
 		 },
 		 { "label":"FK", 
+		   "labelDisplay":"📤FK", 
+		   "labelComment":"Foreign keys",
 		   "rule": "column.fullName IN foreignKeys.columns",
 		   "comment":"Foreign Key constraint ${foreignKeys.columns[column.fullName].constraint.owner}.${foreignKeys.columns[column.fullName].constraint.name} (column position in FK : #${foreignKeys.columns[column.fullName].position})"
 		 },		         
 		 { "label":"I",
+		   "labelComment":"Indexed columns",
 		   "rule": "column.fullName IN indexes.columns AND NOT LABELLED 'PK' AND NOT LABELLED 'UK'",
-		   "comment":"Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"
+		   "comment":"Indexed by ${indexes.columns[column.fullName].index.owner}.${indexes.columns[column.fullName].index.name} (position in index : #${indexes.columns[column.fullName].position})"   
 		 },	         
 		 { "label":"FK??",
+		   "labelDisplay":"🤔FK??",
+		   "labelComment":"Candidate foreign keys, that may have been forgotten",
 		   "type":"warning",
-		   "rule": "prefix:(column.shortName LIKE '(.*)_FK') AND NOT LABELLED 'FK' AND prefix.group1 IN tables.byShortName",
-		   "candidateFkToTable" : "${source.currentSchema}.${prefix.group1}",
-		   "comment":"Column ${column.shortName} ending with '_FK', is it a foreign key to ${prefix.group1} ?"   
+		   "rule": "prefix:(column.shortName LIKE '.*_(.*)_FK') AND NOT LABELLED 'FK' AND 'T_${prefix.group1}' IN tables.byShortName",
+		   "candidateFkToTable" : "${source.currentSchema}.T_${prefix.group1}",
+		   "comment":"Column ${column.shortName} ending with '_FK', should it be declared as a foreign key to T_${prefix.group1} ?"   
 		 },		         
 		 { "label":"FK?",
+		   "labelDisplay":"🤔FK?",
+		   "labelComment":"Candidate foreign keys, that may have been forgotten",
 		   "type":"warning",
 		   "rule": "column.fullName LIKE '.*_FK' AND NOT LABELLED 'FK' AND NOT LABELLED 'FK??'",
-		   "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a Foreign Key ?"   
+		   "comment":"Column name ${column.shortName} ending with '_FK', should it be declared as a foreign key ?"   
 		 },		         
-		 { "label":"I?", // TODO cette r�gle est peut-�tre un peu trop stricte
+		 { "label":"I?", 
+		   "labelDisplay":"🤔I?", 
+		   "labelComment":"Foreign keys that are not indexed (ref tables excluded)",
 		   "type":"warning",
-		   "rule": "column.fullName IN foreignKeys.columns AND NOT LABELLED 'I'",
-		   "comment":"${column.shortName} is declared as a Foreign Key, but without any index. If the target table is deleted/updated often, an index should be created for this column."
+		   "rule": "fk:(column.fullName IN foreignKeys.columns) AND NOT column.fullName IN indexes.columns AND NOT fk.constraint.fkTable like 'T_REF_.*'",
+		   "comment":"${column.shortName} is declared as a Foreign Key on ${fk.constraint.fkTable}, but without any index. If the target table is deleted/updated often, an index should be created for this column."   
 		 }
 	]
 }
