@@ -4,7 +4,7 @@
 
 Mitsi is a very simple web application to explore a relational database. It works for Oracle, PostgreSQL, H2 and MySQL/MariaDB, and can be extended to other RDBMS.
 
-With it you may explore your physical data model easily. Unlike other tools, it is quick and cool (I swear).
+With it you may explore your physical data model easily. You can also define labels to find anomalies in your datamodel, and use layers to see differences between databases instantly.
 
 ## Basic functionalities
 
@@ -20,11 +20,11 @@ Watch this silent video to see this functionalities in action : [https://www.you
 
 ## How can I install it ?
 
-### prerequisites
+### Prerequisites
 
 Java (version >= 7) must be installed, and the **JAVA_HOME** environment variable must be set.
 
-### download
+### Download
 
 If you download it [there](https://github.com/jelebg/mitsi/releases/), you will have a tomcat pre-configured with the Mitsi war.
 Unzip the archive (.zip or .tar.gz).
