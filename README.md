@@ -11,7 +11,7 @@ With it you may explore your physical data model easily. You can also define lab
 * Instant search bar for tables, columns, indexes and constraints 
 * Graph navigation, and graph interactions to display table data and metadata 
 * Pathfinding using the relation graph
-* "Candidate FK" detection to find FK to create, or to display links between tables that is not defined as foreign key constraint
+* "Candidate FK" detection to find FK to create, or to display links between tables that are not defined as foreign key constraint
 * Layers to display differences between database schemas
 
 Watch this silent video to see this functionalities in action : [https://www.youtube.com/watch?v=VqIGvtIy5l0](https://www.youtube.com/watch?v=VqIGvtIy5l0)
@@ -74,14 +74,7 @@ This file is used to configure user management. There is three section in it :
 
 #### conf/mitsi-rules.json
 
-* **label** name of the label
-* **labelDisplay** (optional) : name to display, when it is neccessary to display a different name to the user
-* **labelComment** (optional) : comment to display when hovering the filters
-* **rule** : the rule to define if the label is to be applied to the table or to the column or not. More details are available on the wiki here : [https://github.com/jelebg/mitsi/wiki](https://github.com/jelebg/mitsi/wiki)
-* **comment** : the comment to display along with the column or the table. May contain variables using ${...}
-* **type** : normal, warning or diff. Diff labels are displayed only in layers
-* **scope** : column or table
-* **candidateFkToTable** (optional) : used for candidate FK detection. Gives the name of the target table of the candidate FK. May contain variables using ${...}
+Mitsi is packaged with default rules. You may keep this file as it is, but if you want to adapt it to your databases, you will find more details in the wiki : https://github.com/jelebg/mitsi/wiki/mitsi-rules-configuration-guide
 
 ### URL
 
