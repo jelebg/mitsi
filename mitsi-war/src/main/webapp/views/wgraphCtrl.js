@@ -2,16 +2,13 @@ angular.module('mitsiApp')
     .controller('wgraphOptionsCtrl', function($scope, $rootScope, $modalInstance, options) {
     	$scope.alwaysDisplaySchema = options.alwaysDisplaySchema;
     	$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
-    	
-    	$scope.init = function(options) { // TODO : never called ??
-    		$scope.alwaysDisplaySchema    = options.alwaysDisplaySchema;
-    		$scope.sqlGeneratedWithSchema = options.sqlGeneratedWithSchema;
-    	}
-    	
+    	$scope.alwaysDisplaysLinkLabels = options.alwaysDisplaysLinkLabels;
+
         $scope.closeAndSaveOptionsDialog = function() {
         	$modalInstance.close( {
-        		alwaysDisplaySchema    : $scope.alwaysDisplaySchema,
-        		sqlGeneratedWithSchema : $scope.sqlGeneratedWithSchema
+        		"alwaysDisplaySchema"      : $scope.alwaysDisplaySchema,
+        		"sqlGeneratedWithSchema"   : $scope.sqlGeneratedWithSchema,
+        		"alwaysDisplaysLinkLabels" : $scope.alwaysDisplaysLinkLabels
         	});
         }
         
@@ -87,8 +84,9 @@ angular.module('mitsiApp')
 	}
 
 	$scope.options = {
-		alwaysDisplaySchema : false,
-		sqlGeneratedWithSchema : false
+		alwaysDisplaySchema      : false,
+		sqlGeneratedWithSchema   : false,
+		alwaysDisplaysLinkLabels : false
 	}
 	
 	$scope.pathStart = "";
@@ -908,15 +906,34 @@ angular.module('mitsiApp')
 			});
 		}
 		if(connection) {
-			$scope.displayAllLabelsOnConnection(connection, false);
+			$scope.displayAllLabelsOnConnection(connection, $scope.options.alwaysDisplaysLinkLabels);
 	
 			connection.bind("mouseover", function(conn) {
-				$scope.displayAllLabelsOnConnection(conn, true);
+			    if (!$scope.options.alwaysDisplaysLinkLabels) {
+				    $scope.displayAllLabelsOnConnection(conn, true);
+				}
 			});
 			connection.bind("mouseout", function(conn) {
-				$scope.displayAllLabelsOnConnection(conn, false);
+			    if (!$scope.options.alwaysDisplaysLinkLabels) {
+    				$scope.displayAllLabelsOnConnection(conn, false);
+    			}
 			});
 		}
+	}
+
+	$scope.resetAllLabelDisplay = function() {
+        var connectionList = $scope.jsplumb.getConnections();
+        if(!connectionList) {
+            return;
+        }
+        for(const key in connectionList) {
+            if(!connectionList.hasOwnProperty(key)) {
+                continue;
+            }
+
+            const connection = connectionList[key];
+			$scope.displayAllLabelsOnConnection(connection, $scope.options.alwaysDisplaysLinkLabels);
+        }
 	}
 	
 	$scope.displayAllLabelsOnConnection = function(connection, display) {
@@ -1630,6 +1647,7 @@ angular.module('mitsiApp')
 		modalInstance.result.then(function (options) {
 		      $scope.options = options;
 			  $scope.updateSQLText();
+			  $scope.resetAllLabelDisplay();
 		    }, function () {
 		      // nothing
 		    });

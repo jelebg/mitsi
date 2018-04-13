@@ -8,7 +8,7 @@
                class="mitsiCheckOption"
 			   ng-class="{'mitsi-grey':!alwaysDisplaySchema}" >
 				<i class="glyphicon glyphicon-ok" ></i>
-				always display schema name with tables in graphs
+				Always display schema name with tables in graphs
 			</a>
 			<br/>
 			<br/>
@@ -17,8 +17,17 @@
                class="mitsiCheckOption"
 			   ng-class="{'mitsi-grey':!sqlGeneratedWithSchema}" >
 				<i class="glyphicon glyphicon-ok" ></i>
-				always insert schemas along with tables in SQL
+				Always insert schemas along with tables in SQL
 			</a>
+            <br/>
+            <br/>
+            <a href=""
+               ng-click="alwaysDisplaysLinkLabels=!alwaysDisplaysLinkLabels; $event.stopPropagation();"
+               class="mitsiCheckOption"
+               ng-class="{'mitsi-grey':!alwaysDisplaysLinkLabels}" >
+                <i class="glyphicon glyphicon-ok" ></i>
+                Always display links labels
+            </a>
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="closeAndSaveOptionsDialog()">OK</button>
