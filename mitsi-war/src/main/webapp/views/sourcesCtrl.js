@@ -203,6 +203,26 @@ angular.module('mitsiApp')
 		  source.schemas = response.data.schemas;
 		  source.dbProvider = response.data.provider;
 		  source.currentSchemaName = response.data.currentSchemaName;
+
+          $scope.cleanupSource(source);
+	}
+
+	$scope.cleanupSource = function(source) {
+		  // cleanup : remove columns without a name
+		  for (let i = 0; i < source.objects.length; i++) {
+		     let o = source.objects[i];
+
+		     let j = 0;
+		     while(j < o.columns.length) {
+		        let c = o.columns[j];
+		        if (!c.name) {
+		            o.columns.splice(j, 1);
+		        }
+		        else {
+		            j ++;
+		        }
+		     }
+		  }
 	}
 	
 	$scope.initSource = function(source, response) {
@@ -581,6 +601,9 @@ angular.module('mitsiApp')
 	}
 
 	$scope.getLabelsTypes = function(labelsContext) {
+	    if (!labelsContext) {
+	        return [];
+	    }
 	    return Object.keys(labelsContext.labelsStringByType);
 	}
 
@@ -600,6 +623,9 @@ angular.module('mitsiApp')
 	}
 	
 	$scope.getLabels = function(labelsContext, labelType) {
+	    if (!labelsContext) {
+	        return [];
+	    }
 		return labelsContext.labelsStringByType[labelType];
 	}
 	

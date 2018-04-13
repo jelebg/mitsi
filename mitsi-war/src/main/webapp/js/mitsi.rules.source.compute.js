@@ -261,7 +261,7 @@ function computeColumnLabels(source, rules, returnVariables, altObjects) {
 
         let labelsWorkingContext = initLabelsWorkingContext();
 
-        computeRulesForSource(rules, variables, labelsWorkingContext, "table");
+        computeRulesForSource(rules, variables, labelsWorkingContext, "table", source.currentSchemaName+"."+obj.id.name);
 
         obj.labelsContext = getLabelsContext(labelsWorkingContext);
         updateLabelsCount(obj.labelsContext.labels, obj.columnsLabels, labelsFilters);
@@ -289,7 +289,7 @@ function computeColumnLabels(source, rules, returnVariables, altObjects) {
                 return variables;
             }
 
-            computeRulesForSource(rules, variables, labelsWorkingContext, "column");
+            computeRulesForSource(rules, variables, labelsWorkingContext, "column", source.currentSchemaName+"."+obj.id.name+"."+column.name);
 
             column.labelsContext = getLabelsContext(labelsWorkingContext);
             updateLabelsCount(column.labelsContext.labels, obj.columnsLabels, labelsFilters);
@@ -297,7 +297,7 @@ function computeColumnLabels(source, rules, returnVariables, altObjects) {
     }
 }
 
-function computeRulesForSource(rules, variables, labelsWorkingContext, scope) {
+function computeRulesForSource(rules, variables, labelsWorkingContext, scope, debugObjectName) {
     let labels = labelsWorkingContext.labels;
     let labelsComments = labelsWorkingContext.labelsComments;
     let candidateFks = labelsWorkingContext.candidateFks;
@@ -320,8 +320,16 @@ function computeRulesForSource(rules, variables, labelsWorkingContext, scope) {
 
         variables.customArrays = {};
         variables.customVariables = {};
-        let result = ruleCompute(parsedRule, variables, labels);
-        if(result) {
+
+        let result = null;
+		try {
+			result = ruleCompute(parsedRule, variables, labels);
+		}
+		catch (e) {
+			console.log("error while computing rule '" + rule.rule + "' for object '"+debugObjectName+"'");
+		}
+
+		if(result) {
             let ruleType = getRuleType(rule);
             let byType = labels[ruleType];
             if (!byType) {
