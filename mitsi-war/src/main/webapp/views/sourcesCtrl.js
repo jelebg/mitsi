@@ -205,6 +205,39 @@ angular.module('mitsiApp')
 		  source.currentSchemaName = response.data.currentSchemaName;
 
           $scope.cleanupSource(source);
+          $scope.computeFKTo(source)
+	}
+
+	$scope.computeFKTo = function(source) {
+		  // FK names pointing to each table will be used in the filters
+          let constraintsByObjectName = {};
+
+		  for (let i = 0; i < source.objects.length; i++) {
+		     let o = source.objects[i];
+
+		     for (let j=0; j!=o.constraints.length; j++) {
+		        let c = o.constraints[j];
+		        if (c.type != 'R') {
+                    continue;
+                }
+
+    		    let targetTableName = c.fkConstraintOwner + "." + c.fkTable;
+
+    		    let entry = constraintsByObjectName[targetTableName];
+    		    if (!entry) {
+    		        entry = [];
+    		    }
+    		    entry.push(c.name);
+    		    constraintsByObjectName[targetTableName] = entry;
+		     }
+		  }
+
+		  for (let i = 0; i < source.objects.length; i++) {
+		     let o = source.objects[i];
+
+		     let entry = constraintsByObjectName[o.id.schema+"."+o.id.name];
+             o.fkToConstraintNames = entry ? entry : [];
+		  }
 	}
 
 	$scope.cleanupSource = function(source) {
@@ -237,6 +270,7 @@ angular.module('mitsiApp')
 				  columnName:true,
 				  indexName:true,
 				  constraintName:true,
+				  fkToConstraintName:true,
 				  exclusion:"^(.*\\$|SYS_)"
 		  };
 
@@ -387,6 +421,15 @@ angular.module('mitsiApp')
 				}
 			}
 		}
+
+		if(object.fkToConstraintNames && source.filter.fkToConstraintName!== false) {
+			for(let i=0; i!=object.fkToConstraintNames.length; i++) {
+				const fkName=object.fkToConstraintNames[i];
+				if(fkName.toLowerCase().indexOf( filter ) !== -1) {
+					return false;
+				}
+			}
+	    }
 		
 		return true;
 

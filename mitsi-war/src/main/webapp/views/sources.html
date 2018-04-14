@@ -149,6 +149,10 @@
 				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.constraintName}"></i>
 				        	filter constraints names
 				        </a></li>
+				        <li ><a href="" ng-click="s.filter.fkToConstraintName=!s.filter.fkToConstraintName; $event.stopPropagation();">
+				        	<i class="glyphicon glyphicon-ok" ng-class="{'mitsi-grey':!s.filter.fkToConstraintName}"></i>
+				        	filter FK constraints names to this table
+				        </a></li>
 				        <li>
 				          <table><tr><td>excl.&nbsp</td><td> 
 				        	<input type="text" 
