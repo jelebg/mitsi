@@ -68,7 +68,7 @@
 		end	secondary_type,
     all_tab_columns.column_name column_name,
     all_tab_columns.data_type column_type,
-    all_tab_columns.data_length column_length,
+    case when all_tab_columns.data_type in ('BLOB', 'CLOB', 'LONG', 'LONG RAW', 'NCLOB', 'RAW') then 0 else all_tab_columns.data_length end column_length,
     all_tab_columns.data_precision column_precision,
     all_tab_columns.data_scale column_scale,
     <!-- all_tab_columns.data_default column_default_value,
