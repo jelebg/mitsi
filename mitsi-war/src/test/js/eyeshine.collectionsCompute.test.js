@@ -407,7 +407,8 @@ describe("eyeshine collections computation", function() {
         "primaryKeys",
         "uniqueConstraints",
         "indexes",
-        "tables"
+        "tables",
+        "columns"
     ] );
 
     // collections in collections lists
@@ -421,7 +422,8 @@ describe("eyeshine collections computation", function() {
     ]);
 
     expect(Object.keys(collections.uniqueConstraints)).toEqual( [
-        "columns"
+        "columns",
+        "columnsByShortName"
     ]);
 
     expect(Object.keys(collections.indexes)).toEqual( [
@@ -438,6 +440,55 @@ describe("eyeshine collections computation", function() {
         "byShortName",
         "byFullName"
     ]);
+
+    expect(Object.keys(collections.columns)).toEqual( [
+        "byShortName",
+        "byFullName"
+    ]);
+
+    expect(collections.columns.byShortName.ID.length).toBe(6);
+    expect(collections.columns.byShortName.ID[0]).toEqual({
+        "name": "ID",
+        "type": "4",
+        "length": 0,
+        "description": ""
+    });
+
+    expect(collections.columns.byFullName["GALAXY.ID"].length).toBe(1);
+    expect(collections.columns.byFullName["GALAXY.ID"][0]).toEqual({
+        "name": "ID",
+        "type": "4",
+        "length": 0,
+        "description": ""
+    });
+
+    expect(collections.uniqueConstraints.columns["PUBLIC.GALAXY.ID"].length).toBe(1);
+    expect(collections.uniqueConstraints.columns["PUBLIC.GALAXY.ID"][0]).toEqual({
+       "index": {
+         "owner": "PUBLIC",
+         "tableName": "GALAXY",
+         "name": "PRIMARY_KEY_7",
+         "type": "3",
+         "uniqueness": "t",
+         "columns": "ID"
+       },
+       "position": 1,
+       "columnsDefinition": "ID"
+     });
+
+    expect(collections.uniqueConstraints.columnsByShortName["ID"].length).toBe(6);
+    expect(collections.uniqueConstraints.columnsByShortName["ID"][0]).toEqual({
+       "index": {
+         "owner": "PUBLIC",
+         "tableName": "GALAXY",
+         "name": "PRIMARY_KEY_7",
+         "type": "3",
+         "uniqueness": "t",
+         "columns": "ID"
+       },
+       "position": 1,
+       "columnsDefinition": "ID"
+     });
 
     // foreign keys column collection
 

@@ -22,11 +22,14 @@ function computeColumnCollections(source, collections) {
     // TODO : gérer la case-insensitivity en ne stockant que des majuscules ?
     let fkColumnNames = {};
     let pkColumnNames = {};
-    let ukColumnNames = {};
+    let ukColumnFullNames = {};
+    let ukColumnShortNames = {};
     let indexedColumnNames = {};
     let indexedColumnsDefinitions = {};
     let tablesByShortName  = {};
     let tablesByFullName   = {};
+    let columnsByShortName  = {};
+    let columnsByFullName   = {};
     collections["foreignKeys"] = {
             "columns" : fkColumnNames
     }
@@ -34,7 +37,8 @@ function computeColumnCollections(source, collections) {
             "columns" : pkColumnNames
     }
     collections["uniqueConstraints"] = {
-            "columns" : ukColumnNames
+            "columns" : ukColumnFullNames,
+            "columnsByShortName" : ukColumnShortNames
     }
     collections["indexes"] = {
             "columns" : indexedColumnNames,
@@ -43,6 +47,10 @@ function computeColumnCollections(source, collections) {
     collections["tables"] = {
             "byShortName" : tablesByShortName,
             "byFullName"  : tablesByFullName
+    }
+    collections["columns"] = {
+            "byShortName" : columnsByShortName,
+            "byFullName"  : columnsByFullName
     }
 
     for(let iObj=0; iObj!=source.objects.length; iObj++) {
@@ -57,6 +65,25 @@ function computeColumnCollections(source, collections) {
 
         if(!obj.columns) {
             continue;
+        }
+
+        for(let i=0; i!=obj.columns.length; i++) {
+            let column = obj.columns[i];
+            let columnFullName = obj.id.name+"."+column.name;
+
+            let columnsByShortNameCurrent = columnsByShortName[column.name];
+            if (!columnsByShortNameCurrent) {
+                columnsByShortNameCurrent = [];
+                columnsByShortName[column.name] = columnsByShortNameCurrent;
+            }
+            columnsByShortNameCurrent.push(column);
+
+            let columnsByFullNameCurrent = columnsByFullName[columnFullName];
+            if (!columnsByFullNameCurrent) {
+                columnsByFullNameCurrent = [];
+                columnsByFullName[columnFullName] = columnsByFullNameCurrent;
+            }
+            columnsByFullNameCurrent.push(column);
         }
 
         if(obj.indexes) {
@@ -90,12 +117,20 @@ function computeColumnCollections(source, collections) {
                     current.push(indexCollectionEntry);
 
                     if (index.uniqueness == 't') {
-                        let ukCurrent = ukColumnNames[columnFullName];
-                        if (!ukCurrent) {
-                            ukCurrent = [];
-                            ukColumnNames[columnFullName] = ukCurrent;
+                        let ukCurrentFull = ukColumnFullNames[columnFullName];
+                        if (!ukCurrentFull) {
+                            ukCurrentFull = [];
+                            ukColumnFullNames[columnFullName] = ukCurrentFull;
                         }
-                        ukCurrent.push(indexCollectionEntry);
+                        ukCurrentFull.push(indexCollectionEntry);
+
+
+                        let ukCurrentShort = ukColumnShortNames[columnName];
+                        if (!ukCurrentShort) {
+                            ukCurrentShort = [];
+                            ukColumnShortNames[columnName] = ukCurrentShort;
+                        }
+                        ukCurrentShort.push(indexCollectionEntry);
                     }
                 }
             }

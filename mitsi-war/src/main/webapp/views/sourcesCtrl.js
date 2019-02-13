@@ -252,6 +252,8 @@ angular.module('mitsiApp')
 		            o.columns.splice(j, 1);
 		        }
 		        else {
+		            c.tableName = o.id.name;
+
 		            j ++;
 		        }
 		     }

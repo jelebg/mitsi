@@ -241,7 +241,83 @@ describe("eyeshine rule computation", function() {
                   "columnsDefinition": "ID"
                 }
               ]
-            }
+            },
+            "columnsByShortName": {
+                          "ID": [
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "GALAXY",
+                                "name": "PRIMARY_KEY_7",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            },
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "PLANET",
+                                "name": "PRIMARY_KEY_8",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            },
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "PLANET_TYPE",
+                                "name": "PRIMARY_KEY_3",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            },
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "SATELLITE",
+                                "name": "PRIMARY_KEY_4",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            },
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "SPECTRAL_TYPE",
+                                "name": "PRIMARY_KEY_A",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            },
+                            {
+                              "index": {
+                                "owner": "PUBLIC",
+                                "tableName": "STAR",
+                                "name": "PRIMARY_KEY_2",
+                                "type": "3",
+                                "uniqueness": "t",
+                                "columns": "ID"
+                              },
+                              "position": 1,
+                              "columnsDefinition": "ID"
+                            }
+                          ]
+                        }
           },
           "indexes" : {
             "columns": {
@@ -938,5 +1014,21 @@ describe("eyeshine rule computation", function() {
         .toBe(true);
         expect(ruleCompute(peg.parse("mycapture.group1 == 'NET,NET'"), variables, {"normal": [], "warning": []}))
         .toBe(true);
+    });
+
+    it("find UK with same column name", function() {
+        // pour faire plaisir à Romain ;)
+
+        let parsedRule1 = peg.parse("myvar:(column.shortName in uniqueConstraints.columnsByShortName)");
+
+        // initializes myvar.index.name
+        let v1 = getVariablesForColumn("PLANET_TYPE_FK");
+        expect(ruleCompute(parsedRule1, v1, {"normal": [], "warning": []}))
+        .toBe(false);
+        let v2 = getVariablesForColumn("ID");
+        expect(ruleCompute(parsedRule1, v2, {"normal": [], "warning": []}))
+        .toBe(true);
+        console.log(v2.customArrays.myvar[0]);
+
     });
 });
