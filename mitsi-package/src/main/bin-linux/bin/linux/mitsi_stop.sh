@@ -11,5 +11,5 @@ fi
 
 echo MITSI_HOME=$MITSI_HOME
 
-export CATALINA_HOME=$MITSI_HOME/apache-tomcat-8.0.20
+export CATALINA_HOME=$MITSI_HOME/apache-tomcat-${tomcat.version}
 $CATALINA_HOME/bin/shutdown.sh

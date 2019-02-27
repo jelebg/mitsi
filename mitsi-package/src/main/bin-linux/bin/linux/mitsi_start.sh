@@ -12,7 +12,7 @@ fi
 
 echo MITSI_HOME=$MITSI_HOME
 
-export CATALINA_HOME=$MITSI_HOME/apache-tomcat-8.0.20
+export CATALINA_HOME=$MITSI_HOME/apache-tomcat-${tomcat.version}
 $CATALINA_HOME/bin/startup.sh
 
 echo if you use the default configuration, try connecting to http://$(hostname):9035/mitsi

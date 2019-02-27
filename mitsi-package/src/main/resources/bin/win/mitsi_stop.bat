@@ -9,5 +9,5 @@ IF defined MITSI_HOME goto :mitsi_stop
 :mitsi_stop
 echo MITSI_HOME=%MITSI_HOME%
 
-set CATALINA_HOME=%p%\apache-tomcat-8.0.20
+set CATALINA_HOME=%p%\apache-tomcat-${tomcat.version}
 %CATALINA_HOME%\bin\shutdown.sh
