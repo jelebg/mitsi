@@ -25,7 +25,7 @@
 		<dependency>
 		    <groupId>com.mchange</groupId>
 		    <artifactId>c3p0</artifactId>
-		    <version>0.9.5.2-mitsi</version>
+		    <version>0.9.5.4</version>
 		</dependency>
 		<dependency><!-- TODO : dependency necessary just because I manually packaged c3p0 ... -->
 	        <groupId>com.mchange</groupId>
