@@ -45,10 +45,13 @@ public class TypeHelper {
 		case Types.NUMERIC :
 		case Types.INTEGER:
 			return TYPE_INTEGER;
-		
-		case Types.NCHAR :
+
+		case Types.CHAR :
 		case Types.VARCHAR :
 		case Types.LONGVARCHAR :
+		case Types.NCHAR :
+		case Types.NVARCHAR :
+		case Types.LONGNVARCHAR :
 		default :
 			return TYPE_STRING;
 		}
@@ -119,9 +122,11 @@ public class TypeHelper {
 
 		case Types.LONGVARCHAR :
 			return getStringAsStream(rs, column);
-			
+
+		case Types.CHAR :
 		case Types.NCHAR :
 		case Types.VARCHAR :
+		case Types.NVARCHAR :
 			if(rs.getObject(column) == null) {
 				return null;
 			}
