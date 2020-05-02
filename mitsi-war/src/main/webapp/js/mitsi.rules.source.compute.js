@@ -383,18 +383,21 @@ function computeRulesForSource(rules, variables, labelsWorkingContext, scope, de
                 labelsComments.push(comment);
             }
 
-            let candidateFkElement = null;
             if(rule.candidateFkToTableParts) {
-                let candidateFk = computeVariableString(rule.candidateFkToTableParts, variables);
-                candidateFkElement = {
-                    "targetTableName" : candidateFk,
-                }
-                candidateFks.push(candidateFkElement);
+                let candidateFkArray = computeVariableString(rule.candidateFkToTableParts, variables, true);
+                for (let iCfk = 0; iCfk < 1 /*candidateFkArray.length*/; iCfk++) {
+                   let candidateFk = candidateFkArray[iCfk];
+                   let candidateFkElement = null;
+                   candidateFkElement = {
+                        "targetTableName" : candidateFk,
+                   }
+                   candidateFks.push(candidateFkElement);
+                   if (candidateFkElement && comment) {
+                        candidateFkElement["comment"] = comment;
+                   }
+              }
             }
 
-            if (candidateFkElement && comment) {
-                candidateFkElement["comment"] = comment;
-            }
         }
     }
 }
